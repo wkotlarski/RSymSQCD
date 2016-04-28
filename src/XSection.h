@@ -7,6 +7,7 @@
 #ifndef XSECTION_H_
 #define XSECTION_H_
 
+#include <array>
 #include "LHAPDF/LHAPDF.h"
 
 class XSection {
@@ -23,7 +24,7 @@ class XSection {
     double sgluon_mass;
     std::array<double, 2> sgluons_width {{ 0., 0.}};
     double top_quark_mass = 173.21;
-    const LHAPDF::PDF* pdf;
+    const LHAPDF::PDF* pdf = LHAPDF::mkPDF("MMHT2014nlo68cl", 0);
   public:
     XSection();
     virtual ~XSection();

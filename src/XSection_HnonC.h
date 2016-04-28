@@ -7,7 +7,9 @@
 #ifndef XSECTION_HNONC_H_
 #define XSECTION_HNONC_H_
 
+#include <iostream>
 #include "XSection.h"
+#include "LHAPDF/LHAPDF.h"
 
 class XSection_HnonC : public virtual XSection {
   private:

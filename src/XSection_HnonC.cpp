@@ -22,4 +22,7 @@ XSection_HnonC::~XSection_HnonC() {
 
 void XSection_HnonC::show_settings() {
   std::cout << S_sqrt << std::endl;
+        double x1 = 0.1;
+        double m = 1000;
+        std::cout << pdf->xfxQ(21, x1, m)/x1 << std::endl;
 }
