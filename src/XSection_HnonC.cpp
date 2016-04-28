@@ -26,3 +26,10 @@ void XSection_HnonC::show_settings() {
         double m = 1000;
         std::cout << pdf->xfxQ(21, x1, m)/x1 << std::endl;
 }
+
+
+int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
+              const int *ncomp, cubareal ff[], void *userdata) {
+    
+    return 1;
+}

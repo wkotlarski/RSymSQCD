@@ -1,14 +1,9 @@
-/*
- * XSection.h
- *
- *  Created on: 27 kwi 2016
- */
-
 #ifndef XSECTION_H_
 #define XSECTION_H_
 
 #include <array>
 #include "LHAPDF/LHAPDF.h"
+#include "include/cuba.h"
 
 class XSection {
   protected:

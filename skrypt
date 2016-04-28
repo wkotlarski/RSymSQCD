@@ -1,6 +1,6 @@
 #!/bin/bash
 
-/opt/local/bin/g++-mp-4.9 -std=c++1y -I./src -I/Users/Navir/Fizyka/Programy/LHAPDF-6.1.6/include -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/XSection_HnonC.d" -MT"./src/XSection_HnonC.o" -o "./src/XSection_HnonC.o" "./src/XSection_HnonC.cpp"
-/opt/local/bin/g++-mp-4.9 -std=c++1y -I./src  -I/Users/Navir/Fizyka/Programy/LHAPDF-6.1.6/include -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/main.d" -MT"./src/main.o" -o "./src/main.o" "./src/main.cpp"
-/opt/local/bin/g++-mp-4.9 -std=c++1y -I./src -I/Users/Navir/Fizyka/Programy/LHAPDF-6.1.6/include -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/XSection.d" -MT"./src/XSection.o" -o "./src/XSection.o" "./src/XSection.cpp"
-/opt/local/bin/g++-mp-4.9 -L/opt/local/lib -L/Users/Navir/Fizyka/Programy/LHAPDF-6.1.6/lib -lLHAPDF -o "RSymSQCD" ./src/main.o ./src/XSection.o ./src/XSection_HnonC.o
+/opt/local/bin/g++-mp-4.9 -std=c++1y -I/Users/Navir/Fizyka/Programy/Cuba-4.2 -I./src -I/Users/Navir/Fizyka/Programy/LHAPDF-6.1.6/include -I/Users/Navir/Fizyka/Programy/rc/include -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/XSection_HnonC.d" -MT"./src/XSection_HnonC.o" -o "./src/XSection_HnonC.o" "./src/XSection_HnonC.cpp"
+/opt/local/bin/g++-mp-4.9 -std=c++1y -I/Users/Navir/Fizyka/Programy/Cuba-4.2 -I./src  -I/Users/Navir/Fizyka/Programy/LHAPDF-6.1.6/include -I/Users/Navir/Fizyka/Programy/rc/include -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/main.d" -MT"./src/main.o" -o "./src/main.o" "./src/main.cpp"
+/opt/local/bin/g++-mp-4.9 -std=c++1y -I/Users/Navir/Fizyka/Programy/Cuba-4.2 -I./src -I/Users/Navir/Fizyka/Programy/LHAPDF-6.1.6/include -I/Users/Navir/Fizyka/Programy/rc/include -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/XSection.d" -MT"./src/XSection.o" -o "./src/XSection.o" "./src/XSection.cpp"
+/opt/local/bin/g++-mp-4.9 -L/opt/local/lib -L/Users/Navir/Fizyka/Programy/LHAPDF-6.1.6/lib -L/Users/Navir/Fizyka/Programy/Cuba-4.2/lib -L/Users/Navir/Fizyka/Programy/rc/lib -I/Users/Navir/Fizyka/Programy/rc/include -lLHAPDF -lcuba -lrk -o "RSymSQCD" ./src/main.o ./src/XSection.o ./src/XSection_HnonC.o
