@@ -7,7 +7,8 @@
 
 class XSection {
   protected:
-    double S_sqrt = 13000;
+    const double S_sqrt = 13000;
+    const double S = pow( S_sqrt, 2);
     double gluino_width = 0;
     double gluino_mass = 1000;
     //
@@ -21,8 +22,7 @@ class XSection {
     double top_quark_mass = 173.21;
     const LHAPDF::PDF* pdf = LHAPDF::mkPDF("MMHT2014nlo68cl", 0);
   public:
-    XSection();
-    virtual ~XSection();
+    virtual double integrate() = 0;
 };
 
 #endif /* XSECTION_H_ */

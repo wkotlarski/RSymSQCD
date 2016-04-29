@@ -12,12 +12,13 @@
 
 class XSection_HnonC : public virtual XSection {
   private:
-    static int integrand(const int *ndim, const cubareal xx[],
+   static int integrand(const int *ndim, const cubareal xx[],
               const int *ncomp, cubareal ff[], void *userdata);
 
   public:
     XSection_HnonC();
     virtual ~XSection_HnonC();
+    double integrate();
     void show_settings();
 };
 
