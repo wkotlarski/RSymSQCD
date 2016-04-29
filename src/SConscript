@@ -1,0 +1,17 @@
+env = Environment(
+#need to set compiler used for LHAPDF
+CXX = '/opt/local/bin/g++-mp-4.9',
+ CPPPATH = [ '/Users/Navir/Fizyka/Programy/LHAPDF-6.1.6/include', '/opt/local/include',
+                  '/Users/Navir/Fizyka/Programy/Cuba-4.2', '/Users/Navir/Fizyka/Programy/rc/include'], 
+                  LIBS = ['LHAPDF', 'cuba', 'rk'],
+                  LIBPATH = ['/Users/Navir/Fizyka/Programy/LHAPDF-6.1.6/lib', '/Users/Navir/Fizyka/Programy/Cuba-4.2/lib', 
+                  '/Users/Navir/Fizyka/Programy/rc/lib', '/opt/local/lib'],
+                   CXXFLAGS = '-std=c++11')
+env.Program(  'RSymSQCD', 
+              [Glob('*.cpp')], 
+              LIBS = ['LHAPDF', 'cuba', 'rk'],
+              LIBPATH = [ '/Users/Navir/Fizyka/Programy/LHAPDF-6.1.6/lib', 
+                          '/Users/Navir/Fizyka/Programy/Cuba-4.2/lib', 
+                          '/Users/Navir/Fizyka/Programy/rc/lib'
+                        ] 
+           )
