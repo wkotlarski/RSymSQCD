@@ -1,0 +1,27 @@
+/*
+ * mathematical_constants.hpp
+ *
+ *  Created on: 6 mar 2016
+ *      Author: Navir
+ */
+
+#ifndef CONSTANTS_HPP_
+#define CONSTANTS_HPP_
+
+#include <boost/math/constants/constants.hpp>
+
+// mathematical constants
+
+// http://www.boost.org/doc/libs/1_60_0/libs/math/doc/html/math_toolkit/constants.html
+using boost::math::double_constants::pi;
+using boost::math::double_constants::pi_sqr;
+using boost::math::double_constants::pi_cubed;
+using boost::math::double_constants::two_pi;
+using boost::math::double_constants::euler;
+using boost::math::double_constants::e;
+
+// physics
+
+constexpr double to_fb = 3.89379e+11;
+
+#endif /* CONSTANTS_HPP_ */

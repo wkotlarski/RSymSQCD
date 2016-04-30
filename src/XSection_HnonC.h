@@ -4,7 +4,8 @@
 #include <iostream>
 #include "XSection.h"
 
-#include "LHAPDF/LHAPDF.h"
+#include "constants.hpp"
+
 
 //  
 #include "rk/rk.hh"

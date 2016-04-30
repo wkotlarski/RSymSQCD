@@ -5,22 +5,36 @@
 #include "LHAPDF/LHAPDF.h"
 #include "include/cuba.h"
 
+#include "mathematica_wrapper.hpp"
+
 class XSection {
   protected:
-    const double S_sqrt = 13000;
-    const double S = pow( S_sqrt, 2);
-    double gluino_width = 0;
-    double gluino_mass = 1000;
+    static constexpr double S_sqrt = 13000;
+    static constexpr double S = pow( S_sqrt, 2);
+    static constexpr double gluino_width = 0;
+    static constexpr double gluino_mass = 1000;
     //
-    std::array<double, 12> squark_mass {
-      {1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500}};
-    std::array< std::array<double, 2>, 6 > squark_width {{
-      {{0., 0.}}, {{0., 0.}}, {{0., 0.}}, {{0., 0.}}, {{0., 0.}}, {{0., 0.}}
+    static constexpr std::array< std::array<double, 2>, 6 > squark_mass {{
+          {{1500, 1500}},
+          {{1500, 1500}},
+          {{1500, 1500}},
+          {{1500, 1500}},
+          {{1500, 1500}},
+          {{1500, 1500}}
+        }};
+    static constexpr std::array< std::array<double, 2>, 6 > squark_width {{
+      {{0., 0.}},
+      {{0., 0.}},
+      {{0., 0.}},
+      {{0., 0.}},
+      {{0., 0.}},
+      {{0., 0.}}
     }};
-    double sgluon_mass;
-    std::array<double, 2> sgluons_width {{ 0., 0.}};
-    double top_quark_mass = 173.21;
-    const LHAPDF::PDF* pdf = LHAPDF::mkPDF("MMHT2014nlo68cl", 0);
+    static constexpr double sgluon_mass = 1e+3;
+    static constexpr std::array<double, 2> sgluons_width {{ 0., 0.}};
+    // 5-flavor scheme (only massive top)
+    static constexpr double top_quark_mass = 173.21;
+    static const LHAPDF::PDF* pdf;
   public:
     virtual double integrate() = 0;
 };
