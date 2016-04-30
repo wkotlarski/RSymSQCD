@@ -22,6 +22,4 @@ class XSection_HnonC : public virtual XSection {
     void show_settings();
 };
 
-
-
 #endif /* XSECTION_HNONC_H_ */
