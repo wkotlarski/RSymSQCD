@@ -1,20 +1,32 @@
 #include "XSection_HnonC.h"
 
-XSection_HnonC::XSection_HnonC() {
+std::array<double, 3> XSection_HnonC::integrate() {
 
-  // TODO Auto-generated constructor stub
+  //
+  constexpr int ndim { 7 }, ncomp { 1 };
+  //
+  constexpr double accuracy_rel { 1e-3 }, accuracy_abs { 1e-12 };
 
-}
+  constexpr int neval_min = 0;
+  long long int neval;
+  constexpr long long int neval_max { 100000 }; //strtoll( "1e+3", NULL, 10 );
 
-XSection_HnonC::~XSection_HnonC() {
-  // TODO Auto-generated destructor stub
-}
+  // technical (Vegas specific) stuff
+  constexpr int nstart = 0;
+  constexpr int nincrease = 100;
+  constexpr int nbatch = 1000;
+  constexpr int gridno = 0;
+  const char* state_file = "";
 
-void XSection_HnonC::show_settings() {
-  std::cout << S_sqrt << std::endl;
-        double x1 = 0.1;
-//        double m = 1000;
-        //std::cout << pdf->xfxQ(21, x1, m)/x1 << std::endl;
+  int nregions, fail;
+  cubareal integral[ncomp], error[ncomp], prob[ncomp];
+  llVegas( ndim, ncomp, integrand, NULL, 1,
+           accuracy_rel, accuracy_abs, 8 | 1, 0,
+           0, 1000, 100, nincrease, nbatch,
+           gridno, state_file, NULL,
+           &neval, &fail, integral, error, prob );
+  std::array <double, 3> result_finite { integral[0], error[0], prob[0] };
+  return result_finite;
 }
 
 int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
@@ -22,8 +34,6 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
   double m = 1500;
   double m_sqr = m*m;
 
-  double dS = 0.001;
-  double dC = dS/50.;
   /*
    * 3-body phase space parametrization based on
    * http://www.t39.ph.tum.de/T39_files/T39_people_files/duell_files/Dipl-MultiPion.pdf
@@ -49,7 +59,6 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 	double shat = x1 * x2 * S;
 	double shat_sqrt = sqrt( shat );
 
-	//double x = exp(1 + gsl_sf_lambert_Wm1( - xx[0] /e ) );
 	double Ej_max = shat_sqrt/2 - 2 * m_sqr/shat_sqrt;
 	if ( Ej_max < dS * shat_sqrt/2) {
 	  ff[0] = 0;
@@ -206,8 +215,6 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 	      ((-1 + dS)*S*xx0*xx1*(-1 + xx2) -
 	        4*Power(m,2)*(-1 + xx0*xx1 + dS*(-1 + xx0*xx1)*(-1 + xx2) - xx0*xx1*xx2))));
 
-
-
   //if( isnan( temp * abs(jacobian) ) ) {
     //cout << "Result is NaN. Skipping phase space point." << endl;
   //  ff[0] = 0;
@@ -217,28 +224,4 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
   //}
 
 	return 0;
-}
-
-double XSection_HnonC::integrate() {
-  const int ndim = 7;
-  const int ncomp = 1;
-  constexpr double accuracy_rel = 1e-3;
-  constexpr double accuracy_abs = 1e-12;
-  constexpr int eval_min = 0;
-  constexpr int nstart = 0;
-  constexpr int nincrease = 100;
-  constexpr int nbatch = 1000;
-  constexpr int gridno = 0;
-  const char* state_file = "";
-
-  long long int eval_max = 1e+5;//strtoll( "1e+3", NULL, 10 );
-  long long int neval;
-  int nregions, fail;
-  cubareal integral[ncomp], error[ncomp], prob[ncomp];
-  llVegas(ndim, ncomp, integrand, NULL, 1,
-         accuracy_rel, accuracy_abs, 8 | 1, 0,
-         0, 1000, 100, nincrease, nbatch,
-         gridno, state_file, NULL,
-         &neval, &fail, integral, error, prob);
-  return (double)integral[0];
 }

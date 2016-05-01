@@ -11,10 +11,9 @@
 #include "XSection.h"
 
 class XSection_SC: public XSection {
+
   public:
-    XSection_SC();
-    virtual ~XSection_SC();
-    double integrate();
+    std::array<double, 3> integrate();
 };
 
 #endif /* SRC_XSECTION_SC_H_ */

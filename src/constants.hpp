@@ -1,10 +1,3 @@
-/*
- * mathematical_constants.hpp
- *
- *  Created on: 6 mar 2016
- *      Author: Navir
- */
-
 #ifndef CONSTANTS_HPP_
 #define CONSTANTS_HPP_
 
@@ -22,6 +15,6 @@ using boost::math::double_constants::e;
 
 // physics
 
-constexpr double to_fb = 3.89379e+11;
+constexpr double to_fb { 3.89379e+11 };
 
 #endif /* CONSTANTS_HPP_ */
