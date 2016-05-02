@@ -37,7 +37,8 @@ class XSection {
     static constexpr std::array<double, 2> sgluons_width {{ 0., 0.}};
     // 5-flavor scheme (only massive top)
     static constexpr double top_quark_mass = 173.21;
-    static const LHAPDF::PDF* pdf;
+    static const LHAPDF::PDF* pdf_lo;
+    static const LHAPDF::PDF* pdf_nlo;
     /*
      *  TODO: add random generation of phase space point which can be used to check
      *  IR finiteness

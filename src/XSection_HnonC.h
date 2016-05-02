@@ -5,7 +5,7 @@
 
 #include "constants.hpp"
 
-// neede to do Euler rotations
+// neede to do Euler rotation
 #include "rk/rk.hh"
 #include "rk/geom3.hh"
 

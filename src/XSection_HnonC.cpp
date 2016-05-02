@@ -2,17 +2,17 @@
 
 std::array<double, 3> XSection_HnonC::integrate() {
 
-  //
+  //  integral dimension, number of integrands
   constexpr int ndim { 7 }, ncomp { 1 };
-  //
+  //  accuraccy
   constexpr double accuracy_rel { 1e-3 }, accuracy_abs { 1e-12 };
 
   constexpr int neval_min = 0;
   long long int neval;
-  constexpr long long int neval_max { 100000 }; //strtoll( "1e+3", NULL, 10 );
+  constexpr long long int neval_max { 10000000 }; //strtoll( "1e+3", NULL, 10 );
 
   // technical (Vegas specific) stuff
-  constexpr int nstart = 0;
+  constexpr int nstart = 200000;
   constexpr int nincrease = 100;
   constexpr int nbatch = 1000;
   constexpr int gridno = 0;
@@ -22,15 +22,18 @@ std::array<double, 3> XSection_HnonC::integrate() {
   cubareal integral[ncomp], error[ncomp], prob[ncomp];
   llVegas( ndim, ncomp, integrand, NULL, 1,
            accuracy_rel, accuracy_abs, 8 | 1, 0,
-           0, 1000, 100, nincrease, nbatch,
+           neval_min, neval_max, 100, nincrease, nbatch,
            gridno, state_file, NULL,
            &neval, &fail, integral, error, prob );
-  std::array <double, 3> result_finite { integral[0], error[0], prob[0] };
+
+  std::array <double, 3> result_finite
+    { integral[0], error[0], prob[0] };
   return result_finite;
 }
 
 int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
   const int *ncomp, cubareal ff[], void *userdata) {
+  //std::cout << squark_mass[1][1] << std::endl;
   double m = 1500;
   double m_sqr = m*m;
 
@@ -191,7 +194,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
   // choose gg or qqbar initial state
   double temp2 = 0;
-  temp2 = pdf->xfxQ(21, x1, m)/x1 * pdf->xfxQ(21, x2, m)/x2;
+  temp2 = pdf_nlo->xfxQ(21, x1, m)/x1 * pdf_nlo->xfxQ(21, x2, m)/x2;
   for ( int flav = 1; flav < 6; ++flav ) {
     //temp2 += 2 * pdf->xfxQ(flav, x1, m)/x1 * pdf->xfxQ(-flav, x2, m)/x2;
   }
