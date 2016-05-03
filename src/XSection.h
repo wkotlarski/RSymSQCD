@@ -17,14 +17,7 @@ class XSection {
     static constexpr double gluino_width { 0 };
     static constexpr double gluino_mass { 1e+3 };
     //
-    static constexpr std::array< std::array<double, 2>, 6 > squark_mass {{
-          {{1500, 1500}},
-          {{1500, 1500}},
-          {{1500, 1500}},
-          {{1500, 1500}},
-          {{1500, 1500}},
-          {{1500, 1500}}
-    }};
+    static std::array< std::array<double, 2>, 6 > squark_mass;
     static constexpr std::array< std::array<double, 2>, 6 > squark_width {{
       {{0., 0.}},
       {{0., 0.}},

@@ -14,6 +14,14 @@ const LHAPDF::PDF* XSection::pdf_lo = LHAPDF::mkPDF("MMHT2014lo68cl", 0);
 const LHAPDF::PDF* XSection::pdf_nlo = LHAPDF::mkPDF("MMHT2014nlo68cl", 0);
 double XSection_HnonC::dS = 1e-3;
 double XSection_HnonC::dC = 1e-4;
+std::array< std::array<double, 2>, 6 > XSection::squark_mass {{
+          {1500, 1500},
+          {1500, 1500},
+          {1500, 1500},
+          {1500, 1500},
+          {1500, 1500},
+          {1500, 1500}
+    }};
 
 int main(int argc, char* argv[]) {
 

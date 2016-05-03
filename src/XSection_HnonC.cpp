@@ -33,8 +33,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
 
 int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
   const int *ncomp, cubareal ff[], void *userdata) {
-  //std::cout << squark_mass[1][1] << std::endl;
-  double m = 1500;
+  double m = squark_mass.at(1).at(1);
   double m_sqr = m*m;
 
   /*
