@@ -4,6 +4,7 @@
 #include "LHAPDF/LHAPDF.h"
 #include "include/cuba.h"
 
+#include "constants.hpp"
 #include "mathematica_wrapper.hpp"
 
 class XSection {
@@ -26,7 +27,7 @@ class XSection {
       {{0., 0.}},
       {{0., 0.}}
     }};
-    static constexpr double sgluon_mass = 1e+3;
+    static constexpr double sgluon_mass = 1e+4;
     static constexpr std::array<double, 2> sgluons_width {{ 0., 0.}};
     // 5-flavor scheme (only massive top)
     static constexpr double top_quark_mass = 173.21;

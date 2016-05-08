@@ -1,15 +1,24 @@
 #include "XSection_HnonC.h"
+#include <cassert>
+#include "Process_uu_ulurg.cc"
+#include <iostream>
+Process_uu_ulurg process;
 
 std::array<double, 3> XSection_HnonC::integrate() {
 
+  process.initProc("/Users/Navir/Fizyka/Programy/"
+  "MG5_aMC/PROC_SA_MRSSMQCD_UFO_from_philip_0/Cards/param_card.dat");
+  
   //  integral dimension, number of integrands
   constexpr int ndim { 7 }, ncomp { 1 };
   //  accuraccy
-  constexpr double accuracy_rel { 1e-3 }, accuracy_abs { 1e-12 };
+  constexpr double accuracy_rel { 1e-5 }, 
+          accuracy_abs { 1e-12 };
 
-  constexpr int neval_min = 0;
+  constexpr int neval_min = 10000;
   long long int neval;
-  constexpr long long int neval_max { 10000000 }; //strtoll( "1e+3", NULL, 10 );
+  constexpr long long int neval_max { 1000000000 }; 
+    // @TODO: read from external source strtoll( "1e+3", NULL, 10 );
 
   // technical (Vegas specific) stuff
   constexpr int nstart = 200000;
@@ -17,12 +26,12 @@ std::array<double, 3> XSection_HnonC::integrate() {
   constexpr int nbatch = 1000;
   constexpr int gridno = 0;
   const char* state_file = "";
-
   int nregions, fail;
+
   cubareal integral[ncomp], error[ncomp], prob[ncomp];
   llVegas( ndim, ncomp, integrand, NULL, 1,
            accuracy_rel, accuracy_abs, 8 | 1, 0,
-           neval_min, neval_max, 100, nincrease, nbatch,
+           neval_min, neval_max, nstart, nincrease, nbatch,
            gridno, state_file, NULL,
            &neval, &fail, integral, error, prob );
 
@@ -62,6 +71,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 	double shat_sqrt = sqrt( shat );
 
 	double Ej_max = shat_sqrt/2 - 2 * m_sqr/shat_sqrt;
+
 	if ( Ej_max < dS * shat_sqrt/2) {
 	  ff[0] = 0;
 	  return 1;
@@ -71,9 +81,11 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
 	double c = shat - 2 * shat_sqrt * Ej;
 	// Eq. 4.5
-	double E1_max = ( shat_sqrt - Ej) * c + Ej * sqrt( (c - 2 * m_sqr) * (c - 2 * m_sqr) - 4 * m_sqr * m_sqr );
+	double E1_max = ( shat_sqrt - Ej) * c + Ej * sqrt( (c - 2 * m_sqr) 
+    * (c - 2 * m_sqr) - 4 * m_sqr * m_sqr );
 	E1_max /= 2 * c;
-  double E1_min = ( shat_sqrt - Ej) * c - Ej * sqrt( (c - 2 * m_sqr) * (c - 2 * m_sqr) - 4 * m_sqr * m_sqr );
+  double E1_min = ( shat_sqrt - Ej) * c - Ej * sqrt( (c - 2 * m_sqr) 
+    * (c - 2 * m_sqr) - 4 * m_sqr * m_sqr );
   E1_min /= 2 * c;
 	double E1 = E1_min + (E1_max - E1_min) * xx[1];
 
@@ -122,7 +134,8 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
   geom3::Rotation3 rot( rotation_axis, xx[4] * two_pi);
 
   /*
-   *  kinematics was solved for the cosx angle between parton and SUSY particle
+   *  kinematics was solved for the cosx of angle
+   *  between parton and SUSY particle
    *
    *  probably it would be also ok to skip it hoping that
    *  periodicity of sin and cos would solve the thing
@@ -166,26 +179,26 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
   // write parton momentum to momentum matrix p
   p.push_back(new double[4]);
-  for(int i =0; i <4; ++i) p[4][i] = p_temp_2[0][i];
-
+  p[4] = p_temp_2[0];    
+      
   double t15 = p[0][0] * p[4][0] - p[0][3] * p[4][3];
   t15 = - 2 * t15;
   double t25 = p[1][0] * p[4][0] - p[1][3] * p[4][3];
   t25 = - 2 * t25;
 
-	// check if we are not in the collinear region
-	// if yes, return
-	if ( -t15 < dC * shat || -t25 < dC * shat ) {
+  // check if we are not in the collinear region
+  // if yes, return
+  if ( -t15 < dC * shat || -t25 < dC * shat ) {
 	  ff[0] = 0;
 	  return 0;
 	}
 
-  //process.setMomenta(p);	// Set momenta for this event
-  //process.sigmaKin();		// Evaluate matrix element
-  //const double* matrix_elements = process.getMatrixElements();
+  process.setMomenta(p);	// Set momenta for this event
+  process.sigmaKin();		// Evaluate matrix element
+  const double* matrix_elements = process.getMatrixElements();
 
   // some final factors
-  double temp = to_fb;// * matrix_elements[0];
+  double temp = to_fb * matrix_elements[0];
   temp /=  2 * shat;
 
   temp *= sin( xx[2] * pi ) * 4;
@@ -193,11 +206,11 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
   // choose gg or qqbar initial state
   double temp2 = 0;
-  temp2 = pdf_nlo->xfxQ(21, x1, m)/x1 * pdf_nlo->xfxQ(21, x2, m)/x2;
+  //temp2 = pdf_nlo->xfxQ(21, x1, m)/x1 * pdf_nlo->xfxQ(21, x2, m)/x2;
   for ( int flav = 1; flav < 6; ++flav ) {
     //temp2 += 2 * pdf->xfxQ(flav, x1, m)/x1 * pdf->xfxQ(-flav, x2, m)/x2;
   }
-  //temp2 = pdf->xfxQ(2, x1, m)/x1 * pdf->xfxQ(2, x2, m)/x2;
+  temp2 = pdf_nlo->xfxQ(2, x1, m)/x1 * pdf_nlo->xfxQ(2, x2, m)/x2;
   //temp2 = 2 * pdf->xfxQ(21, x1, m)/x1 * pdf->xfxQ(2, x2, m)/x2;
 
   temp *=  temp2;
@@ -205,6 +218,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
   double xx1 = xx[6];
   double xx2 = xx[0];
 
+  // TODO: simplify this
   double jacobian =  ((Power(-4*Power(m,2) + S,2)*xx0*((-4*Power(m,2) + S)*xx0*xx1 +
         dS*(-(S*xx0*xx1) + 4*Power(m,2)*(-1 + xx0*xx1)))*
 	      (dS*(-(S*xx0*xx1) + 4*Power(m,2)*(-1 + xx0*xx1))*(-1 + xx2) +
@@ -217,13 +231,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 	      ((-1 + dS)*S*xx0*xx1*(-1 + xx2) -
 	        4*Power(m,2)*(-1 + xx0*xx1 + dS*(-1 + xx0*xx1)*(-1 + xx2) - xx0*xx1*xx2))));
 
-  //if( isnan( temp * abs(jacobian) ) ) {
-    //cout << "Result is NaN. Skipping phase space point." << endl;
-  //  ff[0] = 0;
-  //}
-  //else {
     ff[0] = temp * abs(jacobian);
-  //}
 
 	return 0;
 }

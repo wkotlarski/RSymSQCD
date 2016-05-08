@@ -1,16 +1,10 @@
-/*
- * XSectionSC.h
- *
- *  Created on: 28 kwi 2016
- *      Author: Navir
- */
-
 #ifndef SRC_XSECTION_SC_H_
 #define SRC_XSECTION_SC_H_
 
-#include "XSection.h"
+#include "XSection_Real.hpp"
+#include "dilog.hpp"
 
-class XSection_SC: public XSection {
+class XSection_SC: public XSection_Real {
 
   public:
     std::array<double, 3> integrate();
