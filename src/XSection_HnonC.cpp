@@ -6,13 +6,14 @@ Process_uu_ulurg process;
 
 std::array<double, 3> XSection_HnonC::integrate() {
 
-  process.initProc("/Users/Navir/Fizyka/Programy/"
-  "MG5_aMC/PROC_SA_MRSSMQCD_UFO_from_philip_0/Cards/param_card.dat");
+  //process.initProc("/Users/Navir/Fizyka/Programy/"
+  //"MG5_aMC/PROC_SA_MRSSMQCD_UFO_from_philip_0/Cards/param_card.dat");
+  process.initProc("mg/Cards/param_card.dat");
   
   //  integral dimension, number of integrands
   constexpr int ndim { 7 }, ncomp { 1 };
   //  accuraccy
-  constexpr double accuracy_rel { 1e-4 }, 
+  constexpr double accuracy_rel { 1e-3 }, 
           accuracy_abs { 1e-12 };
 
   constexpr int neval_min = 10000;

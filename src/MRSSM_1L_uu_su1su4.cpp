@@ -1,6 +1,6 @@
 #include "MRSSM_1L_uu_su1su4.h"
 
-double MsquaredReal(double alphaS, double MassSq, double MassGlu, 
+double MsquaredRealMRSSMVirt_uu_suLsuR(double alphaS, double MassSq, double MassGlu, 
                 double T, double S, double U, double MassphiO,
                 double MassTop, double mu, double FiniteGs, 
                 double Dminus4, double divergence)

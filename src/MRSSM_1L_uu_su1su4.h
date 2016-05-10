@@ -8,7 +8,7 @@ using namespace std;
 
 typedef complex<double> dcomp;
 
-double MsquaredReal(double, double, double, double, double, double, 
+double MsquaredRealMRSSMVirt_uu_suLsuR(double, double, double, double, double, double, 
                          double, double, double, double, double,
                          double);
 

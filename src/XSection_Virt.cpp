@@ -1,5 +1,6 @@
 /*
- *
+ calculation of virtual correction to squark production
+ the matrix element is imported from "MRSSM_1L_uu_su1su4.h"
  */
 
 #include "XSection_Virt.h"
@@ -15,21 +16,13 @@ XSection_Virt::~XSection_Virt() {
   // TODO Auto-generated destructor stub
 }
 
-//double XSection_HnonC::integrate() {
-//  return 1.;
-//}
-
-void XSection_Virt::show_settings() {
-  std::cout << S_sqrt << std::endl;
-        std::cout << "alphaS = " << pdf_nlo->alphasQ(1500.) << std::endl;
-}
 
 
 int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
                              const int *ncomp, cubareal ff[], void *userdata) {
 
 
-    static double MassSq = 1500.;//squark_mass[0];
+    static double MassSq = squark_mass.at(0).at(0);
     static double mu = MassSq;
     double x1 = xx[1];
     double x2 = xx[2];
@@ -47,69 +40,50 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
         ff[0] = 0;
         return 0;
     }
+
     // no prefactors
     double FiniteGs = 1;
     double Dminus4 = 0;
     double Divergence = 0;     // O(eps) 
-    double SquaredMReal = MsquaredReal(pdf_nlo->alphasQ(MassSq), MassSq,
+    double SquaredMReal = MsquaredRealMRSSMVirt_uu_suLsuR(
+                          pdf_nlo->alphasQ(MassSq), MassSq,
                           gluino_mass,T, s, U, sgluon_mass,
                           top_quark_mass, mu,
                           FiniteGs, Dminus4, Divergence);
     double dSigmaPart1 = 2.*SquaredMReal*4.*M_PI/(pow(4.*M_PI,2))/
                          (4.*9)/(pow(s,2));
-     // contraction with O(eps) prefactor of phase space and loop integrals 
-     Divergence = -1;           // O(eps) 
-     FiniteGs = 0;
-     const double gamma = 0.577216;    // Euler-gamma
-     SquaredMReal = MsquaredReal(pdf_nlo->alphasQ(MassSq), MassSq,
-                          gluino_mass,T, s, U, sgluon_mass,
-                          top_quark_mass, mu,
-                          FiniteGs, Dminus4, Divergence);
-     double dSigmaPart2 = 2.*SquaredMReal*4.*M_PI/(pow(4.*M_PI,2))/
-                          (4.*9)/(pow(s,2))
-                          *(2.*log(4*M_PI) - 2*gamma -
-                          log((T*U - pow(MassSq,4))/(pow(mu,2)*s)));
-     // contraction with O(eps) from Dminus4
-     Dminus4 = -2.;
-     double SquaredMRealMinus2 = MsquaredReal(pdf_nlo->alphasQ(MassSq), 
-                          MassSq, gluino_mass,T, s, U, sgluon_mass,
-                          top_quark_mass, mu,
-                          FiniteGs, Dminus4, Divergence);
-     double dSigmaPart3 = 2.*(SquaredMRealMinus2 - SquaredMReal)*
-                          4.*M_PI/(pow(4.*M_PI,2))/
-                          (4.*9)/(pow(s,2));
- 
-     // contraction with O(eps^2) prefactor of phase space and loop integral
-     // and with product of O(eps) prefactors of phase space and loop 
-     // integral
-     Divergence = -2;
-     Dminus4 = 0;
-     SquaredMReal = MsquaredReal(pdf_nlo->alphasQ(MassSq), MassSq,
-                          gluino_mass,T, s, U, sgluon_mass,
-                          top_quark_mass, mu,
-                          FiniteGs, Dminus4, Divergence);
-     double dSigmaPart4 = 2.*SquaredMReal*4.*M_PI/(pow(4.*M_PI,2))/
-                          (4.*9)/(pow(s,2))
-     * (1./2*pow((log(4*M_PI) - log((T*U - pow(MassSq,4))/(pow(mu,2)*s))),2)
-     + (pow(gamma,2)/2 - pow(M_PI,2)/12) - gamma* (log(4*M_PI)
-     - log((T*U - pow(MassSq,4))/(pow(mu,2)*s))) + pow(gamma,2)/2
-     - pow(M_PI,2)/12 + pow(log(4*M_PI),2)/2 - gamma*log(4*M_PI)
-     + (log(4*M_PI) - gamma) * (log(4*M_PI) - log((T*U
-     - pow(MassSq,4))/(pow(mu,2)*s)) - gamma));
-     // contraction with product of D-2eps and prefactors of of phase space
-     // and loop integral
-     Dminus4 = -2;
-     SquaredMRealMinus2 = MsquaredReal(pdf_nlo->alphasQ(MassSq), MassSq,
-                          gluino_mass,T, s, U, sgluon_mass,
-                          top_quark_mass, mu,
-                          FiniteGs, Dminus4, Divergence);
-     double dSigmaPart5 = 2.*(SquaredMRealMinus2 - SquaredMReal)*
-                          4.*M_PI/(pow(4.*M_PI,2))/(4.*9)/(pow(s,2))
-                          *(2.*log(4*M_PI) - 2*gamma -
-                          log((T*U - pow(MassSq,4))/(pow(mu,2)*s)));
 
-    double dSigmaHad = (dSigmaPart1 + dSigmaPart2 + dSigmaPart3
-                      + dSigmaPart4 + dSigmaPart5)
+    // contraction with O(eps) from Dminus4
+    Divergence = -1;           // O(eps) 
+    FiniteGs = 0;
+    SquaredMReal = MsquaredRealMRSSMVirt_uu_suLsuR(
+                         pdf_nlo->alphasQ(MassSq), MassSq,
+                         gluino_mass,T, s, U, sgluon_mass,
+                         top_quark_mass, mu,
+                         FiniteGs, Dminus4, Divergence);
+    Dminus4 = -2.;
+    double SquaredMRealMinus2 = MsquaredRealMRSSMVirt_uu_suLsuR(
+                         pdf_nlo->alphasQ(MassSq), 
+                         MassSq, gluino_mass,T, s, U, sgluon_mass,
+                         top_quark_mass, mu,
+                         FiniteGs, Dminus4, Divergence);
+    double dSigmaPart3 = 2.*(SquaredMRealMinus2 - SquaredMReal)*
+                         4.*M_PI/(pow(4.*M_PI,2))/
+                         (4.*9)/(pow(s,2));
+
+    // contraction with O(eps^2) prefactor of loop integral
+    Divergence = -2;
+    Dminus4 = 0;
+    SquaredMReal = MsquaredRealMRSSMVirt_uu_suLsuR(
+                         pdf_nlo->alphasQ(MassSq), MassSq,
+                         gluino_mass,T, s, U, sgluon_mass,
+                         top_quark_mass, mu,
+                         FiniteGs, Dminus4, Divergence);
+    double dSigmaPart4 = 2.*SquaredMReal*4.*M_PI/(pow(4.*M_PI,2))/
+                         (4.*9)/(pow(s,2))
+                         *(pow(M_PI,2.)/6.);
+
+    double dSigmaHad = (dSigmaPart1 + dSigmaPart3 + dSigmaPart4)
                      * pdf_nlo->xfxQ(2,x1,mu)/x1
                      * pdf_nlo->xfxQ(2,x2,mu)/x2;
 
