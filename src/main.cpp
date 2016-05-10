@@ -1,5 +1,6 @@
 #include <chrono>
 
+#include "XSection_Tree.h"
 #include "XSection_Virt.h"
 #include "XSection_SC.hpp"
 #include "XSection_HnonC.h"
@@ -32,16 +33,24 @@ int main(int argc, char* argv[]) {
   // some preparing might go here
     std::complex<double> z1 (1000.7, 0);
     std::cout << setprecision(16) << dilogarithm::dilog(z1) << endl;
-  // accual calculation
-  auto t1 = chrono::steady_clock::now();
 
-  XSection_Virt v;
-  //array<double, 3> xsection_v = v.integrate();
-  auto t2 = chrono::steady_clock::now();
-//  cout << "\nBorn part took " <<
-//        chrono::duration_cast<chrono::seconds>(t2-t1).count() << endl;
-//    cout << "Result: " << xsection_v.at(0) << " +/- " << xsection_v.at(1)
-//        << " fb ( p-value = " << xsection_v.at(2) << " )\n";
+    // actual calculation
+    auto t0 = chrono::steady_clock::now();
+    XSection_Tree tree;
+    array<double,3> xsection_tree = tree.integrate();
+    auto t1 = chrono::steady_clock::now();
+    cout << "\nBorn part took " <<
+            chrono::duration_cast<chrono::seconds>(t1-t0).count() << endl;
+    cout << "Result: " << xsection_tree.at(0) << " +/- " << xsection_tree.at(1)
+         << " fb ( p-value = " << xsection_tree.at(2) << " )\n";
+  
+    XSection_Virt virt;
+    array<double, 3> xsection_virt = virt.integrate();
+    auto t2 = chrono::steady_clock::now();
+    cout << "\nVirtual part took " <<
+            chrono::duration_cast<chrono::seconds>(t2-t1).count() << endl;
+    cout << "Result: " << xsection_virt.at(0) << " +/- " << xsection_virt.at(1)
+         << " fb ( p-value = " << xsection_virt.at(2) << " )\n";
 
     XSection_HnonC hc;
     array<double, 3> xsection_HnonC = hc.integrate();
@@ -62,8 +71,16 @@ int main(int argc, char* argv[]) {
     cout << "Total real emission:\n";
     cout    << xsection_HnonC.at(0) + xsection_SC.at(0) << " "
             << sqrt( pow(xsection_HnonC.at(1),2) + pow(xsection_SC.at(1),2) )
-            <<  '\n';
+            <<  '\n' << endl;
+    cout << "NLO Result: " << xsection_tree.at(0) + xsection_virt.at(0) 
+                            + xsection_HnonC.at(0) + xsection_SC.at(0) << 
+                            " fb +/-" << sqrt(pow(xsection_tree.at(1),2) + 
+                                              pow(xsection_virt.at(1),2) +
+                                              pow(xsection_HnonC.at(1),2) +
+                                              pow(xsection_SC.at(1),2)) <<
+                            " fb" << endl;
 
+                           
   
   return 1;
 }
