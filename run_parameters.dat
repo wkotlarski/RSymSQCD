@@ -1,0 +1,3 @@
+# choose pdf and its member set for lo and nlo calculation
+PDF_LO MMHT2014lo68cl 0
+PDF_NLO MMHT2014nlo68cl 0
