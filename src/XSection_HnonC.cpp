@@ -12,7 +12,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
   //  integral dimension, number of integrands
   constexpr int ndim { 7 }, ncomp { 1 };
   //  accuraccy
-  constexpr double accuracy_rel { 1e-5 }, 
+  constexpr double accuracy_rel { 1e-4 }, 
           accuracy_abs { 1e-12 };
 
   constexpr int neval_min = 10000;
