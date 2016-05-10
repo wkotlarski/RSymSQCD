@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
     array<double,3> xsection_tree = tree.integrate();
     auto t1 = chrono::steady_clock::now();
     cout << "\nBorn part took " <<
-            chrono::duration_cast<chrono::seconds>(t1-t0).count() << endl;
+            chrono::duration_cast<chrono::seconds>(t1-t0).count() << " s" << endl;
     cout << "Result: " << xsection_tree.at(0) << " +/- " << xsection_tree.at(1)
          << " fb ( p-value = " << xsection_tree.at(2) << " )\n";
   
@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
     array<double, 3> xsection_virt = virt.integrate();
     auto t2 = chrono::steady_clock::now();
     cout << "\nVirtual part took " <<
-            chrono::duration_cast<chrono::seconds>(t2-t1).count() << endl;
+            chrono::duration_cast<chrono::seconds>(t2-t1).count() << " s" << endl;
     cout << "Result: " << xsection_virt.at(0) << " +/- " << xsection_virt.at(1)
          << " fb ( p-value = " << xsection_virt.at(2) << " )\n";
 
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
     array<double, 3> xsection_SC = sc.integrate();
     auto t3 = chrono::steady_clock::now();
     cout << "\nSoft and/or collinear part took " <<
-        chrono::duration_cast<chrono::seconds>(t3-t2).count() << endl;
+        chrono::duration_cast<chrono::seconds>(t3-t2).count() << " s" << endl;
     cout << "Result: " << xsection_SC.at(0) << " +/- " << xsection_SC.at(1)
         << " fb ( p-value = " << xsection_SC.at(2) << " )\n";    
   
@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
     array<double, 3> xsection_HnonC = hc.integrate();
     auto t4 = chrono::steady_clock::now();
     cout << "\nHard - non-collinear part took " <<
-      chrono::duration_cast<chrono::seconds>(t4-t3).count() << endl;
+      chrono::duration_cast<chrono::seconds>(t4-t3).count() << " s" << endl;
     cout << "Result: " << xsection_HnonC.at(0) << " +/- " << xsection_HnonC.at(1)
       << " fb ( p-value = " << xsection_HnonC.at(2) << " )\n";
 
@@ -84,8 +84,10 @@ int main(int argc, char* argv[]) {
                                               pow(xsection_HnonC.at(1),2) +
                                               pow(xsection_SC.at(1),2)) <<
                             " fb" << endl;
-
+    cout << "Total time needed: "
+         << chrono::duration_cast<chrono::seconds>(t4-t0).count()
+         << " s\n" << endl;
                            
   
-  return 1;
+  return 0;
 }
