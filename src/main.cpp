@@ -17,7 +17,7 @@ const LHAPDF::PDF* XSection::pdf_lo = LHAPDF::mkPDF("MMHT2014lo68cl", 0);
 //std::cout << "initializing NLO PDF\n";
 const LHAPDF::PDF* XSection::pdf_nlo = LHAPDF::mkPDF("MMHT2014nlo68cl", 0);
 
-double XSection_Real::dS = 2e-5;
+double XSection_Real::dS = 1e-4;
 double XSection_Real::dC = dS / 50.;
 
 std::array< std::array<double, 2>, 6 > XSection::squark_mass {{
@@ -32,8 +32,9 @@ std::array< std::array<double, 2>, 6 > XSection::squark_mass {{
 int main(int argc, char* argv[]) {
     
   // some preparing might go here
-    std::complex<double> z1 (1000.7, 0);
-    std::cout << setprecision(16) << dilogarithm::dilog(z1) << endl;
+    //complex<double> z1 (1000.7, 0);
+    cout << scientific << setprecision(4);
+    //dilogarithm::dilog(z1) << endl;
 
     // actual calculation
     auto t0 = chrono::steady_clock::now();
