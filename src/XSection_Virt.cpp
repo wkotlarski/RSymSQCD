@@ -101,10 +101,23 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
     constexpr int eval_min = 1000;
     constexpr int eval_max = 1000000;
     constexpr int verbose = 1;        // adjust shown output 0 ... 3
-    constexpr int last = 4;
-    constexpr int key = 0;
     int nregions, neval, fail;
     cubareal integral[ncomp], error[ncomp], prob[ncomp];
+    // Vegas specific
+    //int seed = 1;
+    //int nstart = 1000;
+    //int nincrease = 500;
+    //int nbatch = 1000;
+    //int grindo = 0;
+    // Cuhre specific
+    constexpr int last = 4;
+    constexpr int key = 0;
+
+    //  Vegas(ndim, ncomp, integrand, NULL, nvec,
+    //  accuracy_rel, accuracy_abs, verbose, seed,
+    //  eval_min, eval_max, nstart, nincrease, nbatch, 
+    //  grindo, NULL, NULL,
+    //  &neval, &fail, integral, error, prob);
 
       Cuhre(ndim, ncomp, integrand, NULL, nvec,
       accuracy_rel, accuracy_abs, verbose | last,
