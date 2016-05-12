@@ -1,11 +1,11 @@
 #include "MRSSM_1L_uu_su1su4.h"
 
 double MsquaredRealMRSSMVirt_uu_suLsuR(double alphaS, double MassSq, double MassGlu, 
-                double T, double S, double U, double MassphiO,
+                double T, double S, double U, double MasssigmaO,
                 double MassTop, double mu, double FiniteGs, 
                 double Dminus4, double divergence)
 {
-	double MasssigmaO = sqrt(pow(MassphiO,2) - 4 * pow(MassGlu,2));
+	double MassphiO = sqrt(pow(MasssigmaO,2) - 4 * pow(MassGlu,2));
 	ltini();
 	setmudim(pow(mu,2));
 	setlambda(divergence);
