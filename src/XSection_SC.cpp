@@ -6,7 +6,7 @@ std::array<double, 3> XSection_SC::integrate() {
   constexpr int ndim { 3 }, ncomp { 1 };
   //  accuraccy
     constexpr double accuracy_rel_sc { 1e-4 }, 
-            accuracy_rel_c { 1e-4 };
+            accuracy_rel_c { 1e-5 };
     constexpr double accuracy_abs { 1e-12 };
 
   constexpr int neval_min = 10000;

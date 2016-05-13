@@ -6,8 +6,6 @@ Process_uu_ulurg process;
 
 std::array<double, 3> XSection_HnonC::integrate() {
 
-  //process.initProc("/Users/Navir/Fizyka/Programy/"
-  //"MG5_aMC/PROC_SA_MRSSMQCD_UFO_from_philip_0/Cards/param_card.dat");
   process.initProc("mg/Cards/param_card.dat");
   
   //  integral dimension, number of integrands
@@ -16,13 +14,13 @@ std::array<double, 3> XSection_HnonC::integrate() {
   constexpr double accuracy_rel { 1e-4 }, 
           accuracy_abs { 1e-12 };
 
-  constexpr int neval_min = 10000;
+  constexpr int neval_min = 10'000;
   long long int neval;
-  constexpr long long int neval_max { 1000000000 }; 
+  constexpr long long int neval_max { 100'000'000 }; 
     // @TODO: read from external source strtoll( "1e+3", NULL, 10 );
 
   // technical (Vegas specific) stuff
-  constexpr int nstart = 200000;
+  constexpr int nstart = 200'000;
   constexpr int nincrease = 100;
   constexpr int nbatch = 1000;
   constexpr int gridno = 0;
