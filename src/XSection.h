@@ -15,7 +15,7 @@ class XSection {
 
   protected:
     static constexpr double S_sqrt { 13e+3 };
-    static constexpr double S { pow( S_sqrt, 2) };
+    static constexpr double S { S_sqrt * S_sqrt };
     static constexpr double gluino_width { 0 };
     static constexpr double gluino_mass { 1e+3 };
     //
