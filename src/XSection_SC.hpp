@@ -15,7 +15,9 @@ class XSection_SC: public XSection_Real {
   private:
     static int integrand_sc(const int*, const cubareal[],
               const int*, cubareal[], void*);
-    static int integrand_c(const int*, const cubareal[],
+    static int integrand_c1(const int*, const cubareal[],
+              const int*, cubareal[], void*);
+    static int integrand_c2(const int*, const cubareal[],
               const int*, cubareal[], void*);
 };
 
