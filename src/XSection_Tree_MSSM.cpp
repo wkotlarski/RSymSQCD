@@ -2,22 +2,22 @@
  *
  */
 
-#include "XSection_Tree.h"
-#include "MRSSM_Tree_uu_su1su4.h"
+#include "XSection_Tree_MSSM.h"
+#include "MSSM_Tree_uu_su1su4_EqualFlavor.h"
 
-XSection_Tree::XSection_Tree() {
+XSection_Tree_MSSM::XSection_Tree_MSSM() {
 
   // TODO Auto-generated constructor stub
 
 }
 
-XSection_Tree::~XSection_Tree() {
+XSection_Tree_MSSM::~XSection_Tree_MSSM() {
   // TODO Auto-generated destructor stub
 }
 
 
 
-int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
+int XSection_Tree_MSSM::integrand(const int *ndim, const cubareal xx[],
                              const int *ncomp, cubareal ff[], void *userdata) {
 
 
@@ -40,8 +40,8 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
         return 0;
     }
     // no prefactors
-    double SquaredMReal = MsquaredMRSSMTree_uu_suLsuR(pdf_nlo->alphasQ(MassSq), 
-                          MassSq, gluino_mass,T, U);
+    double SquaredMReal = MsquaredMSSMTree_uu_suLsuR_EqualFlavor(pdf_nlo->alphasQ(MassSq), 
+                          MassSq, gluino_mass, s, T, U);
     double dSigmaPart = SquaredMReal*4.*M_PI/(pow(4.*M_PI,2))/
                          (4.*9)/(pow(s,2));
 
@@ -54,7 +54,7 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
 }
 
 
- std::array<double, 3> XSection_Tree::integrate() {
+ std::array<double, 3> XSection_Tree_MSSM::integrate() {
     constexpr int ndim = 3;
     constexpr int ncomp = 1;
     constexpr int nvec = 1;
@@ -62,7 +62,7 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
     constexpr double accuracy_abs = 1e-12;
     constexpr int eval_min = 1000;
     constexpr int eval_max = 1000000;
-    constexpr int verbose = 0;        // adjust shown output 0 ... 3
+    constexpr int verbose = 1;        // adjust shown output 0 ... 3
     constexpr int last = 4;
     constexpr int key = 0;
     int nregions, neval, fail;

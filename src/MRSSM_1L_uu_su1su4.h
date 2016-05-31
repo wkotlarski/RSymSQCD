@@ -1,5 +1,5 @@
-#ifndef __MSQUARED_H
-#define __MSQUARED_H
+#ifndef __MSQUARED_1L_MRSSM_H
+#define __MSQUARED_1L_MRSSM_H
 
 #include <math.h>
 #include <complex>
