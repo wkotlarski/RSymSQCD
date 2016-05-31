@@ -1,7 +1,8 @@
 #include <chrono>
 
-#include "XSection_Tree.h"
-#include "XSection_Virt.h"
+#include "XSection_Tree_MRSSM.h"
+#include "XSection_Virt_MRSSM.h"
+#include "XSection_Virt_MSSM.h"
 #include "XSection_SC.hpp"
 #include "XSection_HnonC.h"
 
@@ -27,12 +28,12 @@ int main(int argc, char* argv[]) {
 
     // actual calculation
     auto t0 = chrono::steady_clock::now();
-    XSection_Tree tree;
-    array<double,3> xsection_tree = tree.integrate();
+    XSection_Tree_MRSSM tree_MRSSM;
+    array<double,3> xsection_tree = tree_MRSSM.integrate();
     auto t1 = chrono::steady_clock::now();
   
-    XSection_Virt virt;
-    //array<double, 3> xsection_virt = virt.integrate();
+    XSection_Virt_MRSSM virt_MRSSM;
+    array<double, 3> xsection_virt = virt_MRSSM.integrate();
     auto t2 = chrono::steady_clock::now();
 
     XSection_SC sc;
@@ -48,26 +49,27 @@ int main(int argc, char* argv[]) {
     chrono::duration_cast<chrono::seconds>(t1-t0).count() << " s" << endl;
     cout << "Result: " << xsection_tree.at(0) << " +/- " << xsection_tree.at(1)
          << " fb ( p-value = " << xsection_tree.at(2) << " )\n";
+        cout << "\nVirtual part took " <<
+            chrono::duration_cast<chrono::seconds>(t2-t1).count() << " s" << endl;
+    cout << "Result: " << xsection_virt.at(0) << " +/- " << xsection_virt.at(1)
+         << " fb ( p-value = " << xsection_virt.at(2) << " )\n";
     
-    cout << "\nVirtual part took " <<
-    chrono::duration_cast<chrono::seconds>(t2-t1).count() << " s" << endl;
-//    cout << "Result: " << xsection_virt.at(0) << " +/- " << xsection_virt.at(1)
-//        << " fb ( p-value = " << xsection_virt.at(2) << " )\n";
-    
-        cout << "\nSoft and/or collinear part took " <<
-        chrono::duration_cast<chrono::seconds>(t3-t2).count() << " s" << endl;
-    cout << "Result: " << xsection_SC.at(0) << " +/- " << xsection_SC.at(1)
-        << " fb ( p-value = " << xsection_SC.at(2) << " )\n";  
+//        cout << "\nSoft and/or collinear part took " <<
+//        chrono::duration_cast<chrono::seconds>(t3-t2).count() << " s" << endl;
+//    cout << "Result: " << xsection_SC.at(0) << " +/- " << xsection_SC.at(1)
+//        << " fb ( p-value = " << xsection_SC.at(2) << " )\n";  
     
     cout << "\nHard - non-collinear part took " <<
    chrono::duration_cast<chrono::seconds>(t4-t3).count() << " s" << endl;
    cout << "Result: " << xsection_HnonC.at(0) << " +/- " << xsection_HnonC.at(1)
          << " fb ( p-value = " << xsection_HnonC.at(2) << " )\n";
 
+
     cout << "Total real emission:\n";
     cout    << xsection_HnonC.at(0) + xsection_SC.at(0) << " "
             << sqrt( pow(xsection_HnonC.at(1),2) + pow(xsection_SC.at(1),2) )
             <<  '\n' << endl;
+
 //    cout << "NLO Result: " << xsection_tree.at(0) + xsection_virt.at(0) 
 //                            + xsection_HnonC.at(0) + xsection_SC.at(0) << 
 //                            " fb +/-" << sqrt(pow(xsection_tree.at(1),2) + 
@@ -75,9 +77,9 @@ int main(int argc, char* argv[]) {
 //                                              pow(xsection_HnonC.at(1),2) +
 //                                              pow(xsection_SC.at(1),2)) <<
 //                            " fb" << endl;
-    cout << "Total time needed: "
-         << chrono::duration_cast<chrono::seconds>(t4-t0).count()
-         << " s\n" << endl;
+//    cout << "Total time needed: "
+//         << chrono::duration_cast<chrono::seconds>(t4-t0).count()
+//         << " s\n" << endl;
                            
   
   return 0;
