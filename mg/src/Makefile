@@ -1,7 +1,6 @@
 LIBDIR=../lib
-CXXFLAGS= -O -I. -std=c++14
-CXX= g++-mp-4.9
-#CXX = icpc
+CXXFLAGS= -O -I. -std=c++11
+CXX= g++
 target=$(LIBDIR)/libmodel_MRSSMQCD_UFO_from_philip.a
 
 all: $(target)
