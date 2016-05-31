@@ -53,13 +53,13 @@ int main(int argc, char* argv[]) {
         t2 = chrono::steady_clock::now();
     }
 
-//    XSection_SC sc;
-//    array<double, 3> xsection_SC = sc.integrate();
-//    auto t3 = chrono::steady_clock::now();  
-//  
-//    XSection_HnonC hc;
-//    array<double, 3> xsection_HnonC = hc.integrate();
-//    auto t4 = chrono::steady_clock::now();
+    XSection_SC sc;
+    array<double, 3> xsection_SC = sc.integrate();
+    auto t3 = chrono::steady_clock::now();  
+  
+    XSection_HnonC hc;
+    array<double, 3> xsection_HnonC = hc.integrate();
+    auto t4 = chrono::steady_clock::now();
     
     cout << "\nBorn part took " 
          << chrono::duration_cast<chrono::seconds>(t1-t0).count() << " s" << endl;
