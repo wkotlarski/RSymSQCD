@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 
     // actual calculation
     auto t0 = chrono::steady_clock::now();
-    bool MRSSM = false;
+    bool MRSSM = true;
     auto t1 = chrono::steady_clock::now(), t2 = chrono::steady_clock::now();
     array<double,3> xsection_tree, xsection_virt;
     if (MRSSM)
@@ -71,30 +71,30 @@ int main(int argc, char* argv[]) {
     cout << "Result: " << xsection_virt.at(0) << " +/- " << xsection_virt.at(1)
          << " fb ( p-value = " << xsection_virt.at(2) << " )\n";
     
-//    cout << "\nSoft and/or collinear part took " 
-//         << chrono::duration_cast<chrono::seconds>(t3-t2).count() << " s" << endl;
-//    cout << "Result: " << xsection_SC.at(0) << " +/- " << xsection_SC.at(1)
-//         << " fb ( p-value = " << xsection_SC.at(2) << " )\n";  
-//    
-//    cout << "\nHard - non-collinear part took " 
-//         << chrono::duration_cast<chrono::seconds>(t4-t3).count() << " s" << endl;
-//    cout << "Result: " << xsection_HnonC.at(0) << " +/- " << xsection_HnonC.at(1)
-//         << " fb ( p-value = " << xsection_HnonC.at(2) << " )\n";
-//
-//    cout << "Total real emission:\n";
-//    cout << xsection_HnonC.at(0) + xsection_SC.at(0) << " "
-//         << sqrt( pow(xsection_HnonC.at(1),2) + pow(xsection_SC.at(1),2) )
-//         <<  '\n' << endl;
-//    cout << "NLO Result: " << xsection_tree.at(0) + xsection_virt.at(0) 
-//                            + xsection_HnonC.at(0) + xsection_SC.at(0) << 
-//                            " fb +/-" << sqrt(pow(xsection_tree.at(1),2) + 
-//                                              pow(xsection_virt.at(1),2) +
-//                                              pow(xsection_HnonC.at(1),2) +
-//                                              pow(xsection_SC.at(1),2)) <<
-//                            " fb" << endl;
-//    cout << "Total time needed: "
-//         << chrono::duration_cast<chrono::seconds>(t4-t0).count()
-//         << " s\n" << endl;
+    cout << "\nSoft and/or collinear part took " 
+         << chrono::duration_cast<chrono::seconds>(t3-t2).count() << " s" << endl;
+    cout << "Result: " << xsection_SC.at(0) << " +/- " << xsection_SC.at(1)
+         << " fb ( p-value = " << xsection_SC.at(2) << " )\n";  
+    
+    cout << "\nHard - non-collinear part took " 
+         << chrono::duration_cast<chrono::seconds>(t4-t3).count() << " s" << endl;
+    cout << "Result: " << xsection_HnonC.at(0) << " +/- " << xsection_HnonC.at(1)
+         << " fb ( p-value = " << xsection_HnonC.at(2) << " )\n";
+
+    cout << "Total real emission:\n";
+    cout << xsection_HnonC.at(0) + xsection_SC.at(0) << " "
+         << sqrt( pow(xsection_HnonC.at(1),2) + pow(xsection_SC.at(1),2) )
+         <<  '\n' << endl;
+    cout << "NLO Result: " << xsection_tree.at(0) + xsection_virt.at(0) 
+                            + xsection_HnonC.at(0) + xsection_SC.at(0) << 
+                            " fb +/-" << sqrt(pow(xsection_tree.at(1),2) + 
+                                              pow(xsection_virt.at(1),2) +
+                                              pow(xsection_HnonC.at(1),2) +
+                                              pow(xsection_SC.at(1),2)) <<
+                            " fb" << endl;
+    cout << "Total time needed: "
+         << chrono::duration_cast<chrono::seconds>(t4-t0).count()
+         << " s\n" << endl;
                            
   
   return 0;
