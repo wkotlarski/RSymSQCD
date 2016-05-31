@@ -5,13 +5,13 @@ std::array<double, 3> XSection_SC::integrate() {
   //  integral dimension, number of integrands
   constexpr int ndim { 3 }, ncomp { 1 };
   //  accuraccy
-    constexpr double accuracy_rel_sc { 1e-3 }, 
+    constexpr double accuracy_rel_sc { 1e-4 }, 
             accuracy_rel_c { 1e-4 };
     constexpr double accuracy_abs { 1e-12 };
 
   constexpr int neval_min = 10000;
   long long int neval;
-  constexpr long long int neval_max { 1000000000 }; 
+  constexpr long long int neval_max { 100'000'000 }; 
     // @TODO: read from external source strtoll( "1e+3", NULL, 10 );
 
   // technical (Vegas specific) stuff
@@ -42,7 +42,7 @@ std::array<double, 3> XSection_SC::integrate() {
            neval_min, neval_max, nstart, nincrease, nbatch,
            gridno, state_file, NULL,
            &neval, &fail, integral_c2, error_c2, prob_c2 );
-  
+  std::cout << integral_sc[0] << ' ' << integral_c1[0] << ' ' <<  integral_c2[0] << '\n';
   std::array <double, 3> result_finite { 
       integral_sc[0] + integral_c1[0] + integral_c2[0], 
       sqrt( pow( error_sc[0], 2) + pow ( error_c1[0], 2) + pow ( error_c2[0], 2) ),
@@ -2505,7 +2505,7 @@ int XSection_SC::integrand_sc(const int *ndim, const cubareal xx[],
 int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
   const int *ncomp, cubareal ff[], void *userdata) {
 
-        double m_sqr = pow( 1500., 2);
+    double m_sqr = pow( 1500., 2);
     double MGl2 = pow ( gluino_mass, 2 );
     double muF = 1500.;
     double muR = 1500.;
@@ -2521,7 +2521,7 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
     double Alfas = pdf_nlo->alphasQ(1500.);
     double Alfas2 = pow( Alfas, 2);
     
-    ff[0] = to_fb
+    ff[0] = 2 * to_fb
             * pdf_nlo->xfxQ(2, x1, 1500.)/x1 * pdf_nlo->xfxQ(2, x2, 1500.)/x2
             * ((-4*Alfas*Alfas2*Power(beta,3)*s12*(Power(beta,4)*(s12*s12) + 4*(beta*beta)*s12*(2*MGl2 + s12) + Power(4*MGl2 + s12,2) + 2*(beta*beta)*(s12*s12)*cos(2*th))*
      (-Log(Power(muR,4)/(s12*(muF*muF))) + 2*(euler + Log((beta*Sin(th))/(8.*pi))))*Power(Sin(th),3))/
