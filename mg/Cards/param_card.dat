@@ -17,20 +17,20 @@ Block mass
    16 1.000000e-09 # Mnu 
    23 9.118760e+01 # MZ 
    25 1.250000e+02 # MH 
-  1000001 1.000000e+03 # msdl 
-  1000002 1.500000e+03 # msul 
-  1000003 1.000000e+03 # mssl 
-  1000004 1.000000e+03 # mscl 
-  1000005 1.000000e+03 # msbl 
-  1000006 1.000000e+03 # mstl 
-  2000001 1.000000e+03 # msdr 
-  2000002 1.500000e+03 # msur 
-  2000003 1.000000e+03 # mssr 
-  2000004 1.000000e+03 # mscr 
-  2000005 1.000000e+03 # msbr 
-  2000006 1.000000e+03 # mstr 
-  3000021 1.000000e+03 # mOs 
-  3000022 1.000000e+03 # mOp 
+  1000001 1.500000e+03 # msdl 
+  1000002 2.00000e+03 # msul 
+  1000003 1.500000e+03 # mssl 
+  1000004 1.500000e+03 # mscl 
+  1000005 1.500000e+03 # msbl 
+  1000006 1.500000e+03 # mstl 
+  2000001 1.500000e+03 # msdr 
+  2000002 2.00000e+03 # msur 
+  2000003 1.500000e+03 # mssr 
+  2000004 1.500000e+03 # mscr 
+  2000005 1.500000e+03 # msbr 
+  2000006 1.500000e+03 # mstr 
+  3000021 0.000000e+03 # mOs 
+  3000022 0.000000e+03 # mOp 
 ## Dependent parameters, given by model restrictions.
 ## Those values should be edited following the 
 ## analytical expression. MG5 ignores those values 
@@ -48,7 +48,7 @@ Block mass
   24 79.824360 # w+ : cmath.sqrt(MZ__exp__2/2. + cmath.sqrt(MZ__exp__4/4. - (aEW*cmath.pi*MZ__exp__2)/(Gf*sqrt__2))) 
   12 0.000000 # ve : Mnu 
   14 0.000000 # vm : Mnu 
-  1000021 20000.000000 # go : MD3 
+  1000021 0.000000 # go : MD3 
 
 ###################################
 ## INFORMATION FOR MSOFT
@@ -62,15 +62,16 @@ Block msoft
 Block sminputs 
     1 1.279000e+02 # aEWM1 
     2 1.166370e-05 # Gf 
-    3 8.41235e-02 # aS
+      3 0.0816326 # aS
+#    3 8.41235e-02 # aS
+#    3 0.0857842 # aS
 #    3 8.79089e-2 # aS
-
 ###################################
 ## INFORMATION FOR YUKAWA
 ###################################
 Block yukawa 
-    6 1.720000e+02 # ymt 
-   15 1.777000e+00 # ymtau 
+    6 100000.0000e+02 # ymt 
+   15 0.000e+00 # ymtau 
 
 ###################################
 ## INFORMATION FOR DECAY

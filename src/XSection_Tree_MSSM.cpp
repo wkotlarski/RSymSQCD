@@ -62,7 +62,7 @@ int XSection_Tree_MSSM::integrand(const int *ndim, const cubareal xx[],
     constexpr double accuracy_abs = 1e-12;
     constexpr int eval_min = 1000;
     constexpr int eval_max = 1000000;
-    constexpr int verbose = 1;        // adjust shown output 0 ... 3
+    constexpr int verbose = 0;        // adjust shown output 0 ... 3
     constexpr int last = 4;
     constexpr int key = 0;
     int nregions, neval, fail;

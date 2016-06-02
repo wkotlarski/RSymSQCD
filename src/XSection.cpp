@@ -9,8 +9,8 @@
 void XSection::init(void) {
     
     squark_mass = {{
-          {1500, 1500},
-          {1500, 1500},
+          {2000, 2000},
+          {2000, 2000},
           {1500, 1500},
           {1500, 1500},
           {1500, 1500},
@@ -45,6 +45,7 @@ void XSection::init(void) {
             read_card.push_back(tokens);
         }
     }
+    std::cout << pdf_nlo->alphasQ(2000.) << '\n';
     for (auto const &element: read_card)
         //std::cout << element[1] << '\n';
         std::cout << element.at(0) <<'\n';

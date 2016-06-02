@@ -11,7 +11,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
   //  integral dimension, number of integrands
   constexpr int ndim { 7 }, ncomp { 1 };
   //  accuraccy
-  constexpr double accuracy_rel { 1e-3 }, 
+  constexpr double accuracy_rel { 1e-4 }, 
           accuracy_abs { 1e-12 };
 
   constexpr int neval_min = 10'000;
@@ -41,7 +41,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
 
 int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
   const int *ncomp, cubareal ff[], void *userdata) {
-  double m = squark_mass.at(1).at(1);
+  double m = squark_mass.at(0).at(0);
   double m_sqr = m*m;
 
   /*

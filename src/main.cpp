@@ -20,10 +20,11 @@ const LHAPDF::PDF* XSection::pdf_lo;
 
 int main(int argc, char* argv[]) {
     
+   
     // this function initiales parameters in XSection class 
     // at runtime reading values from text file
     XSection::init();
-
+    
     // format terminal output
     cout << scientific << setprecision(4);
 
