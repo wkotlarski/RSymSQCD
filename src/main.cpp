@@ -15,6 +15,8 @@ double XSection_Real::dC = dS / 50.;
 // why do I have to write this?
 // why isn't init() enough?
 std::array< std::array<double, 2>, 6 > XSection::squark_mass; 
+double XSection::muF;
+double XSection::muR;
 const LHAPDF::PDF* XSection::pdf_nlo;
 const LHAPDF::PDF* XSection::pdf_lo;
 

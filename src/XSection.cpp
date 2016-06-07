@@ -16,6 +16,8 @@ void XSection::init(void) {
           {1500, 1500},
           {1500, 1500}
     }};
+    muR = squark_mass.at(0).at(0);
+    muF = squark_mass.at(0).at(0);
     //XSection::squark_mass = 
     std::vector <std::vector<std::string>> read_card;
     read_card.clear();

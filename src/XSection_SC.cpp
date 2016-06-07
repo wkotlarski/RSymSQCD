@@ -55,10 +55,8 @@ std::array<double, 3> XSection_SC::integrate() {
 int XSection_SC::integrand_sc(const int *ndim, const cubareal xx[],
   const int *ncomp, cubareal ff[], void *userdata) {
    bool pref = true;
-    double m_sqr = pow( 2000., 2);
+    double m_sqr = pow( squark_mass.at(0).at(0), 2);
     double MGl2 = pow ( gluino_mass, 2 );
-    double muR = 2000.;
-    double muF = 2000.;
     
     // integration variables
     double x1 = 4. * m_sqr/S + (1 - 4. * m_sqr/S ) * xx[0];
@@ -2511,14 +2509,14 @@ int XSection_SC::integrand_sc(const int *ndim, const cubareal xx[],
 int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
   const int *ncomp, cubareal ff[], void *userdata) {
 
-    double m_sqr = pow( 2000., 2);
+    double m_sqr = pow( squark_mass.at(0).at(0), 2);
     double MGl2 = pow ( gluino_mass, 2 );
-    double muF = 2000.;
-    double muR = 2000.;
+    //double muF = 2000.;
+    //double muR = 2000.;
     
     // integration variables
     double x1 = 4. * m_sqr/S + (1 - 4. * m_sqr/S ) * xx[0];
-	double x2 = 4. * m_sqr /(S * x1) + (1 - 4. * m_sqr/(S * x1)) * xx[1];
+    double x2 = 4. * m_sqr /(S * x1) + (1 - 4. * m_sqr/(S * x1)) * xx[1];
     double th = pi * xx[2];
     
     double s12 = x1 * x2 * S;
@@ -2542,10 +2540,8 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
 int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
   const int *ncomp, cubareal ff[], void *userdata) {
     
-    double m_sqr = pow( 2000., 2);
+    double m_sqr = pow( squark_mass.at(0).at(0), 2);
     double MGl2 = pow ( gluino_mass, 2 );
-    double muF = 2000.;
-    double muR = 2000.;
     
     // integration variables
     double x1 = 4. * m_sqr/S + (1 - 4. * m_sqr/S ) * xx[0];
