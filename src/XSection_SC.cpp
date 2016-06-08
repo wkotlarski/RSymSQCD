@@ -54,7 +54,7 @@ std::array<double, 3> XSection_SC::integrate() {
 
 int XSection_SC::integrand_sc(const int *ndim, const cubareal xx[],
   const int *ncomp, cubareal ff[], void *userdata) {
-   bool pref = true;
+   bool pref = false;
     double m_sqr = pow( squark_mass.at(0).at(0), 2);
     double MGl2 = pow ( gluino_mass, 2 );
     
@@ -2525,7 +2525,7 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
     double Alfas = pdf_nlo->alphasQ( muR );
     double Alfas2 = pow( Alfas, 2);
     
-    ff[0] = 2 * to_fb
+    ff[0] = 0 * 2 * to_fb
             * pdf_nlo->xfxQ(2, x1, muF)/x1 * pdf_nlo->xfxQ(2, x2, muF)/x2
             * ((-4*Alfas*Alfas2*Power(beta,3)*s12*(Power(beta,4)*(s12*s12) + 4*(beta*beta)*s12*(2*MGl2 + s12) + Power(4*MGl2 + s12,2) + 2*(beta*beta)*(s12*s12)*cos(2*th))*
      (-Log(Power(muR,4)/(s12*(muF*muF))) + 2*(euler + Log((beta*Sin(th))/(8.*pi))))*Power(Sin(th),3))/
