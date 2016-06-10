@@ -3,7 +3,7 @@ INCDIR=../../src
 MODELLIB=model_MRSSMQCD_UFO_from_philip
 CXXFLAGS= -O -I$(INCDIR) -I. -std=c++11
 LIBFLAGS= -L$(LIBDIR) -l$(MODELLIB)
-CXX= g++-mp-4.9
+CXX= g++#-mp-4.9
 main=check
 
 all: $(main)

@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
    
     // this function initiales parameters in XSection class 
     // at runtime reading values from text file
-    XSection::init(1500.);
+    XSection::init(2000.);
     
     // format terminal output
     cout << scientific << setprecision(4);

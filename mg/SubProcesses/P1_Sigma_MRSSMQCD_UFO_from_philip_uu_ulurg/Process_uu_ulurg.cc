@@ -17,7 +17,8 @@ using namespace MG5_MRSSMQCD_UFO_from_philip;
 //--------------------------------------------------------------------------
 // Initialize process.
 
-void Process_uu_ulurg::initProc(string param_card_name) 
+void Process_uu_ulurg::initProc(string param_card_name, double mass_squark,
+                                double mass_gluino) 
 {
   // Instantiate the model class and set parameters that stay fixed during run
   pars = Parameters_MRSSMQCD_UFO_from_philip::getInstance(); 
@@ -29,8 +30,10 @@ void Process_uu_ulurg::initProc(string param_card_name)
   // Set external particle masses for this matrix element
   mME.push_back(pars->ZERO); 
   mME.push_back(pars->ZERO); 
-  mME.push_back(pars->mdl_msul); 
-  mME.push_back(pars->mdl_msur); 
+  //mME.push_back(pars->mdl_msul); 
+  //mME.push_back(pars->mdl_msur); 
+  mME.push_back(mass_squark); 
+  mME.push_back(mass_gluino); 
   mME.push_back(pars->ZERO); 
   jamp2[0] = new double[4]; 
 }

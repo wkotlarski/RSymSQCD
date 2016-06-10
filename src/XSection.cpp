@@ -9,12 +9,12 @@
 void XSection::init(double x) {
     
     squark_mass = {{
-          {x, 1500},
-          {1500, 1500},
-          {1500, 1500},
-          {1500, 1500},
-          {1500, 1500},
-          {1500, 1500}
+          {x, x},
+          {x, x},
+          {x, x},
+          {x, x},
+          {x, x},
+          {x, x}
     }};
     muR = squark_mass.at(0).at(0);
     muF = squark_mass.at(0).at(0);
