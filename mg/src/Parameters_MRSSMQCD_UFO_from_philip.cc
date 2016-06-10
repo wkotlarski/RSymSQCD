@@ -38,12 +38,12 @@ void Parameters_MRSSMQCD_UFO_from_philip::setIndependentParameters(SLHAReader&
   mdl_WT = slha.get_block_entry("decay", 6, 1.508336e+00); 
   mdl_ymtau = slha.get_block_entry("yukawa", 15, 1.777000e+00); 
   mdl_ymt = slha.get_block_entry("yukawa", 6, 1.720000e+02); 
-  aS = slha.get_block_entry("sminputs", 3, 1.184000e-01); 
+  aS = slha.get_block_entry("sminputs", 3, 1.184000e-01); //alphaS
   mdl_Gf = slha.get_block_entry("sminputs", 2, 1.166370e-05); 
   aEWM1 = slha.get_block_entry("sminputs", 1, 1.279000e+02); 
-  mdl_MD3 = slha.get_block_entry("msoft", 1, 1.000000e+03); 
-  mdl_mOp = slha.get_block_entry("mass", 3000022, 1.000000e+03); 
-  mdl_mOs = slha.get_block_entry("mass", 3000021, 1.000000e+03); 
+  mdl_MD3 = slha.get_block_entry("msoft", 1, 1.000000e+03);//gluino 
+  mdl_mOp = slha.get_block_entry("mass", 3000022, 1.000000e+03); //sgluon
+  mdl_mOs = slha.get_block_entry("mass", 3000021, 1.000000e+03); //sgluon
   mdl_mstr = slha.get_block_entry("mass", 2000006, 1.000000e+03); 
   mdl_msbr = slha.get_block_entry("mass", 2000005, 1.000000e+03); 
   mdl_mscr = slha.get_block_entry("mass", 2000004, 1.000000e+03); 

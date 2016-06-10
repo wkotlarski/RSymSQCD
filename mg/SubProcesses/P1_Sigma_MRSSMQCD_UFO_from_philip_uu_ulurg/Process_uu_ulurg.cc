@@ -18,22 +18,33 @@ using namespace MG5_MRSSMQCD_UFO_from_philip;
 // Initialize process.
 
 void Process_uu_ulurg::initProc(string param_card_name, double mass_squark,
-                                double mass_gluino) 
+                                double mass_gluino, double alphaS) 
 {
   // Instantiate the model class and set parameters that stay fixed during run
   pars = Parameters_MRSSMQCD_UFO_from_philip::getInstance(); 
   SLHAReader slha(param_card_name); 
   pars->setIndependentParameters(slha); 
+
   pars->setIndependentCouplings(); 
   pars->printIndependentParameters(); 
+  /* begin hard code */
+  pars->mdl_msul = mass_squark;
+  pars->mdl_msur = mass_squark;
+  pars->mdl_msdl = mass_squark;
+  pars->mdl_msdr = mass_squark;
+  pars->mdl_MD3  = mass_gluino;
+  pars->aS = alphaS;
+  /* end hard code */
   pars->printIndependentCouplings(); 
   // Set external particle masses for this matrix element
   mME.push_back(pars->ZERO); 
   mME.push_back(pars->ZERO); 
   //mME.push_back(pars->mdl_msul); 
   //mME.push_back(pars->mdl_msur); 
+  /* begin hard code */
   mME.push_back(mass_squark); 
-  mME.push_back(mass_gluino); 
+  mME.push_back(mass_squark); 
+  /* end hard code */
   mME.push_back(pars->ZERO); 
   jamp2[0] = new double[4]; 
 }

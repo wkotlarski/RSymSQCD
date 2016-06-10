@@ -7,7 +7,7 @@ Process_uu_ulurg process;
 std::array<double, 3> XSection_HnonC::integrate() {
 
   process.initProc("mg/Cards/param_card.dat", squark_mass.at(0).at(0),
-    squark_mass.at(0).at(0) );
+    gluino_mass, pdf_nlo->alphasQ(squark_mass.at(0).at(0)) );
   
   //  integral dimension, number of integrands
   constexpr int ndim { 7 }, ncomp { 1 };

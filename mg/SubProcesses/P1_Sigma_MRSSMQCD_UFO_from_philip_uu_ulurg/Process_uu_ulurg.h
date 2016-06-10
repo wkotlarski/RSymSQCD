@@ -28,7 +28,7 @@ class Process_uu_ulurg
     Process_uu_ulurg() {}
 
     // Initialize process.
-    virtual void initProc(string param_card_name, double, double ); 
+    virtual void initProc(string param_card_name, double, double, double ); 
 
     // Calculate flavour-independent parts of cross section.
     virtual void sigmaKin(); 

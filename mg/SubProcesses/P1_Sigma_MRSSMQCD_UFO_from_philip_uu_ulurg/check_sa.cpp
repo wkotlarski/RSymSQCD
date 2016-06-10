@@ -10,7 +10,7 @@ int main(int argc, char** argv){
   Process_uu_ulurg process;
 
   // Read param_card and set parameters
-  process.initProc("../../Cards/param_card.dat", 1501. ,1501.);
+  process.initProc("../../Cards/param_card.dat", 1501. ,1501., 1.);
 
   double energy = 3500;
   double weight;
