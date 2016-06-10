@@ -6,11 +6,11 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
-void XSection::init(void) {
+void XSection::init(double x) {
     
     squark_mass = {{
-          {2000, 2000},
-          {2000, 2000},
+          {x, 1500},
+          {1500, 1500},
           {1500, 1500},
           {1500, 1500},
           {1500, 1500},

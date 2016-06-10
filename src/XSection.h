@@ -11,7 +11,7 @@ class XSection {
 
   public:
     virtual std::array<double, 3> integrate() = 0;
-    static void init (void);
+    static void init (double);
 
   protected:
     static constexpr double S_sqrt { 13e+3 };
