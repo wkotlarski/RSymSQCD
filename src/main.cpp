@@ -1,4 +1,5 @@
 #include <chrono>
+#include <stdio.h>
 
 #include "XSection_Tree_MRSSM.h"
 #include "XSection_Tree_MSSM.h"
@@ -22,10 +23,29 @@ const LHAPDF::PDF* XSection::pdf_lo;
 
 int main(int argc, char* argv[]) {
     
-   
+    ofstream myfile;
+    char file_MRSSM_uu_susu[] =
+         "MRSSM_1L_uu_susu_msg=2000GeV.txt";
+    myfile.open(file_MRSSM_uu_susu);   
+
+    /* array of squark masses */
+    int num = 100;
+    double m_sq[num];
+    m_sq[0] = 100.;
+    for(int i=0;i<=num-2;i++)
+    {
+        m_sq[i+1] = m_sq[0] + 1900.*(i+2)/num;
+    }
+    myfile << "m_squark,Tree_XSection,Virt_XSection,Real_XSection,1L_XSection";
+
+auto start = chrono::steady_clock::now();
+for(int j=0; j<=num-1;j++)
+{
+    myfile << m_sq[j] << "  ";    
+
     // this function initiales parameters in XSection class 
     // at runtime reading values from text file
-    XSection::init(2000.);
+    XSection::init(m_sq[j]);
     
     // format terminal output
     cout << scientific << setprecision(4);
@@ -98,7 +118,11 @@ int main(int argc, char* argv[]) {
     cout << "Total time needed: "
          << chrono::duration_cast<chrono::seconds>(t4-t0).count()
          << " s\n" << endl;
-                           
-  
+    myfile << xsection_tree.at(0) << "  " << xsection_virt.at(0) << "   " << xsection_HnonC.at(0)+xsection_SC.at(0) << "    ";
+    myfile << xsection_tree.at(0) + xsection_virt.at(0) + xsection_HnonC.at(0) + xsection_SC.at(0) << "\n";
+}  
+auto end = chrono::steady_clock::now();
+myfile.close();                           
+cout << "Whole calcluation took " << chrono::duration_cast<chrono::seconds>(end-start).count()/3600. << " hours" << endl;
   return 0;
 }
