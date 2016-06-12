@@ -37,7 +37,6 @@ int main(int argc, char* argv[]) {
         m_sq[i+1] = m_sq[0] + 1900.*(i+2)/num;
     }
     myfile << "m_squark,Tree_XSection,Virt_XSection,Real_XSection,1L_XSection";
-
 auto start = chrono::steady_clock::now();
 for(int j=0; j<=num-1;j++)
 {
@@ -45,7 +44,7 @@ for(int j=0; j<=num-1;j++)
 
     // this function initiales parameters in XSection class 
     // at runtime reading values from text file
-    XSection::init(m_sq[j]);
+    XSection::init(m_sq[j]/*, 2000.*/);
     
     // format terminal output
     cout << scientific << setprecision(4);

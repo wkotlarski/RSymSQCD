@@ -6,7 +6,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
-void XSection::init(double x) {
+void XSection::init(double x/*, double m_sg*/) {
     
     squark_mass = {{
           {x, x},
@@ -16,6 +16,7 @@ void XSection::init(double x) {
           {x, x},
           {x, x}
     }};
+    //XSection::gluino_mass = m_sg;
     muR = squark_mass.at(0).at(0);
     muF = squark_mass.at(0).at(0);
     //XSection::squark_mass = 

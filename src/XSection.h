@@ -11,13 +11,13 @@ class XSection {
 
   public:
     virtual std::array<double, 3> integrate() = 0;
-    static void init (double);
+    static void init (double/*, double*/);
 
   protected:
     static constexpr double S_sqrt { 13e+3 };
     static constexpr double S { S_sqrt * S_sqrt };
     static constexpr double gluino_width { 0 };
-    static constexpr double gluino_mass { 1e+3 };
+    static constexpr double gluino_mass {2000.};
     //
     static std::array< std::array<double, 2>, 6 > squark_mass;
     static double muR;
