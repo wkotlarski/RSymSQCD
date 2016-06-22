@@ -16,6 +16,8 @@ double XSection_Real::dC = dS / 50.;
 // why do I have to write this?
 // why isn't init() enough?
 std::array< std::array<double, 2>, 6 > XSection::squark_mass; 
+double XSection::gluino_mass; 
+double XSection::sgluon_mass; 
 double XSection::muF;
 double XSection::muR;
 const LHAPDF::PDF* XSection::pdf_nlo;
@@ -25,10 +27,10 @@ int main(int argc, char* argv[]) {
     
     ofstream myfile;
     char file_MRSSM_uu_susu[] =
-         "MRSSM_1L_uu_susu_msg=2000GeV.txt";
+         "MSSM_1L_uu_susu_msg=2000GeV.txt";
     myfile.open(file_MRSSM_uu_susu);   
 
-    /* array of squark masses */
+    /* array of masses */
     int num = 100;
     double m_sq[num];
     m_sq[0] = 100.;
@@ -36,22 +38,24 @@ int main(int argc, char* argv[]) {
     {
         m_sq[i+1] = m_sq[0] + 1900.*(i+2)/num;
     }
-    myfile << "m_squark,Tree_XSection,Virt_XSection,Real_XSection,1L_XSection";
+    myfile << "m_squark,Tree_XSection,1L_XSection\n";
 auto start = chrono::steady_clock::now();
+
+
 for(int j=0; j<=num-1;j++)
 {
     myfile << m_sq[j] << "  ";    
 
     // this function initiales parameters in XSection class 
     // at runtime reading values from text file
-    XSection::init(m_sq[j]/*, 2000.*/);
+    XSection::init(m_sq[j], 2000., 5000.);      //squark mass, gluino mass, sgluon mass
     
     // format terminal output
     cout << scientific << setprecision(4);
 
     // actual calculation
     auto t0 = chrono::steady_clock::now();
-    bool MRSSM = true;
+    bool MRSSM = false;
     auto t1 = chrono::steady_clock::now(), t2 = chrono::steady_clock::now();
     array<double,3> xsection_tree, xsection_virt;
     if (MRSSM)
@@ -117,7 +121,7 @@ for(int j=0; j<=num-1;j++)
     cout << "Total time needed: "
          << chrono::duration_cast<chrono::seconds>(t4-t0).count()
          << " s\n" << endl;
-    myfile << xsection_tree.at(0) << "  " << xsection_virt.at(0) << "   " << xsection_HnonC.at(0)+xsection_SC.at(0) << "    ";
+    myfile << xsection_tree.at(0) << "    ";
     myfile << xsection_tree.at(0) + xsection_virt.at(0) + xsection_HnonC.at(0) + xsection_SC.at(0) << "\n";
 }  
 auto end = chrono::steady_clock::now();

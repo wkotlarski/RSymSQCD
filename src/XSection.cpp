@@ -6,17 +6,18 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
-void XSection::init(double x/*, double m_sg*/) {
+void XSection::init(double m_sq, double m_gluino, double m_sgluon) {
     
     squark_mass = {{
-          {x, x},
-          {x, x},
-          {x, x},
-          {x, x},
-          {x, x},
-          {x, x}
+          {m_sq, m_sq},
+          {m_sq, m_sq},
+          {m_sq, m_sq},
+          {m_sq, m_sq},
+          {m_sq, m_sq},
+          {m_sq, m_sq}
     }};
-    //XSection::gluino_mass = m_sg;
+    gluino_mass = m_gluino;
+    sgluon_mass = m_sgluon;
     muR = squark_mass.at(0).at(0);
     muF = squark_mass.at(0).at(0);
     //XSection::squark_mass = 
@@ -48,7 +49,7 @@ void XSection::init(double x/*, double m_sg*/) {
             read_card.push_back(tokens);
         }
     }
-    std::cout << pdf_nlo->alphasQ(2000.) << '\n';
+    //std::cout << pdf_nlo->alphasQ(2000.) << '\n';
     for (auto const &element: read_card)
         //std::cout << element[1] << '\n';
         std::cout << element.at(0) <<'\n';

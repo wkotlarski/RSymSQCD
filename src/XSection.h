@@ -11,13 +11,13 @@ class XSection {
 
   public:
     virtual std::array<double, 3> integrate() = 0;
-    static void init (double/*, double*/);
+    static void init (double, double, double);
 
   protected:
     static constexpr double S_sqrt { 13e+3 };
     static constexpr double S { S_sqrt * S_sqrt };
     static constexpr double gluino_width { 0 };
-    static constexpr double gluino_mass {2000.};
+    static double gluino_mass;
     //
     static std::array< std::array<double, 2>, 6 > squark_mass;
     static double muR;
@@ -30,7 +30,7 @@ class XSection {
       {{0., 0.}},
       {{0., 0.}}
     }};
-    static constexpr double sgluon_mass = 5e+3;
+    static double sgluon_mass;
     static constexpr std::array<double, 2> sgluons_width {{ 0., 0.}};
     // 5-flavor scheme (only massive top)
     static constexpr double top_quark_mass = 173.21;
