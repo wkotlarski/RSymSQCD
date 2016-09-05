@@ -26,36 +26,33 @@ const LHAPDF::PDF* XSection::pdf_lo;
 int main(int argc, char* argv[]) {
     
     ofstream myfile;
-    char file_MRSSM_uu_susu[] =
-         "MSSM_1L_uu_susu_msg=2000GeV.txt";
+    char file_MRSSM_uu_susu[] = "MRSSM_1L_uu_susu.txt";
     myfile.open(file_MRSSM_uu_susu);   
 
-    /* array of masses */
-    int num = 100;
-    double m_sq[num];
-    m_sq[0] = 100.;
-    for(int i=0;i<=num-2;i++)
-    {
-        m_sq[i+1] = m_sq[0] + 1900.*(i+2)/num;
-    }
-    myfile << "m_squark,Tree_XSection,1L_XSection\n";
 auto start = chrono::steady_clock::now();
 
+double M_min = 100;
+double M_maxGlu = 3000;
+double M_maxSq = 2000;
+int num = 10;
 
-for(int j=0; j<=num-1;j++)
+for(int i=0; i<=num-1;i++)
 {
-    myfile << m_sq[j] << "  ";    
+    for(int j=0; j<=num-1;j++)
+    {
+    double m_squark = M_min + i/(num-1.)*(M_maxSq - M_min);
+    double m_gluino = M_min + j/(num-1.)*(M_maxGlu - M_min);
 
     // this function initiales parameters in XSection class 
     // at runtime reading values from text file
-    XSection::init(m_sq[j], 2000., 5000.);      //squark mass, gluino mass, sgluon mass
+    XSection::init(m_squark, m_gluino, 5000.);      //squark mass, gluino mass, sgluon mass
     
     // format terminal output
     cout << scientific << setprecision(4);
 
     // actual calculation
     auto t0 = chrono::steady_clock::now();
-    bool MRSSM = false;
+    bool MRSSM = true;
     auto t1 = chrono::steady_clock::now(), t2 = chrono::steady_clock::now();
     array<double,3> xsection_tree, xsection_virt;
     if (MRSSM)
@@ -79,41 +76,42 @@ for(int j=0; j<=num-1;j++)
         t2 = chrono::steady_clock::now();
     }
 
-    XSection_SC sc;
-    array<double, 3> xsection_SC = sc.integrate();
-    auto t3 = chrono::steady_clock::now();  
-  
-    XSection_HnonC hc;
-    array<double, 3> xsection_HnonC = hc.integrate();
-    auto t4 = chrono::steady_clock::now();
-    
     cout << "\nBorn part took " 
          << chrono::duration_cast<chrono::seconds>(t1-t0).count() << " s" << endl;
     cout << "Result: " << xsection_tree.at(0) << " +/- " << xsection_tree.at(1)
          << " fb ( p-value = " << xsection_tree.at(2) << " )\n";
-    
+
     cout << "\nVirtual part took " 
          << chrono::duration_cast<chrono::seconds>(t2-t1).count() << " s" << endl;
     cout << "Result: " << xsection_virt.at(0) << " +/- " << xsection_virt.at(1)
          << " fb ( p-value = " << xsection_virt.at(2) << " )\n";
+
+    XSection_SC sc;
+    array<double, 3> xsection_SC = sc.integrate();
+    auto t3 = chrono::steady_clock::now();  
     
     cout << "\nSoft and/or collinear part took " 
          << chrono::duration_cast<chrono::seconds>(t3-t2).count() << " s" << endl;
     cout << "Result: " << xsection_SC.at(0) << " +/- " << xsection_SC.at(1)
          << " fb ( p-value = " << xsection_SC.at(2) << " )\n";  
     
+    XSection_HnonC hc;
+    array<double, 3> xsection_HnonC = hc.integrate();
+    auto t4 = chrono::steady_clock::now();
+    
     cout << "\nHard - non-collinear part took " 
          << chrono::duration_cast<chrono::seconds>(t4-t3).count() << " s" << endl;
     cout << "Result: " << xsection_HnonC.at(0) << " +/- " << xsection_HnonC.at(1)
          << " fb ( p-value = " << xsection_HnonC.at(2) << " )\n";
 
+    cout << endl;
     cout << "Total real emission:\n";
     cout << xsection_HnonC.at(0) + xsection_SC.at(0) << " "
          << sqrt( pow(xsection_HnonC.at(1),2) + pow(xsection_SC.at(1),2) )
          <<  '\n' << endl;
     cout << "NLO Result: " << xsection_tree.at(0) + xsection_virt.at(0) 
                             + xsection_HnonC.at(0) + xsection_SC.at(0) << 
-                            " fb +/-" << sqrt(pow(xsection_tree.at(1),2) + 
+                            " fb +/- " << sqrt(pow(xsection_tree.at(1),2) + 
                                               pow(xsection_virt.at(1),2) +
                                               pow(xsection_HnonC.at(1),2) +
                                               pow(xsection_SC.at(1),2)) <<
@@ -121,8 +119,10 @@ for(int j=0; j<=num-1;j++)
     cout << "Total time needed: "
          << chrono::duration_cast<chrono::seconds>(t4-t0).count()
          << " s\n" << endl;
-    myfile << xsection_tree.at(0) << "    ";
-    myfile << xsection_tree.at(0) + xsection_virt.at(0) + xsection_HnonC.at(0) + xsection_SC.at(0) << "\n";
+    myfile << xsection_tree.at(0) + xsection_virt.at(0) + xsection_HnonC.at(0) + xsection_SC.at(0) << "   ";
+    cout << 100.*(j+1+i*num)/(num*num) << "% done" << endl;
+    }
+    myfile << endl;
 }  
 auto end = chrono::steady_clock::now();
 myfile.close();                           
