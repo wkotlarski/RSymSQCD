@@ -50,7 +50,7 @@ void XSection::init(double m_sq, double m_gluino, double m_sgluon) {
         }
     }
     //std::cout << pdf_nlo->alphasQ(2000.) << '\n';
-    for (auto const &element: read_card)
+    //for (auto const &element: read_card)
         //std::cout << element[1] << '\n';
-        std::cout << element.at(0) <<'\n';
+        //std::cout << element.at(0) <<'\n';
 }

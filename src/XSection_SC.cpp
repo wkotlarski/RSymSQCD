@@ -31,21 +31,21 @@ std::array<double, 3> XSection_SC::integrate() {
    
    */
   llVegas( ndim, ncomp, integrand_sc, NULL, 1,
-           accuracy_rel_sc, accuracy_abs, 8 | 1, 0,
+           accuracy_rel_sc, accuracy_abs, 0 | 1, 0,
            neval_min, neval_max, nstart, nincrease, nbatch,
            gridno, state_file, NULL,
            &neval, &fail, integral_sc, error_sc, prob_sc );
 
   cubareal integral_c1[ncomp], error_c1[ncomp], prob_c1[ncomp];
   llVegas( ndim, ncomp, integrand_c1, NULL, 1,
-           accuracy_rel_c, accuracy_abs, 8 | 1, 0,
+           accuracy_rel_c, accuracy_abs, 0 | 1, 0,
            neval_min, neval_max, nstart, nincrease, nbatch,
            gridno, state_file, NULL,
            &neval, &fail, integral_c1, error_c1, prob_c1 );  
   
   cubareal integral_c2[ncomp], error_c2[ncomp], prob_c2[ncomp];
   llVegas( ndim, ncomp, integrand_c2, NULL, 1,
-           accuracy_rel_c, accuracy_abs, 8 | 1, 0,
+           accuracy_rel_c, accuracy_abs, 0 | 1, 0,
            neval_min, neval_max, nstart, nincrease, nbatch,
            gridno, state_file, NULL,
            &neval, &fail, integral_c2, error_c2, prob_c2 );

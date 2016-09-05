@@ -30,7 +30,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
 
   cubareal integral[ncomp], error[ncomp], prob[ncomp];
   llVegas( ndim, ncomp, integrand, NULL, 1,
-           accuracy_rel, accuracy_abs, 8 | 1, 0,
+           accuracy_rel, accuracy_abs, 0 | 1, 0,
            neval_min, neval_max, nstart, nincrease, nbatch,
            gridno, state_file, NULL,
            &neval, &fail, integral, error, prob );
