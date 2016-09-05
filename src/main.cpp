@@ -25,23 +25,23 @@ const LHAPDF::PDF* XSection::pdf_lo;
 
 int main(int argc, char* argv[]) {
     
-    ofstream myfile;
-    char file_MRSSM_uu_susu[] = "MRSSM_1L_uu_susu.txt";
-    myfile.open(file_MRSSM_uu_susu);   
+//    ofstream myfile;
+//    char file_MRSSM_uu_susu[] = "MRSSM_1L_uu_susu.txt";
+//    myfile.open(file_MRSSM_uu_susu);   
 
 auto start = chrono::steady_clock::now();
 
-double M_min = 100;
-double M_maxGlu = 3000;
-double M_maxSq = 2000;
-int num = 10;
+//double M_min = 100;
+//double M_maxGlu = 3000;
+//double M_maxSq = 2000;
+//int num = 10;
 
-for(int i=0; i<=num-1;i++)
-{
-    for(int j=0; j<=num-1;j++)
-    {
-    double m_squark = M_min + i/(num-1.)*(M_maxSq - M_min);
-    double m_gluino = M_min + j/(num-1.)*(M_maxGlu - M_min);
+//for(int i=0; i<=num-1;i++)
+//{
+//    for(int j=0; j<=num-1;j++)
+//    {
+    double m_squark = 1500.;//M_min + i/(num-1.)*(M_maxSq - M_min);
+    double m_gluino = 1000.;//M_min + j/(num-1.)*(M_maxGlu - M_min);
 
     // this function initiales parameters in XSection class 
     // at runtime reading values from text file
@@ -119,13 +119,13 @@ for(int i=0; i<=num-1;i++)
     cout << "Total time needed: "
          << chrono::duration_cast<chrono::seconds>(t4-t0).count()
          << " s\n" << endl;
-    myfile << xsection_tree.at(0) + xsection_virt.at(0) + xsection_HnonC.at(0) + xsection_SC.at(0) << "   ";
-    cout << 100.*(j+1+i*num)/(num*num) << "% done" << endl;
-    }
-    myfile << endl;
-}  
+//    myfile << xsection_tree.at(0) + xsection_virt.at(0) + xsection_HnonC.at(0) + xsection_SC.at(0) << "   ";
+//    cout << 100.*(j+1+i*num)/(num*num) << "% done" << endl;
+//    }
+//    myfile << endl;
+//}  
 auto end = chrono::steady_clock::now();
-myfile.close();                           
+//myfile.close();                           
 cout << "Whole calcluation took " << chrono::duration_cast<chrono::seconds>(end-start).count()/3600. << " hours" << endl;
   return 0;
 }
