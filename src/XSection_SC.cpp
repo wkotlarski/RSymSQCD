@@ -23,6 +23,13 @@ std::array<double, 3> XSection_SC::integrate() {
   int nregions, fail;
 
   cubareal integral_sc[ncomp], error_sc[ncomp], prob_sc[ncomp];
+  /*
+   Note about Vegas setings:
+      seed = 0 uses quasi-random number generator
+   with seed = 1 (pseudo-random generator) Vegas fails to reduce 
+   * chi2/#d.o.f < 1
+   
+   */
   llVegas( ndim, ncomp, integrand_sc, NULL, 1,
            accuracy_rel_sc, accuracy_abs, 8 | 1, 0,
            neval_min, neval_max, nstart, nincrease, nbatch,
