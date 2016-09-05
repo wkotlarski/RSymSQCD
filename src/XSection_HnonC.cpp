@@ -164,22 +164,23 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
   geom3::Vector3 p_temp = rot.rotate(p_parton);
 
   // set parton momenta
-  std::vector< double* > p_temp_2(1, new double [4]);
-  p_temp_2[0][0] = Ej;
-  p_temp_2[0][1] = p_temp.x();
-  p_temp_2[0][2] = p_temp.y();
-  p_temp_2[0][3] = p_temp.z();
+  double*  p_temp_2 = new double [4];
+  p_temp_2[0] = Ej;
+  p_temp_2[1] = p_temp.x();
+  p_temp_2[2] = p_temp.y();
+  p_temp_2[3] = p_temp.z();
 
   // 2nd sgluon momenta
   p.push_back(new double[4]);
   p[3][0] = shat_sqrt - E1 - Ej;
   for ( int i = 1; i < 4; ++i) {
-    p[3][i] = - p[2][i] - p_temp_2[0][i];
+    p[3][i] = - p[2][i] - p_temp_2[i];
   }
 
   // write parton momentum to momentum matrix p
   p.push_back(new double[4]);
-  p[4] = p_temp_2[0];    
+  for(int i = 0; i < 4; ++i) p[4][i] = p_temp_2[i];
+  delete[] p_temp_2;
       
   double t15 = p[0][0] * p[4][0] - p[0][3] * p[4][3];
   t15 = - 2 * t15;
@@ -188,12 +189,20 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
   // check if we are not in the collinear region
   // if yes, return
-  if ( -t15 < dC * shat || -t25 < dC * shat ) {
+   if ( -t15 < dC * shat_sqrt * Ej || -t25 < dC * shat_sqrt * Ej ) {
 	  ff[0] = 0;
 	  return 0;
 	}
 
   process.setMomenta(p);	// Set momenta for this event
+  
+  // delete (otherwise causes memory leak)
+  for(vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {
+     delete (*i);
+  }
+  p.clear();
+  p.shrink_to_fit();
+  
   process.sigmaKin();		// Evaluate matrix element
   const double* matrix_elements = process.getMatrixElements();
 

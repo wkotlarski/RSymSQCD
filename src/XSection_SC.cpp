@@ -2555,7 +2555,8 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
     double Alfas2 = pow( Alfas, 2);
     
     ff[0] = 2 * to_fb 
-            * ((4*(1 - y))/3. + (4*(1 + Power(y,2))*Log((dC*s12*(1 - y))/(Power(muF,2)*y)))/(3.*(1 - y))) 
+            * ((4*(1 - y))/3. + (4*(1 + Power(y,2))*Log((dC*s12*(1 - y)*(1 - y))
+            / (2 * muF * muF * y)))/(3.*(1 - y))) 
             * 1./y * pdf_nlo->xfxQ(2, std::min(x1/y, 1.), muF)/std::min(x1/y, 1.) 
             * pdf_nlo->xfxQ(2, x2, muF)/x2 
             * Alfas/two_pi 
