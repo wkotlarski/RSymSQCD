@@ -11,7 +11,7 @@
 using namespace std;
 
 double XSection_Real::dS = 1e-4;
-double XSection_Real::dC = dS / 50.;
+double XSection_Real::dC = 1e-5;
 
 // why do I have to write this?
 // why isn't init() enough?
@@ -24,7 +24,6 @@ const LHAPDF::PDF* XSection::pdf_nlo;
 const LHAPDF::PDF* XSection::pdf_lo;
 
 int main(int argc, char* argv[]) {
-    
 //    ofstream myfile;
 //    char file_MRSSM_uu_susu[] = "MRSSM_1L_uu_susu.txt";
 //    myfile.open(file_MRSSM_uu_susu);   
@@ -52,7 +51,7 @@ auto start = chrono::steady_clock::now();
 
     // actual calculation
     auto t0 = chrono::steady_clock::now();
-    bool MRSSM = true;
+    bool MRSSM = false;
     auto t1 = chrono::steady_clock::now(), t2 = chrono::steady_clock::now();
     array<double,3> xsection_tree, xsection_virt;
     if (MRSSM)
@@ -124,8 +123,21 @@ auto start = chrono::steady_clock::now();
 //    }
 //    myfile << endl;
 //}  
-auto end = chrono::steady_clock::now();
-//myfile.close();                           
-cout << "Whole calcluation took " << chrono::duration_cast<chrono::seconds>(end-start).count()/3600. << " hours" << endl;
-  return 0;
+   auto end = chrono::steady_clock::now();
+//myfile.close();   
+
+   double total_time = chrono::duration_cast<chrono::seconds>(end-start).count();
+
+   cout << "Whole calcluation took ";
+   if ( total_time < 60 ) {
+      cout << total_time << " seconds\n";
+   }
+   else if (total_time >= 60 && total_time < 3600 ) {
+      cout << total_time/60.0 << " minutes\n";
+   }
+   else if (total_time >= 3600 ) {
+      cout << total_time/3600.0 << " hours\n";
+   }
+
+   return 0;
 }

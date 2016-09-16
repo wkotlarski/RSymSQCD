@@ -196,16 +196,17 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
   process.setMomenta(p);	// Set momenta for this event
   
-  // delete (otherwise causes memory leak)
+  process.sigmaKin();		// Evaluate matrix element
+  const double* matrix_elements = process.getMatrixElements();
+
+    // delete (otherwise causes memory leak)
   for(vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {
      delete (*i);
+     *i = 0;
   }
   p.clear();
   p.shrink_to_fit();
   
-  process.sigmaKin();		// Evaluate matrix element
-  const double* matrix_elements = process.getMatrixElements();
-
   // some final factors
   double temp = to_fb * matrix_elements[0];
   temp /=  2 * shat;
