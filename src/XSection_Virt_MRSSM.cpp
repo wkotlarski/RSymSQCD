@@ -127,29 +127,31 @@ int XSection_Virt_MRSSM::integrand(const int *ndim, const cubareal xx[],
     double FiniteGs = 1;
     double Dminus4 = 0;
     double Divergence = 0;     // O(eps) 
-    double SquaredMReal = MsquaredRealMRSSMVirt_uu_suLsuR(
+    double (*matrixelement)(double, double, double, double, double, double, double, double, double, double, double, double);
+    matrixelement = &MsquaredRealMRSSMVirt_uu_suLsuR;
+    double squaredMReal = matrixelement(
                           pdf_nlo->alphasQ(MassSq), MassSq,
                           gluino_mass,T, s, U, sgluon_mass,
                           top_quark_mass, mu,
                           FiniteGs, Dminus4, Divergence);
-    double dSigmaPart1 = 2.*SquaredMReal*4.*M_PI/(pow(4.*M_PI,2))/
+    double dSigmaPart1 = 2.*squaredMReal*4.*M_PI/(pow(4.*M_PI,2))/
                          (4.*9)/(pow(s,2));
 
     // contraction with O(eps) from Dminus4
     Divergence = -1;           // O(eps) 
     FiniteGs = 0;
-    SquaredMReal = MsquaredRealMRSSMVirt_uu_suLsuR(
+    squaredMReal = matrixelement(
                           pdf_nlo->alphasQ(MassSq), 
                           MassSq, gluino_mass, T, s,
                           U, gluino_mass, top_quark_mass, mu, FiniteGs,
                           Dminus4, Divergence);
     Dminus4 = -2.;
-    double SquaredMRealMinus2 = MsquaredRealMRSSMVirt_uu_suLsuR(
+    double squaredMRealMinus2 = matrixelement(
                          pdf_nlo->alphasQ(MassSq), 
                          MassSq, gluino_mass,T, s, U, sgluon_mass,
                          top_quark_mass, mu,
                          FiniteGs, Dminus4, Divergence);
-    double dSigmaPart3 = 2.*(SquaredMRealMinus2 - SquaredMReal)*
+    double dSigmaPart3 = 2.*(squaredMRealMinus2 - squaredMReal)*
                          4.*M_PI/(pow(4.*M_PI,2))/
                          (4.*9)/(pow(s,2));
 
@@ -157,12 +159,12 @@ int XSection_Virt_MRSSM::integrand(const int *ndim, const cubareal xx[],
     // and with product of O(eps) prefactors of phase space and loop integral
     Divergence = -2;
     Dminus4 = 0;
-    SquaredMReal = MsquaredRealMRSSMVirt_uu_suLsuR(
+    squaredMReal = matrixelement(
                           pdf_nlo->alphasQ(MassSq), 
                           MassSq, gluino_mass, T, s,
                           U, sgluon_mass, top_quark_mass, mu, FiniteGs,
                           Dminus4, Divergence);
-    double dSigmaPart4 = 2.*SquaredMReal*4.*M_PI/(pow(4.*M_PI,2))/
+    double dSigmaPart4 = 2.*squaredMReal*4.*M_PI/(pow(4.*M_PI,2))/
                          (4.*9)/(pow(s,2))
                          *(pow(M_PI,2.)/6.);
 

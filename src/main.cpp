@@ -51,7 +51,7 @@ auto start = chrono::steady_clock::now();
 
     // actual calculation
     auto t0 = chrono::steady_clock::now();
-    bool MRSSM = false;
+    bool MRSSM = true;
     auto t1 = chrono::steady_clock::now(), t2 = chrono::steady_clock::now();
     array<double,3> xsection_tree, xsection_virt;
     if (MRSSM)
