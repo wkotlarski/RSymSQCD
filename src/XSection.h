@@ -3,6 +3,7 @@
 
 #include "LHAPDF/LHAPDF.h"
 #include "include/cuba.h"
+#include <string>
 
 #include "constants.hpp"
 #include "mathematica_wrapper.hpp"
@@ -11,7 +12,7 @@ class XSection {
 
   public:
     virtual std::array<double, 3> integrate() = 0;
-    static void init (double, double, double);
+    static void init (double, double, double, double );//std::string);
 
   protected:
     static constexpr double S_sqrt { 13e+3 };
@@ -40,6 +41,7 @@ class XSection {
      *  TODO: add random generation of phase space point which can be used to check
      *  IR finiteness
      */
+    static double processID; //std::string processID;
 };
 
 #endif /* XSECTION_H_ */

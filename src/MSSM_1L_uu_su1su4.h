@@ -10,6 +10,6 @@ typedef complex<double> dcomp;
 
 double MsquaredRealMSSMVirt_uu_suLsuR(double, double, double, double, double, 
                          double, double, double, double, double,
-                         double);
+                         double, double);
 
 #endif

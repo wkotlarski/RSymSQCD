@@ -3,8 +3,7 @@
 
 #include "XSection_Tree_MRSSM.h"
 #include "XSection_Tree_MSSM.h"
-#include "XSection_Virt_MRSSM.h"
-#include "XSection_Virt_MSSM.h"
+#include "XSection_Virt.h"
 #include "XSection_SC.hpp"
 #include "XSection_HnonC.h"
 
@@ -42,38 +41,24 @@ auto start = chrono::steady_clock::now();
     double m_squark = 1500.;//M_min + i/(num-1.)*(M_maxSq - M_min);
     double m_gluino = 1000.;//M_min + j/(num-1.)*(M_maxGlu - M_min);
 
+    //std::string process = "MRSSM,uu_suLsuR";
     // this function initiales parameters in XSection class 
     // at runtime reading values from text file
-    XSection::init(m_squark, m_gluino, 5000.);      //squark mass, gluino mass, sgluon mass
+    XSection::init(m_squark, m_gluino, 5000., 1.);      //squark mass, gluino mass, sgluon mass, string which specifies the matrix element
     
     // format terminal output
     cout << scientific << setprecision(4);
 
     // actual calculation
     auto t0 = chrono::steady_clock::now();
-    bool MRSSM = true;
-    auto t1 = chrono::steady_clock::now(), t2 = chrono::steady_clock::now();
     array<double,3> xsection_tree, xsection_virt;
-    if (MRSSM)
-    {
-        XSection_Tree_MRSSM tree_MRSSM;
-        xsection_tree = tree_MRSSM.integrate();
-        t1 = chrono::steady_clock::now();
-      
-        XSection_Virt_MRSSM virt_MRSSM;
-        xsection_virt = virt_MRSSM.integrate();
-        t2 = chrono::steady_clock::now();
-    }
-    else // MSSM
-    {
-        XSection_Tree_MSSM tree_MSSM;
-        xsection_tree = tree_MSSM.integrate();
-        t1 = chrono::steady_clock::now();
-      
-        XSection_Virt_MSSM virt_MSSM;
-        xsection_virt = virt_MSSM.integrate();
-        t2 = chrono::steady_clock::now();
-    }
+    //XSection_Tree tree;
+    //xsection_tree = tree.integrate();
+    auto t1 = chrono::steady_clock::now();
+    
+    XSection_Virt virt;
+    xsection_virt = virt.integrate();
+    auto t2 = chrono::steady_clock::now();
 
     cout << "\nBorn part took " 
          << chrono::duration_cast<chrono::seconds>(t1-t0).count() << " s" << endl;

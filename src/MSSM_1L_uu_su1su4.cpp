@@ -3,7 +3,7 @@
 #include "MSSM_1L_uu_su1su4.h"
 
 double MsquaredRealMSSMVirt_uu_suLsuR(double alphaS, double MassSq, double MassGlu, 
-                double T, double S, double U,
+                double T, double S, double U, double mass_sigma0, 
                 double MassTop, double mu, const double FiniteGs, 
                 const double Dminus4, const double divergence)
 {        
