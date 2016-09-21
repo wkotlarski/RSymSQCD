@@ -12,13 +12,14 @@ class XSection {
 
   public:
     virtual std::array<double, 3> integrate() = 0;
-    static void init (double, double, double, double );//std::string);
+    static void init (double, double, double, std::string);
 
   protected:
     static constexpr double S_sqrt { 13e+3 };
     static constexpr double S { S_sqrt * S_sqrt };
     static constexpr double gluino_width { 0 };
     static double gluino_mass;
+    static std::string processID;
     //
     static std::array< std::array<double, 2>, 6 > squark_mass;
     static double muR;
@@ -41,7 +42,6 @@ class XSection {
      *  TODO: add random generation of phase space point which can be used to check
      *  IR finiteness
      */
-    static double processID; //std::string processID;
 };
 
 #endif /* XSECTION_H_ */

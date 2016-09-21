@@ -5,6 +5,6 @@
 using namespace std;
 
 
-double MsquaredMRSSMTree_uu_suLsuR(double, double, double, double, double);
+double MsquaredMRSSMTree_uu_suLsuR(double, double, double, double, double, double);
 
 #endif

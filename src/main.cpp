@@ -1,8 +1,7 @@
 #include <chrono>
 #include <stdio.h>
 
-#include "XSection_Tree_MRSSM.h"
-#include "XSection_Tree_MSSM.h"
+#include "XSection_Tree.h"
 #include "XSection_Virt.h"
 #include "XSection_SC.hpp"
 #include "XSection_HnonC.h"
@@ -17,6 +16,7 @@ double XSection_Real::dC = 1e-5;
 std::array< std::array<double, 2>, 6 > XSection::squark_mass; 
 double XSection::gluino_mass; 
 double XSection::sgluon_mass; 
+std::string XSection::processID; 
 double XSection::muF;
 double XSection::muR;
 const LHAPDF::PDF* XSection::pdf_nlo;
@@ -40,11 +40,10 @@ auto start = chrono::steady_clock::now();
 //    {
     double m_squark = 1500.;//M_min + i/(num-1.)*(M_maxSq - M_min);
     double m_gluino = 1000.;//M_min + j/(num-1.)*(M_maxGlu - M_min);
-
-    //std::string process = "MRSSM,uu_suLsuR";
+    std::string process = "MRSSM,uu_suLsuR";
     // this function initiales parameters in XSection class 
     // at runtime reading values from text file
-    XSection::init(m_squark, m_gluino, 5000., 1.);      //squark mass, gluino mass, sgluon mass, string which specifies the matrix element
+    XSection::init(m_squark, m_gluino, 5000., process);      //squark mass, gluino mass, sgluon mass, string which specifies the matrix element
     
     // format terminal output
     cout << scientific << setprecision(4);
@@ -52,8 +51,8 @@ auto start = chrono::steady_clock::now();
     // actual calculation
     auto t0 = chrono::steady_clock::now();
     array<double,3> xsection_tree, xsection_virt;
-    //XSection_Tree tree;
-    //xsection_tree = tree.integrate();
+    XSection_Tree tree;
+    xsection_tree = tree.integrate();
     auto t1 = chrono::steady_clock::now();
     
     XSection_Virt virt;
