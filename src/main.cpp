@@ -40,7 +40,7 @@ auto start = chrono::steady_clock::now();
 //    {
     double m_squark = 1500.;//M_min + i/(num-1.)*(M_maxSq - M_min);
     double m_gluino = 1000.;//M_min + j/(num-1.)*(M_maxGlu - M_min);
-    std::string process = "MRSSM,uu_suLsuR";
+    std::string process = "MSSM,ud_suLsdR";
     // this function initiales parameters in XSection class 
     // at runtime reading values from text file
     XSection::init(m_squark, m_gluino, 5000., process);      //squark mass, gluino mass, sgluon mass, string which specifies the matrix element
@@ -55,14 +55,14 @@ auto start = chrono::steady_clock::now();
     xsection_tree = tree.integrate();
     auto t1 = chrono::steady_clock::now();
     
-    XSection_Virt virt;
-    xsection_virt = virt.integrate();
-    auto t2 = chrono::steady_clock::now();
-
     cout << "\nBorn part took " 
          << chrono::duration_cast<chrono::seconds>(t1-t0).count() << " s" << endl;
     cout << "Result: " << xsection_tree.at(0) << " +/- " << xsection_tree.at(1)
          << " fb ( p-value = " << xsection_tree.at(2) << " )\n";
+
+    XSection_Virt virt;
+    xsection_virt = virt.integrate();
+    auto t2 = chrono::steady_clock::now();
 
     cout << "\nVirtual part took " 
          << chrono::duration_cast<chrono::seconds>(t2-t1).count() << " s" << endl;

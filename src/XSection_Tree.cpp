@@ -43,32 +43,40 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
         return 0;
     }
     double (*matrixelement)(double, double, double, double, double, double); // matrix element squared
+    double f1,f2;                                                            // flavours of initial state quarks
     if(processID == "MRSSM,uu_suLsuR")
     {
     matrixelement = &matrixMRSSMTree_uu_suLsuR;
+    f1 = 2.;
+    f2 = 2.;
     }
     else if(processID == "MSSM,uu_suLsuR")
     {
     matrixelement = &matrixMSSMTree_uu_suLsuR;
+    f1 = 2.;
+    f2 = 2.;
     }
     else if(processID == "MRSSM,ud_suLsdR")
     {
-    matrixelement = &matrixMSSMTree_uu_suLsuR;
+    matrixelement = &matrixMRSSMTree_ud_suLsdR;
+    f1 = 2.;
+    f2 = 1.;
     }
     else if(processID == "MSSM,ud_suLsdR")
     {
-    matrixelement = &matrixMSSMTree_uu_suLsuR;
+    matrixelement = &matrixMSSMTree_ud_suLsdR;
+    f1 = 2.;
+    f2 = 1.;
     }
 
-    // no prefactors
     double squaredMReal = matrixelement(pdf_nlo->alphasQ(MassSq), 
                           MassSq, gluino_mass,T, U, s);
     double dSigmaPart = squaredMReal*4.*M_PI/(pow(4.*M_PI,2))/
                          (4.*9)/(pow(s,2));
 
     double dSigmaHad = dSigmaPart
-                     * pdf_nlo->xfxQ(2,x1,mu)/x1
-                     * pdf_nlo->xfxQ(2,x2,mu)/x2;
+                     * pdf_nlo->xfxQ(f1,x1,mu)/x1
+                     * pdf_nlo->xfxQ(f2,x2,mu)/x2;
 
     ff[0] = dSigmaHad*jacobian*3.89379*pow(10,11);   // in femto barn
     return 1;
