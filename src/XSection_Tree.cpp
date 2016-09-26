@@ -5,6 +5,8 @@
 #include "XSection_Tree.h"
 #include "MRSSM_Tree_uu_su1su4.h"
 #include "MSSM_Tree_uu_su1su4.h"
+#include "MRSSM_Tree_ud_su1sd4.h"
+#include "MSSM_Tree_ud_su1sd4.h"
 
 XSection_Tree::XSection_Tree() {
 
@@ -45,7 +47,15 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
     {
     matrixelement = &matrixMRSSMTree_uu_suLsuR;
     }
-    if(processID == "MSSM,uu_suLsuR")
+    else if(processID == "MSSM,uu_suLsuR")
+    {
+    matrixelement = &matrixMSSMTree_uu_suLsuR;
+    }
+    else if(processID == "MRSSM,ud_suLsdR")
+    {
+    matrixelement = &matrixMSSMTree_uu_suLsuR;
+    }
+    else if(processID == "MSSM,ud_suLsdR")
     {
     matrixelement = &matrixMSSMTree_uu_suLsuR;
     }
