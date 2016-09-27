@@ -40,7 +40,7 @@ auto start = chrono::steady_clock::now();
 //    {
     double m_squark = 1500.;//M_min + i/(num-1.)*(M_maxSq - M_min);
     double m_gluino = 1000.;//M_min + j/(num-1.)*(M_maxGlu - M_min);
-    std::string process = "MSSM,ud_suLsdR";
+    std::string process = "MRSSM,uu_suLsuR";
     // this function initiales parameters in XSection class 
     // at runtime reading values from text file
     XSection::init(m_squark, m_gluino, 5000., process);      //squark mass, gluino mass, sgluon mass, string which specifies the matrix element
