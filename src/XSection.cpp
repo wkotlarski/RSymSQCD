@@ -51,6 +51,7 @@ void XSection::init(double m_sq, double m_gluino, double m_sgluon, Process *proc
             );
                 if ( tokens.at(0) == "pdf_nlo") {
                     pdf_nlo = LHAPDF::mkPDF(tokens.at(1), 0);
+                    LHAPDF::setVerbosity(0);
                 }
             read_card.push_back(tokens);
         }

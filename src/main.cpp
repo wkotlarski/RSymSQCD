@@ -6,7 +6,6 @@
 #include "XSection_SC.hpp"
 #include "XSection_HnonC.h"
 
-
 using namespace std;
 
 double XSection_Real::dS = 1e-4;
