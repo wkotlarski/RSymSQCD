@@ -6,8 +6,12 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
  
+//XSection::XSection(Process process_init) {
+//    process = process_init;
+//}
 
-void XSection::init(double m_sq, double m_gluino, double m_sgluon, std::string processID_init) {
+
+void XSection::init(double m_sq, double m_gluino, double m_sgluon, Process *processID_init) {
     
     squark_mass = {{
           {m_sq, m_sq},

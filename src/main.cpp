@@ -6,6 +6,7 @@
 #include "XSection_SC.hpp"
 #include "XSection_HnonC.h"
 
+
 using namespace std;
 
 double XSection_Real::dS = 1e-4;
@@ -16,7 +17,7 @@ double XSection_Real::dC = 1e-5;
 std::array< std::array<double, 2>, 6 > XSection::squark_mass; 
 double XSection::gluino_mass; 
 double XSection::sgluon_mass; 
-std::string XSection::processID; 
+Process *XSection::processID; 
 double XSection::muF;
 double XSection::muR;
 const LHAPDF::PDF* XSection::pdf_nlo;
@@ -26,13 +27,11 @@ int main(int argc, char* argv[]) {
 
    auto start = chrono::steady_clock::now();
 
-   double m_squark = 1500.;//M_min + i/(num-1.)*(M_maxSq - M_min);
-   double m_gluino = 1000.;//M_min + j/(num-1.)*(M_maxGlu - M_min);
-   std::string process = "MRSSM,uu_suLsuR";
-    
-   // this function initiales parameters in XSection class 
-   // at runtime reading values from text file
-   XSection::init(m_squark, m_gluino, 5000., process);      //squark mass, gluino mass, sgluon mass, string which specifies the matrix element
+    double m_squark = 1500.;//M_min + i/(num-1.)*(M_maxSq - M_min);
+    double m_gluino = 1000.;//M_min + j/(num-1.)*(M_maxGlu - M_min);
+    Process process("MRSSM,uu_suLsuR");
+
+    XSection::init(m_squark, m_gluino, 5000., &process);      //squark mass, gluino mass, sgluon mass, string which specifies the matrix element
     
    auto t0 = chrono::steady_clock::now();
    array<double,3> xsection_tree, xsection_virt;

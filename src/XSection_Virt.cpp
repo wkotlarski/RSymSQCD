@@ -4,10 +4,7 @@
  */
 
 #include "XSection_Virt.h"
-#include "MRSSM_1L_uu_su1su4.h"
-#include "MSSM_1L_uu_su1su4.h"
-#include "MRSSM_1L_ud_su1sd4.h"
-#include "MSSM_1L_ud_su1sd4.h"
+
 
 XSection_Virt::XSection_Virt() {
 
@@ -126,30 +123,13 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
 ////////////////////////////////////////////////////////////////////
 // here comes the part without prefactors
 ////////////////////////////////////////////////////////////////////
-    // real part of M^B M^(1Loop\ast)
-    double (*matrixelement)(double, double, double, double, double, double, double, double, double, double, double, double);
-    if(processID == "MRSSM,uu_suLsuR")
-    {
-        matrixelement = &matrixMRSSMVirt_uu_suLsuR;
-    }
-    else if(processID == "MSSM,uu_suLsuR")
-    {
-        matrixelement = &matrixMSSMVirt_uu_suLsuR;
-    }
-    else if(processID == "MRSSM,ud_suLsdR")
-    {
-        matrixelement = &matrixMRSSMVirt_ud_suLsdR;
-    }
-    else if(processID == "MSSM,ud_suLsdR")
-    {
-        matrixelement = &matrixMSSMVirt_ud_suLsdR;
-    }
+
 
     // no prefactors
     double FiniteGs = 1;
     double Dminus4 = 0;
     double Divergence = 0;     // O(eps) 
-    double squaredMReal = matrixelement(
+    double squaredMReal = processID->matrixelementVirt(
                           pdf_nlo->alphasQ(MassSq), MassSq,
                           gluino_mass,T, s, U, sgluon_mass,
                           top_quark_mass, mu,
@@ -160,13 +140,13 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
     // contraction with O(eps) from Dminus4
     Divergence = -1;           // O(eps) 
     FiniteGs = 0;
-    squaredMReal = matrixelement(
+    squaredMReal = processID->matrixelementVirt(
                           pdf_nlo->alphasQ(MassSq), 
                           MassSq, gluino_mass, T, s,
                           U, gluino_mass, top_quark_mass, mu, FiniteGs,
                           Dminus4, Divergence);
     Dminus4 = -2.;
-    double squaredMRealMinus2 = matrixelement(
+    double squaredMRealMinus2 = processID->matrixelementVirt(
                          pdf_nlo->alphasQ(MassSq), 
                          MassSq, gluino_mass,T, s, U, sgluon_mass,
                          top_quark_mass, mu,
@@ -179,7 +159,7 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
     // and with product of O(eps) prefactors of phase space and loop integral
     Divergence = -2;
     Dminus4 = 0;
-    squaredMReal = matrixelement(
+    squaredMReal = processID->matrixelementVirt(
                           pdf_nlo->alphasQ(MassSq), 
                           MassSq, gluino_mass, T, s,
                           U, sgluon_mass, top_quark_mass, mu, FiniteGs,

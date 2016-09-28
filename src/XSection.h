@@ -7,19 +7,22 @@
 
 #include "constants.hpp"
 #include "mathematica_wrapper.hpp"
+#include "Process.h"
 
 class XSection {
 
   public:
+    //Xsection(Process);
     virtual std::array<double, 3> integrate() = 0;
-    static void init (double, double, double, std::string);
+    static void init (double, double, double, Process*);
 
   protected:
+    static Process *processID;
     static constexpr double S_sqrt { 13e+3 };
     static constexpr double S { S_sqrt * S_sqrt };
     static constexpr double gluino_width { 0 };
     static double gluino_mass;
-    static std::string processID;
+    //static std::string processID;
     //
     static std::array< std::array<double, 2>, 6 > squark_mass;
     static double muR;
