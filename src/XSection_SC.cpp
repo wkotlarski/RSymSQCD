@@ -1,60 +1,46 @@
 #include "XSection_SC.hpp"
 
+
+
 std::array<double, 3> XSection_SC::integrate() {
   
-  //  integral dimension, number of integrands
-  constexpr int ndim { 3 }, ncomp { 1 };
-  //  accuraccy
-    constexpr double accuracy_rel_sc { 1e-3 }, 
-            accuracy_rel_c { 1e-3 };
-    constexpr double accuracy_abs { 1e-12 };
+   // integral dimension, number of integrands
+   constexpr int ndim { 3 }, ncomp { 1 };
+   // accuraccy
+   constexpr double accuracy_rel_sc { 1e-6 }, 
+            accuracy_rel_c { 1e-6 };
+   constexpr double accuracy_abs { 1e-12 };
 
-  constexpr int neval_min = 10000;
-  long long int neval;
-  constexpr long long int neval_max { 100'000'000 }; 
-    // @TODO: read from external source strtoll( "1e+3", NULL, 10 );
+   constexpr int neval_min = 10000;
+   long long int neval;
+   constexpr long long int neval_max { 100'000'000 }; 
+   // @TODO: read from external source strtoll( "1e+3", NULL, 10 );
 
-  // technical (Vegas specific) stuff
-  constexpr int nstart      = 200000;
-  constexpr int nincrease   = 100;
-  constexpr int nbatch      = 1000;
-  constexpr int gridno      = 0;
-  const char* state_file    = "";
-  int nregions, fail;
+   int nregions, fail;
 
-  cubareal integral_sc[ncomp], error_sc[ncomp], prob_sc[ncomp];
-  /*
-   Note about Vegas setings:
-      seed = 0 uses quasi-random number generator
-   with seed = 1 (pseudo-random generator) Vegas fails to reduce 
-   * chi2/#d.o.f < 1
-   
-   */
-  llVegas( ndim, ncomp, integrand_sc, NULL, 1,
-           accuracy_rel_sc, accuracy_abs, 0 | 1, 0,
-           neval_min, neval_max, nstart, nincrease, nbatch,
-           gridno, state_file, NULL,
-           &neval, &fail, integral_sc, error_sc, prob_sc );
-
-  cubareal integral_c1[ncomp], error_c1[ncomp], prob_c1[ncomp];
-  llVegas( ndim, ncomp, integrand_c1, NULL, 1,
-           accuracy_rel_c, accuracy_abs, 0 | 1, 0,
-           neval_min, neval_max, nstart, nincrease, nbatch,
-           gridno, state_file, NULL,
-           &neval, &fail, integral_c1, error_c1, prob_c1 );  
+   cubareal integral_sc[ncomp], error_sc[ncomp], prob_sc[ncomp];
+   llCuhre(ndim, ncomp, integrand_sc, NULL, 1,
+      accuracy_rel_sc, accuracy_abs, 0,
+      neval_min, neval_max, 1, NULL, NULL,
+      &nregions, &neval, &fail, integral_sc, error_sc, prob_sc);
+        
+   cubareal integral_c1[ncomp], error_c1[ncomp], prob_c1[ncomp];
+   llCuhre(ndim, ncomp, integrand_c1, NULL, 1,
+      accuracy_rel_c, accuracy_abs, 0,
+      neval_min, neval_max, 1, NULL, NULL,
+      &nregions, &neval, &fail, integral_c1, error_c1, prob_c1);
   
-  cubareal integral_c2[ncomp], error_c2[ncomp], prob_c2[ncomp];
-  llVegas( ndim, ncomp, integrand_c2, NULL, 1,
-           accuracy_rel_c, accuracy_abs, 0 | 1, 0,
-           neval_min, neval_max, nstart, nincrease, nbatch,
-           gridno, state_file, NULL,
-           &neval, &fail, integral_c2, error_c2, prob_c2 );
- // std::cout << integral_sc[0] << ' ' << integral_c1[0] << ' ' <<  integral_c2[0] << '\n';
-  std::array <double, 3> result_finite { 
+   cubareal integral_c2[ncomp], error_c2[ncomp], prob_c2[ncomp];
+   llCuhre(ndim, ncomp, integrand_c2, NULL, 1,
+      accuracy_rel_c, accuracy_abs, 0,
+      neval_min, neval_max, 1, NULL, NULL,
+      &nregions, &neval, &fail, integral_c2, error_c2, prob_c2);
+
+   std::array <double, 3> result_finite { 
       integral_sc[0]  + integral_c1[0] + integral_c2[0], 
       sqrt( pow( error_sc[0], 2)  + pow ( error_c1[0], 2) + pow ( error_c2[0], 2) ),
       prob_sc[0]  + prob_c2[0] 
-  };
+   };
   
   return result_finite;
 }
@@ -2542,7 +2528,7 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
     ff[0] *= (pi*Power(-4*m_sqr + S,2)*xx[0])/(S*(-4*m_sqr*(-1 + xx[0]) + S*xx[0]));
     
     return 0;
-}
+}  
 
 int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
   const int *ncomp, cubareal ff[], void *userdata) {
@@ -2561,6 +2547,8 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
     double Alfas = pdf_nlo->alphasQ( muR );
     double Alfas2 = pow( Alfas, 2);
     
+    
+    
     ff[0] = 2 * to_fb 
             * ((4*(1 - y))/3. + (4*(1 + Power(y,2))*Log((dC*s12*(1 - y)*(1 - y))
             / (2 * muF * muF * y)))/(3.*(1 - y))) 
@@ -2570,7 +2558,8 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
             // 2->2 cross-section
             * (Alfas2*pi*(-8*beta*s12 + 2*(4*MGl2 + s12 + Power(beta,2)*s12)*Log((4*MGl2 + Power(1 + beta,2)*s12)/
             (4*MGl2 + Power(-1 + beta,2)*s12))))/(9.*Power(s12,2));
-    
+            //* qq_s3Ls3R(&Alfas, &s12, &beta, &MGl2);
+   
     // multiply by jakobian of integration variable transformation
     ff[0] *= (Power(-4*m_sqr + S,2)*xx[0]*(4*m_sqr*(-1 + xx[0]) - S*(-1 + dS + xx[0])))/
         (Power(S,2)*(-4*m_sqr*(-1 + xx[0]) + S*xx[0]));

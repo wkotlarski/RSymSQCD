@@ -49,13 +49,14 @@ void XSection::init(double m_sq, double m_gluino, double m_sgluon, Process *proc
                 ), 
                 tokens.end()
             );
-                if ( tokens.at(0) == "PDF_NLO") {
+                if ( tokens.at(0) == "pdf_nlo") {
                     pdf_nlo = LHAPDF::mkPDF(tokens.at(1), 0);
                 }
             read_card.push_back(tokens);
         }
     }
-    //std::cout << pdf_nlo->alphasQ(2000.) << '\n';
+    std::cout << std::scientific << std::setprecision(18) << 
+            pdf_nlo->alphasQ(1000.) << " " << pdf_nlo->xfxQ(0, 0.1, 1000.) << '\n';
     //for (auto const &element: read_card)
         //std::cout << element[1] << '\n';
         //std::cout << element.at(0) <<'\n';
