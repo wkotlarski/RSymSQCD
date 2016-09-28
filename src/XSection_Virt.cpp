@@ -169,8 +169,8 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
                          *(pow(M_PI,2.)/6.);
 
     double dSigmaHad = (dSigmaPart1 + dSigmaPart3 + dSigmaPart4)
-                     * pdf_nlo->xfxQ(2,x1,mu)/x1
-                     * pdf_nlo->xfxQ(2,x2,mu)/x2;
+                     * pdf_nlo->xfxQ(processID->f1,x1,mu)/x1
+                     * pdf_nlo->xfxQ(processID->f2,x2,mu)/x2;
 //////////////////////////////////////////////////////////////////////
 // here ends the part without prefactors
 //////////////////////////////////////////////////////////////////////
