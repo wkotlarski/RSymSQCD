@@ -70,8 +70,8 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
 */
     double squaredMReal = processID->matrixelementTree(pdf_nlo->alphasQ(MassSq), 
                           MassSq, gluino_mass,T, U, s);
-    double dSigmaPart = squaredMReal*4.*M_PI/(pow(4.*M_PI,2))/
-                         (4.*9)/(pow(s,2));
+    double dSigmaPart = squaredMReal*(processID->h)*M_PI/(pow(4.*M_PI,2))/
+                         (processID->k)/(pow(s,2));
 
     double dSigmaHad = dSigmaPart
                      * pdf_nlo->xfxQ(processID->f1,x1,mu)/x1

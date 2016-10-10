@@ -250,7 +250,7 @@ I*(dZSOc1+dZGG1 +2*dZgs1)*g3^2*(SUNF[ct1, ct3, ct2, ct4] + SUNF[ct1, ct4, ct2, c
  C[S[13, {gt1, ct1}], -S[13, {gt2, ct2}], V[5, {ct3}], V[5, {ct4}]] == {{
 (I/4)*g3^2*IndexDelta[gt1, gt2]*LambdaProd[ct3,ct4][ct2,ct1] (**(Lam[ct3, ct2, 1]*Lam[ct4, 1, ct1] + Lam[ct3, ct2, 2]*Lam[ct4, 2, ct1] + Lam[ct3, ct2, 3]*Lam[ct4, 3, ct1])*) + 
 (I/4)*g3^2*IndexDelta[gt1, gt2]*LambdaProd[ct4,ct3][ct2,ct1] (**(Lam[ct3, 1, ct1]*Lam[ct4, ct2, 1] + Lam[ct3, 2, ct1]*Lam[ct4, ct2, 2] + Lam[ct3, 3, ct1]*Lam[ct4, ct2, 3])*),
-(I/4)*g3^2*(dZGG1+2*dZgs1+dZSu[gt1]/2+dZSu[gt2]/2)*IndexDelta[gt1, gt2]*LambdaProd[ct3,ct4][ct2,ct1] + (I/4)*g3^2*(dZGG1+2*dZgs1+dZSu[gt1]/2+dZSu[gt2]/2)*IndexDelta[gt1, gt2]*LambdaProd[ct4,ct3][ct2,ct1]}},
+(I/4)*g3^2*(dZGG1+2*dZgs1+dZSu1[gt1]/2+dZSu1[gt2]/2)*IndexDelta[gt1, gt2]*LambdaProd[ct3,ct4][ct2,ct1] + (I/4)*g3^2*(dZGG1+2*dZgs1+dZSu1[gt1]/2+dZSu1[gt2]/2)*IndexDelta[gt1, gt2]*LambdaProd[ct4,ct3][ct2,ct1]}},
 
  (* C[S[13, {gt1, ct1}], -S[13, {gt2, ct2}], V[5, {ct3}], V[1]] == {{(I/6)*CTW*g1*g3*Lam[ct3, ct2, ct1]*(Conjugate[ZU[gt1, 1]]*ZU[gt2, 1] + Conjugate[ZU[gt1, 2]]*ZU[gt2, 2] + Conjugate[ZU[gt1, 3]]*ZU[gt2, 3]) + (I/2)*g2*g3*STW*Lam[ct3, ct2, ct1]*(Conjugate[ZU[gt1, 1]]*ZU[gt2, 1] + Conjugate[ZU[gt1, 2]]*ZU[gt2, 2] + Conjugate[ZU[gt1, 3]]*ZU[gt2, 3]) + ((2*I)/3)*CTW*g1*g3*Lam[ct3, ct2, ct1]*(Conjugate[ZU[gt1, 4]]*ZU[gt2, 4] + Conjugate[ZU[gt1, 5]]*ZU[gt2, 5] + Conjugate[ZU[gt1, 6]]*ZU[gt2, 6])}}, *)
  (* C[S[13, {gt1, ct1}], -S[14, {gt2, ct2}], V[5, {ct3}], V[3]] == {{(I*g2*g3*Lam[ct3, ct2, ct1]*(Conjugate[ZU[gt1, 1]]*ZD[gt2, 1] + Conjugate[ZU[gt1, 2]]*ZD[gt2, 2] + Conjugate[ZU[gt1, 3]]*ZD[gt2, 3]))/Sqrt[2]}}, *)
@@ -574,8 +574,8 @@ RenConst[dMSu1[gen_]] := MassRC[S[13,{gen}]]
 RenConst[dZSd1[gen_]] := FieldRC[S[14,{gen}]]	
 RenConst[dMSd1[gen_]] := MassRC[S[14,{gen}]]
 
-RenConst[dZGlL1] := xZfL1[F[15], 0]
-RenConst[dZGlR1] := xZfR1[F[15], 0]
+RenConst[dZGlL1] := FieldRC[F[15]][[1]]  (*xZfL1[F[15], 0]*)
+RenConst[dZGlR1] := FieldRC[F[15]][[2]]  (*xZfR1[F[15], 0]*)
 RenConst[dZbarGlL1] := dZGlR1
 RenConst[dZbarGlR1] := dZGlL1
 RenConst[dMGl1] := MassRC[F[15]]

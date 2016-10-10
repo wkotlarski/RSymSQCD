@@ -134,8 +134,8 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
                           gluino_mass,T, s, U, sgluon_mass,
                           top_quark_mass, mu,
                           FiniteGs, Dminus4, Divergence);
-    double dSigmaPart1 = 2.*squaredMReal*4.*M_PI/(pow(4.*M_PI,2))/
-                         (4.*9)/(pow(s,2));
+    double dSigmaPart1 = 2.*squaredMReal*(processID->h)*M_PI/(pow(4.*M_PI,2))/
+                         (processID->k)/(pow(s,2));
 
     // contraction with O(eps) from Dminus4
     Divergence = -1;           // O(eps) 
@@ -152,8 +152,8 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
                          top_quark_mass, mu,
                          FiniteGs, Dminus4, Divergence);
     double dSigmaPart3 = 2.*(squaredMRealMinus2 - squaredMReal)*
-                         4.*M_PI/(pow(4.*M_PI,2))/
-                         (4.*9)/(pow(s,2));
+                         (processID->h)*M_PI/(pow(4.*M_PI,2))/
+                         (processID->k)/(pow(s,2));
 
     // contraction with O(eps^2) prefactor of loop integral
     // and with product of O(eps) prefactors of phase space and loop integral
@@ -164,8 +164,8 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
                           MassSq, gluino_mass, T, s,
                           U, sgluon_mass, top_quark_mass, mu, FiniteGs,
                           Dminus4, Divergence);
-    double dSigmaPart4 = 2.*squaredMReal*4.*M_PI/(pow(4.*M_PI,2))/
-                         (4.*9)/(pow(s,2))
+    double dSigmaPart4 = 2.*squaredMReal*(processID->h)*M_PI/(pow(4.*M_PI,2))/
+                         (processID->k)/(pow(s,2))
                          *(pow(M_PI,2.)/6.);
 
     double dSigmaHad = (dSigmaPart1 + dSigmaPart3 + dSigmaPart4)
