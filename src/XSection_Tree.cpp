@@ -1,12 +1,4 @@
-/*
- *
- */
-
 #include "XSection_Tree.h"
-#include "MRSSM_Tree_uu_su1su4.h"
-#include "MSSM_Tree_uu_su1su4.h"
-#include "MRSSM_Tree_ud_su1sd4.h"
-#include "MSSM_Tree_ud_su1sd4.h"
 
 XSection_Tree::XSection_Tree() {
 
@@ -68,8 +60,8 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
     f2 = 1.;
     }
 */
-    double squaredMReal = processID->matrixelementTree(pdf_nlo->alphasQ(MassSq), 
-                          MassSq, gluino_mass,T, U, s);
+    
+    double squaredMReal = (processID->*processID->matrixelementTree)(pdf_nlo->alphasQ(MassSq), T, U, s);
     double dSigmaPart = squaredMReal*(processID->h)*M_PI/(pow(4.*M_PI,2))/
                          (processID->k)/(pow(s,2));
 
