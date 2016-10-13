@@ -15,9 +15,10 @@ class XSection {
     //Xsection(Process);
     virtual std::array<double, 3> integrate() = 0;
     static void init (double, double, double, Process*);
+    static Process* processID;
 
   protected:
-    static Process *processID;
+    
     static constexpr double S_sqrt { 13e+3 };
     static constexpr double S { S_sqrt * S_sqrt };
     static constexpr double gluino_width { 0 };

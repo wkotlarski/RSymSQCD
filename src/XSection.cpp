@@ -56,9 +56,4 @@ void XSection::init(double m_sq, double m_gluino, double m_sgluon, Process *proc
             read_card.push_back(tokens);
         }
     }
-    std::cout << std::scientific << std::setprecision(18) << 
-            pdf_nlo->alphasQ(1000.) << " " << pdf_nlo->xfxQ(0, 0.1, 1000.) << '\n';
-    //for (auto const &element: read_card)
-        //std::cout << element[1] << '\n';
-        //std::cout << element.at(0) <<'\n';
 }

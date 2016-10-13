@@ -69,7 +69,7 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
                      * pdf_nlo->xfxQ(processID->f1,x1,mu)/x1
                      * pdf_nlo->xfxQ(processID->f2,x2,mu)/x2;
 
-    ff[0] = dSigmaHad*jacobian*3.89379*pow(10,11);   // in femto barn
+    ff[0] = dSigmaHad*jacobian*to_fb;   // in femto barn
     return 1;
 }
 

@@ -128,28 +128,26 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
     // no prefactors
     double FiniteGs = 1;
     double Dminus4 = 0;
-    double Divergence = 0;     // O(eps) 
-    double squaredMReal = processID->matrixelementVirt(
-                          pdf_nlo->alphasQ(MassSq), MassSq,
-                          gluino_mass,T, s, U, sgluon_mass,
-                          top_quark_mass, mu,
+    int Divergence = 0;     // O(eps) 
+    double squaredMReal = (processID->*processID->matrixelementVirt)(
+                          pdf_nlo->alphasQ(MassSq), T, s, U, mu,
                           FiniteGs, Dminus4, Divergence);
+    
     double dSigmaPart1 = 2.*squaredMReal*(processID->h)*M_PI/(pow(4.*M_PI,2))/
                          (processID->k)/(pow(s,2));
 
     // contraction with O(eps) from Dminus4
     Divergence = -1;           // O(eps) 
     FiniteGs = 0;
-    squaredMReal = processID->matrixelementVirt(
+    squaredMReal = (processID->*processID->matrixelementVirt)(
                           pdf_nlo->alphasQ(MassSq), 
-                          MassSq, gluino_mass, T, s,
-                          U, gluino_mass, top_quark_mass, mu, FiniteGs,
+                          T, s,
+                          U, mu, FiniteGs,
                           Dminus4, Divergence);
     Dminus4 = -2.;
-    double squaredMRealMinus2 = processID->matrixelementVirt(
+    double squaredMRealMinus2 = (processID->*processID->matrixelementVirt)(
                          pdf_nlo->alphasQ(MassSq), 
-                         MassSq, gluino_mass,T, s, U, sgluon_mass,
-                         top_quark_mass, mu,
+                         T, s, U, mu,
                          FiniteGs, Dminus4, Divergence);
     double dSigmaPart3 = 2.*(squaredMRealMinus2 - squaredMReal)*
                          (processID->h)*M_PI/(pow(4.*M_PI,2))/
@@ -159,10 +157,10 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
     // and with product of O(eps) prefactors of phase space and loop integral
     Divergence = -2;
     Dminus4 = 0;
-    squaredMReal = processID->matrixelementVirt(
+    squaredMReal = (processID->*processID->matrixelementVirt)(
                           pdf_nlo->alphasQ(MassSq), 
-                          MassSq, gluino_mass, T, s,
-                          U, sgluon_mass, top_quark_mass, mu, FiniteGs,
+                          T, s,
+                          U, mu, FiniteGs,
                           Dminus4, Divergence);
     double dSigmaPart4 = 2.*squaredMReal*(processID->h)*M_PI/(pow(4.*M_PI,2))/
                          (processID->k)/(pow(s,2))
@@ -175,7 +173,7 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
 // here ends the part without prefactors
 //////////////////////////////////////////////////////////////////////
 
-    ff[0] = dSigmaHad*jacobian*3.89379*pow(10,11);   // in femto barn
+    ff[0] = dSigmaHad*jacobian*to_fb;   // in femto barn
     return 1;
 }
 
