@@ -182,7 +182,7 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
     constexpr int ndim = 3;
     constexpr int ncomp = 1;
     constexpr int nvec = 1;
-    constexpr double accuracy_rel = 1e-3;
+    //constexpr double accuracy_rel = 1e-3;
     constexpr double accuracy_abs = 1e-12;
     constexpr int eval_min = 1000;
     constexpr int eval_max = 1000000;
@@ -206,7 +206,7 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
     //  &neval, &fail, integral, error, prob);
 
       Cuhre(ndim, ncomp, integrand, NULL, nvec,
-      accuracy_rel, accuracy_abs, verbose | last,
+      prec_virt, accuracy_abs, verbose | last,
       eval_min, eval_max, key, NULL, NULL,
       &nregions, &neval, &fail, integral, error, prob);
 

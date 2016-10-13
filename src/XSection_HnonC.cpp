@@ -12,12 +12,12 @@ std::array<double, 3> XSection_HnonC::integrate() {
   //  integral dimension, number of integrands
   constexpr int ndim { 7 }, ncomp { 1 };
   //  accuraccy
-  constexpr double accuracy_rel { 1e-3 }, 
+  double accuracy_rel { prec_hnc }, 
           accuracy_abs { 1e-12 };
 
   constexpr int neval_min = 10'000;
   long long int neval;
-  constexpr long long int neval_max { 100'000'000 }; 
+  constexpr long long int neval_max { 1'000'000'000'000 }; 
     // @TODO: read from external source strtoll( "1e+3", NULL, 10 );
 
   // technical (Vegas specific) stuff
@@ -30,7 +30,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
 
   cubareal integral[ncomp], error[ncomp], prob[ncomp];
   llVegas( ndim, ncomp, integrand, NULL, 1,
-           accuracy_rel, accuracy_abs, 0 | 1, 0,
+           accuracy_rel, accuracy_abs, 0 |0, 0,
            neval_min, neval_max, nstart, nincrease, nbatch,
            gridno, state_file, NULL,
            &neval, &fail, integral, error, prob );

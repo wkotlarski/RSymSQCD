@@ -1,6 +1,7 @@
 #ifndef XSECTION_H_
 #define XSECTION_H_
 
+#include <boost/property_tree/ptree.hpp>
 #include "LHAPDF/LHAPDF.h"
 #include "include/cuba.h"
 #include <string>
@@ -14,32 +15,21 @@ class XSection {
   public:
     //Xsection(Process);
     virtual std::array<double, 3> integrate() = 0;
-    static void init (double, double, double, Process*);
+    static void init (Process*, boost::property_tree::ptree, double, double, double);
     static Process* processID;
 
   protected:
     
     static constexpr double S_sqrt { 13e+3 };
     static constexpr double S { S_sqrt * S_sqrt };
-    static constexpr double gluino_width { 0 };
-    static double gluino_mass;
-    //static std::string processID;
-    //
+    static double prec_virt;
+    static double prec_sc;
+    static double prec_hnc;
     static std::array< std::array<double, 2>, 6 > squark_mass;
     static double muR;
     static double muF;
-    static constexpr std::array< std::array<double, 2>, 6 > squark_width {{
-      {{0., 0.}},
-      {{0., 0.}},
-      {{0., 0.}},
-      {{0., 0.}},
-      {{0., 0.}},
-      {{0., 0.}}
-    }};
-    static double sgluon_mass;
-    static constexpr std::array<double, 2> sgluons_width {{ 0., 0.}};
-    // 5-flavor scheme (only massive top)
-    static constexpr double top_quark_mass = 173.21;
+    static double gluino_mass;
+
     static const LHAPDF::PDF* pdf_lo;
     static const LHAPDF::PDF* pdf_nlo;
     /*
