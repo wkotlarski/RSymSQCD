@@ -7,16 +7,14 @@
 #include <string>
 #include <array>
 #include <iostream>
-//typedef complex<double> dcomp;
+#include <boost/property_tree/ptree.hpp>
+
 class Process {
    private:
       // particle masses
-      double MassGlu = 1.0e+3;
-      double MassSq = 1.5e+3;
-      double MasssigmaO  = 1e+3;
-      double MassphiO  = sqrt( pow(MasssigmaO,2) + 4.0 * pow(MassGlu, 2) );
-      std::array< std::array<double, 2>, 6 > squark_mass;
-      double MassTop = 173.21;
+      double MasssigmaO, MassphiO, MassGlu, MassTop, MassSq,
+         MassSuL, MassSuR, MassSdL, MassSdR, MassSsL, MassSsR,
+         MassScL, MassScR, MassSbL, MassSbR, MassStL, MassStR;
        
       // tree-level matrix elements
       double matrixMSSMTree_uu_suLsuR(double, double, double, double);
@@ -29,7 +27,7 @@ class Process {
       double matrixMSSMVirt_uu_suLsuR(double, double, double, double, 
                  double, const double, const double, int);
    public: 
-      Process(std::string); 
+      Process(std::string,  boost::property_tree::ptree); 
       double (Process::* matrixelementTree)(double, double, double, double); // matrix element squared 
       double (Process::* matrixelementVirt)(double, double, double, double, double, double,
                                     double, int); // Re[M^1L M^(B star)]

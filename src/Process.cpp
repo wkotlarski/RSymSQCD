@@ -1,6 +1,27 @@
 #include "Process.h"
 
-Process::Process(std::string processID) {	        
+Process::Process(std::string processID, boost::property_tree::ptree pt) {
+   
+   MassTop = pt.get<double>("masses.top");
+   MassGlu = pt.get<double>("masses.gluino");
+   MasssigmaO = pt.get<double>("masses.pseudoscalar_sgluon");
+   MassphiO  = sqrt( pow(MasssigmaO,2) + 4.0 * pow(MassGlu, 2) );
+   MassSuL = pt.get<double>("masses.suL");
+   MassSuR = pt.get<double>("masses.suR");
+   MassSdL = pt.get<double>("masses.sdL");
+   MassSdR = pt.get<double>("masses.sdR");
+   MassSsL = pt.get<double>("masses.ssL");
+   MassSsR = pt.get<double>("masses.ssR");
+   MassScL = pt.get<double>("masses.scL");
+   MassScR = pt.get<double>("masses.scR");
+   MassSbL = pt.get<double>("masses.sbL");
+   MassSbR = pt.get<double>("masses.sbR");
+   MassStL = pt.get<double>("masses.stL");
+   MassStR = pt.get<double>("masses.stR");
+   
+   // @todo remove 
+   MassSq = MassSuL;
+   
     /* squark production, MRSSM */
 	if(processID == "MRSSM,uu_suLsuR") {
       // tree-level is the same as in the MSSM

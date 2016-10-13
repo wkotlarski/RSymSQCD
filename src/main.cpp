@@ -6,6 +6,9 @@
 #include "XSection_SC.hpp"
 #include "XSection_HnonC.h"
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+
 using namespace std;
 
 double XSection_Real::dS = 1e-4;
@@ -23,14 +26,19 @@ const LHAPDF::PDF* XSection::pdf_nlo;
 const LHAPDF::PDF* XSection::pdf_lo;
 
 int main(int argc, char* argv[]) {
-
+   
+   boost::property_tree::ptree pt;
+   boost::property_tree::ini_parser::read_ini("config.ini", pt);
+   
    auto start = chrono::steady_clock::now();
 
-    double m_squark = 1500.;//M_min + i/(num-1.)*(M_maxSq - M_min);
-    double m_gluino = 1000.;//M_min + j/(num-1.)*(M_maxGlu - M_min);
-    Process process("MRSSM,uu_suLsuR");
-
-    XSection::init(m_squark, m_gluino, 5000., &process);      //squark mass, gluino mass, sgluon mass, string which specifies the matrix element
+   double m_squark = 1500.;//M_min + i/(num-1.)*(M_maxSq - M_min);
+   double m_gluino = 1000.;//M_min + j/(num-1.)*(M_maxGlu - M_min);
+    
+   if ( string(argv[1]) == "pp_suLsuR" ) {
+      Process process("MSSM,uu_suLsuR", pt);
+    
+   XSection::init(m_squark, m_gluino, 5000., &process);
     
    auto t0 = chrono::steady_clock::now();
    array<double,3> xsection_tree, xsection_virt;
@@ -69,7 +77,7 @@ int main(int argc, char* argv[]) {
     XSection_HnonC hc;
     array<double, 3> xsection_HnonC = hc.integrate();
     auto t4 = chrono::steady_clock::now();
-    
+   
     cout << "\nHard - non-collinear part took " 
          << chrono::duration_cast<chrono::seconds>(t4-t3).count() << " s" << endl;
     cout << "Result: " << xsection_HnonC.at(0) << " +/- " << xsection_HnonC.at(1)
@@ -106,6 +114,9 @@ int main(int argc, char* argv[]) {
    else if (total_time >= 3600 ) {
       cout << total_time/3600.0 << " hours\n";
    }
-
+}
+   else {
+      cout << "Error! Proces not implemented. Aborting.\n";
+   }
    return 0;
 }
