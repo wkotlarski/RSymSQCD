@@ -1,4 +1,4 @@
-#include "XSection_HnonC.h"
+#include "XSection_HnonC.hpp"
 #include <cassert>
 #include "Process_uu_ulurg.cc"
 #include <iostream>

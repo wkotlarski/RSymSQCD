@@ -2,18 +2,15 @@
 #include <stdio.h>
 #include <cstdlib>
 
-#include "XSection_Tree.h"
-#include "XSection_Virt.h"
+#include "XSection_Tree.hpp"
+#include "XSection_Virt.hpp"
 #include "XSection_SC.hpp"
-#include "XSection_HnonC.h"
+#include "XSection_HnonC.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
 using namespace std;
-
-double XSection_Real::dS = 1e-4;
-double XSection_Real::dC = 1e-5;
 
 // why do I have to write this?
 // why isn't init() enough?
@@ -25,6 +22,11 @@ double XSection::muR;
 double XSection::prec_virt;
 double XSection::prec_sc;
 double XSection::prec_hnc;
+double XSection::S;
+double XSection::S_sqrt;
+double XSection::dC;
+double XSection::dS;
+boost::property_tree::ptree XSection::ptr;
 const LHAPDF::PDF* XSection::pdf_nlo;
 const LHAPDF::PDF* XSection::pdf_lo;
 
@@ -89,17 +91,6 @@ int main(int argc, char* argv[]) {
     auto end = chrono::steady_clock::now();
 
    double total_time = chrono::duration_cast<chrono::seconds>(end-start).count();
-
-   cout << "Whole calcluation took ";
-   if ( total_time < 60 ) {
-      cout << total_time << " seconds\n";
-   }
-   else if (total_time >= 60 && total_time < 3600 ) {
-      cout << total_time/60.0 << " minutes\n";
-   }
-   else if (total_time >= 3600 ) {
-      cout << total_time/3600.0 << " hours\n";
-   }
    
    cout << "\nRun summary\n";
    cout << "---------------------------------------------------------------" << endl;

@@ -8,7 +8,7 @@
 
 #include "constants.hpp"
 #include "mathematica_wrapper.hpp"
-#include "Process.h"
+#include "Process.hpp"
 
 class XSection {
 
@@ -20,8 +20,11 @@ class XSection {
 
   protected:
     
-    static constexpr double S_sqrt { 13e+3 };
-    static constexpr double S { S_sqrt * S_sqrt };
+   static double dS;
+   static double dC;
+    static boost::property_tree::ptree ptr;
+    static double S_sqrt;
+    static double S;
     static double prec_virt;
     static double prec_sc;
     static double prec_hnc;

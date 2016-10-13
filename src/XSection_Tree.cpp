@@ -1,4 +1,4 @@
-#include "XSection_Tree.h"
+#include "XSection_Tree.hpp"
 
 XSection_Tree::XSection_Tree() {
 

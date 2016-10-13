@@ -1,4 +1,4 @@
-#include "Process.h"
+#include "Process.hpp"
 
 Process::Process(std::string processID, boost::property_tree::ptree pt) {
    

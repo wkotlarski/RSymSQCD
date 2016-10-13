@@ -3,7 +3,7 @@
  the matrix element is imported from "MRSSM_1L_uu_su1su4.h"
  */
 
-#include "XSection_Virt.h"
+#include "XSection_Virt.hpp"
 
 
 XSection_Virt::XSection_Virt() {

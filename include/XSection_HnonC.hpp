@@ -1,7 +1,7 @@
 #ifndef XSECTION_HNONC_H_
 #define XSECTION_HNONC_H_
 
-#include "XSection_Real.hpp"
+#include "XSection.hpp"
 #include "constants.hpp"
 
 // neede to do Euler rotation
@@ -11,7 +11,7 @@
 #include "Process_uu_ulurg.h"
 
 
-class XSection_HnonC : public virtual XSection_Real {
+class XSection_HnonC : public virtual XSection {
 
   public:
     std::array<double, 3> integrate();
