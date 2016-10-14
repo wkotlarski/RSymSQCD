@@ -1,12 +1,4 @@
-/*
- *
- */
-
-#include "XSection_Tree.h"
-#include "MRSSM_Tree_uu_su1su4.h"
-#include "MSSM_Tree_uu_su1su4.h"
-#include "MRSSM_Tree_ud_su1sd4.h"
-#include "MSSM_Tree_ud_su1sd4.h"
+#include "XSection_Tree.hpp"
 
 XSection_Tree::XSection_Tree() {
 
@@ -68,8 +60,8 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
     f2 = 1.;
     }
 */
-    double squaredMReal = processID->matrixelementTree(pdf_nlo->alphasQ(MassSq), 
-                          MassSq, gluino_mass,T, U, s);
+    
+    double squaredMReal = (processID->*processID->matrixelementTree)(pdf_nlo->alphasQ(MassSq), T, U, s);
     double dSigmaPart = squaredMReal*(processID->h)*M_PI/(pow(4.*M_PI,2))/
                          (processID->k)/(pow(s,2));
 
@@ -77,7 +69,7 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
                      * pdf_nlo->xfxQ(processID->f1,x1,mu)/x1
                      * pdf_nlo->xfxQ(processID->f2,x2,mu)/x2;
 
-    ff[0] = dSigmaHad*jacobian*3.89379*pow(10,11);   // in femto barn
+    ff[0] = dSigmaHad*jacobian*to_fb;   // in femto barn
     return 1;
 }
 

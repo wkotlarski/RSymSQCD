@@ -20,7 +20,7 @@ std::array<double, 3> XSection_SC::integrate() {
 
    cubareal integral_sc[ncomp], error_sc[ncomp], prob_sc[ncomp];
    llCuhre(ndim, ncomp, integrand_sc, NULL, 1,
-      accuracy_rel_sc, accuracy_abs, 0,
+      prec_sc, accuracy_abs, 0,
       neval_min, neval_max, 1, NULL, NULL,
       &nregions, &neval, &fail, integral_sc, error_sc, prob_sc);
         
