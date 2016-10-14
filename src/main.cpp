@@ -1,6 +1,4 @@
 #include <chrono>
-#include <stdio.h>
-#include <cstdlib>
 
 #include "XSection_Tree.hpp"
 #include "XSection_Virt.hpp"
@@ -60,7 +58,6 @@ int main(int argc, char* argv[]) {
    cout  << "\nVirtual part took " 
          << chrono::duration_cast<chrono::seconds>(t2-t1).count() 
          << " s" << endl;
-   
 
    XSection_SC sc;
    array<double, 3> xsection_SC = sc.integrate();
@@ -68,31 +65,20 @@ int main(int argc, char* argv[]) {
     
    cout << "\nSoft and/or collinear part took " 
          << chrono::duration_cast<chrono::seconds>(t3-t2).count() << " s" << endl;
-     
     
     XSection_HnonC hc;
     array<double, 3> xsection_HnonC = hc.integrate();
-    auto t4 = chrono::steady_clock::now();
-   
-    cout << "\nHard - non-collinear part took " 
-         << chrono::duration_cast<chrono::seconds>(t4-t3).count() << " s" << endl;
-    
-
-    cout << endl;
-    cout << "Total real emission:\n";
-    cout << xsection_HnonC.at(0) + xsection_SC.at(0) << " "
-         << sqrt( pow(xsection_HnonC.at(1),2) + pow(xsection_SC.at(1),2) )
-         <<  '\n' << endl;
-    
-    cout << "Total time needed: "
-         << chrono::duration_cast<chrono::seconds>(t4-t0).count()
-         << " s\n" << endl;
-
     auto end = chrono::steady_clock::now();
+   
+   cout << "\nHard - non-collinear part took " 
+        << chrono::duration_cast<chrono::seconds>(end-t3).count() << " s" << endl;
+   cout << endl;
 
    double total_time = chrono::duration_cast<chrono::seconds>(end-start).count();
    
    cout << "\nRun summary\n";
+   cout << "Time: " << chrono::duration_cast<chrono::minutes>(end-start).count()
+        << " minutes\n";
    cout << "---------------------------------------------------------------" << endl;
    cout << setprecision(5);
    cout << setw(12) << "tree:" << setw(13) << xsection_tree.at(0) 
