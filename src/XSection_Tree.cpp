@@ -15,21 +15,24 @@ XSection_Tree::~XSection_Tree() {
 int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
                              const int *ncomp, cubareal ff[], void *userdata) {
 
-
     static double MassSq = squark_mass.at(0).at(0);
+//    std::cout << MassSq << std::endl;
     static double mu = MassSq;
-    double x1 = xx[1];
-    double x2 = xx[2];
+    double x1min = 4. * pow(MassSq,2)/S;
+    double xmax = 1;
+    double x1 = x1min + (xmax - x1min ) * xx[1];
+    double x2min = 4. * pow(MassSq,2)/(S*x1);
+    double x2 = x2min + (xmax - x2min) * xx[2];
     double s = S * x1 * x2;     //partonic 
     double Tmin = pow(MassSq,2) - s/2 - sqrt(pow(s,2)/4 -
                  pow(MassSq,2)*s);
     double Tmax = pow(MassSq,2) - s/2 + sqrt(pow(s,2)/4 -
                   pow(MassSq,2)*s);
     double T = xx[0]*(Tmax-Tmin) + Tmin;
-    double jacobian = (Tmax-Tmin);
+    double jacobian = (Tmax-Tmin)*(xmax-x1min)*(xmax-x2min);
     double U = 2*pow(MassSq,2) - s - T;
  
-    if(s < 4*pow(MassSq,2) || T*U < pow(MassSq,4))
+    if(T*U < pow(MassSq,4))
     {
         ff[0] = 0;
         return 0;
