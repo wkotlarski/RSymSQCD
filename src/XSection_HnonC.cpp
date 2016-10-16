@@ -7,7 +7,7 @@ Process_uu_ulurg process;
 std::array<double, 3> XSection_HnonC::integrate() {
 
   process.initProc("mg/Cards/param_card.dat", squark_mass.at(0).at(0),
-    gluino_mass, pdf_nlo->alphasQ(squark_mass.at(0).at(0)) );
+    1e+3, pdf->alphasQ(squark_mass.at(0).at(0)) );
   
   //  integral dimension, number of integrands
   constexpr int ndim { 7 }, ncomp { 1 };
@@ -220,7 +220,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
   for ( int flav = 1; flav < 6; ++flav ) {
     //temp2 += 2 * pdf->xfxQ(flav, x1, m)/x1 * pdf->xfxQ(-flav, x2, m)/x2;
   }
-  temp2 = pdf_nlo->xfxQ(2, x1, m)/x1 * pdf_nlo->xfxQ(2, x2, m)/x2;
+  temp2 = pdf->xfxQ(2, x1, m)/x1 * pdf->xfxQ(2, x2, m)/x2;
   //temp2 = 2 * pdf->xfxQ(21, x1, m)/x1 * pdf->xfxQ(2, x2, m)/x2;
 
   temp *=  temp2;

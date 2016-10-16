@@ -1,84 +1,39 @@
 #include "XSection_Tree.hpp"
 
-XSection_Tree::XSection_Tree() {
-
-  // TODO Auto-generated constructor stub
-
-}
-
-XSection_Tree::~XSection_Tree() {
-  // TODO Auto-generated destructor stub
-}
-
-
-
 int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
-                             const int *ncomp, cubareal ff[], void *userdata) {
+   const int *ncomp, cubareal ff[], void *userdata) {
 
-    static double MassSq = squark_mass.at(0).at(0);
-//    std::cout << MassSq << std::endl;
-    static double mu = MassSq;
-    double x1min = 4. * pow(MassSq,2)/S;
+    double mu_f = pt.get<double>("collider setup.mu_f");
+    double x1min = 4. * pow(processID->m1,2)/S;
     double xmax = 1;
-    double x1 = x1min + (xmax - x1min ) * xx[1];
-    double x2min = 4. * pow(MassSq,2)/(S*x1);
-    double x2 = x2min + (xmax - x2min) * xx[2];
+    double x1 = x1min + (xmax - x1min ) * xx[0];
+    double x2min = 4. * pow(processID->m1,2)/(S*x1);
+    double x2 = x2min + (xmax - x2min) * xx[1];
     double s = S * x1 * x2;     //partonic 
-    double Tmin = pow(MassSq,2) - s/2 - sqrt(pow(s,2)/4 -
-                 pow(MassSq,2)*s);
-    double Tmax = pow(MassSq,2) - s/2 + sqrt(pow(s,2)/4 -
-                  pow(MassSq,2)*s);
-    double T = xx[0]*(Tmax-Tmin) + Tmin;
-    double jacobian = (Tmax-Tmin)*(xmax-x1min)*(xmax-x2min);
-    double U = 2*pow(MassSq,2) - s - T;
- 
-    if(T*U < pow(MassSq,4))
-    {
-        ff[0] = 0;
-        return 0;
-    }
-/*    double f1,f2;                                                            // flavours of initial state quarks
-    if(processID == "MRSSM,uu_suLsuR")
-    {
-    matrixelement = &matrixMRSSMTree_uu_suLsuR;
-    f1 = 2.;
-    f2 = 2.;
-    }
-    else if(processID == "MSSM,uu_suLsuR")
-    {
-    matrixelement = &matrixMSSMTree_uu_suLsuR;
-    f1 = 2.;
-    f2 = 2.;
-    }
-    else if(processID == "MRSSM,ud_suLsdR")
-    {
-    matrixelement = &matrixMRSSMTree_ud_suLsdR;
-    f1 = 2.;
-    f2 = 1.;
-    }
-    else if(processID == "MSSM,ud_suLsdR")
-    {
-    matrixelement = &matrixMSSMTree_ud_suLsdR;
-    f1 = 2.;
-    f2 = 1.;
-    }
-*/
+   
+   double pdf_flux = 0.;
+   if( processID->f1 == 69 && processID->f2 == 69 ) {
+      for ( int i = 1; i < 6; ++i) pdf_flux += 2. * pdf->xfxQ( i, x1, mu_f ) *
+         pdf->xfxQ( -i, x2, mu_f );
+   } else if( processID->f1 == 0 && processID->f2 == 0 ) {
+      pdf_flux = pdf->xfxQ( processID->f1, x1, mu_f ) *
+         pdf->xfxQ( processID->f2, x2, mu_f );
+   } else {
+      pdf_flux = pdf->xfxQ( processID->f1, x1, mu_f ) *
+         pdf->xfxQ( processID->f2, x2, mu_f );
+   }
+   pdf_flux /= x1 * x2;
+   
+   ff[0] = (processID->*processID->matrixelementTree)(s) * to_fb * pdf_flux *
+      pow(-4.*pow(m1, 2) + S, 2)*xx[0] / 
+      (S*(-4*pow(m1, 2)*(-1 + xx[0]) + S*xx[0]));
     
-    double squaredMReal = (processID->*processID->matrixelementTree)(pdf_nlo->alphasQ(MassSq), T, U, s);
-    double dSigmaPart = squaredMReal*(processID->h)*M_PI/(pow(4.*M_PI,2))/
-                         (processID->k)/(pow(s,2));
-
-    double dSigmaHad = dSigmaPart
-                     * pdf_nlo->xfxQ(processID->f1,x1,mu)/x1
-                     * pdf_nlo->xfxQ(processID->f2,x2,mu)/x2;
-
-    ff[0] = dSigmaHad*jacobian*to_fb;   // in femto barn
-    return 1;
+   return 0;
 }
 
 
  std::array<double, 3> XSection_Tree::integrate() {
-    constexpr int ndim = 3;
+    constexpr int ndim = 2;
     constexpr int ncomp = 1;
     constexpr int nvec = 1;
     constexpr double accuracy_rel = 1e-4;
@@ -97,20 +52,6 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
       &nregions, &neval, &fail, integral, error, prob);
 
     std::array <double, 3> result{integral[0], error[0], prob[0]}; 
-
-  //  int CuhreNeval = neval;
-  //  int CuhreFail = fail;
-  //  double CuhreResult = (double)integral[0];
-  //  double CuhreError = (double)error[0];
-  //  double CuhreProb = (double)prob[0];
-  //  //double CuhreTime = duration(timeNow()-t0);
-  //  printf("Cuhre Result:\tneval %d\tfail %d\n", CuhreNeval, 
-  //         CuhreFail);
-  //  printf("Cuhre Result:\t%.8e +- %.8e\tp = %.3e\n",
-  //         CuhreResult, CuhreError, CuhreProb);
-  //  //printf("Suave Time:\t %f s \n",SuaveTime);
-  //  printf("\n");
-
 
     return result;
 }

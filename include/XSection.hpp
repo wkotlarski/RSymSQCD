@@ -22,7 +22,7 @@ class XSection {
     
    static double dS;
    static double dC;
-    static boost::property_tree::ptree ptr;
+    static boost::property_tree::ptree pt;
     static double S_sqrt;
     static double S;
     static double prec_virt;
@@ -31,14 +31,11 @@ class XSection {
     static std::array< std::array<double, 2>, 6 > squark_mass;
     static double muR;
     static double muF;
-    static double gluino_mass;
-
-    static const LHAPDF::PDF* pdf_lo;
-    static const LHAPDF::PDF* pdf_nlo;
-    /*
-     *  TODO: add random generation of phase space point which can be used to check
-     *  IR finiteness
-     */
+    
+    static double m1;
+    static double m2;
+    
+    static const LHAPDF::PDF* pdf;
 };
 
 #endif /* XSECTION_H_ */

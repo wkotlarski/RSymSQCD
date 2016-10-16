@@ -18,22 +18,30 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    MassSbR = pt.get<double>("masses.sbR");
    MassStL = pt.get<double>("masses.stL");
    MassStR = pt.get<double>("masses.stR");
+   mu_r = pt.get<double>("collider setup.mu_r");
+   mu_f = pt.get<double>("collider setup.mu_f");
+   dS = pt.get<double>("technical parameters.dS");
+   pdf = LHAPDF::mkPDF( pt.get<std::string>("collider setup.pdf") , 0);
    
    // @todo remove 
    MassSq = MassSuL;
    
     /* squark production, MRSSM */
-	if(processID == "MRSSM,uu_suLsuR") {
+	if(processID == "MRSSM-uu_suLsuR") {
       // tree-level is the same as in the MSSM
       matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR;
-      //matrixelementVirt = &matrixMRSSMVirt_uu_suLsuR;
-      f1 = 2.;
-      f2 = 2.;
+      matrixelementVirt = &Process::matrixMSSMVirt_uu_suLsuR;
+      //matrixelementVirt = &Process::f;
+      matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
+      m1 = MassSuL;
+      m2 = MassSuR;
+      f1 = 2;
+      f2 = 2;
       k = 2.*2*3*3;
       h = 2.*2;
    }
    else if(processID == "MRSSM,ud_suLsdR") {
-      matrixelementTree = &Process::matrixMRSSMTree_ud_suLsdR;
+      //matrixelementTree = &Process::matrixMRSSMTree_ud_suLsdR;
       //matrixelementVirt = &matrixMRSSMVirt_ud_suLsdR;
       f1 = 2.;
       f2 = 1.;
@@ -42,15 +50,19 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    }
     /* squark production, MSSM */
    else if(processID == "MSSM,uu_suLsuR") {
-      matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR;
-      matrixelementVirt = &Process::matrixMSSMVirt_uu_suLsuR;
+      //matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR;
+      //matrixelementVirt = &Process::matrixMSSMVirt_uu_suLsuR;
+      //matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
+      matrixelementReal_SC = &Process::g;
+      m1 = MassSuL;
+      m2 = MassSuR;
       f1 = 2.;
       f2 = 2.;
       k = 2.*2*3*3;
       h = 2.*2;
    }
    else if(processID == "MSSM,ud_suLsdR") {
-      matrixelementTree = &Process::matrixMSSMTree_ud_suLsdR;
+      //matrixelementTree = &Process::matrixMSSMTree_ud_suLsdR;
       //matrixelementVirt = &matrixMSSMVirt_ud_suLsdR;
       f1 = 2.;
       f2 = 1.;
@@ -59,7 +71,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    }
 //    /* squark anti-squark production, MRSSM */
    else if(processID == "MRSSM,uubar_suLsuLdagger") {
-      matrixelementTree = &Process::matrixMRSSMTree_uubar_suLsuLdagger;
+      //matrixelementTree = &Process::matrixMRSSMTree_uubar_suLsuLdagger;
       //matrixelementVirt = &matrixMRSSMVirt_uubar_suLsuLdagger;
       f1 = 2.;
       f2 = -2.;
@@ -67,22 +79,50 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       h = 2.*2;
    }
    else if(processID == "MRSSM,GG_suLsuLdagger") {
-      matrixelementTree = &Process::matrixMRSSMTree_GG_suLsuLdagger;
+      //matrixelementTree = &Process::matrixMRSSMTree_GG_suLsuLdagger;
       //matrixelementVirt = &matrixMRSSMVirt_GG_suLsuLdagger;
       f1 = 0.;
       f2 = 0.;
       k = 2.*2*8*8;
       h = 1.;
    }
+   else if( processID == "sgluons-qqbar_OO" ) {
+      matrixelementTree = &Process::matrixSgluonTree_qqbar_OO;
+      matrixelementVirt = &Process::f;
+      m1 =  MasssigmaO;
+      m2 =  MasssigmaO;
+      k = 1;
+      f1 = 69;
+      f2 = 69;
+      h=1;
+   }
+   else if( processID == "sgluons-gg_OO" ) {
+      matrixelementTree = &Process::matrixSgluonTree_gg_OO;
+      matrixelementVirt = &Process::f;
+      m1 = m2 = MasssigmaO;
+      k = 1;
+      f1 = 0;
+      f2 = 0;
+      h=1;
+   }
    else {
       std::cout << "Process not implemented.\n";
    }
 }
 
-double Process::matrixMSSMTree_uu_suLsuR(double alphaS, double T, double U, double S) {
-   return 315.82734083485946*(alphaS*alphaS)*(1/pow(MassGlu*MassGlu - 1.*T,2) + 
-      1/pow(MassGlu*MassGlu - 1.*U,2))*(-1.*pow(MassSq,4) + T*U); /*left-right*/
-                    //+ 105.27578027828648*(alphaS*alphaS)*(MassGlu*MassGlu)*S*(3./pow(MassGlu*MassGlu - 1.*T,2) + 3./pow(MassGlu*MassGlu - 1.*U,2) - 2./((MassGlu*MassGlu - 1.*T)*(MassGlu*MassGlu - 1.*U))); /* left-left + right-right or 1/2 of left-left */
+double Process::f(double S, double T, double x, double y, int z) {
+   return 0.;
+}
+
+double Process::g(double S, double T) {
+   return 0.;
+}
+
+double Process::matrixMSSMTree_uu_suLsuR( double s ) {
+   double MGl2 = pow(MassGlu, 2);
+   double a = pdf->alphasQ( mu_r );
+   return (-4.*pow(a, 2)*pi*(2.*sqrt(s*(-4*pow(m1,2) + s)) + (2.*pow(m1,2) - 2.*MGl2 - s)*
+        log((4.*MGl2 + pow(1. + sqrt(1. - (4.*pow(m1,2))/s),2.)*s)/(4.*MGl2 + pow(-1. + sqrt(1. - (4.*pow(m1,2))/s),2)*s))))/(9.*pow(s,2));
 }
 
 double Process::matrixMRSSMTree_uubar_suLsuLdagger(double alphaS, double T, double U, double S) {
@@ -105,17 +145,33 @@ double Process::matrixMRSSMTree_GG_suLsuLdagger(double alphaS, double T, double 
    return  -157.91367041742973*(alphaS*alphaS)*((96.*(pow(MassSq,4) + T*U - 1.*(MassSq*MassSq)*(T + U)))/(S*S) + MassSq*MassSq*(37.333333333333336/(-1.*(MassSq*MassSq) + U) - 85.33333333333333*(T/pow(-1.*(MassSq*MassSq) + T,2) + U/pow(-1.*(MassSq*MassSq) + U,2))) + (37.333333333333336*(MassSq*MassSq) + (5.333333333333333*(9.*pow(MassSq,4) - 3.*(MassSq*MassSq)*(2.*(MassSq*MassSq) + S) + (S + T)*(S + U)))/(-1.*(MassSq*MassSq) + U))/(-1.*(MassSq*MassSq) + T) - (48.*((5.*pow(MassSq,4) + MassSq*MassSq*U - 1.*T*(-1.*(MassSq*MassSq) + U) - 1.*(MassSq*MassSq)*(3.*S + 4.*T + 2.*U))/(-1.*(MassSq*MassSq) + U) + (5.*pow(MassSq,4) + MassSq*MassSq*U - 1.*T*(-1.*(MassSq*MassSq) + U) - 1.*(MassSq*MassSq)*(3.*S + 2.*T + 4.*U))/(-1.*(MassSq*MassSq) + T)))/S);
 }
 
+inline double Process::matrixSgluonTree_qqbar_OO( double s ) {
+   double a = pdf->alphasQ( mu_r );
+   return 2. * pi * pow(a, 2)/(9. * s) * pow(1. - 4. * m1*m1/s, 3./2. );
+}
+
+inline double Process::matrixSgluonTree_gg_OO( double s ) {
+   double b = sqrt( 1. - 4. * m1*m1/s );
+   double a = pdf->alphasQ( mu_r );
+   return 3. * pi * pow(a, 2)/(32. * s) 
+      * (27.*b - 17*pow(b, 3) + 6.*(-3. + 2. * pow(b, 2) + pow(b, 4) ) * atanh(b) ) ;
+}
 /*
  
  Virtual
  
  */
 
-double Process::matrixMSSMVirt_uu_suLsuR(double alphaS, double T, double S, double U, 
-                 double mu, const double FiniteGs, const double Dminus4, int divergence) {        
+double Process::matrixMSSMVirt_uu_suLsuR(double S, double T, 
+   const double FiniteGs, const double Dminus4, int divergence) {
+   
 	ltini();
-	setmudim(pow(MassSq,2));
-	setlambda((double)divergence);
+	setmudim(pow(mu_r,2));
+	setlambda(divergence);
+   
+   double alphaS = pdf->alphasQ( mu_r );
+   double mu = mu_r;
+   double U = pow(m1, 2) + pow(m2, 2) - S - T;
    
 	int Divergence;    // UV divergence from gauge coupling
 	if(divergence == 0 || divergence == -2) {		    
@@ -131,4 +187,774 @@ double Process::matrixMSSMVirt_uu_suLsuR(double alphaS, double T, double S, doub
 //    ltexi();    // error message of LoopTools 
     double matrixReal = matrix.real();
     return matrixReal;
+}
+
+// soft 
+
+double Process::matrixMRSSMSoft_uu_suLsuRg(double s12, double th) {
+   
+   double Alfas = pdf->alphasQ( mu_r );
+   double Alfas2 = pow(Alfas, 2);
+   double beta = sqrt(1. - 4. * pow(m1, 2)/s12);
+   double MGl2 = pow(MassGlu, 2);
+   
+   std::complex<double> temp = ((-42.666666666666667*Alfas*Alfas2*beta*(-1. + beta*beta)*MGl2*s12*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),4) + 
+   (42.666666666666667*Alfas*Alfas2*beta*MGl2*s12*(-1. + beta*Cos(th))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),4) + 
+   (21.333333333333333*Alfas*Alfas2*beta*MGl2*s12*Power(-1. + beta*Cos(th),2)*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),4) + 
+   (21.333333333333333*Alfas*Alfas2*beta*(s12*s12)*Power(-1. + beta*Cos(th),2)*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),4) + 
+   (10.666666666666667*Alfas*Alfas2*beta*(s12*s12)*Power(-1. + beta*Cos(th),3)*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),4) + 
+   (21.333333333333333*Alfas*Alfas2*beta*MGl2*s12*(-1. + beta*Cos(th))*(1. + beta*Cos(th))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),4) - 
+   (10.666666666666667*Alfas*Alfas2*beta*(s12*s12)*Power(-1. + beta*Cos(th),2)*(1. + beta*Cos(th))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),4) - 
+   (2.3703703703703704*Alfas*Alfas2*beta*MGl2*s12*(-1. + beta*Cos(th))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),3) - 
+   (0.59259259259259259*Alfas*Alfas2*beta*(-1. + beta*beta)*(s12*s12)*(-1. + beta*Cos(th))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),3) + 
+   (1.1851851851851852*Alfas*Alfas2*beta*(s12*s12)*Power(-1. + beta*Cos(th),2)*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),3) + 
+   (0.59259259259259259*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) - 
+   (0.59259259259259259*Alfas*Alfas2*beta*s12*(-1. + beta*Cos(th))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) - 
+   (1.1851851851851852*Alfas*Alfas2*beta*s12*Power(-1. + beta*Cos(th),2)*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) - 
+   (0.14814814814814815*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*Power(-1. + beta*Cos(th),2)*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) - 
+   (0.2962962962962963*Alfas*Alfas2*beta*s12*Power(-1. + beta*Cos(th),3)*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.2962962962962963*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*(-1. + beta*Cos(th))*(1. + beta*Cos(th))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) - 
+   (0.14814814814814815*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*Power(1. + beta*Cos(th),2)*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.2962962962962963*Alfas*Alfas2*beta*s12*(-1. + beta*Cos(th))*Power(1. + beta*Cos(th),2)*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) - 
+   (42.666666666666667*Alfas*Alfas2*beta*(-1. + beta*beta)*MGl2*s12*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),4) + 
+   (42.666666666666667*Alfas*Alfas2*beta*MGl2*s12*(-1. + beta*Cos(th))*(1. + beta*Cos(th))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),4) + 
+   (21.333333333333333*Alfas*Alfas2*beta*(s12*s12)*Power(1. + beta*Cos(th),2)*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),4) + 
+   (10.666666666666667*Alfas*Alfas2*beta*(s12*s12)*(-1. + beta*Cos(th))*Power(1. + beta*Cos(th),2)*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),4) - 
+   (10.666666666666667*Alfas*Alfas2*beta*(s12*s12)*Power(1. + beta*Cos(th),3)*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),4) + 
+   (0.2962962962962963*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.074074074074074074*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*Power(-1. + beta*Cos(th),2)*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) + 
+   (0.59259259259259259*Alfas*Alfas2*beta*s12*(1. + beta*Cos(th))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) + 
+   (0.2962962962962963*Alfas*Alfas2*beta*s12*(-1. + beta*Cos(th))*(1. + beta*Cos(th))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) + 
+   (0.14814814814814815*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*(-1. + beta*Cos(th))*(1. + beta*Cos(th))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.59259259259259259*Alfas*Alfas2*beta*s12*Power(1. + beta*Cos(th),2)*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.074074074074074074*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*Power(1. + beta*Cos(th),2)*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.14814814814814815*Alfas*Alfas2*beta*s12*(-1. + beta*Cos(th))*Power(1. + beta*Cos(th),2)*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) + 
+   (0.14814814814814815*Alfas*Alfas2*beta*s12*Power(1. + beta*Cos(th),3)*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.14814814814814815*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) - 
+   (0.037037037037037037*Alfas*Alfas2*beta*Power(-1. + beta*beta,2)*s12*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.2962962962962963*Alfas*Alfas2*beta*s12*(-1. + beta*Cos(th))*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.2962962962962963*Alfas*Alfas2*beta*s12*Power(-1. + beta*Cos(th),2)*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.037037037037037037*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*Power(-1. + beta*Cos(th),2)*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.074074074074074074*Alfas*Alfas2*beta*s12*Power(-1. + beta*Cos(th),3)*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) - 
+   (0.074074074074074074*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*(-1. + beta*Cos(th))*(1. + beta*Cos(th))*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.037037037037037037*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*Power(1. + beta*Cos(th),2)*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) - 
+   (0.074074074074074074*Alfas*Alfas2*beta*s12*(-1. + beta*Cos(th))*Power(1. + beta*Cos(th),2)*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) - 
+   (0.14814814814814815*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.037037037037037037*Alfas*Alfas2*beta*Power(-1. + beta*beta,2)*s12*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.14814814814814815*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*(-1. + beta*Cos(th))*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.037037037037037037*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*Power(-1. + beta*Cos(th),2)*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.14814814814814815*Alfas*Alfas2*beta*s12*(-1. + beta*Cos(th))*(1. + beta*Cos(th))*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.074074074074074074*Alfas*Alfas2*beta*s12*Power(-1. + beta*Cos(th),2)*(1. + beta*Cos(th))*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) + 
+   (0.037037037037037037*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*Power(1. + beta*Cos(th),2)*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) + 
+   (0.074074074074074074*Alfas*Alfas2*beta*s12*(-1. + beta*Cos(th))*Power(1. + beta*Cos(th),2)*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) + 
+   (1.1851851851851852*Alfas*Alfas2*beta*Power(-1. + beta*beta,2)*(MGl2*MGl2)*s12*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (1.1851851851851852*Alfas*Alfas2*beta*Power(-1. + beta*beta,2)*MGl2*(s12*s12)*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (0.59259259259259259*Alfas*Alfas2*beta*Power(-1. + beta*beta,3)*MGl2*(s12*s12)*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (0.074074074074074074*Alfas*Alfas2*beta*Power(-1. + beta*beta,4)*Power(s12,3)*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) - 
+   (0.14814814814814815*Alfas*Alfas2*beta*Power(-1. + beta*beta,3)*Power(s12,3)*(-1. + beta*Cos(th))*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (0.14814814814814815*Alfas*Alfas2*beta*Power(-1. + beta*beta,2)*Power(s12,3)*Power(-1. + beta*Cos(th),2)*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (0.14814814814814815*Alfas*Alfas2*beta*Power(-1. + beta*beta,3)*Power(s12,3)*(1. + beta*Cos(th))*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (0.14814814814814815*Alfas*Alfas2*beta*Power(-1. + beta*beta,2)*Power(s12,3)*Power(1. + beta*Cos(th),2)*(2.*Log(dS) - 1.*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) - 
+   (0.2962962962962963*Alfas*Alfas2*(-1. + beta*beta)*s12*(-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.2962962962962963*Alfas*Alfas2*s12*(-1. + beta*Cos(th))*(1. + beta*Cos(th))*
+      (-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)
+     - (0.2962962962962963*Alfas*Alfas2*(-1. + beta*beta)*s12*(-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) + 
+   (0.2962962962962963*Alfas*Alfas2*s12*(-1. + beta*Cos(th))*(1. + beta*Cos(th))*
+      (-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)
+     - (9.4814814814814815*Alfas*Alfas2*(-1. + beta*beta)*(MGl2*MGl2)*s12*(-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*
+      Sin(th))/(Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) - 
+   (9.4814814814814815*Alfas*Alfas2*(-1. + beta*beta)*MGl2*(s12*s12)*(-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*
+      Sin(th))/(Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) - 
+   (4.7407407407407407*Alfas*Alfas2*Power(-1. + beta*beta,2)*MGl2*(s12*s12)*
+      (-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) - 
+   (0.59259259259259259*Alfas*Alfas2*Power(-1. + beta*beta,3)*Power(s12,3)*(-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*
+      Sin(th))/(Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (1.1851851851851852*Alfas*Alfas2*Power(-1. + beta*beta,2)*Power(s12,3)*(-1. + beta*Cos(th))*
+      (-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) - 
+   (1.1851851851851852*Alfas*Alfas2*(-1. + beta*beta)*Power(s12,3)*Power(-1. + beta*Cos(th),2)*
+      (-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) - 
+   (1.1851851851851852*Alfas*Alfas2*Power(-1. + beta*beta,2)*Power(s12,3)*(1. + beta*Cos(th))*
+      (-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (9.4814814814814815*Alfas*Alfas2*(MGl2*MGl2)*s12*(-1. + beta*Cos(th))*(1. + beta*Cos(th))*
+      (-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (9.4814814814814815*Alfas*Alfas2*MGl2*(s12*s12)*(-1. + beta*Cos(th))*(1. + beta*Cos(th))*
+      (-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (4.7407407407407407*Alfas*Alfas2*(-1. + beta*beta)*MGl2*(s12*s12)*(-1. + beta*Cos(th))*(1. + beta*Cos(th))*
+      (-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (0.59259259259259259*Alfas*Alfas2*Power(-1. + beta*beta,2)*Power(s12,3)*(-1. + beta*Cos(th))*(1. + beta*Cos(th))*
+      (-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) - 
+   (1.1851851851851852*Alfas*Alfas2*(-1. + beta*beta)*Power(s12,3)*Power(-1. + beta*Cos(th),2)*(1. + beta*Cos(th))*
+      (-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (1.1851851851851852*Alfas*Alfas2*Power(s12,3)*Power(-1. + beta*Cos(th),3)*(1. + beta*Cos(th))*
+      (-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) - 
+   (1.1851851851851852*Alfas*Alfas2*(-1. + beta*beta)*Power(s12,3)*Power(1. + beta*Cos(th),2)*
+      (-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (1.1851851851851852*Alfas*Alfas2*(-1. + beta*beta)*Power(s12,3)*(-1. + beta*Cos(th))*Power(1. + beta*Cos(th),2)*
+      (-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (1.1851851851851852*Alfas*Alfas2*Power(s12,3)*(-1. + beta*Cos(th))*Power(1. + beta*Cos(th),3)*
+      (-1.*Log((1. + beta)/(1. - 1.*beta)) + 2.*beta*Log(dS) - 1.*beta*Log((mu_r*mu_r)/s12))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (0.074074074074074074*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*(4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.037037037037037037*Alfas*Alfas2*beta*Power(-1. + beta*beta,2)*s12*(4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*
+      Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.074074074074074074*Alfas*Alfas2*beta*s12*Power(-1. + beta*Cos(th),2)*(4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*
+      Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.037037037037037037*Alfas*Alfas2*beta*s12*Power(-1. + beta*Cos(th),3)*(4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*
+      Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.074074074074074074*Alfas*Alfas2*beta*s12*(1. + beta*Cos(th))*(4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.074074074074074074*Alfas*Alfas2*beta*s12*(-1. + beta*Cos(th))*(1. + beta*Cos(th))*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)\
+    + (0.018518518518518519*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*(-1. + beta*Cos(th))*(1. + beta*Cos(th))*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)\
+    + (0.018518518518518519*Alfas*Alfas2*beta*s12*Power(-1. + beta*Cos(th),2)*(1. + beta*Cos(th))*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)\
+    - (0.018518518518518519*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*Power(1. + beta*Cos(th),2)*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)\
+    - (0.037037037037037037*Alfas*Alfas2*beta*s12*(-1. + beta*Cos(th))*Power(1. + beta*Cos(th),2)*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)\
+    - (0.018518518518518519*Alfas*Alfas2*beta*s12*Power(1. + beta*Cos(th),3)*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)\
+    + (0.037037037037037037*Alfas*Alfas2*beta*Power(-1. + beta*beta,2)*s12*(4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*
+      Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.037037037037037037*Alfas*Alfas2*beta*(-1. + beta*beta)*s12*(-1. + beta*Cos(th))*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)\
+    + (0.037037037037037037*Alfas*Alfas2*beta*s12*Power(-1. + beta*Cos(th),2)*(1. + beta*Cos(th))*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)\
+    - (0.037037037037037037*Alfas*Alfas2*beta*s12*(-1. + beta*Cos(th))*Power(1. + beta*Cos(th),2)*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)\
+    - (1.1851851851851852*Alfas*Alfas2*beta*Power(-1. + beta*beta,2)*(MGl2*MGl2)*s12*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) - 
+   (1.1851851851851852*Alfas*Alfas2*beta*Power(-1. + beta*beta,2)*MGl2*(s12*s12)*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) - 
+   (0.59259259259259259*Alfas*Alfas2*beta*Power(-1. + beta*beta,3)*MGl2*(s12*s12)*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) - 
+   (0.074074074074074074*Alfas*Alfas2*beta*Power(-1. + beta*beta,4)*Power(s12,3)*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (0.14814814814814815*Alfas*Alfas2*beta*Power(-1. + beta*beta,3)*Power(s12,3)*(-1. + beta*Cos(th))*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) - 
+   (0.14814814814814815*Alfas*Alfas2*beta*Power(-1. + beta*beta,2)*Power(s12,3)*Power(-1. + beta*Cos(th),2)*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (1.1851851851851852*Alfas*Alfas2*beta*(-1. + beta*beta)*(MGl2*MGl2)*s12*(1. + beta*Cos(th))*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (1.1851851851851852*Alfas*Alfas2*beta*(-1. + beta*beta)*MGl2*(s12*s12)*(1. + beta*Cos(th))*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (0.59259259259259259*Alfas*Alfas2*beta*Power(-1. + beta*beta,2)*MGl2*(s12*s12)*(1. + beta*Cos(th))*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) - 
+   (0.074074074074074074*Alfas*Alfas2*beta*Power(-1. + beta*beta,3)*Power(s12,3)*(1. + beta*Cos(th))*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) - 
+   (0.14814814814814815*Alfas*Alfas2*beta*Power(-1. + beta*beta,2)*Power(s12,3)*(-1. + beta*Cos(th))*(1. + beta*Cos(th))*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (0.14814814814814815*Alfas*Alfas2*beta*(-1. + beta*beta)*Power(s12,3)*Power(-1. + beta*Cos(th),2)*(1. + beta*Cos(th))*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (0.14814814814814815*Alfas*Alfas2*beta*(-1. + beta*beta)*Power(s12,3)*Power(1. + beta*Cos(th),3)*
+      (4.*Power(Log(dS),2) - 4.*Log(dS)*Log((mu_r*mu_r)/s12) + Power(Log((mu_r*mu_r)/s12),2))*Sin(th))/
+    (Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2)*Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2)) + 
+   (0.074074074074074074*Alfas*Alfas2*(-1. + beta*beta)*s12*(-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 
+        2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.037037037037037037*Alfas*Alfas2*Power(-1. + beta*beta,2)*s12*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) - 
+   (0.074074074074074074*Alfas*Alfas2*s12*(-1. + beta*Cos(th))*(-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 
+        2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) - 
+   (0.037037037037037037*Alfas*Alfas2*(-1. + beta*beta)*s12*(-1. + beta*Cos(th))*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) - 
+   (0.018518518518518519*Alfas*Alfas2*(-1. + beta*beta)*s12*Power(-1. + beta*Cos(th),2)*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.018518518518518519*Alfas*Alfas2*s12*Power(-1. + beta*Cos(th),3)*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.074074074074074074*Alfas*Alfas2*s12*(1. + beta*Cos(th))*(-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 
+        2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.037037037037037037*Alfas*Alfas2*(-1. + beta*beta)*s12*(1. + beta*Cos(th))*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) - 
+   (0.018518518518518519*Alfas*Alfas2*s12*Power(-1. + beta*Cos(th),2)*(1. + beta*Cos(th))*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) - 
+   (0.018518518518518519*Alfas*Alfas2*(-1. + beta*beta)*s12*Power(1. + beta*Cos(th),2)*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.018518518518518519*Alfas*Alfas2*s12*(-1. + beta*Cos(th))*Power(1. + beta*Cos(th),2)*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) - 
+   (0.018518518518518519*Alfas*Alfas2*s12*Power(1. + beta*Cos(th),3)*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 - 2.*beta*s12*Cos(th),2) + 
+   (0.074074074074074074*Alfas*Alfas2*(-1. + beta*beta)*s12*(-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 
+        2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) + 
+   (0.037037037037037037*Alfas*Alfas2*Power(-1. + beta*beta,2)*s12*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.074074074074074074*Alfas*Alfas2*s12*(-1. + beta*Cos(th))*(-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 
+        2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.037037037037037037*Alfas*Alfas2*(-1. + beta*beta)*s12*(-1. + beta*Cos(th))*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.018518518518518519*Alfas*Alfas2*(-1. + beta*beta)*s12*Power(-1. + beta*Cos(th),2)*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) + 
+   (0.018518518518518519*Alfas*Alfas2*s12*Power(-1. + beta*Cos(th),3)*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) + 
+   (0.074074074074074074*Alfas*Alfas2*s12*(1. + beta*Cos(th))*(-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 
+        2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/
+    Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) + 
+   (0.037037037037037037*Alfas*Alfas2*(-1. + beta*beta)*s12*(1. + beta*Cos(th))*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.018518518518518519*Alfas*Alfas2*s12*Power(-1. + beta*Cos(th),2)*(1. + beta*Cos(th))*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.018518518518518519*Alfas*Alfas2*(-1. + beta*beta)*s12*Power(1. + beta*Cos(th),2)*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) + 
+   (0.018518518518518519*Alfas*Alfas2*s12*(-1. + beta*Cos(th))*Power(1. + beta*Cos(th),2)*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) - 
+   (0.018518518518518519*Alfas*Alfas2*s12*Power(1. + beta*Cos(th),3)*
+      (-1.*Power(Log((1. + beta)/(1. - 1.*beta)),2) + 4.*Log((1. + beta)/(1. - 1.*beta))*Log(dS) - 2.*Log((1. + beta)/(1. - 1.*beta))*Log((mu_r*mu_r)/s12) - 
+        4.*PolyLog(2.,(2.*beta)/(1. + beta)))*Sin(th))/Power(4.*MGl2 + s12 + beta*beta*s12 + 2.*beta*s12*Cos(th),2) + 
+   (0.0023148148148148148*Alfas*Alfas2*beta*Power(1. - 1.*beta*Cos(th),2)*
+      (s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) + 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) - 
+        1.*s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) + 0.5*s12*Power(Log(s12),2) + Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) - 
+        1.*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. - 1.*beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) - 
+        1.*s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(-1.*beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(-1.*beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2) + 
+   (0.0011574074074074074*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*(1. + beta*Cos(th))*
+      (s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) + 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) - 
+        1.*s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) + 0.5*s12*Power(Log(s12),2) + Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) - 
+        1.*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. - 1.*beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) - 
+        1.*s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(-1.*beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(-1.*beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    ((1. - 1.*beta*Cos(th))*Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2)) + 
+   (0.0011574074074074074*Alfas*Alfas2*beta*Power(1. + beta*Cos(th),2)*
+      (s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) + 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) - 
+        1.*s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) + 0.5*s12*Power(Log(s12),2) + Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) - 
+        1.*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. - 1.*beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) - 
+        1.*s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(-1.*beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(-1.*beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2) - 
+   (0.005787037037037037*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. - 1.*beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(-1.*beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(-1.*beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2) + 
+   (0.0046296296296296296*Alfas*Alfas2*beta*(1. - 1.*beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. - 1.*beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(-1.*beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(-1.*beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2) + 
+   (0.0005787037037037037*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*(1. - 1.*beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. - 1.*beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(-1.*beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(-1.*beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2) + 
+   (0.0023148148148148148*Alfas*Alfas2*beta*(1. + beta*Cos(th))*(-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 
+        0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 
+        1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. - 1.*beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(-1.*beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(-1.*beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2) + 
+   (0.0011574074074074074*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*(1. + beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. - 1.*beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(-1.*beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(-1.*beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2) + 
+   (0.0011574074074074074*Alfas*Alfas2*beta*(1. - 1.*beta*Cos(th))*(1. + beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. - 1.*beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(-1.*beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(-1.*beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2) + 
+   (0.0005787037037037037*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*Power(1. + beta*Cos(th),2)*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. - 1.*beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(-1.*beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(-1.*beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    ((1. - 1.*beta*Cos(th))*Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2)) + 
+   (0.040509259259259259*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. - 1.*beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(-1.*beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(-1.*beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. + beta*Cos(th)),2) - 
+   (0.0040509259259259259*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*(1. - 1.*beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. - 1.*beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(-1.*beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(-1.*beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. + beta*Cos(th)),2) - 
+   (0.0081018518518518519*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*(1. + beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. - 1.*beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(-1.*beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(-1.*beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. + beta*Cos(th)),2) + 
+   (0.0081018518518518519*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*(1. + beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. - 1.*beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(-1.*beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(-1.*beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    ((1. - 1.*beta*Cos(th))*Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. + beta*Cos(th)),2)) - 
+   (0.032407407407407407*Alfas*Alfas2*beta*(1. - 1.*beta*Cos(th))*(1. + beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. - 1.*beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(-1.*beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(-1.*beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. + beta*Cos(th)),2) - 
+   (0.0040509259259259259*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*Power(1. + beta*Cos(th),2)*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. - 1.*beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(-1.*beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. - 1.*beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(-1.*beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    ((1. - 1.*beta*Cos(th))*Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. + beta*Cos(th)),2)) + 
+   (0.0034722222222222222*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*
+      (s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) + 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) - 
+        1.*s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) + 0.5*s12*Power(Log(s12),2) + Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) - 
+        1.*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) - 
+        1.*s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. + beta*Cos(th)),2) + 
+   (0.0011574074074074074*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*(1. - 1.*beta*Cos(th))*
+      (s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) + 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) - 
+        1.*s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) + 0.5*s12*Power(Log(s12),2) + Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) - 
+        1.*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) - 
+        1.*s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. + beta*Cos(th)),2) + 
+   (0.0005787037037037037*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*Power(1. - 1.*beta*Cos(th),2)*
+      (s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) + 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) - 
+        1.*s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) + 0.5*s12*Power(Log(s12),2) + Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) - 
+        1.*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) - 
+        1.*s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    ((1. + beta*Cos(th))*Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. + beta*Cos(th)),2)) + 
+   (0.0005787037037037037*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*(1. + beta*Cos(th))*
+      (s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) + 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) - 
+        1.*s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) + 0.5*s12*Power(Log(s12),2) + Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) - 
+        1.*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) - 
+        1.*s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. + beta*Cos(th)),2) + 
+   (0.024305555555555556*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2) + 
+   (0.016203703703703704*Alfas*Alfas2*beta*(1. - 1.*beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2) - 
+   (0.016203703703703704*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*(1. - 1.*beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2) - 
+   (0.032407407407407407*Alfas*Alfas2*beta*(1. - 1.*beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    ((1. + beta*Cos(th))*Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2)) - 
+   (0.0081018518518518519*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*(1. - 1.*beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    ((1. + beta*Cos(th))*Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2)) - 
+   (0.0040509259259259259*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*Power(1. - 1.*beta*Cos(th),2)*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    ((1. + beta*Cos(th))*Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2)) - 
+   (0.0081018518518518519*Alfas*Alfas2*beta*Power(1. - 1.*beta*Cos(th),3)*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    ((1. + beta*Cos(th))*Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2)) - 
+   (0.0040509259259259259*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*(1. + beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2) - 
+   (0.0081018518518518519*Alfas*Alfas2*beta*(1. - 1.*beta*Cos(th))*(1. + beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2) + 
+   (0.0081018518518518519*Alfas*Alfas2*beta*Power(1. + beta*Cos(th),2)*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. - 1.*beta*Cos(th)),2) - 
+   (0.064814814814814815*Alfas*Alfas2*beta*(-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 
+        0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 
+        1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(MGl2 - 0.25*(1. - 1.*(beta*beta))*s12 + 0.5*s12*(1. - 1.*beta*Cos(th)),2) + 
+   (0.016203703703703704*Alfas*Alfas2*beta*(1. - 1.*beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(MGl2 - 0.25*(1. - 1.*(beta*beta))*s12 + 0.5*s12*(1. - 1.*beta*Cos(th)),2) + 
+   (0.064814814814814815*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    ((1. + beta*Cos(th))*Power(MGl2 - 0.25*(1. - 1.*(beta*beta))*s12 + 0.5*s12*(1. - 1.*beta*Cos(th)),2)) - 
+   (0.016203703703703704*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*(1. - 1.*beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    ((1. + beta*Cos(th))*Power(MGl2 - 0.25*(1. - 1.*(beta*beta))*s12 + 0.5*s12*(1. - 1.*beta*Cos(th)),2)) + 
+   (0.032407407407407407*Alfas*Alfas2*beta*Power(1. - 1.*beta*Cos(th),2)*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    ((1. + beta*Cos(th))*Power(MGl2 - 0.25*(1. - 1.*(beta*beta))*s12 + 0.5*s12*(1. - 1.*beta*Cos(th)),2)) - 
+   (0.0081018518518518519*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*(1. + beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(MGl2 - 0.25*(1. - 1.*(beta*beta))*s12 + 0.5*s12*(1. - 1.*beta*Cos(th)),2) + 
+   (0.0081018518518518519*Alfas*Alfas2*beta*Power(1. + beta*Cos(th),2)*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(MGl2 - 0.25*(1. - 1.*(beta*beta))*s12 + 0.5*s12*(1. - 1.*beta*Cos(th)),2) + 
+   (0.0011574074074074074*Alfas*Alfas2*beta*(1. - 1.*(beta*beta))*(1. - 1.*beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    ((1. + beta*Cos(th))*Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. + beta*Cos(th)),2)) + 
+   (0.0046296296296296296*Alfas*Alfas2*beta*(1. - 1.*beta*Cos(th))*(1. + beta*Cos(th))*
+      (-1.*s12*(2.*Power(Log(dS),2) + 2.*Log(dS)*Log(1/s12) + 0.5*Power(Log(1/s12),2)) - 0.5*s12*Power(Log((mu_r*mu_r)/s12),2) + 
+        s12*(-2.*Log(dS) - 1.*Log(1/s12))*Log(s12) - 0.5*s12*Power(Log(s12),2) - 1.*Log((mu_r*mu_r)/s12)*(s12*(-2.*Log(dS) - 1.*Log(1/s12)) - 1.*s12*Log(s12)) + 
+        (s12*(-2.*Log(dS) - 1.*Log(1/s12)) + s12*Log((mu_r*mu_r)/s12) - 1.*s12*Log(s12))*
+         Log(Power(1. + beta*Cos(th),2)/(1. - 1.*(beta*beta)*Power(Cos(th),2) - 1.*(beta*beta)*Power(Sin(th),2))) + 
+        s12*(-1.*Power(Log((1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))),2) + 
+           0.5*Power(Log((1. + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/
+               (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))),2) + 
+           2.*PolyLog(2.,(beta*Cos(th) - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2)))/(1. + beta*Cos(th))) - 
+           2.*PolyLog(2.,(-1.*(beta*Cos(th) + Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))/
+              (1. - 1.*Sqrt(beta*beta*Power(Cos(th),2) + beta*beta*Power(Sin(th),2))))))*Sin(th))/
+    Power(-1.*MGl2 + 0.25*(1. - 1.*(beta*beta))*s12 - 0.5*s12*(1. + beta*Cos(th)),2));
+   
+   return temp.real();
 }
