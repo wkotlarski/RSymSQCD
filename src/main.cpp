@@ -56,17 +56,25 @@ int main(int argc, char* argv[]) {
          cout << xsection_tree.at(0) << endl;
          
       } else if( string(argv[1]) == "pp_suLsuR" ) {
-         Process process1("MRSSM-uu_suLsuR", pt);
-         XSection::init( &process1, pt, 1, 1, 1 );
-         XSection_Tree tree;
-         xsection_tree = tree.integrate();
+		  if ( string(argv[3]) == "MRSSM" ) {
+             Process process1("MRSSM,uu_suLsuR", pt);
+             XSection::init( &process1, pt, 1, 1, 1 );
+             XSection_Tree tree;
+             xsection_tree = tree.integrate();
+          } else if ( string(argv[3]) == "MSSM" ) {
+			  cout << "blabla" << endl;
+             Process process1("MSSM,uu_suLsuR", pt);
+             XSection::init( &process1, pt, 1, 1, 1 );
+             XSection_Tree tree;
+             xsection_tree = tree.integrate();
+          }
       } else {
          cout << "LO process not implemented\n";
       }
    } else if ( string( argv[2] ) == "NLO" ) {
       if( string(argv[1]) == "pp_suLsuR" ) {
          Process process1("MRSSM-uu_suLsuR", pt);
-         XSection::init( &process1, pt, pow(10, -atoi(argv[3])), pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])) );
+         XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
          XSection_Tree tree;
          xsection_tree = tree.integrate();
       
