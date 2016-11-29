@@ -56,12 +56,12 @@ int main(int argc, char* argv[]) {
          cout << xsection_tree.at(0) << endl;
          
       } else if( string(argv[1]) == "pp_suLsuR" ) {
-		  if ( string(argv[3]) == "MRSSM" ) {
+		  if ( string(argv[3]) == "MRSSM" ) { // checked
              Process process1("MRSSM,uu_suLsuR", pt);
              XSection::init( &process1, pt, 1, 1, 1 );
              XSection_Tree tree;
              xsection_tree = tree.integrate();
-          } else if ( string(argv[3]) == "MSSM" ) {
+          } else if ( string(argv[3]) == "MSSM" ) { // checked
 			  cout << "blabla" << endl;
              Process process1("MSSM,uu_suLsuR", pt);
              XSection::init( &process1, pt, 1, 1, 1 );

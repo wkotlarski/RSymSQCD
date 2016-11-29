@@ -110,7 +110,7 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
             * 1./y * pdf->xfxQ(2, std::min(x1/y, 1.), muF)/std::min(x1/y, 1.) 
             * pdf->xfxQ(2, x2, muF)/x2 
             * Alfas/two_pi 
-            * (processID->*processID->matrixelementTree)(s12);
+            * (processID->*processID->sigmaPartTree)(s12);
    
     // multiply by jakobian of integration variable transformation
     ff[0] *= (Power(-4*pow(m1, 2) + S,2)*xx[0]*(4*pow(m1, 2)*(-1 + xx[0]) - S*(-1 + dS + xx[0])))/

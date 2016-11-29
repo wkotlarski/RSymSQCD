@@ -29,8 +29,14 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 /* -------------------- Squark-squark production---------------------------------*/
 
 	if(processID == "MRSSM,uu_suLsuR") {
-      // tree-level is the same as in the MSSM
-      matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM
+	  partonic = false;
+	  if(partonic == true){
+          // tree-level is the same as in the MSSM
+          sigmaPartTree = &Process::sigmaMSSMTree_uu_suLsuR; // same as in MSSM
+      }
+      else{		  
+		  matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM
+	  }    
       // todo: MSSM != MRSSM in virtual corrections
       matrixelementVirt = &Process::matrixMSSMVirt_uu_suLsuR;
       //matrixelementVirt = &Process::f;
@@ -95,7 +101,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 /* -------------------- Sgluon production ---------------------*/
 
    else if( processID == "sgluons-qqbar_OO" ) {
-      matrixelementTree = &Process::matrixSgluonTree_qqbar_OO;
+      sigmaPartTree = &Process::matrixSgluonTree_qqbar_OO;
       matrixelementVirt = &Process::f;
       m1 =  MasssigmaO;
       m2 =  MasssigmaO;
@@ -105,7 +111,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       h=1;
    }
    else if( processID == "sgluons-gg_OO" ) {
-      matrixelementTree = &Process::matrixSgluonTree_gg_OO;
+      sigmaPartTree = &Process::matrixSgluonTree_gg_OO;
       matrixelementVirt = &Process::f;
       m1 = m2 = MasssigmaO;
       k = 1;
@@ -131,12 +137,19 @@ double Process::g(double S, double T) {
 
 /* -------------------- Squark-squark production: q+q > sq+sq ---------------------------------*/
 
-double Process::matrixMSSMTree_uu_suLsuR( double s ) {
+double Process::sigmaMSSMTree_uu_suLsuR( double s ) {
    double MGl2 = pow(MassGlu, 2);
    double a = pdf->alphasQ( mu_r );
    return (-4.*pow(a, 2)*pi*(2.*sqrt(s*(-4*pow(m1,2) + s)) + (2.*pow(m1,2) - 2.*MGl2 - s)*
         log((4.*MGl2 + pow(1. + sqrt(1. - (4.*pow(m1,2))/s),2.)*s)/(4.*MGl2 + pow(-1. + sqrt(1. - (4.*pow(m1,2))/s),2)*s))))/(9.*pow(s,2));
 }
+
+double Process::matrixMSSMTree_uu_suLsuR( double s, double T ) {
+	double alphaS = pdf->alphasQ( mu_r );
+	double U = 2*MassSq*MassSq - s - T;
+	return (315.82734083485946*(alphaS*alphaS)*(-1.*pow(MassSq,4) + T*U))/pow(-1.*(MassGlu*MassGlu) + T,2) + (315.82734083485946*(alphaS*alphaS)*(-1.*pow(MassSq,4) + T*U))/pow(-1.*(MassGlu*MassGlu) + U,2);
+}
+
 /*
 double Process::matrixMSSMTree_uu_suLsuL( double s ) {
    // todo

@@ -22,7 +22,8 @@ class Process {
       const LHAPDF::PDF* pdf;
        
       // tree-level matrix elements
-      double matrixMSSMTree_uu_suLsuR( double );
+      double sigmaMSSMTree_uu_suLsuR( double );
+      double matrixMSSMTree_uu_suLsuR( double, double );
       double matrixMRSSMTree_uubar_suLsuLdagger(double, double, double, double);
       double matrixMSSMTree_ud_suLsdR(double, double, double, double);
       double matrixMRSSMTree_ud_suLsdR(double, double, double, double);
@@ -40,7 +41,8 @@ class Process {
       
    public: 
       Process(std::string,  boost::property_tree::ptree); 
-      double (Process::* matrixelementTree)(double); // matrix element squared 
+      double (Process::* matrixelementTree)(double, double); // matrix element squared 
+      double (Process::* sigmaPartTree)(double); // partonic cross section
       double (Process::* matrixelementVirt)(double, double, double, //double, double, double,
                                     double, int); // Re[M^1L M^(B star)]
       double (Process::* matrixelementReal_SC)(double, double);
@@ -51,5 +53,6 @@ class Process {
       double f1,f2; // flavours of initial partons
       double k;     // 1/k = average over initial state colors and helicities
       double h;     // h = sum over initial and final state helicities of fermions (_hel = 0 in FormCalc)
+      bool partonic;
 };
 #endif /* PROCESS_H_ */
