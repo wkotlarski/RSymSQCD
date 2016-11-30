@@ -48,8 +48,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       k = 2.*2*3*3;
       h = 2.*2;
    }
-   else if(processID == "MRSSM,ud_suLsdR") {
-      //matrixelementTree = &Process::matrixMRSSMTree_ud_suLsdR;
+   else if(processID == "MRSSM,ud_suLsdR") { // same as in MSSM
+      matrixelementTree = &Process::matrixMSSMTree_ud_suLsdR;
       //matrixelementVirt = &matrixMRSSMVirt_ud_suLsdR;
       f1 = 2.;
       f2 = 1.;
@@ -70,7 +70,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       h = 2.*2;
    }
    else if(processID == "MSSM,ud_suLsdR") {
-      //matrixelementTree = &Process::matrixMSSMTree_ud_suLsdR;
+      matrixelementTree = &Process::matrixMSSMTree_ud_suLsdR;
       //matrixelementVirt = &matrixMSSMVirt_ud_suLsdR;
       f1 = 2.;
       f2 = 1.;
@@ -137,16 +137,16 @@ double Process::g(double S, double T) {
 
 /* -------------------- Squark-squark production: q+q > sq+sq ---------------------------------*/
 
-double Process::sigmaMSSMTree_uu_suLsuR( double s ) {
+double Process::sigmaMSSMTree_uu_suLsuR( double s ) { // checked
    double MGl2 = pow(MassGlu, 2);
    double a = pdf->alphasQ( mu_r );
    return (-4.*pow(a, 2)*pi*(2.*sqrt(s*(-4*pow(m1,2) + s)) + (2.*pow(m1,2) - 2.*MGl2 - s)*
         log((4.*MGl2 + pow(1. + sqrt(1. - (4.*pow(m1,2))/s),2.)*s)/(4.*MGl2 + pow(-1. + sqrt(1. - (4.*pow(m1,2))/s),2)*s))))/(9.*pow(s,2));
 }
 
-double Process::matrixMSSMTree_uu_suLsuR( double s, double T ) {
+double Process::matrixMSSMTree_uu_suLsuR( double S, double T ) { // checked (same as MRSSM)
 	double alphaS = pdf->alphasQ( mu_r );
-	double U = 2*MassSq*MassSq - s - T;
+	double U = 2*MassSq*MassSq - S - T;
 	return (315.82734083485946*(alphaS*alphaS)*(-1.*pow(MassSq,4) + T*U))/pow(-1.*(MassGlu*MassGlu) + T,2) + (315.82734083485946*(alphaS*alphaS)*(-1.*pow(MassSq,4) + T*U))/pow(-1.*(MassGlu*MassGlu) + U,2);
 }
 
@@ -156,9 +156,13 @@ double Process::matrixMSSMTree_uu_suLsuL( double s ) {
    return 105.27578027828648*(alphaS*alphaS)*(MassGlu*MassGlu)*S*(3./pow(MassGlu*MassGlu - 1.*T,2) + 3./pow(MassGlu*MassGlu - 1.*U,2) - 2./((MassGlu*MassGlu - 1.*T)*(MassGlu*MassGlu - 1.*U)));
 }
 */
-double Process::matrixMSSMTree_ud_suLsdR(double alphaS, double T, double U, double S) {
-   return (315.82734083485946*(alphaS*alphaS)*(-1.*pow(MassSq,4) + T*U))/pow(MassGlu*MassGlu - 1.*T,2); /*  ONLY HAVE OF THE VALUE WHICH IS COMMENTED: left-right + right-left or 2 of left-right*/
-                   // + 2.*(315.82734083485946*(alphaS*alphaS)*(MassGlu*MassGlu)*S)/pow(MassGlu*MassGlu - 1.*T,2); /* left-left + right-right or 2 of left-left */
+
+double Process::matrixMSSMTree_ud_suLsdR( double S, double T ) { // agrees with Philip (same as MRSSM)
+	double alphaS = pdf->alphasQ( mu_r );
+	double U = 2*MassSq*MassSq - S - T;
+    return (315.82734083485946*(alphaS*alphaS)*(-1.*pow(MassSq,4) + T*U))/pow(MassGlu*MassGlu - 1.*T,2); 
+         // next line not yet checked, however should be in a seperate function and does not occur in MRSSM
+         // + 2.*(315.82734083485946*(alphaS*alphaS)*(MassGlu*MassGlu)*S)/pow(MassGlu*MassGlu - 1.*T,2); /* left-left + right-right or 2 of left-left */ 
 }
 /*
 double Process::matrixMSSMTree_ud_suLsdL(double alphaS, double T, double U, double S) {
@@ -166,26 +170,34 @@ double Process::matrixMSSMTree_ud_suLsdL(double alphaS, double T, double U, doub
    return 0;
 }
 */
-double Process::matrixMRSSMTree_ud_suLsdR(double alphaS, double T, double U, double S) {
-   return (315.82734083485946*(alphaS*alphaS)*(-1.*pow(MassSq,4) + T*U))/pow(-1.*(MassGlu*MassGlu) + T,2);
-}
 
 
 /* -------------------- Squark-antisquark production: q+q^bar > sq+sq^dagger ---------------------*/
 
-double Process::matrixMRSSMTree_uubar_suLsuLdagger(double alphaS, double T, double U, double S) {
-   return  (315.82734083485946*(alphaS*alphaS)*(-1.*pow(MassSq,4) + T*U))/(S*S) + 355.3057584392169*(alphaS*alphaS)*pow(0.3333333333333333/S - 1./(-1.*(MassGlu*MassGlu) + T),2)*(-1.*pow(MassSq,4) + T*U) - 236.8705056261446*(alphaS*alphaS)*(0.3333333333333333/S - 1./(-1.*(MassGlu*MassGlu) + T))*(1/S - 0.3333333333333333/(-1.*(MassGlu*MassGlu) + T))*(-1.*pow(MassSq,4) + T*U) + 355.3057584392169*(alphaS*alphaS)*pow(1/S - 0.3333333333333333/(-1.*(MassGlu*MassGlu) + T),2)*(-1.*pow(MassSq,4) + T*U);  
-}
+double Process::matrixMRSSMTree_uubar_suLsuLdagger( double S, double T ) { // agrees with Philip
+	double alphaS = pdf->alphasQ( mu_r );
+	double U = 2*MassSq*MassSq - S - T;
+    return  (315.82734083485946*(alphaS*alphaS)*(-1.*pow(MassSq,4) + T*U))/(S*S) + 355.3057584392169*(alphaS*alphaS)*pow(0.3333333333333333/S - 1./(-1.*(MassGlu*MassGlu) + T),2)*(-1.*pow(MassSq,4) + T*U) - 236.8705056261446*(alphaS*alphaS)*(0.3333333333333333/S - 1./(-1.*(MassGlu*MassGlu) + T))*(1/S - 0.3333333333333333/(-1.*(MassGlu*MassGlu) + T))*(-1.*pow(MassSq,4) + T*U) + 355.3057584392169*(alphaS*alphaS)*pow(1/S - 0.3333333333333333/(-1.*(MassGlu*MassGlu) + T),2)*(-1.*pow(MassSq,4) + T*U);             
+}           
 /*
 double Process::matrixMSSMTree_uubar_suLsuLdagger(double alphaS, double T, double U, double S) {
    // todo
    return 0;
 }
 */
+double Process::matrixMRSSMTree_ddbar_suLsuLdagger( double S, double T ) { // agrees with Philip
+	double alphaS = pdf->alphasQ( mu_r );
+	double U = 2*MassSq*MassSq - S - T;
+    return  (-631.6546816697189*(alphaS*alphaS)*(pow(MassSq,4) - 1.*T*U))/(S*S);
+} 
+
 /* --------------------- Squark-antisquark production: G+G > sq+sq^dagger ------------------------*/
-double Process::matrixMRSSMTree_GG_suLsuLdagger(double alphaS, double T, double U, double S) {
-   return  -157.91367041742973*(alphaS*alphaS)*((96.*(pow(MassSq,4) + T*U - 1.*(MassSq*MassSq)*(T + U)))/(S*S) + MassSq*MassSq*(37.333333333333336/(-1.*(MassSq*MassSq) + U) - 85.33333333333333*(T/pow(-1.*(MassSq*MassSq) + T,2) + U/pow(-1.*(MassSq*MassSq) + U,2))) + (37.333333333333336*(MassSq*MassSq) + (5.333333333333333*(9.*pow(MassSq,4) - 3.*(MassSq*MassSq)*(2.*(MassSq*MassSq) + S) + (S + T)*(S + U)))/(-1.*(MassSq*MassSq) + U))/(-1.*(MassSq*MassSq) + T) - (48.*((5.*pow(MassSq,4) + MassSq*MassSq*U - 1.*T*(-1.*(MassSq*MassSq) + U) - 1.*(MassSq*MassSq)*(3.*S + 4.*T + 2.*U))/(-1.*(MassSq*MassSq) + U) + (5.*pow(MassSq,4) + MassSq*MassSq*U - 1.*T*(-1.*(MassSq*MassSq) + U) - 1.*(MassSq*MassSq)*(3.*S + 2.*T + 4.*U))/(-1.*(MassSq*MassSq) + T)))/S);
-}
+
+double Process::matrixMRSSMTree_GG_suLsuLdagger( double S, double T ) { // agrees with Philip
+	double alphaS = pdf->alphasQ( mu_r );
+	double U = 2*MassSq*MassSq - S - T;
+    return  -157.91367041742973*(alphaS*alphaS)*((96.*(pow(MassSq,4) + T*U - 1.*(MassSq*MassSq)*(T + U)))/(S*S) + MassSq*MassSq*(37.333333333333336/(-1.*(MassSq*MassSq) + U) - 85.33333333333333*(T/pow(-1.*(MassSq*MassSq) + T,2) + U/pow(-1.*(MassSq*MassSq) + U,2))) + (37.333333333333336*(MassSq*MassSq) + (5.333333333333333*(9.*pow(MassSq,4) - 3.*(MassSq*MassSq)*(2.*(MassSq*MassSq) + S) + (S + T)*(S + U)))/(-1.*(MassSq*MassSq) + U))/(-1.*(MassSq*MassSq) + T) - (48.*((5.*pow(MassSq,4) + MassSq*MassSq*U - 1.*T*(-1.*(MassSq*MassSq) + U) - 1.*(MassSq*MassSq)*(3.*S + 4.*T + 2.*U))/(-1.*(MassSq*MassSq) + U) + (5.*pow(MassSq,4) + MassSq*MassSq*U - 1.*T*(-1.*(MassSq*MassSq) + U) - 1.*(MassSq*MassSq)*(3.*S + 2.*T + 4.*U))/(-1.*(MassSq*MassSq) + T)))/S);
+}           
 
 
 /* --------------------------------- Sgluon production -------------------------------------------*/
