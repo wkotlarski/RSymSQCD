@@ -12,11 +12,11 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
     double s = S * x1 * x2;     //partonic 
 
     /* integration of |M^B|^2 */
-    if(processID->partonic == false) {
-        double Tmin = pow( m1, 2 ) - s/2. - sqrt( pow(s, 2)/4 -
-                      pow( m1, 2 )*s);
-        double Tmax = pow( m1, 2 ) - s/2. + sqrt( pow(s, 2)/4. -
-                      pow( m1, 2 )*s);
+    if(processID->partonic == false) {		
+        double Tmin = pow( processID->m1, 2 ) - s/2. - sqrt( pow(s, 2)/4 -
+                      pow( processID->m1, 2 )*s);
+        double Tmax = pow( processID->m1, 2 ) - s/2. + sqrt( pow(s, 2)/4. -
+                      pow( processID->m1, 2 )*s);
         double T = xx[2]*(Tmax-Tmin) + Tmin;
         double jacobian = (Tmax-Tmin)*(xmax-x1min)*(xmax-x2min);
         double squaredM = (processID->*processID->matrixelementTree)(
@@ -25,8 +25,9 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
                          (processID->k)/(pow(s,2));
         double dSigmaHad = dSigmaPart
                      * pdf->xfxQ( processID->f1, x1, mu_f )/x1
-                     * pdf->xfxQ( processID->f2, x2, mu_f )/x2;
+                     * pdf->xfxQ( processID->f2, x2, mu_f )/x2;            
         ff[0] = dSigmaHad*jacobian*to_fb; 
+        return 0;
     }
     
     /* integration of partonic cross section */

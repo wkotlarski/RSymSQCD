@@ -56,20 +56,59 @@ int main(int argc, char* argv[]) {
          cout << xsection_tree.at(0) << endl;
          
       } else if( string(argv[1]) == "pp_suLsuR" ) {
-		  if ( string(argv[3]) == "MRSSM" ) { // checked
+		  if ( string(argv[3]) == "MRSSM" ) { // checked with MadGraph
              Process process1("MRSSM,uu_suLsuR", pt);
              XSection::init( &process1, pt, 1, 1, 1 );
              XSection_Tree tree;
              xsection_tree = tree.integrate();
-          } else if ( string(argv[3]) == "MSSM" ) { // checked
-			  cout << "blabla" << endl;
+             
+          } else if ( string(argv[3]) == "MSSM" ) { // checked with MadGraph
              Process process1("MSSM,uu_suLsuR", pt);
              XSection::init( &process1, pt, 1, 1, 1 );
              XSection_Tree tree;
              xsection_tree = tree.integrate();
+             
+          }
+      } else if( string(argv[1]) == "pp_suLsuL" ) { // checked 
+		  if ( string(argv[3]) == "MRSSM" ) {
+			  cout << "\n Process does not exist in MRSSM.\n";
+			  xsection_tree = {0,0,0};
+			  
+	      } else if ( string(argv[3]) == "MSSM" ) { // checked with MadGraph
+			 Process process1("MSSM,uu_suLsuL", pt);
+             XSection::init( &process1, pt, 1, 1, 1 );
+             XSection_Tree tree;
+             xsection_tree = tree.integrate();
+             
+          }
+      } else if( string(argv[1]) == "pp_suLsdR" ) {
+		  if ( string(argv[3]) == "MRSSM" ) { // checked with MadGraph
+             Process process1("MRSSM,ud_suLsdR", pt);
+             XSection::init( &process1, pt, 1, 1, 1 );
+             XSection_Tree tree;
+             xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
+             
+          } else if ( string(argv[3]) == "MSSM" ) { // checked with MadGraph
+             Process process1("MSSM,ud_suLsdR", pt);             
+             XSection::init( &process1, pt, 1, 1, 1 );
+             XSection_Tree tree;
+             xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state            
+             
+          }
+      } else if( string(argv[1]) == "pp_suLsdL" ) { // checked
+		  if ( string(argv[3]) == "MRSSM" ) {
+			  cout << "\n Process does not exist in MRSSM.\n";
+			  xsection_tree = {0,0,0};
+			  
+	      } else if ( string(argv[3]) == "MSSM" ) { // checked with MadGraph
+			 Process process1("MSSM,ud_suLsdL", pt);
+             XSection::init( &process1, pt, 1, 1, 1 );
+             XSection_Tree tree;
+             xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
+             
           }
       } else {
-         cout << "LO process not implemented\n";
+         cout << "LO process not implemented.\n";
       }
    } else if ( string( argv[2] ) == "NLO" ) {
       if( string(argv[1]) == "pp_suLsuR" ) {
