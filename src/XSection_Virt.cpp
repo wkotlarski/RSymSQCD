@@ -3,13 +3,14 @@
 int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    const int *ncomp, cubareal ff[], void *userdata) {
 
-   double mu_f = pt.get<double>("collider setup.mu_f");
-   double x1min = 4. * pow( m1, 2 )/S;
-   double x1 = x1min + (1. - x1min ) * xx[1];
-   double x2min = 4. * pow( m1, 2 )/(S*x1);
-   double x2 = x2min + (1. - x2min) * xx[2];
-   double s = S * x1 * x2;     //partonic 
-   double Tmin = pow( m1, 2 ) - s/2. - sqrt( pow(s, 2)/4 -
+    double mu_f = pt.get<double>("collider setup.mu_f");
+    double x1min = 4. * pow( m1, 2 )/S;
+    double xmax = 1.;
+    double x1 = x1min + (xmax - x1min) * xx[1];
+    double x2min = 4. * pow( m1, 2 )/(S*x1);
+    double x2 = x2min + (xmax - x2min) * xx[2];
+    double s = S * x1 * x2;     //partonic 
+    double Tmin = pow( m1, 2 ) - s/2. - sqrt( pow(s, 2)/4 -
                   pow( m1, 2 )*s);
     double Tmax = pow( m1, 2 ) - s/2. + sqrt( pow(s, 2)/4. -
                   pow( m1, 2 )*s);
@@ -19,12 +20,12 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
     double FiniteGs = 1;
     double Dminus4 = 0;
     int Divergence = 0;     // O(eps) 
-   double squaredMReal = (processID->*processID->matrixelementVirt)(
+    double squaredMReal = (processID->*processID->matrixelementVirt)(
       s, T, FiniteGs, Dminus4, Divergence);
     
     double dSigmaPart1 = 2.*squaredMReal*(processID->h)*M_PI/(pow(4.*M_PI,2))/
                          (processID->k)/(pow(s,2));
-
+    
     // contraction with O(eps) from Dminus4
     Divergence = -1;           // O(eps) 
     FiniteGs = 0;

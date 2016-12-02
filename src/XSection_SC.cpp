@@ -20,12 +20,13 @@ std::array<double, 3> XSection_SC::integrate() {
       prec_sc, accuracy_abs, 0,
       neval_min, neval_max, 1, NULL, NULL,
       &nregions, &neval, &fail, integral_sc, error_sc, prob_sc);
-        
+   
    cubareal integral_c1[ncomp], error_c1[ncomp], prob_c1[ncomp];
    llCuhre(ndim, ncomp, integrand_c1, NULL, 1,
       accuracy_rel_c, accuracy_abs, 0,
       neval_min, neval_max, 1, NULL, NULL,
       &nregions, &neval, &fail, integral_c1, error_c1, prob_c1);
+   
   
    cubareal integral_c2[ncomp], error_c2[ncomp], prob_c2[ncomp];
    llCuhre(ndim, ncomp, integrand_c2, NULL, 1,
@@ -92,12 +93,12 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
 
 int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
    const int *ncomp, cubareal ff[], void *userdata) {
-    
+   
    // integration variables
    double x1 = 4. * pow(m1, 2)/S + (1 - 4. * pow(m1, 2)/S ) * xx[0];
 	double x2 = 4. * pow(m1, 2) /(S * x1) + (1 - 4. * pow(m1, 2)/(S * x1)) * xx[1];
    double y = x1 + ( 1 - dS - x1 ) * xx[2];
-    
+     
    double s12 = x1 * x2 * S;
    double beta = sqrt( 1 - 4 * pow(m1, 2)/s12 );
     
@@ -110,7 +111,7 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
             * 1./y * pdf->xfxQ(2, std::min(x1/y, 1.), muF)/std::min(x1/y, 1.) 
             * pdf->xfxQ(2, x2, muF)/x2 
             * Alfas/two_pi 
-            * (processID->*processID->matrixelementTree)(s12);
+            * (processID->*processID->sigmaPartTree)(s12);
    
     // multiply by jakobian of integration variable transformation
     ff[0] *= (Power(-4*pow(m1, 2) + S,2)*xx[0]*(4*pow(m1, 2)*(-1 + xx[0]) - S*(-1 + dS + xx[0])))/

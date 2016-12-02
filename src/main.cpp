@@ -43,8 +43,8 @@ int main(int argc, char* argv[]) {
    auto start = chrono::steady_clock::now();
    auto t0 = chrono::steady_clock::now();
    
-   if( string( argv[2] ) == "LO" ) {
-      if ( string(argv[1]) == "pp_OsOs" ) {         
+   if( string( argv[3] ) == "LO" ) {
+      if ( string(argv[2]) == "pp_OsOs" ) {         
          Process process1("sgluons-gg_OO", pt);
          XSection::init( &process1, pt, 1, 1, 1 );
          XSection_Tree tree;
@@ -55,18 +55,67 @@ int main(int argc, char* argv[]) {
          xsection_tree = add(tree.integrate(), temp);
          cout << xsection_tree.at(0) << endl;
          
-      } else if( string(argv[1]) == "pp_suLsuR" ) {
-         Process process1("MRSSM-uu_suLsuR", pt);
-         XSection::init( &process1, pt, 1, 1, 1 );
-         XSection_Tree tree;
-         xsection_tree = tree.integrate();
+      } else if( string(argv[2]) == "pp_suLsuR" ) {
+		  if ( string(argv[1]) == "MRSSM" ) { // checked with MadGraph
+             Process process1("MRSSM,uu_suLsuR", pt);
+             XSection::init( &process1, pt, 1, 1, 1 );
+             XSection_Tree tree;
+             xsection_tree = tree.integrate();
+             
+          } else if ( string(argv[1]) == "MSSM" ) { // checked with MadGraph
+             Process process1("MSSM,uu_suLsuR", pt);
+             XSection::init( &process1, pt, 1, 1, 1 );
+             XSection_Tree tree;
+             xsection_tree = tree.integrate();
+             
+          }
+      } else if( string(argv[2]) == "pp_suLsuL" ) { // checked 
+		  if ( string(argv[1]) == "MRSSM" ) {
+			  cout << "\n Process does not exist in MRSSM.\n";
+			  xsection_tree = {0,0,0};
+			  
+	      } else if ( string(argv[1]) == "MSSM" ) { // checked with MadGraph
+			 Process process1("MSSM,uu_suLsuL", pt);
+             XSection::init( &process1, pt, 1, 1, 1 );
+             XSection_Tree tree;
+             xsection_tree = tree.integrate();
+             
+          }
+      } else if( string(argv[2]) == "pp_suLsdR" ) {
+		  if ( string(argv[1]) == "MRSSM" ) { // checked with MadGraph
+             Process process1("MRSSM,ud_suLsdR", pt);
+             XSection::init( &process1, pt, 1, 1, 1 );
+             XSection_Tree tree;
+             xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
+             
+          } else if ( string(argv[1]) == "MSSM" ) { // checked with MadGraph
+             Process process1("MSSM,ud_suLsdR", pt);             
+             XSection::init( &process1, pt, 1, 1, 1 );
+             XSection_Tree tree;
+             xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state            
+             
+          }
+      } else if( string(argv[2]) == "pp_suLsdL" ) { // checked
+		  if ( string(argv[1]) == "MRSSM" ) {
+			  cout << "\n Process does not exist in MRSSM.\n";
+			  xsection_tree = {0,0,0};
+			  
+	      } else if ( string(argv[1]) == "MSSM" ) { // checked with MadGraph
+			 Process process1("MSSM,ud_suLsdL", pt);
+             XSection::init( &process1, pt, 1, 1, 1 );
+             XSection_Tree tree;
+             xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
+             
+          }
       } else {
-         cout << "LO process not implemented\n";
+         cout << "LO process not implemented.\n";
       }
-   } else if ( string( argv[2] ) == "NLO" ) {
-      if( string(argv[1]) == "pp_suLsuR" ) {
-         Process process1("MRSSM-uu_suLsuR", pt);
-         XSection::init( &process1, pt, pow(10, -atoi(argv[3])), pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])) );
+   } else if ( string( argv[3] ) == "NLO" ) {
+      if( string(argv[2]) == "pp_suLsuR" ) {
+         
+         Process process1("MRSSM,uu_suLsuR", pt);
+         XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
+         
          XSection_Tree tree;
          xsection_tree = tree.integrate();
       
@@ -82,49 +131,16 @@ int main(int argc, char* argv[]) {
          cout << "NLO process not implemented\n";
       }
    } else {
-      cout << "Second command line argument must be 'LO' or 'NLO'." << endl;
+      cout << "Third command line argument must be 'LO' or 'NLO'." << endl;
       return 0;
    }
-   
-   auto t1 = chrono::steady_clock::now();
-    
-   cout  << "\nBorn part took " 
-         << chrono::duration_cast<chrono::seconds>(t1-t0).count() 
-         << " s" << endl;
-/*
-   auto t2 = chrono::steady_clock::now();
 
-   cout  << "\nVirtual part took " 
-         << chrono::duration_cast<chrono::seconds>(t2-t1).count() 
-         << " s" << endl;
-
-
-   auto t3 = chrono::steady_clock::now();  
-    
-   cout << "\nSoft and/or collinear part took " 
-         << chrono::duration_cast<chrono::seconds>(t3-t2).count() << " s" << endl;
-    
-
-    
-   
-   cout << "\nHard - non-collinear part took " 
-        << chrono::duration_cast<chrono::seconds>(end-t3).count() << " s" << endl;
-   cout << endl;
-
-   double total_time = chrono::duration_cast<chrono::seconds>(end-start).count();
- */  
-   
-   auto end = chrono::steady_clock::now();
-   
-   cout << "\nRun summary\n";
-   cout << "Time: " << chrono::duration_cast<chrono::minutes>(end-start).count()
-        << " minutes\n";
    cout << "---------------------------------------------------------------" << endl;
    cout << setprecision(5);
    cout << setw(12) << "tree:" << setw(13) << xsection_tree.at(0) 
          << " +/- " << setprecision(1) << xsection_tree.at(1)
          << " fb ( p-value = " << setw(8) << xsection_tree.at(2) << " )\n";
-   if( string( argv[2] ) == "NLO" ) { 
+   if( string( argv[3] ) == "NLO" ) { 
    cout << setprecision(5);
    cout << setw(12) << "virtual:" << setw(13) << xsection_virt.at(0) << " +/- " 
          << setprecision(1) << xsection_virt.at(1) << " fb ( p-value = " 

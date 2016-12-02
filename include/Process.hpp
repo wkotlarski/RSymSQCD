@@ -22,13 +22,25 @@ class Process {
       const LHAPDF::PDF* pdf;
        
       // tree-level matrix elements
+
       double matrixMSSMTree_uu_suLsuR( double );
       double matrixMRSSMTree_uubar_suLsuLdagger(double, double, double, double);
       double matrixMSSMTree_ud_suLsdR(double, double, double, double);
       double matrixMRSSMTree_ud_suLsdR(double, double, double, double);
       double matrixMRSSMTree_GG_suLsuLdagger(double, double, double, double);
-      double matrixSgluonTree_qqbar_OO(double);
-      double matrixSgluonTree_gg_OO(double);
+
+      double sigmaMSSMTree_uu_suLsuR( double );
+      double matrixMSSMTree_uu_suLsuR( double, double );
+      double matrixMSSMTree_uu_suLsuL( double, double );
+      double matrixMSSMTree_ud_suLsdR(double, double);
+      double matrixMSSMTree_ud_suLsdL( double, double );
+      double matrixMRSSMTree_ddbar_suLsuLdagger( double, double );
+      double matrixMRSSMTree_uubar_suLsuLdagger(double, double);
+      double matrixMRSSMTree_ud_suLsdR(double, double);
+      double matrixMRSSMTree_GG_suLsuLdagger(double, double);
+      inline double matrixSgluonTree_qqbar_OO(double);
+      inline double matrixSgluonTree_gg_OO(double);
+
       
       // loop-level matrix elements
       double matrixMSSMVirt_uu_suLsuR(double, double, double, double, int);
@@ -40,8 +52,12 @@ class Process {
       
    public: 
       Process(std::string,  boost::property_tree::ptree); 
-      double (Process::* matrixelementTree)(double); 
-      double (Process::* matrixelementVirt)(double, double, double, double, int); // Re[M^1L M^(B star)]
+
+      double (Process::* matrixelementTree)(double, double); // matrix element squared 
+      double (Process::* sigmaPartTree)(double); // partonic cross section
+      double (Process::* matrixelementVirt)(double, double, double, 
+         double, int); // Re[M^1L M^(B star)]
+
       double (Process::* matrixelementReal_SC)(double, double);
       double (Process::* matrixelementReal_HC1)(double, double, double);
       double (Process::* matrixelementReal_HC2)(double, double, double);
@@ -50,5 +66,6 @@ class Process {
       double f1,f2; // flavours of initial partons
       double k;     // 1/k = average over initial state colors and helicities
       double h;     // h = sum over initial and final state helicities of fermions (_hel = 0 in FormCalc)
+      bool partonic;
 };
 #endif /* PROCESS_H_ */
