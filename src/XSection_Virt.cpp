@@ -54,9 +54,6 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
     double dSigmaHad = (dSigmaPart1 + dSigmaPart3 + dSigmaPart4)
                      * pdf->xfxQ( processID->f1, x1, mu_f )/x1
                      * pdf->xfxQ( processID->f2, x2, mu_f )/x2;
-//////////////////////////////////////////////////////////////////////
-// here ends the part without prefactors
-//////////////////////////////////////////////////////////////////////
 
     ff[0] = dSigmaHad*jacobian*to_fb;   // in femto barn
     return 1;
