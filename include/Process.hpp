@@ -44,6 +44,12 @@ class Process {
       
       // loop-level matrix elements
       double matrixMSSMVirt_uu_suLsuR(double, double, double, double, int);
+      double matrixMRSSMVirt_uu_suLsuR(double, double, double, double, int);
+      double matrixMSSMVirt_ud_suLsdR(double, double, double, double, int);
+      double matrixMRSSMVirt_ud_suLsdR(double, double, double, double, int);
+      double matrixMRSSMVirt_uubar_suLsuLdagger(double, double, double, double, int);
+      double matrixMRSSMVirt_ddbar_suLsuLdagger(double, double, double, double, int);
+      double matrixMRSSMVirt_GG_suLsuLdagger(double, double, double, double, int);
       
       // soft matrix elements
       double matrixMRSSMSoft_uu_suLsuRg(double, double);
@@ -62,7 +68,7 @@ class Process {
       double (Process::* matrixelementReal_HC1)(double, double, double);
       double (Process::* matrixelementReal_HC2)(double, double, double);
       
-      double m1, m2;
+      double m1, m2;// masses of final state particle 1 and 2, respectively 
       double f1,f2; // flavours of initial partons
       double k;     // 1/k = average over initial state colors and helicities
       double h;     // h = sum over initial and final state helicities of fermions (_hel = 0 in FormCalc)

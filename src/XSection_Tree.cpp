@@ -34,7 +34,6 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
                      * pdf->xfxQ( processID->f1, x1, mu_f )/x1
                      * pdf->xfxQ( processID->f2, x2, mu_f )/x2;            
         ff[0] = dSigmaHad*jacobian*to_fb; 
-        return 0;
     }
     
     /* integration of partonic cross section */
