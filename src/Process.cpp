@@ -166,41 +166,21 @@ inline double Process::g(double S, double T) {
 
 /* -------------------- Squark-squark production: q+q > sq+sq ---------------------------------*/
 
-#include "matrix_elements_and_xsections/mrssm_uu_suLsuR_tree_matrix.cpp"
-#include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdagger_tree_matrix.cpp"
+// matrix elements
+
+// mssm
+#include "matrix_elements_and_xsections/mssm_uu_suLsuR_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/mssm_uu_suLsuL_tree_matrix.cpp"
 #include "matrix_elements_and_xsections/mssm_ud_suLsdR_tree_matrix.cpp"
-#include "matrix_elements_and_xsections/mrssm_ud_suLsdR_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/mssm_ud_suLsdL_tree_matrix.cpp"                
 
-inline double Process::matrixMRSSMTree_GG_suLsuLdagger(double alphaS, double T, double U, double S) {
-   return  -157.91367041742973*(alphaS*alphaS)*((96.*(pow(MassSq,4) + T*U - 1.*(MassSq*MassSq)*(T + U)))/(S*S) + MassSq*MassSq*(37.333333333333336/(-1.*(MassSq*MassSq) + U) - 85.33333333333333*(T/pow(-1.*(MassSq*MassSq) + T,2) + U/pow(-1.*(MassSq*MassSq) + U,2))) + (37.333333333333336*(MassSq*MassSq) + (5.333333333333333*(9.*pow(MassSq,4) - 3.*(MassSq*MassSq)*(2.*(MassSq*MassSq) + S) + (S + T)*(S + U)))/(-1.*(MassSq*MassSq) + U))/(-1.*(MassSq*MassSq) + T) - (48.*((5.*pow(MassSq,4) + MassSq*MassSq*U - 1.*T*(-1.*(MassSq*MassSq) + U) - 1.*(MassSq*MassSq)*(3.*S + 4.*T + 2.*U))/(-1.*(MassSq*MassSq) + U) + (5.*pow(MassSq,4) + MassSq*MassSq*U - 1.*T*(-1.*(MassSq*MassSq) + U) - 1.*(MassSq*MassSq)*(3.*S + 2.*T + 4.*U))/(-1.*(MassSq*MassSq) + T)))/S);
-}
+// mrssm
+//#include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdagger_tree_matrix.cpp"
+//#include "matrix_elements_and_xsections/mrssm_ud_suLsdR_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/mrssm_gg_suLsuLdagger_tree_matrix.cpp"
 
-double Process::matrixMSSMTree_uu_suLsuR( double S, double T ) { // agrees with Philip + checked with MadGraph (same as MRSSM)
-	double alphaS = pdf->alphasQ( mu_r );
-	double U = 2*MassSq*MassSq - S - T;
-	return (315.82734083485946*(alphaS*alphaS)*(-1.*pow(MassSq,4) + T*U))/pow(-1.*(MassGlu*MassGlu) + T,2) + (315.82734083485946*(alphaS*alphaS)*(-1.*pow(MassSq,4) + T*U))/pow(-1.*(MassGlu*MassGlu) + U,2);
-}
-
-double Process::matrixMSSMTree_uu_suLsuL( double S, double T ) { // checked with MadGraph
-    double alphaS = pdf->alphasQ( mu_r );
-	double U = 2*MassSq*MassSq - S - T;
-	/* factor of 0.5 introduced by hand, as mathematica output for left-left is actually twice as real left-left */
-	/* because of double counting of final state particles */
-    return 0.5*(105.27578027828648*(alphaS*alphaS)*(MassGlu*MassGlu)*S*(3./pow(MassGlu*MassGlu - 1.*T,2) + 3./pow(MassGlu*MassGlu - 1.*U,2) - 2./((MassGlu*MassGlu - 1.*T)*(MassGlu*MassGlu - 1.*U))));
-}          
-                
-double Process::matrixMSSMTree_ud_suLsdR( double S, double T ) { // agrees with Philip + checked with MadGraph (same as MRSSM) 
-	double alphaS = pdf->alphasQ( mu_r );
-	double U = 2*MassSq*MassSq - S - T;
-    return (315.82734083485946*(alphaS*alphaS)*(-1.*pow(MassSq,4) + T*U))/pow(MassGlu*MassGlu - 1.*T,2); 
-}          
-                
-double Process::matrixMSSMTree_ud_suLsdL( double S, double T ) { // checked with MadGraph + checked with MadGraph
-   double alphaS = pdf->alphasQ( mu_r );
-   return (315.82734083485946*(alphaS*alphaS)*(MassGlu*MassGlu)*S)/pow(MassGlu*MassGlu - 1.*T,2);
-}
-
-
+// partonic xsections
+#include "matrix_elements_and_xsections/mrssm_uu_suLsuR_tree_xsec.cpp"
 
 /* -------------------- Squark-antisquark production: q+q^bar > sq+sq^dagger ---------------------*/
 
