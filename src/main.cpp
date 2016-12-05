@@ -138,7 +138,7 @@ int main(int argc, char* argv[]) {
 
           XSection_Virt virt;
           xsection_virt = virt.integrate();
-          cout << "Virtual correction = " << xsection_virt.at(0) << endl;
+          //cout << "Virtual correction = " << xsection_virt.at(0) << endl;
           XSection_SC sc;
           xsection_SC = sc.integrate();
         
