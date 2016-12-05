@@ -31,13 +31,12 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 
 	if(processID == "MRSSM,uu_suLsuR") {
 	  partonic = false;
-	  if(partonic == true){
+	  //if(partonic == true){
           // tree-level is the same as in the MSSM
           sigmaPartTree = &Process::sigmaMSSMTree_uu_suLsuR; // same as in MSSM
-      }
-      else{		  
-		  matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM
-	  }    
+      //}
+      //else{		  
+		  matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM   
       matrixelementVirt = &Process::matrixMRSSMVirt_uu_suLsuR;
       //matrixelementVirt = &Process::f;
       matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
@@ -109,21 +108,33 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    else if(processID == "MRSSM,uubar_suLsuLdagger") {
       //matrixelementTree = &Process::matrixMRSSMTree_uubar_suLsuLdagger;
       //matrixelementVirt = &matrixMRSSMVirt_uubar_suLsuLdagger;
+      matrixelementReal_SC = &Process::matrixMRSSMSoft_uubar_suLsuLdaggerg;
       m1 = MassSuL;
       m2 = MassSuR;
-      f1 = 2.;
-      f2 = -2.;
+      f1 = 2;
+      f2 = -2;
       k = 2.*2*3*3;
       h = 2.*2;
    }
-
-   else if(processID == "MRSSM,GG_suLsuLdagger") {
-      //matrixelementTree = &Process::matrixMRSSMTree_GG_suLsuLdagger;
-      //matrixelementVirt = &matrixMRSSMVirt_GG_suLsuLdagger;
+   else if(processID == "MRSSM,ddbar_suLsuLdagger") {
+      //matrixelementTree = &Process::matrixMRSSMTree_uubar_suLsuLdagger;
+      //matrixelementVirt = &matrixMRSSMVirt_uubar_suLsuLdagger;
+      matrixelementReal_SC = &Process::matrixMRSSMSoft_ddbar_suLsuLdaggerg;
       m1 = MassSuL;
       m2 = MassSuR;
-      f1 = 0.;
-      f2 = 0.;
+      f1 = 1;
+      f2 = -1;
+      k = 2.*2*3*3;
+      h = 2.*2;
+   }
+   else if(processID == "MRSSM,GG_suLsuLdagger") {
+      //matrixelementTree = &Process::matrixMRSSMTree_GG_suLsuLdagger; 
+      //matrixelementVirt = &Process::matrixMRSSMVirt_uu_suLsuR;
+      matrixelementReal_SC = &Process::matrixMRSSMSoft_gg_suLsuLdaggerg;
+      m1 = MassSuL;
+      m2 = MassSuL;
+      f1 = 0;
+      f2 = 0;
       k = 2.*2*8*8;
       h = 1.;
    }
@@ -150,15 +161,15 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       h=1;
    }
    else {
-      std::cout << "Process not implemented.\n";
+      std::cout << "Subprocess not implemented.\n";
    }
 }
 
-double Process::f(double S, double T, double x, double y, int z) {
+inline double Process::f(double S, double T, double x, double y, int z) {
    return 0.;
 }
 
-double Process::g(double S, double T) {
+inline double Process::g(double S, double T) {
    return 0.;
 }
 /* --------------------------------------------------------------------------------------------*/
@@ -167,40 +178,29 @@ double Process::g(double S, double T) {
 
 /* -------------------- Squark-squark production: q+q > sq+sq ---------------------------------*/
 
-double Process::sigmaMSSMTree_uu_suLsuR( double s ) { // checked with MadGraph
-   double MGl2 = pow(MassGlu, 2);
-   double a = pdf->alphasQ( mu_r );
-   return (-4.*pow(a, 2)*pi*(2.*sqrt(s*(-4*pow(m1,2) + s)) + (2.*pow(m1,2) - 2.*MGl2 - s)*
-        log((4.*MGl2 + pow(1. + sqrt(1. - (4.*pow(m1,2))/s),2.)*s)/(4.*MGl2 + pow(-1. + sqrt(1. - (4.*pow(m1,2))/s),2)*s))))/(9.*pow(s,2));
-}
+// matrix elements
 
-double Process::matrixMSSMTree_uu_suLsuR( double S, double T ) { // agrees with Philip + checked with MadGraph (same as MRSSM)
-	double alphaS = pdf->alphasQ( mu_r );
-	double U = 2*MassSq*MassSq - S - T;
-	return (315.82734083485946*(alphaS*alphaS)*(-1.*pow(MassSq,4) + T*U))/pow(-1.*(MassGlu*MassGlu) + T,2) + (315.82734083485946*(alphaS*alphaS)*(-1.*pow(MassSq,4) + T*U))/pow(-1.*(MassGlu*MassGlu) + U,2);
-}
+// mssm
+#include "matrix_elements_and_xsections/mssm_uu_suLsuR_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/mssm_uu_suLsuL_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/mssm_ud_suLsdR_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/mssm_ud_suLsdL_tree_matrix.cpp"                
 
-double Process::matrixMSSMTree_uu_suLsuL( double S, double T ) { // checked with MadGraph
-    double alphaS = pdf->alphasQ( mu_r );
-	double U = 2*MassSq*MassSq - S - T;
-	/* factor of 0.5 introduced by hand, as mathematica output for left-left is actually twice as real left-left */
-	/* because of double counting of final state particles */
-    return 0.5*(105.27578027828648*(alphaS*alphaS)*(MassGlu*MassGlu)*S*(3./pow(MassGlu*MassGlu - 1.*T,2) + 3./pow(MassGlu*MassGlu - 1.*U,2) - 2./((MassGlu*MassGlu - 1.*T)*(MassGlu*MassGlu - 1.*U))));
-}          
-                
-double Process::matrixMSSMTree_ud_suLsdR( double S, double T ) { // agrees with Philip + checked with MadGraph (same as MRSSM) 
-	double alphaS = pdf->alphasQ( mu_r );
-	double U = 2*MassSq*MassSq - S - T;
-    return (315.82734083485946*(alphaS*alphaS)*(-1.*pow(MassSq,4) + T*U))/pow(MassGlu*MassGlu - 1.*T,2); 
-}          
-                
-double Process::matrixMSSMTree_ud_suLsdL( double S, double T ) { // checked with MadGraph + checked with MadGraph
-   double alphaS = pdf->alphasQ( mu_r );
-   return (315.82734083485946*(alphaS*alphaS)*(MassGlu*MassGlu)*S)/pow(MassGlu*MassGlu - 1.*T,2);
-}
+// mrssm
+//#include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdagger_tree_matrix.cpp"
+//#include "matrix_elements_and_xsections/mrssm_ud_suLsdR_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/mrssm_gg_suLsuLdagger_tree_matrix.cpp"
 
+// partonic xsections
+#include "matrix_elements_and_xsections/mrssm_uu_suLsuR_tree_xsec.cpp"
 
+// real
+#include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg.cpp"
+#include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg.cpp"
+#include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdaggerg.cpp"
 
+//#include "matrix_elements_and_xsections/mrssm_uu_suLsuR.cpp"
+//#include "matrix_elements_and_xsections/mrssm_ud_suLsdR.cpp"
 /* -------------------- Squark-antisquark production: q+q^bar > sq+sq^dagger ---------------------*/
 
 double Process::matrixMRSSMTree_uubar_suLsuLdagger( double S, double T ) { // agrees with Philip
@@ -208,7 +208,7 @@ double Process::matrixMRSSMTree_uubar_suLsuLdagger( double S, double T ) { // ag
 	double U = 2*MassSq*MassSq - S - T;
     return  (315.82734083485946*(alphaS*alphaS)*(-1.*pow(MassSq,4) + T*U))/(S*S) + 355.3057584392169*(alphaS*alphaS)*pow(0.3333333333333333/S - 1./(-1.*(MassGlu*MassGlu) + T),2)*(-1.*pow(MassSq,4) + T*U) - 236.8705056261446*(alphaS*alphaS)*(0.3333333333333333/S - 1./(-1.*(MassGlu*MassGlu) + T))*(1/S - 0.3333333333333333/(-1.*(MassGlu*MassGlu) + T))*(-1.*pow(MassSq,4) + T*U) + 355.3057584392169*(alphaS*alphaS)*pow(1/S - 0.3333333333333333/(-1.*(MassGlu*MassGlu) + T),2)*(-1.*pow(MassSq,4) + T*U);             
 }           
- 
+
 double Process::matrixMRSSMTree_ddbar_suLsuLdagger( double S, double T ) { // agrees with Philip
 	double alphaS = pdf->alphasQ( mu_r );
 	double U = 2*MassSq*MassSq - S - T;

@@ -1,5 +1,12 @@
 #include "XSection_Tree.hpp"
 
+/*
+ * E1 = sqrtS/2 (1 + (m1^2 - m2^2)/s)
+ * E2 = sqrtS/2 (1 + (m2^2 - m1^2)/s)
+ * b  = sqrt(1 - 2(m1^2 + m2^2)/s + ((m1 + m2)(m1-m2)/s)^2)
+ * p  = sqrtS/2 b
+ *
+ */
 int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
     const int *ncomp, cubareal ff[], void *userdata) {
 

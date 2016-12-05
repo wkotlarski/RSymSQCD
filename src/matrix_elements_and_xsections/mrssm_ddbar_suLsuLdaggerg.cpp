@@ -1,0 +1,9 @@
+double Process::matrixMRSSMSoft_ddbar_suLsuLdaggerg( double s12, double th) {
+   double Alfas = pdf->alphasQ( mu_r );
+   double Alfas2 = pow(Alfas, 2);
+   double b = sqrt(1. - 4. * pow(m1, 2)/s12);
+   double lndS = log(dS);
+   double muR = mu_r;
+   std::complex<double> temp = (-0.0023148148148148148148*Alfas*Alfas2*(8.*(m1*m1) + (-2. + b*b)*s12 + b*b*s12*Cos(2.*th))*(-72.*b - 32.*b*lndS*s12 + 32.*b*(lndS*lndS)*s12 + 8.*lndS*(m1*m1)*Log((1. + b)/(1. - 1.*b)) + 16.*s12*Log((1. + b)/(1. - 1.*b)) - 4.*lndS*s12*Log((1. + b)/(1. - 1.*b)) - 2.*(m1*m1)*Power(Log((1. + b)/(1. - 1.*b)),2) + s12*Power(Log((1. + b)/(1. - 1.*b)),2) - 9.*b*s12*Power(Log((1. + b)/(1. - 1.*b)),2) + 16.*b*s12*Log((muR*muR)/s12) - 32.*b*lndS*s12*Log((muR*muR)/s12) - 4.*(m1*m1)*Log((1. + b)/(1. - 1.*b))*Log((muR*muR)/s12) + 2.*s12*Log((1. + b)/(1. - 1.*b))*Log((muR*muR)/s12) + 8.*b*s12*Power(Log((muR*muR)/s12),2) + 14.*b*s12*Power(Log((-1. + b)/(-1. + b*Cos(th))),2) + 28.*b*lndS*s12*Log((-1.*Power(-1. + b*Cos(th),2))/(-1. + b*b)) - 14.*b*s12*Log((muR*muR)/s12)*Log((-1.*Power(-1. + b*Cos(th),2))/(-1. + b*b)) + 4.*b*s12*Power(Log((1. - 1.*b)/(1. + b*Cos(th))),2) + 8.*b*lndS*s12*Log((-1.*Power(1. + b*Cos(th),2))/(-1. + b*b)) - 4.*b*s12*Log((muR*muR)/s12)*Log((-1.*Power(1. + b*Cos(th),2))/(-1. + b*b)) + (-8.*(m1*m1) + 4.*s12)*PolyLog(2.,(2.*b)/(1. + b)) + 8.*b*s12*PolyLog(2.,(b*(1. + Cos(th)))/(-1. + b)) + 28.*b*s12*PolyLog(2.,(b - 1.*b*Cos(th))/(-1. + b)) - 28.*b*s12*PolyLog(2.,(b*(1. + Cos(th)))/(-1. + b*Cos(th))) - 8.*b*s12*PolyLog(2.,(b*(-1. + Cos(th)))/(1. + b*Cos(th))))*Sin(th))/Power(s12,3);
+   return temp.real();
+}

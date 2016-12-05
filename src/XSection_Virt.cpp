@@ -25,7 +25,7 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
     
     double dSigmaPart1 = 2.*squaredMReal*(processID->h)*M_PI/(pow(4.*M_PI,2))/
                          (processID->k)/(pow(s,2));
-
+    
     // contraction with O(eps) from Dminus4
     Divergence = -1;           // O(eps) 
     FiniteGs = 0;

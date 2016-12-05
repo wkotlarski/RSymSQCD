@@ -22,6 +22,13 @@ class Process {
       const LHAPDF::PDF* pdf;
        
       // tree-level matrix elements
+
+      double matrixMSSMTree_uu_suLsuR( double );
+      double matrixMRSSMTree_uubar_suLsuLdagger(double, double, double, double);
+      double matrixMSSMTree_ud_suLsdR(double, double, double, double);
+      double matrixMRSSMTree_ud_suLsdR(double, double, double, double);
+      double matrixMRSSMTree_GG_suLsuLdagger(double, double, double, double);
+
       double sigmaMSSMTree_uu_suLsuR( double );
       double matrixMSSMTree_uu_suLsuR( double, double );
       double matrixMSSMTree_uu_suLsuL( double, double );
@@ -33,6 +40,7 @@ class Process {
       double matrixMRSSMTree_GG_suLsuLdagger(double, double);
       inline double matrixSgluonTree_qqbar_OO(double);
       inline double matrixSgluonTree_gg_OO(double);
+
       
       // loop-level matrix elements
       double matrixMSSMVirt_uu_suLsuR(double, double, double, double, int);
@@ -45,15 +53,23 @@ class Process {
       
       // soft matrix elements
       double matrixMRSSMSoft_uu_suLsuRg(double, double);
+      
+      // pp > suLsuL*
+      double matrixMRSSMSoft_gg_suLsuLdaggerg( double, double );
+      double matrixMRSSMSoft_ddbar_suLsuLdaggerg( double, double );
+      double matrixMRSSMSoft_uubar_suLsuLdaggerg( double, double );
+      
       double f( double, double, double, double, int );
       double g( double, double );
       
    public: 
       Process(std::string,  boost::property_tree::ptree); 
+
       double (Process::* matrixelementTree)(double, double); // matrix element squared 
       double (Process::* sigmaPartTree)(double); // partonic cross section
-      double (Process::* matrixelementVirt)(double, double, double, //double, double, double,
-                                    double, int); // Re[M^1L M^(B star)]
+      double (Process::* matrixelementVirt)(double, double, double, 
+         double, int); // Re[M^1L M^(B star)]
+
       double (Process::* matrixelementReal_SC)(double, double);
       double (Process::* matrixelementReal_HC1)(double, double, double);
       double (Process::* matrixelementReal_HC2)(double, double, double);
