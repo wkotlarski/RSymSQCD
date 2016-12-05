@@ -39,20 +39,152 @@ int main(int argc, char* argv[]) {
    "./RSymSQCD MSSM pp_suLsuR NLO 1 1 1" for  NLO calculation  
        with last three numbers giving the desired accuracy of the virtual,
        soft-collinear and hard-noncollinear part, respectively 
-   "./RSymSQCD MSSM pp_suLsuR NLO  " for  LO calculation  */
+   "./RSymSQCD MSSM pp_suLsuR LO" for  LO calculation  */
    
    cout << "\nPlease do take care of used pdf-set. For LO/NLO calculations "
         << "LO/NLO pdf's are NOT used automatically, but need to be "
         << "specified in config.ini!\n" << endl;
+        
    boost::property_tree::ptree pt;
-   boost::property_tree::ini_parser::read_ini("config.ini", pt);
-   
+   boost::property_tree::ini_parser::read_ini("config.ini", pt);   
    array<double,3> temp, xsection_tree, xsection_virt, xsection_SC, xsection_HnonC;
+   enum Model {
+       MRSSM,
+       MSSM,  
+       no_model
+   };
+   enum Channel {
+       pp_OsOs,
+       pp_suLsuR,  
+       pp_suLsuL,
+       pp_suLsdR,
+       pp_suLsdL,
+       pp_suLsuLdagger,
+       pp_suLsuRdagger,
+       pp_suLsdLdagger,
+       pp_suLsdRdagger,
+       no_channel
+   };  
    
+   Model model = no_model;
+   Channel channel = no_channel; 
+   
+   if ( string(argv[1]) == "MRSSM" ) {
+      model = MRSSM;
+   } else if ( string(argv[1]) == "MSSM" ) {
+      model = MSSM;
+   } else {
+	   cout << "\n Model not implemented! \n\n";
+   }
+   
+   if ( string(argv[2]) == "pp_OsOs" ) {
+      channel = pp_OsOs;  
+   } else if ( string(argv[2]) == "pp_suLsuR" ) {
+      channel = pp_suLsuR;
+   } else if ( string(argv[2]) == "pp_suLsuL" ) {
+      channel = pp_suLsuL;   
+   } else if ( string(argv[2]) == "pp_suLsdR" ) {
+      channel = pp_suLsdR;
+   } else if ( string(argv[2]) == "pp_suLsdL" ) {
+      channel = pp_suLsdL;
+   } else if ( string(argv[2]) == "pp_suLsuLdagger" ) {
+      channel = pp_suLsuLdagger;
+   } else if ( string(argv[2]) == "pp_suLsuRdagger" ) {
+      channel = pp_suLsuRdagger;
+   } else if ( string(argv[2]) == "pp_suLsdLdagger" ) {
+      channel = pp_suLsdLdagger;
+   } else if ( string(argv[2]) == "pp_suLsdRdagger" ) {
+      channel = pp_suLsdRdagger;
+   } else {
+	   cout << "\n Process not implemented! \n\n";
+   } 
+     
    auto start = chrono::steady_clock::now();
    auto t0 = chrono::steady_clock::now();
-   
    if( string( argv[3] ) == "LO" ) {
+	  switch(model) {
+         case MRSSM:
+            switch(channel) {
+               case pp_OsOs:
+                  {
+                  Process process1("sgluons-gg_OO", pt);  
+                  XSection::init( &process1, pt, 1, 1, 1 );
+                  XSection_Tree tree;
+                  temp = tree.integrate();     
+                  Process process2("sgluons-qqbar_OO", pt);
+                  XSection::init( &process2, pt, 1, 1, 1 );
+                  xsection_tree = add(tree.integrate(), temp);   
+                  break;
+			      }                  
+               case pp_suLsuR: 
+                  {                                                     // checked with MadGraph 
+                  Process process1("MRSSM,uu_suLsuR", pt);
+                  XSection::init( &process1, pt, 1, 1, 1 );
+                  XSection_Tree tree;
+                  xsection_tree = tree.integrate();
+                  break;      	
+			      }	
+			   case pp_suLsdR: 
+                  {                                                     // checked with MadGraph 
+                  Process process1("MRSSM,ud_suLsdR", pt);
+                  XSection::init( &process1, pt, 1, 1, 1 );
+                  XSection_Tree tree;
+                  xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
+                  break;      	
+			      }	
+			   default:
+			      {
+			      xsection_tree = {0,0,0};
+			      break;
+			      }		
+            }
+            break;
+         case MSSM:
+            switch(channel) {
+			   case pp_suLsuR:  
+			      {                                                     // checked with MadGraph 
+                  Process process1("MSSM,uu_suLsuR", pt);
+                  XSection::init( &process1, pt, 1, 1, 1 );
+                  XSection_Tree tree;
+                  xsection_tree = tree.integrate();
+                  break;
+		          }
+		       case pp_suLsuL:
+		          {
+				  Process process1("MSSM,uu_suLsuL", pt);
+                  XSection::init( &process1, pt, 1, 1, 1 );
+                  XSection_Tree tree;
+                  xsection_tree = tree.integrate();
+                  break;	  
+				  }
+			   case pp_suLsdR: 
+                  {                                                     // checked with MadGraph 
+                  Process process1("MSSM,ud_suLsdR", pt);
+                  XSection::init( &process1, pt, 1, 1, 1 );
+                  XSection_Tree tree;
+                  xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
+                  break;      	
+			      }
+			   case pp_suLsdL: 
+                  {                                                     // checked with MadGraph 
+                  Process process1("MSSM,ud_suLsdL", pt);
+                  XSection::init( &process1, pt, 1, 1, 1 );
+                  XSection_Tree tree;
+                  xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
+                  break;      	
+			      }
+			   default:
+			      {
+			      xsection_tree = {0,0,0};
+			      break;
+			      }		       
+            }
+         break;								
+      }
+   }   		 
+	   
+/*   
+   if( string( argv[3] ) == "LO" ) {     		  	  
       if ( string(argv[2]) == "pp_OsOs" ) {         
          Process process1("sgluons-gg_OO", pt);
          XSection::init( &process1, pt, 1, 1, 1 );
@@ -173,7 +305,7 @@ int main(int argc, char* argv[]) {
       cout << "Third command line argument must be 'LO' or 'NLO'." << endl;
       return 0;
    }
-
+*/
    auto end = chrono::steady_clock::now();
    
    // print out total run time
