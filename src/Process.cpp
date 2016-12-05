@@ -161,7 +161,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       h=1;
    }
    else {
-      std::cout << "Subprocess not implemented.\n";
+      std::cout << "Error! Subprocess " << processID << " not implemented.\n";
    }
 }
 
