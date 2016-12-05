@@ -53,6 +53,12 @@ class Process {
       
       // soft matrix elements
       double matrixMRSSMSoft_uu_suLsuRg(double, double);
+      
+      // pp > suLsuL*
+      double matrixMRSSMSoft_gg_suLsuLdaggerg( double, double );
+      double matrixMRSSMSoft_ddbar_suLsuLdaggerg( double, double );
+      double matrixMRSSMSoft_uubar_suLsuLdaggerg( double, double );
+      
       double f( double, double, double, double, int );
       double g( double, double );
       

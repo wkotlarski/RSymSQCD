@@ -108,21 +108,33 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    else if(processID == "MRSSM,uubar_suLsuLdagger") {
       //matrixelementTree = &Process::matrixMRSSMTree_uubar_suLsuLdagger;
       //matrixelementVirt = &matrixMRSSMVirt_uubar_suLsuLdagger;
+      matrixelementReal_SC = &Process::matrixMRSSMSoft_uubar_suLsuLdaggerg;
       m1 = MassSuL;
       m2 = MassSuR;
-      f1 = 2.;
-      f2 = -2.;
+      f1 = 2;
+      f2 = -2;
       k = 2.*2*3*3;
       h = 2.*2;
    }
-
-   else if(processID == "MRSSM,GG_suLsuLdagger") {
-      //matrixelementTree = &Process::matrixMRSSMTree_GG_suLsuLdagger;
-      //matrixelementVirt = &matrixMRSSMVirt_GG_suLsuLdagger;
+   else if(processID == "MRSSM,ddbar_suLsuLdagger") {
+      //matrixelementTree = &Process::matrixMRSSMTree_uubar_suLsuLdagger;
+      //matrixelementVirt = &matrixMRSSMVirt_uubar_suLsuLdagger;
+      matrixelementReal_SC = &Process::matrixMRSSMSoft_ddbar_suLsuLdaggerg;
       m1 = MassSuL;
       m2 = MassSuR;
-      f1 = 0.;
-      f2 = 0.;
+      f1 = 1;
+      f2 = -1;
+      k = 2.*2*3*3;
+      h = 2.*2;
+   }
+   else if(processID == "MRSSM,GG_suLsuLdagger") {
+      //matrixelementTree = &Process::matrixMRSSMTree_GG_suLsuLdagger; 
+      //matrixelementVirt = &Process::matrixMRSSMVirt_uu_suLsuR;
+      matrixelementReal_SC = &Process::matrixMRSSMSoft_gg_suLsuLdaggerg;
+      m1 = MassSuL;
+      m2 = MassSuL;
+      f1 = 0;
+      f2 = 0;
       k = 2.*2*8*8;
       h = 1.;
    }
@@ -149,7 +161,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       h=1;
    }
    else {
-      std::cout << "Process not implemented.\n";
+      std::cout << "Subprocess not implemented.\n";
    }
 }
 
@@ -182,6 +194,13 @@ inline double Process::g(double S, double T) {
 // partonic xsections
 #include "matrix_elements_and_xsections/mrssm_uu_suLsuR_tree_xsec.cpp"
 
+// real
+#include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg.cpp"
+#include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg.cpp"
+#include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdaggerg.cpp"
+
+//#include "matrix_elements_and_xsections/mrssm_uu_suLsuR.cpp"
+//#include "matrix_elements_and_xsections/mrssm_ud_suLsdR.cpp"
 /* -------------------- Squark-antisquark production: q+q^bar > sq+sq^dagger ---------------------*/
 
 double Process::matrixMRSSMTree_uubar_suLsuLdagger( double S, double T ) { // agrees with Philip
