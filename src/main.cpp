@@ -170,7 +170,7 @@ int main(int argc, char* argv[]) {
                   Process process1("MSSM,ud_suLsdL", pt);
                   XSection::init( &process1, pt, 1, 1, 1 );
                   XSection_Tree tree;
-                  xsection_tree = tree.integrate();
+                  xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
                   break;      	
 			      }
 			   default:

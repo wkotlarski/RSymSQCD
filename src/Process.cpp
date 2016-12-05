@@ -31,14 +31,13 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 
 	if(processID == "MRSSM,uu_suLsuR") {
 	  partonic = false;
-	  //if(partonic == true){
-          // tree-level is the same as in the MSSM
+	  if(partonic == true){
           sigmaPartTree = &Process::sigmaMSSMTree_uu_suLsuR; // same as in MSSM
-      //}
-      //else{		  
-		  matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM   
+      }
+      else{		  
+		  matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM 
+	  }  
       matrixelementVirt = &Process::matrixMRSSMVirt_uu_suLsuR;
-      //matrixelementVirt = &Process::f;
       matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
       m1 = MassSuL;
       m2 = MassSuR;
@@ -117,8 +116,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       h = 2.*2;
    }
    else if(processID == "MRSSM,ddbar_suLsuLdagger") {
-      //matrixelementTree = &Process::matrixMRSSMTree_uubar_suLsuLdagger;
-      //matrixelementVirt = &matrixMRSSMVirt_uubar_suLsuLdagger;
+      matrixelementTree = &Process::matrixMRSSMTree_ddbar_suLsuLdagger;
+      //matrixelementVirt = &matrixMRSSMVirt_ddbar_suLsuLdagger;
       matrixelementReal_SC = &Process::matrixMRSSMSoft_ddbar_suLsuLdaggerg;
       m1 = MassSuL;
       m2 = MassSuR;
@@ -127,10 +126,73 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       k = 2.*2*3*3;
       h = 2.*2;
    }
+   else if(processID == "MRSSM,udbar_suLsdLdagger") {
+      matrixelementTree = &Process::matrixMSSMTree_ud_suLsdR;  // matrix elements are identical
+      m1 = MassSuL;
+      m2 = MassSuR;
+      f1 = 2;
+      f2 = -1;
+      k = 2.*2*3*3;
+      h = 2.*2;
+   }
    else if(processID == "MRSSM,GG_suLsuLdagger") {
-      //matrixelementTree = &Process::matrixMRSSMTree_GG_suLsuLdagger; 
+      matrixelementTree = &Process::matrixMRSSMTree_GG_suLsuLdagger; 
       //matrixelementVirt = &Process::matrixMRSSMVirt_uu_suLsuR;
       matrixelementReal_SC = &Process::matrixMRSSMSoft_gg_suLsuLdaggerg;
+      m1 = MassSuL;
+      m2 = MassSuL;
+      f1 = 0;
+      f2 = 0;
+      k = 2.*2*8*8;
+      h = 1.;
+   }
+   else if(processID == "MSSM,uubar_suLsuLdagger") {
+      matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR;  // matrix elements are identical
+      m1 = MassSuL;
+      m2 = MassSuR;
+      f1 = 2;
+      f2 = -2;
+      k = 2.*2*3*3;
+      h = 2.*2;
+   }
+   else if(processID == "MSSM,uubar_suLsuRdagger") {
+      matrixelementTree = &Process::matrixMSSMTree_uubar_suLsuRdagger;
+      m1 = MassSuL;
+      m2 = MassSuR;
+      f1 = 2;
+      f2 = -2;
+      k = 2.*2*3*3;
+      h = 2.*2;
+   }
+   else if(processID == "MSSM,udbar_suLsdLdagger") {
+      matrixelementTree = &Process::matrixMSSMTree_ud_suLsdR;  // matrix elements are identical
+      m1 = MassSuL;
+      m2 = MassSuR;
+      f1 = 2;
+      f2 = -1;
+      k = 2.*2*3*3;
+      h = 2.*2;
+   }
+   else if(processID == "MSSM,udbar_suLsdRdagger") {
+      matrixelementTree = &Process::matrixMSSMTree_uubar_suLsuRdagger; // matrix elements are identical
+      m1 = MassSuL;
+      m2 = MassSuR;
+      f1 = 2;
+      f2 = -1;
+      k = 2.*2*3*3;
+      h = 2.*2;
+   }
+      else if(processID == "MSSM,ddbar_suLsuLdagger") {
+      matrixelementTree = &Process::matrixMRSSMTree_ddbar_suLsuLdagger; // matrix elements are identical
+      m1 = MassSuL;
+      m2 = MassSuR;
+      f1 = 1;
+      f2 = -1;
+      k = 2.*2*3*3;
+      h = 2.*2;
+   }
+      else if(processID == "MSSM,GG_suLsuLdagger") {
+      matrixelementTree = &Process::matrixMRSSMTree_GG_suLsuLdagger; // matrix elements are identical
       m1 = MassSuL;
       m2 = MassSuL;
       f1 = 0;
@@ -141,7 +203,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 
 /* -------------------- Sgluon production ---------------------*/
 
-   else if( processID == "sgluons-qqbar_OO" ) {
+   else if( processID == "sgluons-qqbar_OO" ) {	  
+	  partonic = true;
       sigmaPartTree = &Process::matrixSgluonTree_qqbar_OO;
       matrixelementVirt = &Process::f;
       m1 =  MasssigmaO;
@@ -152,6 +215,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       h=1;
    }
    else if( processID == "sgluons-gg_OO" ) {
+	  partonic = true;
       sigmaPartTree = &Process::matrixSgluonTree_gg_OO;
       matrixelementVirt = &Process::f;
       m1 = m2 = MasssigmaO;
@@ -180,24 +244,20 @@ inline double Process::g(double S, double T) {
 
 
 /* -------------------- Squark-squark production: q+q > sq+sq ---------------------------------*/
-// mssm
 #include "matrix_elements_and_xsections/mssm_uu_suLsuR_tree_matrix.cpp"
 #include "matrix_elements_and_xsections/mssm_uu_suLsuL_tree_matrix.cpp"
 #include "matrix_elements_and_xsections/mssm_ud_suLsdR_tree_matrix.cpp"
 #include "matrix_elements_and_xsections/mssm_ud_suLsdL_tree_matrix.cpp"                
-// mrssm: 2 channels: uu_suLsuR and ud_suLsdR which are at tree level the same as in the mssm
 
 /* -------------------- Squark-antisquark production: q+q^bar > sq+sq^dagger ---------------------*/
-//mrssm 
 #include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdagger_tree_matrix.cpp"
-#include "matrix_elements_and_xsections/mrssm_gg_suLsuLdagger_tree_matrix.cpp"
-// todo udbar_suLsdLdagger
-//mssm identical to mrssm, but additional channel:
-// todo uubar_suLsuRdagger
-// todo udbar_suLsdRdagger
+#include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdagger_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/mrssm_udbar_suLsdLdagger_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/mssm_uubar_suLsuRdagger_tree_matrix.cpp"
 
 /* -------------------- Squark-antisquark production: q+q^bar > sq+sq^dagger ---------------------*/
-#include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdagger_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/mrssm_gg_suLsuLdagger_tree_matrix.cpp"
+
 
 
 /* /////////////////////////////////// partonic xsections /////////////////////////////////////// */
