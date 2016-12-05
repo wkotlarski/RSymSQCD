@@ -22,22 +22,18 @@ class Process {
       const LHAPDF::PDF* pdf;
        
       // tree-level matrix elements
-
-      double matrixMSSMTree_uu_suLsuR( double );
-      double matrixMRSSMTree_uubar_suLsuLdagger(double, double, double, double);
-      double matrixMSSMTree_ud_suLsdR(double, double, double, double);
-      double matrixMRSSMTree_ud_suLsdR(double, double, double, double);
-      double matrixMRSSMTree_GG_suLsuLdagger(double, double, double, double);
-
       double sigmaMSSMTree_uu_suLsuR( double );
       double matrixMSSMTree_uu_suLsuR( double, double );
       double matrixMSSMTree_uu_suLsuL( double, double );
       double matrixMSSMTree_ud_suLsdR(double, double);
       double matrixMSSMTree_ud_suLsdL( double, double );
+      
       double matrixMRSSMTree_ddbar_suLsuLdagger( double, double );
       double matrixMRSSMTree_uubar_suLsuLdagger(double, double);
-      double matrixMRSSMTree_ud_suLsdR(double, double);
+      // todo
+      //double matrixMRSSMTree_udbar_suLsdLdagger(double, double);
       double matrixMRSSMTree_GG_suLsuLdagger(double, double);
+      
       inline double matrixSgluonTree_qqbar_OO(double);
       inline double matrixSgluonTree_gg_OO(double);
 
