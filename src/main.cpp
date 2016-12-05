@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
    } 
      
    auto start = chrono::steady_clock::now();
-   auto t0 = chrono::steady_clock::now();
+
    if( string( argv[3] ) == "LO" ) {
 	  switch(model) {
          case MRSSM:
@@ -132,6 +132,20 @@ int main(int argc, char* argv[]) {
                   xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
                   break;      	
 			      }	
+			   case pp_suLsuLdagger:
+			      { 
+				  Process process1("MRSSM,uubar_suLsuLdagger", pt);
+				  XSection::init( &process1, pt, 1, 1, 1 );
+                  XSection_Tree tree;
+                  temp = tree.integrate();
+                  Process process2("MRSSM,ddbar_suLsuLdagger", pt);
+                  break;
+			      }
+			   case pp_suLsdLdagger:
+			      { 
+				  // todo
+                  break;
+			      }
 			   default:
 			      {
 			      xsection_tree = {0,0,0};
@@ -173,6 +187,26 @@ int main(int argc, char* argv[]) {
                   xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
                   break;      	
 			      }
+			   case pp_suLsuLdagger:
+			      { 
+				  // todo
+                  break;
+			      }
+			   case pp_suLsuRdagger:
+			      { 
+				  // todo
+                  break;
+			      }
+			   case pp_suLsdLdagger:
+			      { 
+				  // todo
+                  break;
+			      }
+			   case pp_suLsdRdagger:
+			      { 
+				  // todo
+                  break;
+			      }
 			   default:
 			      {
 			      xsection_tree = {0,0,0};
@@ -182,130 +216,146 @@ int main(int argc, char* argv[]) {
          break;								
       }
    }   		 
-	   
-/*   
-   if( string( argv[3] ) == "LO" ) {     		  	  
-      if ( string(argv[2]) == "pp_OsOs" ) {         
-         Process process1("sgluons-gg_OO", pt);
-         XSection::init( &process1, pt, 1, 1, 1 );
-         XSection_Tree tree;
-         temp = tree.integrate();
-      
-         Process process2("sgluons-qqbar_OO", pt);
-         XSection::init( &process2, pt, 1, 1, 1 );
-         xsection_tree = add(tree.integrate(), temp);
-         cout << xsection_tree.at(0) << endl;
-         
-      } else if( string(argv[2]) == "pp_suLsuR" ) {
-		  if ( string(argv[1]) == "MRSSM" ) { // checked with MadGraph
-             Process process1("MRSSM,uu_suLsuR", pt);
-             XSection::init( &process1, pt, 1, 1, 1 );
-             XSection_Tree tree;
-             xsection_tree = tree.integrate();
-             
-          } else if ( string(argv[1]) == "MSSM" ) { // checked with MadGraph
-             Process process1("MSSM,uu_suLsuR", pt);
-             XSection::init( &process1, pt, 1, 1, 1 );
-             XSection_Tree tree;
-             xsection_tree = tree.integrate();
-             
-          }
-      } else if( string(argv[2]) == "pp_suLsuL" ) { // checked 
-		  if ( string(argv[1]) == "MRSSM" ) {
-			  cout << "\n Process does not exist in MRSSM.\n";
-			  xsection_tree = {0,0,0};
-			  
-	      } else if ( string(argv[1]) == "MSSM" ) { // checked with MadGraph
-			 Process process1("MSSM,uu_suLsuL", pt);
-             XSection::init( &process1, pt, 1, 1, 1 );
-             XSection_Tree tree;
-             xsection_tree = tree.integrate();
-             
-          }
-      } else if( string(argv[2]) == "pp_suLsdR" ) {
-		  if ( string(argv[1]) == "MRSSM" ) { // checked with MadGraph
-             Process process1("MRSSM,ud_suLsdR", pt);
-             XSection::init( &process1, pt, 1, 1, 1 );
-             XSection_Tree tree;
-             xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
-             
-          } else if ( string(argv[1]) == "MSSM" ) { // checked with MadGraph
-             Process process1("MSSM,ud_suLsdR", pt);             
-             XSection::init( &process1, pt, 1, 1, 1 );
-             XSection_Tree tree;
-             xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state            
-             
-          }
-      } else if( string(argv[2]) == "pp_suLsdL" ) { // checked
-		  if ( string(argv[1]) == "MRSSM" ) {
-			  cout << "\n Process does not exist in MRSSM.\n";
-			  xsection_tree = {0,0,0};
-			  
-	      } else if ( string(argv[1]) == "MSSM" ) { // checked with MadGraph
-			 Process process1("MSSM,ud_suLsdL", pt);
-             XSection::init( &process1, pt, 1, 1, 1 );
-             XSection_Tree tree;
-             xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
-             
-          }
-      } else {
-         cout << "LO process not implemented.\n";
-      }
-      
-   } else if ( string( argv[3] ) == "NLO" ) {
-      if( string(argv[2]) == "pp_suLsuR" ) {
-		  string tempStr;
-		  if( string(argv[1]) == "MRSSM" ) {			   
-              tempStr = "MRSSM,uu_suLsuR";     
-                                         
-          } else if ( string(argv[1]) == "MSSM" ) {
-			  tempStr = "MSSM,uu_suLsuR";
-			  
-	      } 	  
-	      Process process1(tempStr, pt);
-	      XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
-          XSection_Tree tree;
-          xsection_tree = tree.integrate();      
 
-          XSection_Virt virt;
-          xsection_virt = virt.integrate();
-          //cout << "Virtual correction = " << xsection_virt.at(0) << endl;
-          XSection_SC sc;
-          xsection_SC = sc.integrate();
+   if( string( argv[3] ) == "NLO" ) {
+	  switch(model) {
+         case MRSSM:
+            switch(channel) {
+               case pp_OsOs:
+                  {
+                  // todo   
+                  break;
+			      }                  
+               case pp_suLsuR: 
+                  {     
+                  Process process1("MSSM,uu_suLsuR", pt);
+	              XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
+                  XSection_Tree tree;
+                  xsection_tree = tree.integrate();      
+                  //cout << "Born  = " << xsection_tree.at(0) << endl;
+                  XSection_Virt virt;
+                  xsection_virt = virt.integrate();
+                  //cout << "Virtual correction = " << xsection_virt.at(0) << endl;
+                  XSection_SC sc;
+                  xsection_SC = sc.integrate();
         
-          XSection_HnonC hc;
-          xsection_HnonC = hc.integrate(); 
-      } if( string(argv[2]) == "pp_suLsdR" ) {
-		  string tempStr;
-		  if( string(argv[1]) == "MRSSM" ) {			  
-              tempStr = "MRSSM,ud_suLsdR";    
-                                         
-          } else if ( string(argv[1]) == "MSSM" ) {
-			  tempStr = "MSSM,ud_suLsdR";
-			  
-	      } 
-	  
-	      Process process1(tempStr, pt);
-	      XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
-          XSection_Tree tree;
-          xsection_tree = tree.integrate();      
+                  XSection_HnonC hc;
+                  xsection_HnonC = hc.integrate();
+                  break;      	
+			      }	
+			   case pp_suLsdR:  // result doubled up, as there is ud and du initial state
+                  {                                                     
+                  Process process1("MRSSM,ud_suLsdR", pt);
+	              XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
+                  XSection_Tree tree;
+                  xsection_tree = add(tree.integrate(),tree.integrate());      
 
-          XSection_Virt virt;
-          xsection_virt = virt.integrate();
-          
-          XSection_SC sc;
-          xsection_SC = sc.integrate();
+                  XSection_Virt virt;
+                  xsection_virt = virt.integrate();
+                  //cout << "Virtual correction = " << xsection_virt.at(0) << endl;
+                  XSection_SC sc;
+                  xsection_SC = add(sc.integrate(),sc.integrate());
         
-          XSection_HnonC hc;
-          xsection_HnonC = hc.integrate();   
-      } else {
-         cout << "NLO process not implemented\n";
+                  XSection_HnonC hc;
+                  xsection_HnonC = add(hc.integrate(),hc.integrate());
+                  break;      	
+			      }	
+			   case pp_suLsuLdagger:
+			      { 
+				  // todo
+                  break;
+			      }
+			   case pp_suLsdLdagger:
+			      { 
+				  // todo
+                  break;
+			      }
+			   default:
+			      {
+			      xsection_tree = {0,0,0};
+			      break;
+			      }		
+            }
+            break;
+         case MSSM:
+            switch(channel) {
+			   case pp_suLsuR:  
+			      {                                                      
+                  Process process1("MSSM,uu_suLsuR", pt);
+	              XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
+                  XSection_Tree tree;
+                  xsection_tree = tree.integrate();      
+
+                  XSection_Virt virt;
+                  xsection_virt = virt.integrate();
+                  //cout << "Virtual correction = " << xsection_virt.at(0) << endl;
+                  XSection_SC sc;
+                  xsection_SC = sc.integrate();
+        
+                  XSection_HnonC hc;
+                  xsection_HnonC = hc.integrate();
+                  break;
+		          }
+		       case pp_suLsuL:
+		          {
+				  // todo
+                  break;	  
+				  }
+			   case pp_suLsdR: // result doubled up, as there is ud and du initial state
+                  {          	                                             
+                  Process process1("MSSM,ud_suLsdR", pt);
+	              XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
+                  XSection_Tree tree;
+                  xsection_tree = add(tree.integrate(),tree.integrate());      
+
+                  XSection_Virt virt;
+                  xsection_virt = virt.integrate();
+                  //cout << "Virtual correction = " << xsection_virt.at(0) << endl;
+                  XSection_SC sc;
+                  xsection_SC = add(sc.integrate(),sc.integrate());
+        
+                  XSection_HnonC hc;
+                  xsection_HnonC = add(hc.integrate(),hc.integrate());
+                  break;      	
+			      }
+			   case pp_suLsdL: 
+                  {                                                      
+                  // todo
+                  break;      	
+			      }
+			   case pp_suLsuLdagger:
+			      { 
+				  // todo
+                  break;
+			      }
+			   case pp_suLsuRdagger:
+			      { 
+				  // todo
+                  break;
+			      }
+			   case pp_suLsdLdagger:
+			      { 
+				  // todo
+                  break;
+			      }
+			   case pp_suLsdRdagger:
+			      { 
+				  // todo
+                  break;
+			      }
+			   default:
+			      {
+			      xsection_tree = {0,0,0};
+			      break;
+			      }		       
+            }
+         break;								
       }
    } else {
       cout << "Third command line argument must be 'LO' or 'NLO'." << endl;
       return 0;
    }
-*/
+
    auto end = chrono::steady_clock::now();
    
    // print out total run time
