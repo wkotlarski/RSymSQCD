@@ -26,7 +26,6 @@ std::array<double, 3> XSection_SC::integrate() {
       accuracy_rel_c, accuracy_abs, 0,
       neval_min, neval_max, 1, NULL, NULL,
       &nregions, &neval, &fail, integral_c1, error_c1, prob_c1);
-   
   
    cubareal integral_c2[ncomp], error_c2[ncomp], prob_c2[ncomp];
    llCuhre(ndim, ncomp, integrand_c2, NULL, 1,

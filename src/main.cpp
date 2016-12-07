@@ -132,6 +132,20 @@ int main(int argc, char* argv[]) {
                   xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
                   break;      	
 			      }	
+            case pp_suLsuLdagger:
+            {
+               Process process1("MRSSM,GG_suLsuLdagger", pt);
+               XSection::init( &process1, pt, 1, 1, 1 );
+               XSection_Tree tree;
+               xsection_tree = tree.integrate();
+               Process process2("MRSSM,uubar_suLsuLdagger", pt);
+               XSection::init( &process2, pt, 1, 1, 1 );
+               xsection_tree = add(xsection_tree, tree.integrate());
+               Process process3("MRSSM,ddbar_suLsuLdagger", pt);
+               XSection::init( &process3, pt, 1, 1, 1 );
+               xsection_tree = add(xsection_tree, tree.integrate());
+               break; 
+            }
 			   default:
 			      {
 			      xsection_tree = {0,0,0};
@@ -251,8 +265,8 @@ int main(int argc, char* argv[]) {
       } else {
          cout << "LO process not implemented.\n";
       }
-      
-   } else if ( string( argv[3] ) == "NLO" ) {
+*/      
+   else if ( string( argv[3] ) == "NLO" ) {
       if( string(argv[2]) == "pp_suLsuR" ) {
 		  string tempStr;
 		  if( string(argv[1]) == "MRSSM" ) {			   
@@ -297,7 +311,7 @@ int main(int argc, char* argv[]) {
           xsection_SC = sc.integrate();
         
           XSection_HnonC hc;
-          xsection_HnonC = hc.integrate();   
+          //xsection_HnonC = hc.integrate();   
       } else {
          cout << "NLO process not implemented\n";
       }
@@ -305,7 +319,7 @@ int main(int argc, char* argv[]) {
       cout << "Third command line argument must be 'LO' or 'NLO'." << endl;
       return 0;
    }
-*/
+
    auto end = chrono::steady_clock::now();
    
    // print out total run time
