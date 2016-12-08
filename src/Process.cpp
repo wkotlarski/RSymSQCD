@@ -30,11 +30,15 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 /* -------------------- Squark-squark production---------------------------------*/
 
 	if(processID == "MRSSM,uu_suLsuR") {
-      sigmaPartTree = &Process::sigmaMSSMTree_uu_suLsuR; // same as in MSSM
+      
 		matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM 
 	    
       matrixelementVirt = &Process::matrixMRSSMVirt_uu_suLsuR;
+      
+      sigmaPartTree = &Process::sigmaMSSMTree_uu_suLsuR; // same as in MSSM
       matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
+      matrixelementReal_HnonC = &Process::matrixMRSSMHard_uu_suLsuRg;
+      
       m1 = MassSuL;
       m2 = MassSuR;
       flav.push_back( std::vector<int> {2, 2, 1} );
@@ -106,6 +110,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       matrixelementTree = &Process::matrixMRSSMTree_uubar_suLsuLdagger;
       //matrixelementVirt = &matrixMRSSMVirt_uubar_suLsuLdagger;
       matrixelementReal_SC = &Process::matrixMRSSMSoft_uubar_suLsuLdaggerg;
+      //matrixelementReal_HnonC = &Process::matrixMRSSMHard_uubar_suLsuLdaggerg;
       m1 = MassSuL;
       m2 = MassSuL;
       flav.push_back( std::vector<int> {2, -2, 2} );
@@ -239,6 +244,45 @@ inline double Process::f(double S, double T, double x, double y, int z) {
 inline double Process::g(double S, double T) {
    return 0.;
 }
+
+inline double Process::hh( std::vector< double* >& ) {
+   return 1.;
+}
+
+inline double Process::det( std::vector< double* >& p, int i1, int i2, int i3, int i4 ) {
+   boost::numeric::ublas::matrix<double> m (4, 4);
+   for (unsigned i = 0; i < m.size1 (); ++ i) {
+      m(0, i) = p[i1-1][i];
+      m(1, i) = p[i2-1][i];
+      m(2, i) = p[i3-1][i];
+      m(3, i) = p[i4-1][i];
+   }
+        
+   return 1.;
+}
+
+int Process::determinant_sign(const boost::numeric::ublas::permutation_matrix<std::size_t>& pm)
+{
+    int pm_sign=1;
+    std::size_t size = pm.size();
+    for (std::size_t i = 0; i < size; ++i)
+        if (i != pm(i))
+            pm_sign *= -1.0; // swap_rows would swap a pair of rows here, so we change sign
+    return pm_sign;
+}
+
+double Process::determinant( boost::numeric::ublas::matrix<double>& m ) {
+    boost::numeric::ublas::permutation_matrix<std::size_t> pm(m.size1());
+    double det = 1.0;
+    if( boost::numeric::ublas::lu_factorize(m,pm) ) {
+        det = 0.0;
+    } else {
+        for(int i = 0; i < m.size1(); i++) 
+            det *= m(i,i); // multiply by elements on diagonal
+        det = det * determinant_sign( pm );
+    }
+    return det;
+}
 /* ///////////////////////////////////// matrix elements ///////////////////////////////////// */
 
 /* --------------------------------------------------------------------------------------------*/
@@ -303,6 +347,8 @@ inline double Process::g(double S, double T) {
 #include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg.cpp"
 #include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg.cpp"
 #include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdaggerg.cpp"
+
+#include "matrix_elements_and_xsections/mrssm_uu_suLsuRg_hard.cpp"
 /* -----------------------------------------------------------------------------------------------*/
 /* --------------------------------------------- Soft --------------------------------------------*/ 
 /* -----------------------------------------------------------------------------------------------*/

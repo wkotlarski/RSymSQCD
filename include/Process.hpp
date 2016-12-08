@@ -8,6 +8,9 @@
 #include <array>
 #include <iostream>
 #include <boost/property_tree/ptree.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/lu.hpp>
 #include <mathematica_wrapper.hpp>
 #include <constants.hpp>
 #include "LHAPDF/LHAPDF.h"
@@ -49,12 +52,16 @@ class Process {
       
       // soft matrix elements
       double matrixMRSSMSoft_uu_suLsuRg(double, double);
+      double matrixMRSSMHard_uu_suLsuRg( std::vector< double* >& );
       //double matrixMRSSMSoft_ud_suLsdRg(double, double);
       
       // pp > suL suL*
       double matrixMRSSMSoft_gg_suLsuLdaggerg( double, double );
       double matrixMRSSMSoft_ddbar_suLsuLdaggerg( double, double );
       double matrixMRSSMSoft_uubar_suLsuLdaggerg( double, double );
+      double matrixMRSSMHard_gg_suLsuLdaggerg( std::vector< double* >& );
+      double matrixMRSSMHard_uubar_suLsuLdaggerg( std::vector< double* >& );
+      double matrixMRSSMHard_ddbar_suLsuLdaggerg( std::vector< double* >& );
       
       // pp > OO
       //double matrixMRSSMSoft_qqbar_OOg( double, double );
@@ -62,6 +69,11 @@ class Process {
       
       double f( double, double, double, double, int );
       double g( double, double );
+      double hh( std::vector< double* >& );
+      double matrix_hard_stub( std::vector< double* >& );
+      double det(std::vector< double* >&, int, int, int, int);
+      double determinant( boost::numeric::ublas::matrix<double>& );
+      int determinant_sign(const boost::numeric::ublas::permutation_matrix<std::size_t>& );
       
    public: 
       Process(std::string,  boost::property_tree::ptree); 
@@ -74,6 +86,7 @@ class Process {
       double (Process::* matrixelementReal_SC)(double, double);
       double (Process::* matrixelementReal_HC1)(double, double, double);
       double (Process::* matrixelementReal_HC2)(double, double, double);
+      double (Process::* matrixelementReal_HnonC)(std::vector< double* >& );
       
       double m1, m2;// masses of final state particle 1 and 2, respectively 
       double f1,f2; // flavours of initial partons

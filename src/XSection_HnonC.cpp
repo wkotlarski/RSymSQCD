@@ -1,13 +1,12 @@
 #include "XSection_HnonC.hpp"
 #include <cassert>
-#include "Process_uu_ulurg.cc"
+//#include "CPPProcess_uu_suLsuRg.cc"
 #include <iostream>
-Process_uu_ulurg process;
+//CPPProcess_uu_suLsuRg process;
 
 std::array<double, 3> XSection_HnonC::integrate() {
 
-  process.initProc("mg/Cards/param_card.dat", squark_mass.at(0).at(0),
-    1e+3, pdf->alphasQ(squark_mass.at(0).at(0)) );
+  //process.initProc("mg/Cards/param_card.dat");
   
   //  integral dimension, number of integrands
   constexpr int ndim { 7 }, ncomp { 1 };
@@ -30,7 +29,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
 
   cubareal integral[ncomp], error[ncomp], prob[ncomp];
   llVegas( ndim, ncomp, integrand, NULL, 1,
-           accuracy_rel, accuracy_abs, 0 |0, 0,
+           accuracy_rel, accuracy_abs, 1, 0,
            neval_min, neval_max, nstart, nincrease, nbatch,
            gridno, state_file, NULL,
            &neval, &fail, integral, error, prob );
@@ -194,11 +193,12 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 	  return 0;
 	}
 
-  process.setMomenta(p);	// Set momenta for this event
+  //process.setMomenta(p);	// Set momenta for this event
   
-  process.sigmaKin();		// Evaluate matrix element
-  const double* matrix_elements = process.getMatrixElements();
-
+  //process.sigmaKin();		// Evaluate matrix element
+  //const double* matrix_elements = process.getMatrixElements();
+  
+  double matrix_elements = (processID->*processID->matrixelementReal_HnonC)(p);
     // delete (otherwise causes memory leak)
   for(vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {
      delete (*i);
@@ -208,7 +208,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
   p.shrink_to_fit();
   
   // some final factors
-  double temp = to_fb * matrix_elements[0];
+  double temp = to_fb * matrix_elements;
   temp /=  2 * shat;
 
   temp *= sin( xx[2] * pi ) * 4;
