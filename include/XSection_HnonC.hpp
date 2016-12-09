@@ -7,8 +7,6 @@
 // neede to do Euler rotation
 #include "rk/rk.hh"
 #include "rk/geom3.hh"
-// hard-non collinear ME
-#include "Process_uu_ulurg.h"
 
 
 class XSection_HnonC : public virtual XSection {
