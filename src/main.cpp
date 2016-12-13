@@ -49,7 +49,10 @@ int main(int argc, char* argv[]) {
         
    boost::property_tree::ptree pt;
    boost::property_tree::ini_parser::read_ini("config.ini", pt);   
-   array<double,3> temp, xsection_tree, xsection_virt, xsection_SC, xsection_HnonC;
+   array<double,3> temp, xsection_tree, xsection_virt, xsection_SC, xsection_HnonC,
+           xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1,
+           xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2,
+           xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3;
    enum Model {
        MRSSM,
        MSSM,  
@@ -320,25 +323,25 @@ int main(int argc, char* argv[]) {
          XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
          
          XSection_Tree tree;
-         xsection_tree = tree.integrate();      
+         xsection_tree1 = tree.integrate();      
          XSection_Virt virt;
-         xsection_virt = virt.integrate();
+         xsection_virt1 = virt.integrate();
          XSection_SC sc;
-         xsection_SC = sc.integrate();
+         xsection_SC1 = sc.integrate();
          XSection_HnonC hc;
-         xsection_HnonC = hc.integrate();
+         xsection_HnonC1 = hc.integrate();
          
          Process process2("MRSSM,ddbar_suLsuLdagger", pt);
          XSection::init( &process2, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );  
          
          cout << "hard\n";
-         //xsection_HnonC = hc.integrate();
+         xsection_HnonC2 = hc.integrate();
          
          Process process3("MRSSM,GG_suLsuLdagger", pt);
          XSection::init( &process3, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
          
          cout << "hard\n";
-         //xsection_HnonC = hc.integrate();
+         xsection_HnonC3 = hc.integrate();
       } else {
          cout << "NLO process not implemented\n";
       }
@@ -347,6 +350,13 @@ int main(int argc, char* argv[]) {
       return 0;
    }
 
+   xsection_HnonC = add( xsection_HnonC1, xsection_HnonC2);
+   xsection_HnonC = add( xsection_HnonC, xsection_HnonC3);
+   xsection_HnonC = xsection_HnonC1;
+   xsection_tree = xsection_tree1;
+   xsection_virt = xsection_virt1;
+   xsection_SC = xsection_SC1;
+   
    auto end = chrono::steady_clock::now();
    
    // print out total run time
