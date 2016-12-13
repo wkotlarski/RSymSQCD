@@ -21,6 +21,8 @@ std::array< std::array<double, 2>, 6 > XSection::squark_mass;
 Process *XSection::processID; 
 double XSection::muF;
 double XSection::muR;
+double XSection::mu_r;
+double XSection::mu_f;
 double XSection::m1;
 double XSection::m2;
 double XSection::prec_virt;
@@ -132,20 +134,21 @@ int main(int argc, char* argv[]) {
                   xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
                   break;      	
 			      }	
-			   case pp_suLsuLdagger:
-			      { 
-				  Process process1("MRSSM,uubar_suLsuLdagger", pt);
-				  XSection::init( &process1, pt, 1, 1, 1 );
-                  XSection_Tree tree;
-                  temp = tree.integrate();
-                  Process process2("MRSSM,ddbar_suLsuLdagger", pt);
-                  break;
-			      }
-			   case pp_suLsdLdagger:
-			      { 
-				  // todo
-                  break;
-			      }
+
+            case pp_suLsuLdagger:
+            {
+               Process process1("MRSSM,GG_suLsuLdagger", pt);
+               XSection::init( &process1, pt, 1, 1, 1 );
+               XSection_Tree tree;
+               xsection_tree = tree.integrate();
+               Process process2("MRSSM,uubar_suLsuLdagger", pt);
+               XSection::init( &process2, pt, 1, 1, 1 );
+               xsection_tree = add(xsection_tree, tree.integrate());
+               Process process3("MRSSM,ddbar_suLsuLdagger", pt);
+               XSection::init( &process3, pt, 1, 1, 1 );
+               xsection_tree = add(xsection_tree, tree.integrate());
+               break; 
+            }
 			   default:
 			      {
 			      xsection_tree = {0,0,0};
@@ -292,6 +295,7 @@ int main(int argc, char* argv[]) {
                   XSection_SC sc;
                   xsection_SC = sc.integrate();
         
+<<<<<<< HEAD
                   XSection_HnonC hc;
                   xsection_HnonC = hc.integrate();
                   break;
@@ -363,6 +367,7 @@ int main(int argc, char* argv[]) {
    cout << "Time: " << chrono::duration_cast<chrono::minutes>(end-start).count()
         << " minutes\n";
    
+   cout << scientific;
    //print out LO run statistics
    cout << "---------------------------------------------------------------" << endl;
    cout << setprecision(5);

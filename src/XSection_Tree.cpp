@@ -30,10 +30,12 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
                            s, T);
         double dSigmaPart = squaredM*(processID->h)*M_PI/(pow(4.*M_PI,2))/
                          (processID->k)/(pow(s,2));
-        double dSigmaHad = dSigmaPart
-                     * pdf->xfxQ( processID->f1, x1, mu_f )/x1
-                     * pdf->xfxQ( processID->f2, x2, mu_f )/x2;            
-        ff[0] = dSigmaHad*jacobian*to_fb; 
+        double pdf_flux = 0.0;
+        for (const auto& inner : processID->flav) {
+               //std::cout << inner.at(0) << " " << inner.at(1) << '\n';
+         pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f ) * pdf->xfxQ( inner.at(1), x2, mu_f );
+         }            
+        ff[0] = dSigmaPart * pdf_flux * jacobian*to_fb / (x1 * x2); 
     }
     
     /* integration of partonic cross section */
