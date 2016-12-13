@@ -1,13 +1,9 @@
 #include "XSection_HnonC.hpp"
 #include <cassert>
-//#include "CPPProcess_uu_suLsuRg.cc"
 #include <iostream>
-//CPPProcess_uu_suLsuRg process;
 
 std::array<double, 3> XSection_HnonC::integrate() {
 
-  //process.initProc("mg/Cards/param_card.dat");
-  
   //  integral dimension, number of integrands
   constexpr int ndim { 7 }, ncomp { 1 };
   //  accuraccy
@@ -41,9 +37,10 @@ std::array<double, 3> XSection_HnonC::integrate() {
 
 int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
   const int *ncomp, cubareal ff[], void *userdata) {
-  double m = squark_mass.at(0).at(0);
-  double m_sqr = m*m;
 
+  double m_sqr = m1*m1;
+  double mu_f = pt.get<double>("collider setup.mu_f");
+  
   /*
    * 3-body phase space parametrization based on
    * http://www.t39.ph.tum.de/T39_files/T39_people_files/duell_files/Dipl-MultiPion.pdf
@@ -64,33 +61,33 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
     return 0;
   }
 
-	double x1 = 4 * m_sqr/S + (1 - 4 * m_sqr/S ) * xx[5];
-	double x2 = 4 * m_sqr /(S * x1) + (1 - 4 * m_sqr/(S * x1)) * xx[6];
+	double x1 = 4. * m_sqr/S + (1. - 4. * m_sqr/S ) * xx[5];
+	double x2 = 4. * m_sqr /(S * x1) + (1. - 4. * m_sqr/(S * x1)) * xx[6];
 	double shat = x1 * x2 * S;
 	double shat_sqrt = sqrt( shat );
 
-	double Ej_max = shat_sqrt/2 - 2 * m_sqr/shat_sqrt;
+	double Ej_max = shat_sqrt/2. - 2. * m_sqr/shat_sqrt;
 
-	if ( Ej_max < dS * shat_sqrt/2) {
+	if ( Ej_max < dS * shat_sqrt/2.) {
 	  ff[0] = 0;
 	  return 1;
 	}
 
 	double Ej = dS * shat_sqrt/2 + ( Ej_max - dS * shat_sqrt/2) * xx[0];
 
-	double c = shat - 2 * shat_sqrt * Ej;
+	double c = shat - 2. * shat_sqrt * Ej;
 	// Eq. 4.5
-	double E1_max = ( shat_sqrt - Ej) * c + Ej * sqrt( (c - 2 * m_sqr) 
-    * (c - 2 * m_sqr) - 4 * m_sqr * m_sqr );
+	double E1_max = ( shat_sqrt - Ej) * c + Ej * sqrt( (c - 2. * m_sqr) 
+    * (c - 2 * m_sqr) - 4. * m_sqr * m_sqr );
 	E1_max /= 2 * c;
   double E1_min = ( shat_sqrt - Ej) * c - Ej * sqrt( (c - 2 * m_sqr) 
-    * (c - 2 * m_sqr) - 4 * m_sqr * m_sqr );
-  E1_min /= 2 * c;
+    * (c - 2. * m_sqr) - 4. * m_sqr * m_sqr );
+  E1_min /= 2. * c;
 	double E1 = E1_min + (E1_max - E1_min) * xx[1];
 
 	// Eq. 4.2 with E2 = Ej
-  double cosx = (shat - 2 * shat_sqrt * ( E1 + Ej ) + 2 * Ej * E1 )/
-      (2 * Ej * sqrt( ( E1 - m ) * ( E1 + m ) ) );
+  double cosx = (shat - 2 * shat_sqrt * ( E1 + Ej ) + 2. * Ej * E1 )/
+      (2. * Ej * sqrt( ( E1 - m1 ) * ( E1 + m1 ) ) );
 
   // check if due to numerics abs(cosx) is not > 1
   if ( cosx > 1 || cosx < -1)  {
@@ -117,7 +114,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
   // 1st sgluons momenta
   p.push_back(new double[4]);
   p[2][0] = E1;
-  double p1 = sqrt( ( E1 - m ) * ( E1 + m ) );
+  double p1 = sqrt( ( E1 - m1 ) * ( E1 + m1 ) );
   p[2][1] = p1 * sin( pi * xx[2] ) * cos( two_pi * xx[3] );
   p[2][2] = p1 * sin( pi * xx[2] ) * sin( two_pi * xx[3] );
   p[2][3] = p1 * cos( pi * xx[2] );
@@ -140,18 +137,18 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    *  periodicity of sin and cos would solve the thing
    */
   double parton_theta, parton_phi;
-  if ( pi * xx[2] + acos(cosx) < pi ) {
+  //if ( pi * xx[2] + acos(cosx) < pi ) {
     parton_theta = pi * xx[2] + acos(cosx);
     parton_phi = two_pi * xx[3];
-  }
-  else if (pi * xx[2] - acos(cosx) > 0 ) {
-    parton_theta = pi * xx[2] - acos(cosx);
-    parton_phi = two_pi * xx[3];
-  }
-  else {
-    parton_theta = abs(pi * xx[2] - acos(cosx));
-    parton_phi = two_pi * xx[3] + pi;
-  }
+//  }
+//  else if (pi * xx[2] - acos(cosx) > 0 ) {
+//    parton_theta = pi * xx[2] - acos(cosx);
+//    parton_phi = two_pi * xx[3];
+//  }
+//  else {
+//    parton_theta = abs(pi * xx[2] - acos(cosx));
+//    parton_phi = two_pi * xx[3] + pi;
+//  }
 
   geom3::Vector3 p_parton(
       Ej * sin( parton_theta ) * cos( parton_phi ),
@@ -168,6 +165,8 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
   p_temp_2[1] = p_temp.x();
   p_temp_2[2] = p_temp.y();
   p_temp_2[3] = p_temp.z();
+  
+
 
   // 2nd sgluon momenta
   p.push_back(new double[4]);
@@ -175,16 +174,20 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
   for ( int i = 1; i < 4; ++i) {
     p[3][i] = - p[2][i] - p_temp_2[i];
   }
-
+   assert( abs(
+      (pow(p[3][0], 2) - pow(p[3][1], 2) - pow(p[3][2], 2) - pow(p[3][3], 2))/(m2 * m2) - 1) < 1e-5 
+      && p[3][0] >= m2
+   );
+  
   // write parton momentum to momentum matrix p
   p.push_back(new double[4]);
   for(int i = 0; i < 4; ++i) p[4][i] = p_temp_2[i];
   delete[] p_temp_2;
       
   double t15 = p[0][0] * p[4][0] - p[0][3] * p[4][3];
-  t15 = - 2 * t15;
+  t15 = - 2. * t15;
   double t25 = p[1][0] * p[4][0] - p[1][3] * p[4][3];
-  t25 = - 2 * t25;
+  t25 = - 2. * t25;
 
   // check if we are not in the collinear region
   // if yes, return
@@ -192,15 +195,12 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 	  ff[0] = 0;
 	  return 0;
 	}
-
-  //process.setMomenta(p);	// Set momenta for this event
-  
-  //process.sigmaKin();		// Evaluate matrix element
-  //const double* matrix_elements = process.getMatrixElements();
   
   double matrix_elements = (processID->*processID->matrixelementReal_HnonC)(p);
+  assert( matrix_elements >= 0 );
+  
     // delete (otherwise causes memory leak)
-  for(vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {
+  for(std::vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {
      delete (*i);
      *i = 0;
   }
@@ -208,40 +208,36 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
   p.shrink_to_fit();
   
   // some final factors
-  double temp = to_fb * matrix_elements;
-  temp /=  2 * shat;
+  matrix_elements *= to_fb;
+  matrix_elements /=  2 * shat;
 
-  temp *= sin( xx[2] * pi ) * 4;
-  temp /= 256 * pi_sqr;
+  matrix_elements *= sin( xx[2] * pi ) * 4;
+  matrix_elements /= 256 * pi_sqr;
 
-  // choose gg or qqbar initial state
-  double temp2 = 0;
-  //temp2 = pdf_nlo->xfxQ(21, x1, m)/x1 * pdf_nlo->xfxQ(21, x2, m)/x2;
-  for ( int flav = 1; flav < 6; ++flav ) {
-    //temp2 += 2 * pdf->xfxQ(flav, x1, m)/x1 * pdf->xfxQ(-flav, x2, m)/x2;
-  }
-  temp2 = pdf->xfxQ(2, x1, m)/x1 * pdf->xfxQ(2, x2, m)/x2;
-  //temp2 = 2 * pdf->xfxQ(21, x1, m)/x1 * pdf->xfxQ(2, x2, m)/x2;
+   double pdf_flux = 0.0;
+   for (const auto& inner : processID->flav) {
+      pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f ) * pdf->xfxQ( inner.at(1), x2, mu_f );
+   } 
 
-  temp *=  temp2;
+  matrix_elements *=  pdf_flux / ( x1 * x2 );
   double xx0 = xx[5];
   double xx1 = xx[6];
   double xx2 = xx[0];
 
   // TODO: simplify this
-  double jacobian =  ((Power(-4*Power(m,2) + S,2)*xx0*((-4*Power(m,2) + S)*xx0*xx1 +
-        dS*(-(S*xx0*xx1) + 4*Power(m,2)*(-1 + xx0*xx1)))*
-	      (dS*(-(S*xx0*xx1) + 4*Power(m,2)*(-1 + xx0*xx1))*(-1 + xx2) +
-	        (-4*Power(m,2) + S)*xx0*xx1*xx2)*
-	      Sqrt(((-4*Power(m,2) + S)*xx0*xx1 +
-	          dS*(-(S*xx0*xx1) + 4*Power(m,2)*(-1 + xx0*xx1)))*(-1 + xx2)*
+  double jacobian =  ((Power(-4*Power(m1,2) + S,2)*xx0*((-4*Power(m1,2) + S)*xx0*xx1 +
+        dS*(-(S*xx0*xx1) + 4*Power(m1,2)*(-1 + xx0*xx1)))*
+	      (dS*(-(S*xx0*xx1) + 4*Power(m1,2)*(-1 + xx0*xx1))*(-1 + xx2) +
+	        (-4*Power(m1,2) + S)*xx0*xx1*xx2)*
+	      Sqrt(((-4*Power(m1,2) + S)*xx0*xx1 +
+	          dS*(-(S*xx0*xx1) + 4*Power(m1,2)*(-1 + xx0*xx1)))*(-1 + xx2)*
 	        (S*xx0*xx1*(-1 + dS + xx2 - dS*xx2) +
-	          4*Power(m,2)*(-1 + xx0*xx1 + dS*(-1 + xx0*xx1)*(-1 + xx2) - xx0*xx1*xx2))))/
-	    (4.*S*(-4*Power(m,2)*(-1 + xx0) + S*xx0)*(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1))*
+	          4*Power(m1,2)*(-1 + xx0*xx1 + dS*(-1 + xx0*xx1)*(-1 + xx2) - xx0*xx1*xx2))))/
+	    (4.*S*(-4*Power(m1,2)*(-1 + xx0) + S*xx0)*(S*xx0*xx1 + Power(m1,2)*(4 - 4*xx0*xx1))*
 	      ((-1 + dS)*S*xx0*xx1*(-1 + xx2) -
-	        4*Power(m,2)*(-1 + xx0*xx1 + dS*(-1 + xx0*xx1)*(-1 + xx2) - xx0*xx1*xx2))));
+	        4*Power(m1,2)*(-1 + xx0*xx1 + dS*(-1 + xx0*xx1)*(-1 + xx2) - xx0*xx1*xx2))));
 
-    ff[0] = temp * abs(jacobian);
+    ff[0] = matrix_elements * abs(jacobian);
 
 	return 0;
 }

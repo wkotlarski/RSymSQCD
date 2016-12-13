@@ -23,7 +23,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    dS = pt.get<double>("technical parameters.dS");
    pdf = LHAPDF::mkPDF( pt.get<std::string>("collider setup.pdf") , 0);
    
-   // @todo remove 
+   // @todo remove
    MassSq = MassSuL;
    partonic = false; // calculate sigma_had with |M|^2 and not sigma_part
    
@@ -62,7 +62,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR;
       matrixelementVirt = &Process::matrixMSSMVirt_uu_suLsuR;
       //matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
-      matrixelementReal_SC = &Process::g;
+      matrixelementReal_SC = &Process::matrix_soft_stub;
       flav.push_back( std::vector<int> {2, 2, 1} );
       m1 = MassSuL;
       m2 = MassSuR;
@@ -75,7 +75,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       matrixelementTree = &Process::matrixMSSMTree_uu_suLsuL;
       //matrixelementVirt = &Process::matrixMSSMVirt_uu_suLsuL;
       //matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuLg;
-      matrixelementReal_SC = &Process::g;
+      matrixelementReal_SC = &Process::matrix_soft_stub;
       m1 = MassSuL;
       m2 = MassSuR;
       f1 = 2.;
@@ -103,14 +103,15 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       k = 2.*2*3*3;
       h = 2.*2;
    }
-   
+  
 /* -------------------- Squark-antisquark production ---------------------*/
 
    else if(processID == "MRSSM,uubar_suLsuLdagger") {
+      sigmaPartTree = &Process::sigmaMRSSMTree_uubar_suLsuLdagger;
       matrixelementTree = &Process::matrixMRSSMTree_uubar_suLsuLdagger;
-      //matrixelementVirt = &matrixMRSSMVirt_uubar_suLsuLdagger;
+      matrixelementVirt = &Process::matrixMRSSMVirt_uubar_suLsuLdagger;
       matrixelementReal_SC = &Process::matrixMRSSMSoft_uubar_suLsuLdaggerg;
-      //matrixelementReal_HnonC = &Process::matrixMRSSMHard_uubar_suLsuLdaggerg;
+      matrixelementReal_HnonC = &Process::matrixMRSSMHard_uubar_suLsuLdaggerg;
       m1 = MassSuL;
       m2 = MassSuL;
       flav.push_back( std::vector<int> {2, -2, 2} );
@@ -120,9 +121,11 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       h = 2.*2;
    }
    else if(processID == "MRSSM,ddbar_suLsuLdagger") {
+      sigmaPartTree = &Process::sigmaMRSSMTree_ddbar_suLsuLdagger;
       matrixelementTree = &Process::matrixMRSSMTree_ddbar_suLsuLdagger;
-      //matrixelementVirt = &matrixMRSSMVirt_ddbar_suLsuLdagger;
-      matrixelementReal_SC = &Process::matrixMRSSMSoft_ddbar_suLsuLdaggerg;
+      matrixelementVirt = &Process::matrix_virt_stub;
+      matrixelementReal_SC = &Process::matrix_soft_stub;
+      //matrixelementReal_HnonC = &Process::matrixMRSSMHard_ddbar_suLsuLdaggerg;
       m1 = MassSuL;
       m2 = MassSuL;
       flav.push_back( std::vector<int> {1, -1, 2} );
@@ -141,9 +144,12 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       h = 2.*2;
    }
    else if(processID == "MRSSM,GG_suLsuLdagger") {
+      sigmaPartTree = &Process::sigmaMRSSMTree_gg_suLsuLdagger;
       matrixelementTree = &Process::matrixMRSSMTree_GG_suLsuLdagger; 
-      //matrixelementVirt = &Process::matrixMRSSMVirt_uu_suLsuR;
-      matrixelementReal_SC = &Process::matrixMRSSMSoft_gg_suLsuLdaggerg;
+      matrixelementVirt = &Process::matrix_virt_stub;
+      matrixelementReal_SC = &Process::matrix_soft_stub;
+      matrixelementReal_HnonC = &Process::matrixMRSSMHard_gg_suLsuLdaggerg;
+      
       m1 = MassSuL;
       m2 = MassSuL;
       flav.push_back( std::vector<int> {0, 0, 1} );
@@ -214,7 +220,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    else if( processID == "sgluons-qqbar_OO" ) {	  
 	  partonic = true;
       sigmaPartTree = &Process::matrixSgluonTree_qqbar_OO;
-      matrixelementVirt = &Process::f;
+      matrixelementVirt = &Process::matrix_virt_stub;
       m1 =  MasssigmaO;
       m2 =  MasssigmaO;
       k = 1;
@@ -225,7 +231,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    else if( processID == "sgluons-gg_OO" ) {
 	  partonic = true;
       sigmaPartTree = &Process::matrixSgluonTree_gg_OO;
-      matrixelementVirt = &Process::f;
+      matrixelementVirt = &Process::matrix_virt_stub;
       m1 = m2 = MasssigmaO;
       k = 1;
       f1 = 0;
@@ -237,18 +243,6 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    }
 }
 
-inline double Process::f(double S, double T, double x, double y, int z) {
-   return 0.;
-}
-
-inline double Process::g(double S, double T) {
-   return 0.;
-}
-
-inline double Process::hh( std::vector< double* >& ) {
-   return 1.;
-}
-
 inline double Process::det( std::vector< double* >& p, int i1, int i2, int i3, int i4 ) {
    boost::numeric::ublas::matrix<double> m (4, 4);
    for (unsigned i = 0; i < m.size1 (); ++ i) {
@@ -258,7 +252,7 @@ inline double Process::det( std::vector< double* >& p, int i1, int i2, int i3, i
       m(3, i) = p[i4-1][i];
    }
         
-   return 1.;
+   return 0*determinant(m);
 }
 
 int Process::determinant_sign(const boost::numeric::ublas::permutation_matrix<std::size_t>& pm)
@@ -309,7 +303,7 @@ double Process::determinant( boost::numeric::ublas::matrix<double>& m ) {
 
 /* /////////////////////////////////// partonic xsections /////////////////////////////////////// */
 #include "matrix_elements_and_xsections/mrssm_uu_suLsuR_tree_xsec.cpp"
-
+#include "matrix_elements_and_xsections/mrssm_partonic_xsections.cpp"
 /* --------------------------------- Sgluon production -------------------------------------------*/
 #include "matrix_elements_and_xsections/mrssm_uubar_OO_tree_xsec.cpp" // is identical for all initial state quarks
 #include "matrix_elements_and_xsections/mrssm_gg_OO_tree_xsec.cpp"
@@ -346,7 +340,10 @@ double Process::determinant( boost::numeric::ublas::matrix<double>& m ) {
 // real
 #include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg.cpp"
 #include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg.cpp"
-#include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdaggerg.cpp"
+#include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdaggerg_soft.cpp"
+#include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdaggerg_hard.cpp"
+#include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_hard.cpp"
+//#include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg_hard.cpp"
 
 #include "matrix_elements_and_xsections/mrssm_uu_suLsuRg_hard.cpp"
 /* -----------------------------------------------------------------------------------------------*/

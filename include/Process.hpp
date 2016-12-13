@@ -24,13 +24,25 @@ class Process {
          mu_r, mu_f, dS;
       const LHAPDF::PDF* pdf;
        
+      /*
+       *    for the moment use those functions for missing ME
+       *    @todo delete after we are done
+       */
+      double matrix_virt_stub( double, double, double, double, int ) { return 0.; };
+      double matrix_soft_stub( double, double )  { return 0.; };
+      double matrix_hard_stub( std::vector< double* >& )  { return 0.; };
+      double matrix_xsec_stub( double )  { return 0.; };
+      
       // tree-level matrix elements
       double sigmaMSSMTree_uu_suLsuR( double );
+      double sigmaMRSSMTree_uubar_suLsuLdagger( double );
+      double sigmaMRSSMTree_ddbar_suLsuLdagger( double );
+      double sigmaMRSSMTree_gg_suLsuLdagger( double );
       double matrixMSSMTree_uu_suLsuR( double, double );
       double matrixMSSMTree_uu_suLsuL( double, double );
       double matrixMSSMTree_ud_suLsdR( double, double );
       double matrixMSSMTree_ud_suLsdL( double, double );
-      
+
       double matrixMRSSMTree_ddbar_suLsuLdagger( double, double );
       double matrixMRSSMTree_uubar_suLsuLdagger( double, double );
       double matrixMSSMTree_uubar_suLsuRdagger( double, double );
@@ -67,10 +79,6 @@ class Process {
       //double matrixMRSSMSoft_qqbar_OOg( double, double );
       //double matrixMRSSMSoft_gg_OOg( double, double );
       
-      double f( double, double, double, double, int );
-      double g( double, double );
-      double hh( std::vector< double* >& );
-      double matrix_hard_stub( std::vector< double* >& );
       double det(std::vector< double* >&, int, int, int, int);
       double determinant( boost::numeric::ublas::matrix<double>& );
       int determinant_sign(const boost::numeric::ublas::permutation_matrix<std::size_t>& );

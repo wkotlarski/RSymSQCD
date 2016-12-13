@@ -30,6 +30,8 @@ void XSection::init(Process *processID_init, boost::property_tree::ptree pt_in, 
     S = pow(S_sqrt, 2);
     muR = pt.get<double>("collider setup.mu_r");
     muF = pt.get<double>("collider setup.mu_f");
+    mu_r = muR;
+    mu_f = muF;
     pdf = LHAPDF::mkPDF( pt.get<std::string>("collider setup.pdf") , 0);
     LHAPDF::setVerbosity(0);
     

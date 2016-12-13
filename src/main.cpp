@@ -21,6 +21,8 @@ std::array< std::array<double, 2>, 6 > XSection::squark_mass;
 Process *XSection::processID; 
 double XSection::muF;
 double XSection::muR;
+double XSection::mu_r;
+double XSection::mu_f;
 double XSection::m1;
 double XSection::m2;
 double XSection::prec_virt;
@@ -289,7 +291,7 @@ int main(int argc, char* argv[]) {
         
           XSection_HnonC hc;
           xsection_HnonC = hc.integrate(); 
-      } if( string(argv[2]) == "pp_suLsdR" ) {
+      } else if( string(argv[2]) == "pp_suLsdR" ) {
 		  string tempStr;
 		  if( string(argv[1]) == "MRSSM" ) {			  
               tempStr = "MRSSM,ud_suLsdR";    
@@ -311,7 +313,32 @@ int main(int argc, char* argv[]) {
           xsection_SC = sc.integrate();
         
           XSection_HnonC hc;
-          //xsection_HnonC = hc.integrate();   
+          //xsection_HnonC = hc.integrate();  
+      } else if( string(argv[2]) == "pp_suLsuLdagger" ) {
+         
+         Process process1("MRSSM,uubar_suLsuLdagger", pt);
+         XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
+         
+         XSection_Tree tree;
+         xsection_tree = tree.integrate();      
+         XSection_Virt virt;
+         xsection_virt = virt.integrate();
+         XSection_SC sc;
+         xsection_SC = sc.integrate();
+         XSection_HnonC hc;
+         xsection_HnonC = hc.integrate();
+         
+         Process process2("MRSSM,ddbar_suLsuLdagger", pt);
+         XSection::init( &process2, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );  
+         
+         cout << "hard\n";
+         //xsection_HnonC = hc.integrate();
+         
+         Process process3("MRSSM,GG_suLsuLdagger", pt);
+         XSection::init( &process3, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
+         
+         cout << "hard\n";
+         //xsection_HnonC = hc.integrate();
       } else {
          cout << "NLO process not implemented\n";
       }
@@ -327,6 +354,7 @@ int main(int argc, char* argv[]) {
    cout << "Time: " << chrono::duration_cast<chrono::minutes>(end-start).count()
         << " minutes\n";
    
+   cout << scientific;
    //print out LO run statistics
    cout << "---------------------------------------------------------------" << endl;
    cout << setprecision(5);

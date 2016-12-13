@@ -53,11 +53,15 @@ int XSection_SC::integrand_sc(const int *ndim, const cubareal xx[],
    double th = xx[2] * pi;
     
    double s12 = x1 * x2 * S;
-   double Alfas = pdf->alphasQ( muR );
+   double Alfas = pdf->alphasQ( mu_r );
     
+   double pdf_flux = 0.0;
+   for (const auto& inner : processID->flav) {
+      pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f ) * pdf->xfxQ( inner.at(1), x2, mu_f );
+   }
+   
    ff[0] = to_fb * (processID->*processID->matrixelementReal_SC)(s12, th) 
-            * pdf->xfxQ(2, x1, muF)/x1 
-            * pdf->xfxQ(2, x2, muF)/x2;
+            * pdf_flux/( x1 * x2 );
     
    // jakobian
    ff[0] *= pi*Power(-4*pow(m1, 2) + S,2)*xx[0] / 
@@ -81,7 +85,12 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
    double Alfas = pdf->alphasQ( muR );
    double Alfas2 = pow( Alfas, 2);
     
-   ff[0] = 0 * 2 * to_fb
+   double pdf_flux = 0.0;
+   for (const auto& inner : processID->flav) {
+      pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f ) * pdf->xfxQ( inner.at(1), x2, mu_f );
+   }
+   
+   ff[0] = 0*to_fb
       * pdf->xfxQ(2, x1, muF)/x1 * pdf->xfxQ(2, x2, muF)/x2
       * 4./3. * (2 * log(dS) + 3./2.);
     
@@ -101,16 +110,22 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
    double s12 = x1 * x2 * S;
    double beta = sqrt( 1 - 4 * pow(m1, 2)/s12 );
     
-   double Alfas = pdf->alphasQ( muR );
+   double Alfas = pdf->alphasQ( mu_r );
    double Alfas2 = pow( Alfas, 2);
        
-   ff[0] = 2 * to_fb 
-            * ((4*(1 - y))/3. + (4*(1 + Power(y,2))*Log((dC*s12*(1 - y)*(1 - y))
-            / (2 * muF * muF * y)))/(3.*(1 - y))) 
-            * 1./y * pdf->xfxQ(2, std::min(x1/y, 1.), muF)/std::min(x1/y, 1.) 
-            * pdf->xfxQ(2, x2, muF)/x2 
-            * Alfas/two_pi 
-            * (processID->*processID->sigmaPartTree)(s12);
+   double pdf_flux = 0.0;
+   for (const auto& inner : processID->flav) {
+      pdf_flux += inner.at(2) * ( pdf->xfxQ( inner.at(0), std::min(x1/y, 1.), mu_f )/std::min(x1/y, 1.) 
+                  * pdf->xfxQ( inner.at(1), x2, mu_f )/x2
+                  + pdf->xfxQ( inner.at(0), x1, mu_f )/x1
+                  * pdf->xfxQ( inner.at(1), std::min(x2/y, 1.), mu_f )/std::min(x2/y, 1.)
+                  );
+   }
+      
+   ff[0] = to_fb * CF
+            * ( (1 - y) + (1 + y*y)/(1 - y) * log( dC * s12 * pow(1 - y, 2) / (2 * mu_f * mu_f * y) ) ) 
+            * 1./y * pdf_flux 
+            * Alfas/two_pi * (processID->*processID->sigmaPartTree)(s12);
    
     // multiply by jakobian of integration variable transformation
     ff[0] *= (Power(-4*pow(m1, 2) + S,2)*xx[0]*(4*pow(m1, 2)*(-1 + xx[0]) - S*(-1 + dS + xx[0])))/
