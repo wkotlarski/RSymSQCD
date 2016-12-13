@@ -295,7 +295,6 @@ int main(int argc, char* argv[]) {
                   XSection_SC sc;
                   xsection_SC = sc.integrate();
         
-<<<<<<< HEAD
                   XSection_HnonC hc;
                   xsection_HnonC = hc.integrate();
                   break;
