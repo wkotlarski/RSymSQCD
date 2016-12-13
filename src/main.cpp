@@ -223,7 +223,7 @@ int main(int argc, char* argv[]) {
       }
    }   		 
 
-   if( string( argv[3] ) == "NLO" ) {
+   else if( string( argv[3] ) == "NLO" ) {
 	  switch(model) {
          case MRSSM:
             switch(channel) {
@@ -265,7 +265,9 @@ int main(int argc, char* argv[]) {
 
           XSection_HnonC hc;
           //xsection_HnonC = hc.integrate();  
-      } else if( string(argv[2]) == "pp_suLsuLdagger" ) {
+      } 
+               case pp_suLsuLdagger:
+               {
          
          Process process1("MRSSM,uubar_suLsuLdagger", pt);
          XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
@@ -290,9 +292,11 @@ int main(int argc, char* argv[]) {
          
          cout << "hard\n";
          xsection_HnonC3 = hc.integrate();
-      } else {
+      } 
+               default:
          cout << "NLO process not implemented\n";
-
+            }
+     }
 //                  XSection_HnonC hc;
 //                  xsection_HnonC = add(hc.integrate(),hc.integrate());
 //                  break;      	
