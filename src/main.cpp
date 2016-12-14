@@ -35,6 +35,35 @@ double XSection::dS;
 boost::property_tree::ptree XSection::pt;
 const LHAPDF::PDF* XSection::pdf;
 
+void print( string str, array<double,3> tree, array<double,3> virt, array<double,3> soft, array<double,3> hard) {
+   cout << "\nResults for subprocess " << str << '\n';
+      cout << scientific;
+   //print out LO run statistics
+   cout << "---------------------------------------------------------------" << endl;
+   cout << setprecision(5);
+   cout << setw(12) << "tree:" << setw(13) << tree.at(0) 
+         << " +/- " << setprecision(1) << tree.at(1)
+         << " fb ( p-value = " << setw(8) << tree.at(2) << " )\n";
+   cout << setprecision(5);
+   cout << setw(12) << "virtual:" << setw(13) << virt.at(0) << " +/- " 
+           << setprecision(1) << virt.at(1) << " fb ( p-value = " 
+           << setw(8) << virt.at(2) << " )\n";
+
+      cout << setprecision(5);
+      cout << setw(12) << "real (soft):" << setw(13) << soft.at(0) << " +/- " << setprecision(1) << soft.at(1)
+           << " fb ( p-value = " << setw(8) << soft.at(2) << " )\n"; 
+      cout << setprecision(5);
+      cout << setw(12) << "real (hard):" << setw(13) << hard.at(0) << " +/- " << setprecision(1) << hard.at(1)
+           << " fb ( p-value = " << setw(8) << hard.at(2) << " )\n";
+      cout << "---------------------------------------------------------------" << endl;
+      cout << setprecision(5);
+      cout << setw(12) << "sum:" << setw(13)
+           << tree.at(0) + virt.at(0) + hard.at(0) + soft.at(0) 
+           << " +/- " << setprecision(1) << sqrt(pow(tree.at(1),2) + 
+           pow(virt.at(1),2) + pow(hard.at(1),2) +
+           pow(soft.at(1),2)) << " fb" << endl;   
+}
+
 int main(int argc, char* argv[]) {
    
 /* invoke programm like 
@@ -276,22 +305,29 @@ int main(int argc, char* argv[]) {
          xsection_tree1 = tree.integrate();      
          XSection_Virt virt;
          xsection_virt1 = virt.integrate();
+         //xsection_virt1 = {0., 0, 0};
          XSection_SC sc;
          xsection_SC1 = sc.integrate();
          XSection_HnonC hc;
          xsection_HnonC1 = hc.integrate();
+         print( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
          
          Process process2("MRSSM,ddbar_suLsuLdagger", pt);
          XSection::init( &process2, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );  
          
-         cout << "hard\n";
+         xsection_tree2 = tree.integrate();
+         xsection_virt2 = virt.integrate();
+         xsection_SC2 = sc.integrate();
          xsection_HnonC2 = hc.integrate();
+         print( "ddbar > suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
          
          Process process3("MRSSM,GG_suLsuLdagger", pt);
          XSection::init( &process3, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
-         
-         cout << "hard\n";
+         xsection_tree3 = tree.integrate();
+         xsection_virt3 = virt.integrate();
+         xsection_SC3 = sc.integrate();
          xsection_HnonC3 = hc.integrate();
+         print( "gg > suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
       } 
                default:
          cout << "NLO process not implemented\n";
@@ -398,13 +434,7 @@ int main(int argc, char* argv[]) {
       return 0;
    }
 
-   xsection_HnonC = add( xsection_HnonC1, xsection_HnonC2);
-   xsection_HnonC = add( xsection_HnonC, xsection_HnonC3);
-   xsection_HnonC = xsection_HnonC1;
-   xsection_tree = xsection_tree1;
-   xsection_virt = xsection_virt1;
-   xsection_SC = xsection_SC1;
-   
+
    auto end = chrono::steady_clock::now();
    
    // print out total run time
@@ -422,24 +452,7 @@ int main(int argc, char* argv[]) {
 
    // print out NLO part statistics
    if( string( argv[3] ) == "NLO" ) { 
-      cout << setprecision(5);
-      cout << setw(12) << "virtual:" << setw(13) << xsection_virt.at(0) << " +/- " 
-           << setprecision(1) << xsection_virt.at(1) << " fb ( p-value = " 
-           << setw(8) << xsection_virt.at(2) << " )\n";
-
-      cout << setprecision(5);
-      cout << setw(12) << "real (soft):" << setw(13) << xsection_SC.at(0) << " +/- " << setprecision(1) << xsection_SC.at(1)
-           << " fb ( p-value = " << setw(8) << xsection_SC.at(2) << " )\n"; 
-      cout << setprecision(5);
-      cout << setw(12) << "real (hard):" << setw(13) << xsection_HnonC.at(0) << " +/- " << setprecision(1) << xsection_HnonC.at(1)
-           << " fb ( p-value = " << setw(8) << xsection_HnonC.at(2) << " )\n";
-      cout << "---------------------------------------------------------------" << endl;
-      cout << setprecision(5);
-      cout << setw(12) << "sum:" << setw(13)
-           << xsection_tree.at(0) + xsection_virt.at(0) + xsection_HnonC.at(0) + xsection_SC.at(0) 
-           << " +/- " << setprecision(1) << sqrt(pow(xsection_tree.at(1),2) + 
-           pow(xsection_virt.at(1),2) + pow(xsection_HnonC.at(1),2) +
-           pow(xsection_SC.at(1),2)) << " fb" << endl;
+      
    }
    cout << '\n';
    

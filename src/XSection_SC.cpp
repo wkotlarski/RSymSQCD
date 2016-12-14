@@ -115,16 +115,31 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
        
    double pdf_flux = 0.0;
    for (const auto& inner : processID->flav) {
-      pdf_flux += inner.at(2) * ( pdf->xfxQ( inner.at(0), std::min(x1/y, 1.), mu_f )/std::min(x1/y, 1.) 
-                  * pdf->xfxQ( inner.at(1), x2, mu_f )/x2
-                  + pdf->xfxQ( inner.at(0), x1, mu_f )/x1
-                  * pdf->xfxQ( inner.at(1), std::min(x2/y, 1.), mu_f )/std::min(x2/y, 1.)
-                  );
+      if( abs(inner.at(0)) == 1 || abs(inner.at(0)) == 2 || abs(inner.at(0)) == 3 || abs(inner.at(0)) == 4
+              || abs(inner.at(0)) == 5 ) {
+         pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), std::min(x1/y, 1.), mu_f )/std::min(x1/y, 1.) 
+                  * pdf->xfxQ( inner.at(1), x2, mu_f )/x2 * CF *
+                 ( (1 - y) + (1 + y*y)/(1 - y) * log( dC * s12 * pow(1 - y, 2) / (2 * mu_f * mu_f * y) ) );
+      }
+      else if( inner.at(0) == 0 ) {
+         pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), std::min(x1/y, 1.), mu_f )/std::min(x1/y, 1.) 
+                  * pdf->xfxQ( inner.at(1), x2, mu_f )/x2 * 2 * CA *
+                 (y/(1-y) + (1-y)/y + y*(1-y)) * log( dC * s12 * pow(1 - y, 2) / (2 * mu_f * mu_f * y) );
+      }
+      if( abs(inner.at(1)) == 1 || abs(inner.at(1)) == 2 || abs(inner.at(1)) == 3 || abs(inner.at(1)) == 4
+              || abs(inner.at(1)) == 5 ) {
+         pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f )/x1
+                  * pdf->xfxQ( inner.at(1), std::min(x2/y, 1.), mu_f )/std::min(x2/y, 1.) * CF *
+                 ( (1 - y) + (1 + y*y)/(1 - y) * log( dC * s12 * pow(1 - y, 2) / (2 * mu_f * mu_f * y) ) );
+      }
+            else if( inner.at(1) == 0 ) {
+         pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f )/x1
+                  * pdf->xfxQ( inner.at(1), std::min(x2/y, 1.), mu_f )/std::min(x2/y, 1.) * 2 * CA *
+                 (y/(1-y) + (1-y)/y + y*(1-y)) * log( dC * s12 * pow(1 - y, 2) / (2 * mu_f * mu_f * y) );
+      }
    }
       
-   ff[0] = to_fb * CF
-            * ( (1 - y) + (1 + y*y)/(1 - y) * log( dC * s12 * pow(1 - y, 2) / (2 * mu_f * mu_f * y) ) ) 
-            * 1./y * pdf_flux 
+   ff[0] = to_fb * 1./y * pdf_flux 
             * Alfas/two_pi * (processID->*processID->sigmaPartTree)(s12);
    
     // multiply by jakobian of integration variable transformation

@@ -123,12 +123,15 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    else if(processID == "MRSSM,ddbar_suLsuLdagger") {
       sigmaPartTree = &Process::sigmaMRSSMTree_ddbar_suLsuLdagger;
       matrixelementTree = &Process::matrixMRSSMTree_ddbar_suLsuLdagger;
-      matrixelementVirt = &Process::matrix_virt_stub;
-      matrixelementReal_SC = &Process::matrix_soft_stub;
-      //matrixelementReal_HnonC = &Process::matrixMRSSMHard_ddbar_suLsuLdaggerg;
+      matrixelementVirt = &Process::matrixMRSSMVirt_ddbar_suLsuLdagger;
+      matrixelementReal_SC = &Process::matrixMRSSMSoft_ddbar_suLsuLdaggerg;
+      matrixelementReal_HnonC = &Process::matrixMRSSMHard_ddbar_suLsuLdaggerg;
       m1 = MassSuL;
       m2 = MassSuL;
       flav.push_back( std::vector<int> {1, -1, 2} );
+      flav.push_back( std::vector<int> {3, -3, 2} );
+      flav.push_back( std::vector<int> {4, -4, 2} );
+      flav.push_back( std::vector<int> {5, -5, 2} );
       f1 = 1;
       f2 = -1;
       k = 2.*2*3*3;
@@ -146,10 +149,9 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    else if(processID == "MRSSM,GG_suLsuLdagger") {
       sigmaPartTree = &Process::sigmaMRSSMTree_gg_suLsuLdagger;
       matrixelementTree = &Process::matrixMRSSMTree_GG_suLsuLdagger; 
-      matrixelementVirt = &Process::matrix_virt_stub;
-      matrixelementReal_SC = &Process::matrix_soft_stub;
+      matrixelementVirt = &Process::matrixMRSSMVirt_GG_suLsuLdagger;
+      matrixelementReal_SC = &Process::matrixMRSSMSoft_gg_suLsuLdaggerg;
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_gg_suLsuLdaggerg;
-      
       m1 = MassSuL;
       m2 = MassSuL;
       flav.push_back( std::vector<int> {0, 0, 1} );
@@ -343,7 +345,7 @@ double Process::determinant( boost::numeric::ublas::matrix<double>& m ) {
 #include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdaggerg_soft.cpp"
 #include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdaggerg_hard.cpp"
 #include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_hard.cpp"
-//#include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg_hard.cpp"
+#include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg_hard.cpp"
 
 #include "matrix_elements_and_xsections/mrssm_uu_suLsuRg_hard.cpp"
 /* -----------------------------------------------------------------------------------------------*/
