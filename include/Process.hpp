@@ -101,6 +101,8 @@ class Process {
       double k;     // 1/k = average over initial state colors and helicities
       double h;     // h = sum over initial and final state helicities of fermions (_hel = 0 in FormCalc)
       bool partonic;
-      std::vector< std::vector<int> > flav;
+      std::vector< std::vector<int> > flav;  // each entry is a vector containing the following 3 numbers: 
+                                             // first two = initial state flavors, third = how many times does
+                                             // initial state occur, e.g. uu is 1, but ud is 2 as there is also du
 };
 #endif /* PROCESS_H_ */

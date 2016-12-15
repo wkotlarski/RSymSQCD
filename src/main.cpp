@@ -151,7 +151,7 @@ int main(int argc, char* argv[]) {
                   break;
 			      }                  
                case pp_suLsuR: 
-                  {                                                     // checked with MadGraph 
+                  {                                                     // checked with MadGraph and Philip
                   Process process1("MRSSM,uu_suLsuR", pt);
                   XSection::init( &process1, pt, 1, 1, 1 );
                   XSection_Tree tree;
@@ -159,11 +159,12 @@ int main(int argc, char* argv[]) {
                   break;      	
 			      }	
 			   case pp_suLsdR: 
-                  {                                                     // checked with MadGraph 
+                  {  
+				                                                        // checked with MadGraph and Philip 
                   Process process1("MRSSM,ud_suLsdR", pt);
                   XSection::init( &process1, pt, 1, 1, 1 );
                   XSection_Tree tree;
-                  xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
+                  xsection_tree = tree.integrate();
                   break;      	
 			      }	
 

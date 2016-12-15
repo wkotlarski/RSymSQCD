@@ -29,16 +29,12 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    
 /* -------------------- Squark-squark production---------------------------------*/
 
-	if(processID == "MRSSM,uu_suLsuR") {
-      
-		matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM 
-	    
-      matrixelementVirt = &Process::matrixMRSSMVirt_uu_suLsuR;
-      
+	if(processID == "MRSSM,uu_suLsuR") {      
+	  matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM 	    
+      matrixelementVirt = &Process::matrixMRSSMVirt_uu_suLsuR;      
       sigmaPartTree = &Process::sigmaMSSMTree_uu_suLsuR; // same as in MSSM
       matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
-      matrixelementReal_HnonC = &Process::matrixMRSSMHard_uu_suLsuRg;
-      
+      matrixelementReal_HnonC = &Process::matrixMRSSMHard_uu_suLsuRg;      
       m1 = MassSuL;
       m2 = MassSuR;
       flav.push_back( std::vector<int> {2, 2, 1} );
@@ -52,6 +48,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       matrixelementVirt = &Process::matrixMRSSMVirt_ud_suLsdR;
       m1 = MassSuL;
       m2 = MassSuR;
+      flav.push_back( std::vector<int> {2, 1, 2} );
       f1 = 2.;
       f2 = 1.;
       k = 2.*2*3*3;
@@ -163,7 +160,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    else if(processID == "MSSM,uubar_suLsuLdagger") {
       matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR;  // matrix elements are identical
       //std::vector<int> row {2, -2};
-      flav.push_back( std::vector<int> {2, -2} );
+      flav.push_back( std::vector<int> {2, -2, 2} );
       m1 = MassSuL;
       m2 = MassSuL;
       f1 = 2;
@@ -173,6 +170,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    }
    else if(processID == "MSSM,uubar_suLsuRdagger") {
       matrixelementTree = &Process::matrixMSSMTree_uubar_suLsuRdagger;
+      flav.push_back( std::vector<int> {2, -2, 2} );
       m1 = MassSuL;
       m2 = MassSuR;
       f1 = 2;
@@ -207,7 +205,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       k = 2.*2*3*3;
       h = 2.*2;
    }
-      else if(processID == "MSSM,GG_suLsuLdagger") {
+/*      else if(processID == "MSSM,GG_suLsuLdagger") {
       matrixelementTree = &Process::matrixMRSSMTree_GG_suLsuLdagger; // matrix elements are identical
       m1 = MassSuL;
       m2 = MassSuL;
@@ -216,7 +214,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       k = 2.*2*8*8;
       h = 1.;
    }
-
+*/
 /* -------------------- Sgluon production ---------------------*/
 
    else if( processID == "sgluons-qqbar_OO" ) {	  
@@ -298,7 +296,7 @@ double Process::determinant( boost::numeric::ublas::matrix<double>& m ) {
 #include "matrix_elements_and_xsections/mrssm_udbar_suLsdLdagger_tree_matrix.cpp"
 #include "matrix_elements_and_xsections/mssm_uubar_suLsuRdagger_tree_matrix.cpp"
 
-/* -------------------- Squark-antisquark production: q+q^bar > sq+sq^dagger ---------------------*/
+/* -------------------- Squark-antisquark production: G+G > sq+sq^dagger ---------------------*/
 #include "matrix_elements_and_xsections/mrssm_gg_suLsuLdagger_tree_matrix.cpp"
 
 
