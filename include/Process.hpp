@@ -38,6 +38,7 @@ class Process {
       double sigmaMRSSMTree_uubar_suLsuLdagger( double );
       double sigmaMRSSMTree_ddbar_suLsuLdagger( double );
       double sigmaMRSSMTree_gg_suLsuLdagger( double );
+      double sigmaMRSSMTree_uu_suLsuR( double );
       double matrixMSSMTree_uu_suLsuR( double, double );
       double matrixMSSMTree_uu_suLsuL( double, double );
       double matrixMSSMTree_ud_suLsdR( double, double );
