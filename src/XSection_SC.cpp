@@ -20,13 +20,13 @@ std::array<double, 3> XSection_SC::integrate() {
       prec_sc, accuracy_abs, 0,
       neval_min, neval_max, 1, NULL, NULL,
       &nregions, &neval, &fail, integral_sc, error_sc, prob_sc);
-   
+
    cubareal integral_c1[ncomp], error_c1[ncomp], prob_c1[ncomp];
    llCuhre(ndim, ncomp, integrand_c1, NULL, 1,
       accuracy_rel_c, accuracy_abs, 0,
       neval_min, neval_max, 1, NULL, NULL,
       &nregions, &neval, &fail, integral_c1, error_c1, prob_c1);
-  
+
    cubareal integral_c2[ncomp], error_c2[ncomp], prob_c2[ncomp];
    llCuhre(ndim, ncomp, integrand_c2, NULL, 1,
       accuracy_rel_c, accuracy_abs, 0,
@@ -44,8 +44,6 @@ std::array<double, 3> XSection_SC::integrate() {
 
 int XSection_SC::integrand_sc(const int *ndim, const cubareal xx[],
   const int *ncomp, cubareal ff[], void *userdata) {
-   
-   // double m_sqr = pow( pt.get<double>("masses.suL"), 2);
     
    // integration variables
    double x1 = 4. * pow(m1, 2)/S + (1 - 4. * pow(m1, 2)/S ) * xx[0];
@@ -90,8 +88,7 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
       pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f ) * pdf->xfxQ( inner.at(1), x2, mu_f );
    }
    
-   ff[0] = 0*to_fb
-      * pdf->xfxQ(2, x1, muF)/x1 * pdf->xfxQ(2, x2, muF)/x2
+   ff[0] = 0*to_fb * pdf_flux / ( x1 * x2 )
       * 4./3. * (2 * log(dS) + 3./2.);
     
    ff[0] *= (pi*Power(-4*pow(m1, 2) + S,2)*xx[0])/(S*(-4*pow(m1, 2)*(-1 + xx[0]) + S*xx[0]));
@@ -101,7 +98,7 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
 
 int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
    const int *ncomp, cubareal ff[], void *userdata) {
-   
+
    // integration variables
    double x1 = 4. * pow(m1, 2)/S + (1 - 4. * pow(m1, 2)/S ) * xx[0];
 	double x2 = 4. * pow(m1, 2) /(S * x1) + (1 - 4. * pow(m1, 2)/(S * x1)) * xx[1];
@@ -112,7 +109,7 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
     
    double Alfas = pdf->alphasQ( mu_r );
    double Alfas2 = pow( Alfas, 2);
-       
+
    double pdf_flux = 0.0;
    for (const auto& inner : processID->flav) {
       if( abs(inner.at(0)) == 1 || abs(inner.at(0)) == 2 || abs(inner.at(0)) == 3 || abs(inner.at(0)) == 4
@@ -132,14 +129,14 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
                   * pdf->xfxQ( inner.at(1), std::min(x2/y, 1.), mu_f )/std::min(x2/y, 1.) * CF *
                  ( (1 - y) + (1 + y*y)/(1 - y) * log( dC * s12 * pow(1 - y, 2) / (2 * mu_f * mu_f * y) ) );
       }
-            else if( inner.at(1) == 0 ) {
+      else if( inner.at(1) == 0 ) {
          pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f )/x1
                   * pdf->xfxQ( inner.at(1), std::min(x2/y, 1.), mu_f )/std::min(x2/y, 1.) * 2 * CA *
                  (y/(1-y) + (1-y)/y + y*(1-y)) * log( dC * s12 * pow(1 - y, 2) / (2 * mu_f * mu_f * y) );
       }
    }
       
-   ff[0] = to_fb * 1./y * pdf_flux 
+   ff[0] = to_fb * 1./y * pdf_flux
             * Alfas/two_pi * (processID->*processID->sigmaPartTree)(s12);
    
     // multiply by jakobian of integration variable transformation

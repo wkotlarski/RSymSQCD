@@ -263,19 +263,17 @@ int main(int argc, char* argv[]) {
 			      }                  
                case pp_suLsuR: 
                   {     
-                  Process process1("MSSM,uu_suLsuR", pt);
+                  Process process1("MRSSM,uu_suLsuR", pt);
 	              XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
                   XSection_Tree tree;
-                  xsection_tree = tree.integrate();      
-                  //cout << "Born  = " << xsection_tree.at(0) << endl;
+                  xsection_tree1 = tree.integrate();      
                   XSection_Virt virt;
-                  xsection_virt = virt.integrate();
-                  //cout << "Virtual correction = " << xsection_virt.at(0) << endl;
+                  xsection_virt1 = virt.integrate();
                   XSection_SC sc;
-                  xsection_SC = sc.integrate();
-        
+                  xsection_SC1 = sc.integrate();
                   XSection_HnonC hc;
-                  xsection_HnonC = hc.integrate();
+                  xsection_HnonC1 = hc.integrate();
+                  print( "uu > suLsuR", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                   break;      	
 			      }	
 			   case pp_suLsdR:  // result doubled up, as there is ud and du initial state
@@ -302,10 +300,9 @@ int main(int argc, char* argv[]) {
          XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
          
          XSection_Tree tree;
-         xsection_tree1 = tree.integrate();      
+         //xsection_tree1 = tree.integrate();      
          XSection_Virt virt;
-         xsection_virt1 = virt.integrate();
-         //xsection_virt1 = {0., 0, 0};
+         //xsection_virt1 = virt.integrate();
          XSection_SC sc;
          xsection_SC1 = sc.integrate();
          XSection_HnonC hc;
@@ -315,18 +312,18 @@ int main(int argc, char* argv[]) {
          Process process2("MRSSM,ddbar_suLsuLdagger", pt);
          XSection::init( &process2, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );  
          
-         xsection_tree2 = tree.integrate();
-         xsection_virt2 = virt.integrate();
-         xsection_SC2 = sc.integrate();
-         xsection_HnonC2 = hc.integrate();
+         //xsection_tree2 = tree.integrate();
+         //xsection_virt2 = virt.integrate();
+         //xsection_SC2 = sc.integrate();
+         //xsection_HnonC2 = hc.integrate();
          print( "ddbar > suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
          
          Process process3("MRSSM,GG_suLsuLdagger", pt);
          XSection::init( &process3, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
-         xsection_tree3 = tree.integrate();
-         xsection_virt3 = virt.integrate();
-         xsection_SC3 = sc.integrate();
-         xsection_HnonC3 = hc.integrate();
+      //xsection_tree3 = tree.integrate();
+         //xsection_virt3 = virt.integrate();
+         //xsection_SC3 = sc.integrate();
+         //xsection_HnonC3 = hc.integrate();
          print( "gg > suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
       } 
                default:

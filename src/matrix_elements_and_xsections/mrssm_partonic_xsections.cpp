@@ -14,3 +14,14 @@ double Process::sigmaMRSSMTree_gg_suLsuLdagger( double s12 ) {
    double Alfas2 = pow( pdf->alphasQ( mu_r ), 2);
    return (Alfas2*pi*(Sqrt(s12*(-4*(m1*m1) + s12))*(62*(m1*m1) + 5*s12) - 16*(m1*m1)*(m1*m1 + 4*s12)*atanh(Sqrt(1 - (4*(m1*m1))/s12))))/(48.*Power(s12,3));
 }
+
+/*
+ *    checked with MadGraph
+ */
+double Process::sigmaMRSSMTree_uu_suLsuR( double s ) {
+   double MGl2 = pow(MassGlu, 2);
+   double a = pdf->alphasQ( mu_r );
+   return (-4.*pow(a, 2)*pi*(2.*sqrt(s*(-4*pow(m1,2) + s)) + (2.*pow(m1,2) - 2.*MGl2 - s)*
+      log((4.*MGl2 + pow(1. + sqrt(1. - (4.*pow(m1,2))/s),2.)*s)/
+      (4.*MGl2 + pow(-1. + sqrt(1. - (4.*pow(m1,2))/s),2)*s))))/(9.*pow(s,2));
+}
