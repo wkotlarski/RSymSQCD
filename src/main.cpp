@@ -78,10 +78,13 @@ int main(int argc, char* argv[]) {
         
    boost::property_tree::ptree pt;
    boost::property_tree::ini_parser::read_ini("config.ini", pt);   
-   array<double,3> temp, xsection_tree, xsection_virt, xsection_SC, xsection_HnonC,
-           xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1,
-           xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2,
-           xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3;
+   
+   // local arrays are not aumatically initialized to 0
+   // need to use {}
+   array<double,3> temp {}, xsection_tree {}, xsection_virt {}, xsection_SC {}, xsection_HnonC {},
+           xsection_tree1 {}, xsection_virt1 {}, xsection_SC1 {}, xsection_HnonC1 {},
+           xsection_tree2 {}, xsection_virt2 {}, xsection_SC2 {}, xsection_HnonC2 {},
+           xsection_tree3 {}, xsection_virt3 {}, xsection_SC3 {}, xsection_HnonC3 {};
    enum Model {
        MRSSM,
        MSSM,  
@@ -151,7 +154,7 @@ int main(int argc, char* argv[]) {
                   break;
 			      }                  
                case pp_suLsuR: 
-                  {                                                     // checked with MadGraph 
+                  {                                                     // checked with MadGraph and Philip
                   Process process1("MRSSM,uu_suLsuR", pt);
                   XSection::init( &process1, pt, 1, 1, 1 );
                   XSection_Tree tree;
@@ -159,11 +162,12 @@ int main(int argc, char* argv[]) {
                   break;      	
 			      }	
 			   case pp_suLsdR: 
-                  {                                                     // checked with MadGraph 
+                  {  
+				                                                        // checked with MadGraph and Philip 
                   Process process1("MRSSM,ud_suLsdR", pt);
                   XSection::init( &process1, pt, 1, 1, 1 );
                   XSection_Tree tree;
-                  xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
+                  xsection_tree = tree.integrate();
                   break;      	
 			      }	
 
@@ -446,12 +450,6 @@ int main(int argc, char* argv[]) {
    cout << setw(12) << "tree:" << setw(13) << xsection_tree.at(0) 
          << " +/- " << setprecision(1) << xsection_tree.at(1)
          << " fb ( p-value = " << setw(8) << xsection_tree.at(2) << " )\n";
-
-   // print out NLO part statistics
-   if( string( argv[3] ) == "NLO" ) { 
-      
-   }
-   cout << '\n';
    
    return 0;
 }
