@@ -25,7 +25,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    
    // @todo remove
    MassSq = MassSuL;
-   partonic = false; // calculate sigma_had with |M|^2 and not sigma_part
+   partonic = true; // calculate sigma_had with |M|^2 and not sigma_part
    
 /* -------------------- Squark-squark production---------------------------------*/
 
@@ -126,11 +126,9 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       m1 = MassSuL;
       m2 = MassSuL;
       flav.push_back( std::vector<int> {1, -1, 2} );
-      flav.push_back( std::vector<int> {3, -3, 2} );
-      flav.push_back( std::vector<int> {4, -4, 2} );
-      flav.push_back( std::vector<int> {5, -5, 2} );
-      f1 = 1;
-      f2 = -1;
+      //flav.push_back( std::vector<int> {3, -3, 2} );
+      //flav.push_back( std::vector<int> {4, -4, 2} );
+      //flav.push_back( std::vector<int> {5, -5, 2} );
       k = 2.*2*3*3;
       h = 2.*2;
    }
@@ -308,12 +306,6 @@ double Process::determinant( boost::numeric::ublas::matrix<double>& m ) {
 #include "matrix_elements_and_xsections/mrssm_uubar_OO_tree_xsec.cpp" // is identical for all initial state quarks
 #include "matrix_elements_and_xsections/mrssm_gg_OO_tree_xsec.cpp"
 
-/* ///////////////////////////////////// matrix elements ///////////////////////////////////// */
-
-
- 
-
-
 /* -----------------------------------------------------------------------------------------------*/
 /* ------------------------------------------ Virtual --------------------------------------------*/
 /* -----------------------------------------------------------------------------------------------*/
@@ -336,14 +328,19 @@ double Process::determinant( boost::numeric::ublas::matrix<double>& m ) {
 #include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdagger_virt_matrix.cpp"
 #include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdagger_virt_matrix.cpp"
 
-
-// real
-#include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg.cpp"
-#include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg.cpp"
+/*
+ 
+   Real emissions
+ 
+ */
 #include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdaggerg_soft.cpp"
 #include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdaggerg_hard.cpp"
-#include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_hard.cpp"
+
+#include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg_soft.cpp"
 #include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg_hard.cpp"
+
+#include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_hard.cpp"
+#include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg.cpp"
 
 #include "matrix_elements_and_xsections/mrssm_uu_suLsuRg_soft.cpp"
 #include "matrix_elements_and_xsections/mrssm_uu_suLsuRg_hard.cpp"

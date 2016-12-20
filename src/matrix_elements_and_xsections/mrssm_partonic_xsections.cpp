@@ -5,9 +5,10 @@ double Process::sigmaMRSSMTree_uubar_suLsuLdagger( double s12 ) {
         atanh(Sqrt(s12*(-4*(m1*m1) + s12))/(2*(m1*m1) - 2*(MassGlu*MassGlu) - s12))))/(54.*Power(s12,3));
 } 
 
+// checked against MG with SUSYQCD model
 double Process::sigmaMRSSMTree_ddbar_suLsuLdagger( double s12 ) {
    double Alfas2 = pow( pdf->alphasQ( mu_r ), 2);
-   return (2*Alfas2*pi*Power(-4*(m1*m1) + s12,1.5))/(27.*Power(s12,2.5));
+   return (2*Alfas2*pi*pow(-4*(m1*m1) + s12,1.5))/(27.*pow(s12,2.5));
 }
 
 double Process::sigmaMRSSMTree_gg_suLsuLdagger( double s12 ) {
