@@ -54,15 +54,16 @@ int XSection_SC::integrand_sc(const int *ndim, const cubareal xx[],
    double Alfas = pdf->alphasQ( mu_r );
     
    double pdf_flux = 0.0;
-   for (const auto& inner : processID->flav) {
-      pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f ) * pdf->xfxQ( inner.at(1), x2, mu_f );
+   for (const auto& f : processID->flav) {
+      pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x1, mu_f ) * pdf->xfxQ( f.at(1), x2, mu_f );
    }
+   pdf_flux /= x1 * x2;
    
-   ff[0] = to_fb * (processID->*processID->matrixelementReal_SC)(s12, th) 
-            * pdf_flux/( x1 * x2 );
+   ff[0] = pdf_flux * (processID->*processID->matrixelementReal_SC)(s12, th);
+   ff[0] *= to_fb;
     
    // jakobian
-   ff[0] *= pi*Power(-4*pow(m1, 2) + S,2)*xx[0] / 
+   ff[0] *= pi*pow(-4*pow(m1, 2) + S,2)*xx[0] / 
            (S*(-4*pow(m1, 2)*(-1 + xx[0]) + S*xx[0]));
    return 0;
 }
@@ -78,20 +79,18 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
    double th = pi * xx[2];
     
    double s12 = x1 * x2 * S;
-   double beta = sqrt( 1 - 4 * pow(m1, 2)/s12 );
-    
-   double Alfas = pdf->alphasQ( muR );
+   double Alfas = pdf->alphasQ( mu_r );
    double Alfas2 = pow( Alfas, 2);
     
    double pdf_flux = 0.0;
    for (const auto& inner : processID->flav) {
       pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f ) * pdf->xfxQ( inner.at(1), x2, mu_f );
    }
+   pdf_flux /= x1 * x2;
    
-   ff[0] = 0*to_fb * pdf_flux / ( x1 * x2 )
-      * 4./3. * (2 * log(dS) + 3./2.);
+   ff[0] = 0*to_fb * pdf_flux * 4./3. * (2 * log(dS) + 3./2.);
     
-   ff[0] *= (pi*Power(-4*pow(m1, 2) + S,2)*xx[0])/(S*(-4*pow(m1, 2)*(-1 + xx[0]) + S*xx[0]));
+   ff[0] *= 0*(pi*Power(-4*pow(m1, 2) + S,2)*xx[0])/(S*(-4*pow(m1, 2)*(-1 + xx[0]) + S*xx[0]));
     
    return 0;
 }  
@@ -102,46 +101,51 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
    // integration variables
    double x1 = 4. * pow(m1, 2)/S + (1 - 4. * pow(m1, 2)/S ) * xx[0];
 	double x2 = 4. * pow(m1, 2) /(S * x1) + (1 - 4. * pow(m1, 2)/(S * x1)) * xx[1];
-   double y = x1 + ( 1 - dS - x1 ) * xx[2];
+   double z = x1 + ( 1 - dS - x1 ) * xx[2];
+   if( x1/z > 1.) {
+      ff[0] = 0;
+      return 0;
+   }
      
    double s12 = x1 * x2 * S;
-   double beta = sqrt( 1 - 4 * pow(m1, 2)/s12 );
-    
    double Alfas = pdf->alphasQ( mu_r );
    double Alfas2 = pow( Alfas, 2);
 
    double pdf_flux = 0.0;
-   for (const auto& inner : processID->flav) {
-      if( abs(inner.at(0)) == 1 || abs(inner.at(0)) == 2 || abs(inner.at(0)) == 3 || abs(inner.at(0)) == 4
-              || abs(inner.at(0)) == 5 ) {
-         pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), std::min(x1/y, 1.), mu_f )/std::min(x1/y, 1.) 
-                  * pdf->xfxQ( inner.at(1), x2, mu_f )/x2 * CF *
-                 ( (1 - y) + (1 + y*y)/(1 - y) * log( dC * s12 * pow(1 - y, 2) / (2 * mu_f * mu_f * y) ) );
-      }
-      else if( inner.at(0) == 0 ) {
-         pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), std::min(x1/y, 1.), mu_f )/std::min(x1/y, 1.) 
-                  * pdf->xfxQ( inner.at(1), x2, mu_f )/x2 * 2 * CA *
-                 (y/(1-y) + (1-y)/y + y*(1-y)) * log( dC * s12 * pow(1 - y, 2) / (2 * mu_f * mu_f * y) );
-      }
-      if( abs(inner.at(1)) == 1 || abs(inner.at(1)) == 2 || abs(inner.at(1)) == 3 || abs(inner.at(1)) == 4
-              || abs(inner.at(1)) == 5 ) {
-         pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f )/x1
-                  * pdf->xfxQ( inner.at(1), std::min(x2/y, 1.), mu_f )/std::min(x2/y, 1.) * CF *
-                 ( (1 - y) + (1 + y*y)/(1 - y) * log( dC * s12 * pow(1 - y, 2) / (2 * mu_f * mu_f * y) ) );
-      }
-      else if( inner.at(1) == 0 ) {
-         pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f )/x1
-                  * pdf->xfxQ( inner.at(1), std::min(x2/y, 1.), mu_f )/std::min(x2/y, 1.) * 2 * CA *
-                 (y/(1-y) + (1-y)/y + y*(1-y)) * log( dC * s12 * pow(1 - y, 2) / (2 * mu_f * mu_f * y) );
-      }
+   for (const auto& f : processID->flav) {
+//      if( abs(inner.at(0)) == 1 || abs(inner.at(0)) == 2 || abs(inner.at(0)) == 3 || abs(inner.at(0)) == 4
+//              || abs(inner.at(0)) == 5 ) {
+         pdf_flux += f.at(2) * CF * (pdf->xfxQ( f.at(0), x1/z, mu_f )/(x1/z) 
+                  * pdf->xfxQ( f.at(1), x2, mu_f )/x2 + 
+                 pdf->xfxQ( f.at(0), x2, mu_f )/x2
+                  * pdf->xfxQ( f.at(1), x1/z, mu_f )/(x1/z)
+                 ) *
+                 ( (1 - z) + (1 + z*z)/(1 - z) * log( dC/2. * s12/pow(mu_f, 2) * pow(1 - z, 2)/z ) );
+    //  }
+//      else if( inner.at(0) == 0 ) {
+//         pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), std::min(x1/y, 1.), mu_f )/std::min(x1/y, 1.) 
+//                  * pdf->xfxQ( inner.at(1), x2, mu_f )/x2 * 2 * CA *
+//                 (y/(1-y) + (1-y)/y + y*(1-y)) * log( dC * s12 * pow(1 - y, 2) / (2 * mu_f * mu_f * y) );
+//      }
+//      if( abs(inner.at(1)) == 1 || abs(inner.at(1)) == 2 || abs(inner.at(1)) == 3 || abs(inner.at(1)) == 4
+//              || abs(inner.at(1)) == 5 ) {
+//         pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f )/x1
+//                  * pdf->xfxQ( inner.at(1), std::min(x2/y, 1.), mu_f )/std::min(x2/y, 1.) * CF *
+//                 ( (1 - y) + (1 + y*y)/(1 - y) * log( dC * s12 * pow(1 - y, 2) / ( 2 * mu_f * mu_f * y) ) );
+//      }
+//      else if( inner.at(1) == 0 ) {
+//         pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f )/x1
+//                  * pdf->xfxQ( inner.at(1), std::min(x2/y, 1.), mu_f )/std::min(x2/y, 1.) * 2 * CA *
+//                 (y/(1-y) + (1-y)/y + y*(1-y)) * log( dC * s12 * pow(1 - y, 2) / (2 * mu_f * mu_f * y) );
+//      }
    }
       
-   ff[0] = to_fb * 1./y * pdf_flux
-            * Alfas/two_pi * (processID->*processID->sigmaPartTree)(s12);
+   ff[0] = to_fb * pdf_flux  
+            * Alfas/two_pi * 1./z * (processID->*processID->sigmaPartTree)(s12);
    
     // multiply by jakobian of integration variable transformation
-    ff[0] *= (Power(-4*pow(m1, 2) + S,2)*xx[0]*(4*pow(m1, 2)*(-1 + xx[0]) - S*(-1 + dS + xx[0])))/
-        (Power(S,2)*(-4*pow(m1, 2)*(-1 + xx[0]) + S*xx[0]));
-    
-  return 0;
+    ff[0] *= (pow(-4*pow(m1, 2) + S,2)*xx[0]*(4*pow(m1, 2)*(-1 + xx[0]) - S*(-1 + dS + xx[0])))/
+        (pow(S,2)*(-4*pow(m1, 2)*(-1 + xx[0]) + S*xx[0]));
+   
+   return 0;
 }

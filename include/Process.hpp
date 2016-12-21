@@ -75,6 +75,7 @@ class Process {
       double matrixMRSSMHard_gg_suLsuLdaggerg( std::vector< double* >& );
       double matrixMRSSMHard_uubar_suLsuLdaggerg( std::vector< double* >& );
       double matrixMRSSMHard_ddbar_suLsuLdaggerg( std::vector< double* >& );
+      double matrixMRSSMHard_dg_suLsuLdaggerd( std::vector< double* >& );
       
       // pp > OO
       //double matrixMRSSMSoft_qqbar_OOg( double, double );
