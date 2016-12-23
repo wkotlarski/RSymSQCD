@@ -26,3 +26,9 @@ double Process::sigmaMRSSMTree_uu_suLsuR( double s ) {
       log((4.*MGl2 + pow(1. + sqrt(1. - (4.*pow(m1,2))/s),2.)*s)/
       (4.*MGl2 + pow(-1. + sqrt(1. - (4.*pow(m1,2))/s),2)*s))))/(9.*pow(s,2));
 }
+
+double Process::sigmaMRSSMTree_uubar_OO( double s ) {
+   double a2 = pow( pdf->alphasQ( mu_r ), 2);
+   double b = sqrt( 1. - 4. * m1*m1/s );
+   return 2 * a2 * pi * pow(b, 3)/(9. * s);
+}

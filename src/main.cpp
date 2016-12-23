@@ -87,10 +87,12 @@ int main(int argc, char* argv[]) {
            xsection_tree3 {}, xsection_virt3 {}, xsection_SC3 {}, xsection_HnonC3 {};
    enum Model {
        MRSSM,
-       MSSM,  
+       MSSM, 
+       Simplified,
        no_model
    };
    enum Channel {
+       pp_OO,
        pp_OsOs,
        pp_suLsuR,  
        pp_suLsuL,
@@ -110,6 +112,8 @@ int main(int argc, char* argv[]) {
       model = MRSSM;
    } else if ( string(argv[1]) == "MSSM" ) {
       model = MSSM;
+   } else if ( string(argv[1]) == "Simplified" ) {
+      model = Simplified;
    } else {
 	   cout << "\n Model not implemented! \n\n";
    }
@@ -132,6 +136,8 @@ int main(int argc, char* argv[]) {
       channel = pp_suLsdLdagger;
    } else if ( string(argv[2]) == "pp_suLsdRdagger" ) {
       channel = pp_suLsdRdagger;
+         } else if ( string(argv[2]) == "pp_OO" ) {
+      channel = pp_OO;
    } else {
 	   cout << "\n Process not implemented! \n\n";
    } 
@@ -300,26 +306,26 @@ int main(int argc, char* argv[]) {
                case pp_suLsuLdagger:
                {
          
-         Process process1("MRSSM,uubar_suLsuLdagger", pt);
-         XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
+         //Process process1("MRSSM,uubar_suLsuLdagger", pt);
+         //XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
          
-         XSection_Tree tree;
+         //XSection_Tree tree;
          //xsection_tree1 = tree.integrate();      
-         XSection_Virt virt;
+         //XSection_Virt virt;
          //xsection_virt1 = virt.integrate();
          XSection_SC sc;
-         xsection_SC1 = sc.integrate();
+         //xsection_SC1 = sc.integrate();
          XSection_HnonC hc;
-         xsection_HnonC1 = hc.integrate();
-         print( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+         //xsection_HnonC1 = hc.integrate();
+         //print( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
          
          Process process2("MRSSM,ddbar_suLsuLdagger", pt);
          XSection::init( &process2, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );  
          
          //xsection_tree2 = tree.integrate();
          //xsection_virt2 = virt.integrate();
-         //xsection_SC2 = sc.integrate();
-         //xsection_HnonC2 = hc.integrate();
+         xsection_SC2 = sc.integrate();
+         xsection_HnonC2 = hc.integrate();
          print( "ddbar > suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
          
          Process process3("MRSSM,GG_suLsuLdagger", pt);
@@ -333,6 +339,26 @@ int main(int argc, char* argv[]) {
                default:
          cout << "NLO process not implemented\n";
             }
+     case Simplified:
+        switch(channel) {
+           case pp_OO:
+           {
+              {     
+                  Process process1("Simplified,uubar_OO", pt);
+                  XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
+                  XSection_Tree tree;
+                  //xsection_tree1 = tree.integrate();      
+                  XSection_Virt virt;
+                  //xsection_virt1 = virt.integrate();
+                  XSection_SC sc;
+                  xsection_SC1 = sc.integrate();
+                  XSection_HnonC hc;
+                  xsection_HnonC1 = hc.integrate();
+                  print( "qqbar > OO", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                  break;      	
+           }
+        }
+        }
      }
 //                  XSection_HnonC hc;
 //                  xsection_HnonC = add(hc.integrate(),hc.integrate());

@@ -230,26 +230,29 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 */
 /* -------------------- Sgluon production ---------------------*/
 
-   else if( processID == "sgluons-qqbar_OO" ) {	  
-	  partonic = true;
-      sigmaPartTree = &Process::matrixSgluonTree_qqbar_OO;
+      else if(processID == "Simplified,uubar_OO") {
+      sigmaPartTree = &Process::sigmaMRSSMTree_uubar_OO;
+      matrixelementTree = &Process::matrix_tree_stub;
       matrixelementVirt = &Process::matrix_virt_stub;
-      m1 =  MasssigmaO;
-      m2 =  MasssigmaO;
-      k = 1;
-      f1 = 69;
-      f2 = 69;
-      h=1;
+      matrixelementReal_SC = &Process::matrixSimplifiedSoft_uubar_OOg;
+      matrixelementReal_HnonC = &Process::matrixSimplifiedHard_uubar_OOg;
+      m1 = MasssigmaO;
+      m2 = MasssigmaO;
+      flav.push_back( std::vector<int> {1, -1, 2} );
+      flav.push_back( std::vector<int> {2, -2, 2} );      
+      flav.push_back( std::vector<int> {3, -3, 2} );
+      flav.push_back( std::vector<int> {4, -4, 2} );
+      flav.push_back( std::vector<int> {5, -5, 2} );
    }
-   else if( processID == "sgluons-gg_OO" ) {
-	  partonic = true;
-      sigmaPartTree = &Process::matrixSgluonTree_gg_OO;
+      else if(processID == "Simplified,gg_OO") {
+      sigmaPartTree = &Process::matrix_xsec_stub;
+      matrixelementTree = &Process::matrix_tree_stub;
       matrixelementVirt = &Process::matrix_virt_stub;
-      m1 = m2 = MasssigmaO;
-      k = 1;
-      f1 = 0;
-      f2 = 0;
-      h=1;
+      matrixelementReal_SC = &Process::matrixSimplifiedSoft_gg_OOg;
+      matrixelementReal_HnonC = &Process::matrixSimplifiedHard_gg_OOg;
+      m1 = MasssigmaO;
+      m2 = MasssigmaO;
+      flav.push_back( std::vector<int> {21, 21, 0} );
    }
    else {
       std::cout << "Error! Subprocess " << processID << " not implemented.\n";
@@ -361,3 +364,8 @@ double Process::determinant( boost::numeric::ublas::matrix<double>& m ) {
 #include "matrix_elements_and_xsections/mrssm_uu_suLsuRg_soft.cpp"
 #include "matrix_elements_and_xsections/mrssm_uu_suLsuRg_hard.cpp"
 
+#include "matrix_elements_and_xsections/simplified_uubar_OOg_soft.cpp"
+#include "matrix_elements_and_xsections/simplified_uubar_OOg_hard.cpp"
+
+#include "matrix_elements_and_xsections/simplified_gg_OOg_soft.cpp"
+#include "matrix_elements_and_xsections/simplified_gg_OOg_hard.cpp"

@@ -30,6 +30,7 @@ class Process {
        */
       double matrix_virt_stub( double, double, double, double, int ) { return 0.; };
       double matrix_soft_stub( double, double )  { return 0.; };
+      double matrix_tree_stub( double, double )  { return 0.; };
       double matrix_hard_stub( std::vector< double* >& )  { return 0.; };
       double matrix_xsec_stub( double )  { return 0.; };
       
@@ -39,6 +40,7 @@ class Process {
       double sigmaMRSSMTree_ddbar_suLsuLdagger( double );
       double sigmaMRSSMTree_gg_suLsuLdagger( double );
       double sigmaMRSSMTree_uu_suLsuR( double );
+      double sigmaMRSSMTree_uubar_OO( double );
       double matrixMSSMTree_uu_suLsuR( double, double );
       double matrixMSSMTree_uu_suLsuL( double, double );
       double matrixMSSMTree_ud_suLsdR( double, double );
@@ -72,6 +74,10 @@ class Process {
       double matrixMRSSMSoft_gg_suLsuLdaggerg( double, double );
       double matrixMRSSMSoft_ddbar_suLsuLdaggerg( double, double );
       double matrixMRSSMSoft_uubar_suLsuLdaggerg( double, double );
+      double matrixSimplifiedSoft_uubar_OOg( double, double );
+      double matrixSimplifiedHard_uubar_OOg( std::vector< double* >& );
+      double matrixSimplifiedSoft_gg_OOg( double, double );
+      double matrixSimplifiedHard_gg_OOg( std::vector< double* >& );
       double matrixMRSSMHard_gg_suLsuLdaggerg( std::vector< double* >& );
       double matrixMRSSMHard_uubar_suLsuLdaggerg( std::vector< double* >& );
       double matrixMRSSMHard_ddbar_suLsuLdaggerg( std::vector< double* >& );
