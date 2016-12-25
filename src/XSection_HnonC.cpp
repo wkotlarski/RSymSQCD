@@ -2,12 +2,11 @@
 #include <cassert>
 #include <iostream>
 
-//#include "Process_uu_ulurg.cc"
-//Process_uu_ulurg process;
+// @todo this is absolutely neeed but I don't know why
+using namespace std;
 
 std::array<double, 3> XSection_HnonC::integrate() {
-//   process.initProc("mg/Cards/param_card.dat", squark_mass.at(0).at(0),
-//   1000., pdf->alphasQ(squark_mass.at(0).at(0)) );
+
    //  integral dimension, number of integrands
    constexpr int ndim { 7 }, ncomp { 1 };
    //  accuraccy
@@ -97,9 +96,10 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    }
 
    // initialize matrix of particles momenta
-   std::vector< double* > p(1, new double [4]);
+   std::vector< double* > p;
 
    // incoming parton 1 momenta
+   p.push_back(new double[4]);
    p[0][0] = shat_sqrt/2;
    p[0][1] = 0;
    p[0][2] = 0;
@@ -194,13 +194,8 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
       return 0;
 	}
         
-   double matrix_elements = (processID->*processID->matrixelementReal_HnonC)(p);
-   assert( matrix_elements >= 0 );
-   
-//   process.setMomenta(p);
-//   process.sigmaKin();
-//   const double* matrix_elements2 = process.getMatrixElements();
-//   std::cout << matrix_elements2[0]/matrix_elements << '\n';
+   double ME2 = (processID->*processID->matrixelementReal_HnonC)(p);
+   assert( ME2 >= 0 );
    
    // delete (otherwise causes memory leak)
    for(std::vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {
@@ -211,11 +206,11 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    p.shrink_to_fit();
   
    // some final factors
-   matrix_elements *= to_fb;
-   matrix_elements /=  2 * shat;
+   ME2 *= to_fb;
+   ME2 /=  2 * shat;
 
-   matrix_elements *= sin( xx[2] * pi ) * 4;
-   matrix_elements /= 256 * pi_sqr;
+   ME2 *= sin( xx[2] * pi ) * 4;
+   ME2 /= 256 * pi_sqr;
 
    double pdf_flux = 0.0;
    for (const auto& f : processID->flav) {
@@ -223,7 +218,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    }
    pdf_flux /= x1 * x2;
 
-   matrix_elements *=  pdf_flux;
+   ME2 *=  pdf_flux;
    double xx0 = xx[5];
    double xx1 = xx[6];
    double xx2 = xx[0];
@@ -238,8 +233,8 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
      pow((-1 + xx2)*(S*xx0*xx1*(-1 + dS + xx2 - dS*xx2) + 
          4*(-1 + xx0*xx1 + dS*(-1 + xx0*xx1)*(-1 + xx2) - xx0*xx1*xx2)*pow(m1,2))*
        (-4*dS*pow(m1,2) + (-1 + dS)*xx0*xx1*(-S + 4*pow(m1,2))),0.5))/4.;
-
-   ff[0] = matrix_elements * abs(jacobian);
+   
+   ff[0] = ME2 * abs(jacobian);
 
 	return 0;
 }

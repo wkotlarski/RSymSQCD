@@ -5,8 +5,8 @@ std::array<double, 3> XSection_SC::integrate() {
    // integrals dimensions, number of integrands
    constexpr int ndim { 3 }, ncomp { 1 };
    // accuraccy
-   constexpr double accuracy_rel_sc { 1e-6 }, 
-            accuracy_rel_c { 1e-6 };
+   constexpr double accuracy_rel_sc { 1e-7 }, 
+            accuracy_rel_c { 1e-7 };
    constexpr double accuracy_abs { 1e-12 };
 
    constexpr int neval_min = 10000;
@@ -20,7 +20,7 @@ std::array<double, 3> XSection_SC::integrate() {
       prec_sc, accuracy_abs, 0,
       neval_min, neval_max, 1, NULL, NULL,
       &nregions, &neval, &fail, integral_sc, error_sc, prob_sc);
-
+ 
    cubareal integral_c1[ncomp], error_c1[ncomp], prob_c1[ncomp];
    llCuhre(ndim, ncomp, integrand_c1, NULL, 1,
       accuracy_rel_c, accuracy_abs, 0,
@@ -113,31 +113,24 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
 
    double pdf_flux = 0.0;
    for (const auto& f : processID->flav) {
-//      if( abs(inner.at(0)) == 1 || abs(inner.at(0)) == 2 || abs(inner.at(0)) == 3 || abs(inner.at(0)) == 4
-//              || abs(inner.at(0)) == 5 ) {
-         pdf_flux += f.at(2) * CF * (pdf->xfxQ( f.at(0), x1/z, mu_f )/(x1/z) 
-                  * pdf->xfxQ( f.at(1), x2, mu_f )/x2 + 
-                 pdf->xfxQ( f.at(0), x2, mu_f )/x2
-                  * pdf->xfxQ( f.at(1), x1/z, mu_f )/(x1/z)
-                 ) *
-                 ( (1 - z) + (1 + z*z)/(1 - z) * log( dC/2. * s12/pow(mu_f, 2) * pow(1 - z, 2)/z ) );
-    //  }
-//      else if( inner.at(0) == 0 ) {
-//         pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), std::min(x1/y, 1.), mu_f )/std::min(x1/y, 1.) 
-//                  * pdf->xfxQ( inner.at(1), x2, mu_f )/x2 * 2 * CA *
-//                 (y/(1-y) + (1-y)/y + y*(1-y)) * log( dC * s12 * pow(1 - y, 2) / (2 * mu_f * mu_f * y) );
-//      }
-//      if( abs(inner.at(1)) == 1 || abs(inner.at(1)) == 2 || abs(inner.at(1)) == 3 || abs(inner.at(1)) == 4
-//              || abs(inner.at(1)) == 5 ) {
-//         pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f )/x1
-//                  * pdf->xfxQ( inner.at(1), std::min(x2/y, 1.), mu_f )/std::min(x2/y, 1.) * CF *
-//                 ( (1 - y) + (1 + y*y)/(1 - y) * log( dC * s12 * pow(1 - y, 2) / ( 2 * mu_f * mu_f * y) ) );
-//      }
-//      else if( inner.at(1) == 0 ) {
-//         pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f )/x1
-//                  * pdf->xfxQ( inner.at(1), std::min(x2/y, 1.), mu_f )/std::min(x2/y, 1.) * 2 * CA *
-//                 (y/(1-y) + (1-y)/y + y*(1-y)) * log( dC * s12 * pow(1 - y, 2) / (2 * mu_f * mu_f * y) );
-//      }
+      
+      if( abs(f.at(0)) == 1 || abs(f.at(0)) == 2 || abs(f.at(0)) == 3 || abs(f.at(0)) == 4 || abs(f.at(0)) == 5 ) {
+         pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x1/z, mu_f )/(x1/z) * pdf->xfxQ( f.at(1), x2, mu_f )/x2
+            * CF * ( (1 - z) + (1 + z*z)/(1 - z) * log( dC/2. * s12/pow(mu_f, 2) * pow(1 - z, 2)/z ) );
+      }
+      else if( f.at(0) == 21 ) {
+         pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x1/z, mu_f )/(x1/z) * pdf->xfxQ( f.at(1), x2, mu_f )/x2 
+            * 2 * CA * (z/(1-z) + (1-z)/z + z*(1-z)) * log( dC * s12 * pow(1 - z, 2) / (2 * mu_f * mu_f * z) );
+      }
+      
+      if( abs(f.at(1)) == 1 || abs(f.at(1)) == 2 || abs(f.at(1)) == 3 || abs(f.at(1)) == 4 || abs(f.at(1)) == 5 ) {
+         pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x2, mu_f )/x2 * pdf->xfxQ( f.at(1), x1/z, mu_f )/(x1/z) 
+            * CF * ( (1 - z) + (1 + z*z)/(1 - z) * log( dC * s12 * pow(1 - z, 2) / ( 2 * mu_f * mu_f * z) ) );
+      }
+      else if( f.at(1) == 21 ) {
+         pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x2, mu_f )/x2 * pdf->xfxQ( f.at(1), x1/z, mu_f )/(x1/z) 
+            * 2 * CA * (z/(1-z) + (1-z)/z + z*(1-z)) * log( dC * s12 * pow(1 - z, 2) / (2 * mu_f * mu_f * z) );
+      }
    }
       
    ff[0] = to_fb * pdf_flux  

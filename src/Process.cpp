@@ -112,8 +112,6 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       m1 = MassSuL;
       m2 = MassSuL;
       flav.push_back( std::vector<int> {2, -2, 2} );
-      f1 = 2;
-      f2 = -2;
       k = 2.*2*3*3;
       h = 2.*2;
    }
@@ -126,9 +124,9 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       m1 = MassSuL;
       m2 = MassSuL;
       flav.push_back( std::vector<int> {1, -1, 2} );
-      //flav.push_back( std::vector<int> {3, -3, 2} );
-      //flav.push_back( std::vector<int> {4, -4, 2} );
-      //flav.push_back( std::vector<int> {5, -5, 2} );
+      flav.push_back( std::vector<int> {3, -3, 2} );
+      flav.push_back( std::vector<int> {4, -4, 2} );
+      flav.push_back( std::vector<int> {5, -5, 2} );
       k = 2.*2*3*3;
       h = 2.*2;
    }
@@ -164,9 +162,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_gg_suLsuLdaggerg;
       m1 = MassSuL;
       m2 = MassSuL;
-      flav.push_back( std::vector<int> {0, 0, 1} );
-      f1 = 0;
-      f2 = 0;
+      flav.push_back( std::vector<int> {21, 21, 1} );
       k = 2.*2*8*8;
       h = 1.;
    }
@@ -209,7 +205,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       k = 2.*2*3*3;
       h = 2.*2;
    }
-      else if(processID == "MSSM,ddbar_suLsuLdagger") {
+   else if(processID == "MSSM,ddbar_suLsuLdagger") {
       matrixelementTree = &Process::matrixMRSSMTree_ddbar_suLsuLdagger; // matrix elements are identical
       m1 = MassSuL;
       m2 = MassSuR;
@@ -228,9 +224,9 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       h = 1.;
    }
 */
-/* -------------------- Sgluon production ---------------------*/
+/* -------------------- simpliefied models ---------------------*/
 
-      else if(processID == "Simplified,uubar_OO") {
+   else if(processID == "Simplified,uubar_OO") {
       sigmaPartTree = &Process::sigmaMRSSMTree_uubar_OO;
       matrixelementTree = &Process::matrix_tree_stub;
       matrixelementVirt = &Process::matrix_virt_stub;
@@ -244,7 +240,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       flav.push_back( std::vector<int> {4, -4, 2} );
       flav.push_back( std::vector<int> {5, -5, 2} );
    }
-      else if(processID == "Simplified,gg_OO") {
+   else if(processID == "Simplified,gg_OO") {
       sigmaPartTree = &Process::matrix_xsec_stub;
       matrixelementTree = &Process::matrix_tree_stub;
       matrixelementVirt = &Process::matrix_virt_stub;
