@@ -28,14 +28,15 @@ void XSection::init(Process *processID_init, boost::property_tree::ptree pt_in, 
     
     S_sqrt = pt.get<double>("collider setup.sqrt_S");
     S = pow(S_sqrt, 2);
-    muR = pt.get<double>("collider setup.mu_r");
-    muF = pt.get<double>("collider setup.mu_f");
-    mu_r = muR;
-    mu_f = muF;
+    mu_r = pt.get<double>("collider setup.mu_r");
+    mu_f = pt.get<double>("collider setup.mu_f");
+    //mu_r = muR;
+    //mu_f = muF;
     pdf = LHAPDF::mkPDF( pt.get<std::string>("collider setup.pdf") , 0);
     LHAPDF::setVerbosity(0);
     
     //technical
     dS = pt.get<double>("technical parameters.dS");
+    std::cout << dS << '\n';
     dC = pt.get<double>("technical parameters.dC");
 }
