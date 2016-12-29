@@ -68,6 +68,8 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 	double shat_sqrt = sqrt( shat );
 
 	double Ej_max = shat_sqrt/2. - 2. * m_sqr/shat_sqrt;
+   
+   // dS < 0 signs that no soft cut should be applied
 	if ( Ej_max < dS * shat_sqrt/2. ) {
 	  ff[0] = 0;
 	  return 0;

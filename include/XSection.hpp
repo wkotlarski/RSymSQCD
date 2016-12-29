@@ -13,7 +13,6 @@
 class XSection {
 
    public:
-      //Xsection(Process);
       virtual std::array<double, 3> integrate() = 0;
       static void init (Process*, boost::property_tree::ptree, double, double, double);
       static Process* processID;
@@ -29,12 +28,14 @@ class XSection {
       static double prec_sc;
       static double prec_hnc;
       static std::array< std::array<double, 2>, 6 > squark_mass;
-      static double muR;
-      static double muF;
+      //static double muR;
+      //static double muF;
       static double mu_r;
       static double mu_f;
       static double m1;
       static double m2;
+      
+      // SU(3) group factors
       static constexpr double CF = 4/3.;
       static constexpr double CA = 3.;
     

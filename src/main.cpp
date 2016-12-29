@@ -19,8 +19,8 @@ array<double,3> add(array<double,3> x, array<double,3> y) {
 // why isn't init() enough?
 std::array< std::array<double, 2>, 6 > XSection::squark_mass; 
 Process *XSection::processID; 
-double XSection::muF;
-double XSection::muR;
+//double XSection::muF;
+//double XSection::muR;
 double XSection::mu_r;
 double XSection::mu_f;
 double XSection::m1;
@@ -84,7 +84,9 @@ int main(int argc, char* argv[]) {
    array<double,3> temp {}, xsection_tree {}, xsection_virt {}, xsection_SC {}, xsection_HnonC {},
            xsection_tree1 {}, xsection_virt1 {}, xsection_SC1 {}, xsection_HnonC1 {},
            xsection_tree2 {}, xsection_virt2 {}, xsection_SC2 {}, xsection_HnonC2 {},
-           xsection_tree3 {}, xsection_virt3 {}, xsection_SC3 {}, xsection_HnonC3 {};
+           xsection_tree3 {}, xsection_virt3 {}, xsection_SC3 {}, xsection_HnonC3 {},
+           xsection_tree4 {}, xsection_virt4 {}, xsection_SC4 {}, xsection_HnonC4 {},
+           xsection_tree5 {}, xsection_virt5 {}, xsection_SC5 {}, xsection_HnonC5 {};
    enum Model {
        MRSSM,
        MSSM, 
@@ -306,8 +308,8 @@ int main(int argc, char* argv[]) {
                case pp_suLsuLdagger:
                {
          
-         //Process process1("MRSSM,uubar_suLsuLdagger", pt);
-         //XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
+         Process process1("MRSSM,uubar_suLsuLdagger", pt);
+         XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
          
          //XSection_Tree tree;
          //xsection_tree1 = tree.integrate();      
@@ -324,17 +326,26 @@ int main(int argc, char* argv[]) {
          
          //xsection_tree2 = tree.integrate();
          //xsection_virt2 = virt.integrate();
-         xsection_SC2 = sc.integrate();
-         xsection_HnonC2 = hc.integrate();
-         print( "ddbar > suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+         //xsection_SC2 = sc.integrate();
+         //xsection_HnonC2 = hc.integrate();
+         //print( "ddbar > suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
          
          Process process3("MRSSM,GG_suLsuLdagger", pt);
          XSection::init( &process3, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
-      //xsection_tree3 = tree.integrate();
+         //xsection_tree3 = tree.integrate();
          //xsection_virt3 = virt.integrate();
          //xsection_SC3 = sc.integrate();
          //xsection_HnonC3 = hc.integrate();
-         print( "gg > suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
+         //print( "gg > suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
+         
+         double dS_backup = pt.get<double>("technical parameters.dS");
+         Process process4("MRSSM,gq_suLsuLdagger", pt);
+         pt.put( "technical parameters.dS", -1 );
+         XSection::init( &process4, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
+         xsection_SC4 = sc.integrate();
+         xsection_HnonC4 = hc.integrate();
+         print( "gq > suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
+         pt.put( "technical parameters.dS", dS_backup );
       } 
                default:
          cout << "NLO process not implemented\n";

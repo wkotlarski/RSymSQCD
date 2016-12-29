@@ -40,7 +40,7 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
    }
    /* integration of partonic cross section */
    else {    
-      ff[0] = (processID->*processID->sigmaPartTree)(s) * to_fb * pdf_flux *
+      ff[0] = (processID->*processID->sigmaPartTree1)(s) * to_fb * pdf_flux *
          pow(-4.*pow(m1, 2) + S, 2)*xx[0] / 
          (S*(-4*pow(m1, 2)*(-1 + xx[0]) + S*xx[0]));
    }   

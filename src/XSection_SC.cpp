@@ -12,24 +12,25 @@ std::array<double, 3> XSection_SC::integrate() {
    constexpr int neval_min = 10000;
    long long int neval;
    constexpr long long int neval_max { 100'000'000 }; 
+   constexpr int verbose = 0;
 
    int nregions, fail;
 
    cubareal integral_sc[ncomp], error_sc[ncomp], prob_sc[ncomp];
    llCuhre(ndim, ncomp, integrand_sc, NULL, 1,
-      prec_sc, accuracy_abs, 0,
+      prec_sc, accuracy_abs, verbose,
       neval_min, neval_max, 1, NULL, NULL,
       &nregions, &neval, &fail, integral_sc, error_sc, prob_sc);
  
    cubareal integral_c1[ncomp], error_c1[ncomp], prob_c1[ncomp];
    llCuhre(ndim, ncomp, integrand_c1, NULL, 1,
-      accuracy_rel_c, accuracy_abs, 0,
+      accuracy_rel_c, accuracy_abs, verbose,
       neval_min, neval_max, 1, NULL, NULL,
       &nregions, &neval, &fail, integral_c1, error_c1, prob_c1);
 
    cubareal integral_c2[ncomp], error_c2[ncomp], prob_c2[ncomp];
    llCuhre(ndim, ncomp, integrand_c2, NULL, 1,
-      accuracy_rel_c, accuracy_abs, 0,
+      accuracy_rel_c, accuracy_abs, verbose,
       neval_min, neval_max, 1, NULL, NULL,
       &nregions, &neval, &fail, integral_c2, error_c2, prob_c2);
 
@@ -68,7 +69,8 @@ int XSection_SC::integrand_sc(const int *ndim, const cubareal xx[],
    return 0;
 }
 
-// @todo if muR != muF one needs one more term here
+// @todo if mu_r != mu_f one needs these term,
+//    otherwise it's 0   
 
 int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
    const int *ncomp, cubareal ff[], void *userdata) {
@@ -88,7 +90,7 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
    }
    pdf_flux /= x1 * x2;
    
-   ff[0] = 0*to_fb * pdf_flux * 4./3. * (2 * log(dS) + 3./2.);
+   //ff[0] = 0*to_fb * pdf_flux * 4./3. * (2 * log(dS) + 3./2.);
     
    ff[0] *= 0*(pi*Power(-4*pow(m1, 2) + S,2)*xx[0])/(S*(-4*pow(m1, 2)*(-1 + xx[0]) + S*xx[0]));
     
@@ -101,7 +103,15 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
    // integration variables
    double x1 = 4. * pow(m1, 2)/S + (1 - 4. * pow(m1, 2)/S ) * xx[0];
 	double x2 = 4. * pow(m1, 2) /(S * x1) + (1 - 4. * pow(m1, 2)/(S * x1)) * xx[1];
-   double z = x1 + ( 1 - dS - x1 ) * xx[2];
+   
+   double z;
+   if( dS < 0 ) { 
+      z = x1 + ( 1 - x1 ) * xx[2]; 
+   }
+   else { 
+      z = x1 + ( 1 - dS - x1 ) * xx[2]; 
+   };
+   
    if( x1/z > 1.) {
       ff[0] = 0;
       return 0;
@@ -114,31 +124,43 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
    double pdf_flux = 0.0;
    for (const auto& f : processID->flav) {
       
-      if( abs(f.at(0)) == 1 || abs(f.at(0)) == 2 || abs(f.at(0)) == 3 || abs(f.at(0)) == 4 || abs(f.at(0)) == 5 ) {
-         pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x1/z, mu_f )/(x1/z) * pdf->xfxQ( f.at(1), x2, mu_f )/x2
-            * CF * ( (1 - z) + (1 + z*z)/(1 - z) * log( dC/2. * s12/pow(mu_f, 2) * pow(1 - z, 2)/z ) );
-      }
-      else if( f.at(0) == 21 ) {
-         pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x1/z, mu_f )/(x1/z) * pdf->xfxQ( f.at(1), x2, mu_f )/x2 
-            * 2 * CA * (z/(1-z) + (1-z)/z + z*(1-z)) * log( dC * s12 * pow(1 - z, 2) / (2 * mu_f * mu_f * z) );
-      }
-      
-      if( abs(f.at(1)) == 1 || abs(f.at(1)) == 2 || abs(f.at(1)) == 3 || abs(f.at(1)) == 4 || abs(f.at(1)) == 5 ) {
-         pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x2, mu_f )/x2 * pdf->xfxQ( f.at(1), x1/z, mu_f )/(x1/z) 
-            * CF * ( (1 - z) + (1 + z*z)/(1 - z) * log( dC * s12 * pow(1 - z, 2) / ( 2 * mu_f * mu_f * z) ) );
-      }
-      else if( f.at(1) == 21 ) {
-         pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x2, mu_f )/x2 * pdf->xfxQ( f.at(1), x1/z, mu_f )/(x1/z) 
-            * 2 * CA * (z/(1-z) + (1-z)/z + z*(1-z)) * log( dC * s12 * pow(1 - z, 2) / (2 * mu_f * mu_f * z) );
-      }
+//      if( abs(f.at(0)) == 1 || abs(f.at(0)) == 2 || abs(f.at(0)) == 3 || abs(f.at(0)) == 4 || abs(f.at(0)) == 5 ) {
+//         pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x1/z, mu_f )/(x1/z) * pdf->xfxQ( f.at(1), x2, mu_f )/x2
+//            * CF * ( (1 - z) + (1 + z*z)/(1 - z) * log( dC/2. * s12/pow(mu_f, 2) * pow(1 - z, 2)/z ) );
+//      }
+//      else if( f.at(0) == 21 ) {
+//         pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x1/z, mu_f )/(x1/z) * pdf->xfxQ( f.at(1), x2, mu_f )/x2 
+//            * 2 * CA * (z/(1-z) + (1-z)/z + z*(1-z)) * log( dC * s12 * pow(1 - z, 2) / (2 * mu_f * mu_f * z) );
+//      }
+//      
+//      if( abs(f.at(1)) == 1 || abs(f.at(1)) == 2 || abs(f.at(1)) == 3 || abs(f.at(1)) == 4 || abs(f.at(1)) == 5 ) {
+//         pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x2, mu_f )/x2 * pdf->xfxQ( f.at(1), x1/z, mu_f )/(x1/z) 
+//            * CF * ( (1 - z) + (1 + z*z)/(1 - z) * log( dC * s12 * pow(1 - z, 2) / ( 2 * mu_f * mu_f * z) ) );
+//      }
+//      else if( f.at(1) == 21 ) {
+//         pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x2, mu_f )/x2 * pdf->xfxQ( f.at(1), x1/z, mu_f )/(x1/z) 
+//            * 2 * CA * (z/(1-z) + (1-z)/z + z*(1-z)) * log( dC * s12 * pow(1 - z, 2) / (2 * mu_f * mu_f * z) );
+//      }
+   pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x1/z, mu_f )/(x1/z) * pdf->xfxQ( f.at(1), x2, mu_f )/x2
+            * ( (processID->*processID->splitting_kernel1)(z).at(0) * log( dC/2. * s12/pow(mu_f, 2) * pow(1 - z, 2)/z ) -
+           (processID->*processID->splitting_kernel1)(z).at(1)) * (processID->*processID->sigmaPartTree1)(s12);   
+   pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x2, mu_f )/x2 * pdf->xfxQ( f.at(1), x1/z, mu_f )/(x1/z)
+           * ( (processID->*processID->splitting_kernel2)(z).at(0) * log( dC/2. * s12/pow(mu_f, 2) * pow(1 - z, 2)/z ) -
+           (processID->*processID->splitting_kernel2)(z).at(1)) * (processID->*processID->sigmaPartTree2)(s12);
    }
+   
       
    ff[0] = to_fb * pdf_flux  
-            * Alfas/two_pi * 1./z * (processID->*processID->sigmaPartTree)(s12);
+            * Alfas/two_pi * 1./z;
    
-    // multiply by jakobian of integration variable transformation
-    ff[0] *= (pow(-4*pow(m1, 2) + S,2)*xx[0]*(4*pow(m1, 2)*(-1 + xx[0]) - S*(-1 + dS + xx[0])))/
+   // multiply by jakobian of integration variable transformation
+   if( dS < 0 ) {
+      ff[0] *= (pow(-4*pow(m1, 2) + S,2)*xx[0]*(4*pow(m1, 2)*(-1 + xx[0]) - S*(-1 + xx[0])))/
         (pow(S,2)*(-4*pow(m1, 2)*(-1 + xx[0]) + S*xx[0]));
+   } else {
+      ff[0] *= (pow(-4*pow(m1, 2) + S,2)*xx[0]*(4*pow(m1, 2)*(-1 + xx[0]) - S*(-1 + dS + xx[0])))/
+        (pow(S,2)*(-4*pow(m1, 2)*(-1 + xx[0]) + S*xx[0]));
+   }
    
    return 0;
 }

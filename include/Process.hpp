@@ -26,13 +26,28 @@ class Process {
        
       /*
        *    for the moment use those functions for missing ME
-       *    @todo delete after we are done
        */
-      double matrix_virt_stub( double, double, double, double, int ) { return 0.; };
-      double matrix_soft_stub( double, double )  { return 0.; };
-      double matrix_tree_stub( double, double )  { return 0.; };
-      double matrix_hard_stub( std::vector< double* >& )  { return 0.; };
-      double matrix_xsec_stub( double )  { return 0.; };
+      inline double matrix_virt_stub( double, double, double, double, int ) { return 0.; };
+      inline double matrix_soft_stub( double, double )  { return 0.; };
+      inline double matrix_tree_stub( double, double )  { return 0.; };
+      inline double matrix_hard_stub( std::vector< double* >& )  { return 0.; };
+      inline double matrix_xsec_stub( double )  { return 0.; };
+      
+      double CF = 4/3.;
+      double CA = 3;
+      
+      inline std::array<double, 2> Pqq( double z) { return std::array<double, 2> {
+         CF * (1 + z * z)/(1 - z), - CF * (1 - z) }; 
+      }
+      inline std::array<double, 2> Pgq( double z) { return Pqq(1 - z); }; 
+      
+      inline std::array<double, 2> Pgg( double z) { return std::array<double, 2> {
+         2 * CA * (z/(1 - z) + (1 - z)/z + z * (1 - z)), 0 }; 
+      }
+
+      inline std::array<double, 2> Pqg( double z) { 
+         return std::array<double, 2> { 1/2. * ( z*z + (1 - z)*(1 - z) ), -z * (1-z) }; 
+      }
       
       // tree-level matrix elements
       double sigmaMSSMTree_uu_suLsuR( double );
@@ -81,7 +96,7 @@ class Process {
       double matrixMRSSMHard_gg_suLsuLdaggerg( std::vector< double* >& );
       double matrixMRSSMHard_uubar_suLsuLdaggerg( std::vector< double* >& );
       double matrixMRSSMHard_ddbar_suLsuLdaggerg( std::vector< double* >& );
-      double matrixMRSSMHard_dg_suLsuLdaggerd( std::vector< double* >& );
+      double matrixMRSSMHard_gd_suLsuLdaggerd( std::vector< double* >& );
       
       // pp > OO
       //double matrixMRSSMSoft_qqbar_OOg( double, double );
@@ -95,7 +110,10 @@ class Process {
       Process(std::string,  boost::property_tree::ptree); 
 
       double (Process::* matrixelementTree)(double, double); // matrix element squared 
-      double (Process::* sigmaPartTree)(double); // partonic cross section
+      double (Process::* sigmaPartTree1)(double); // partonic cross section
+      double (Process::* sigmaPartTree2)(double);
+      std::array<double, 2> (Process::* splitting_kernel1)(double);
+      std::array<double, 2> (Process::* splitting_kernel2)(double);
       double (Process::* matrixelementVirt)(double, double, double, 
          double, int); // Re[M^1L M^(B star)]
 
@@ -105,7 +123,6 @@ class Process {
       double (Process::* matrixelementReal_HnonC)(std::vector< double* >& );
       
       double m1, m2;// masses of final state particle 1 and 2, respectively 
-      double f1,f2; // flavours of initial partons
       double k;     // 1/k = average over initial state colors and helicities
       double h;     // h = sum over initial and final state helicities of fermions (_hel = 0 in FormCalc)
       bool partonic;
