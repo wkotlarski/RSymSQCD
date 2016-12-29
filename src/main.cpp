@@ -340,7 +340,7 @@ int main(int argc, char* argv[]) {
          
          double dS_backup = pt.get<double>("technical parameters.dS");
          Process process4("MRSSM,gq_suLsuLdagger", pt);
-         pt.put( "technical parameters.dS", -1 );
+         pt.put( "technical parameters.dS", 0. );
          XSection::init( &process4, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
          xsection_SC4 = sc.integrate();
          xsection_HnonC4 = hc.integrate();

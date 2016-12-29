@@ -28,8 +28,6 @@ class XSection {
       static double prec_sc;
       static double prec_hnc;
       static std::array< std::array<double, 2>, 6 > squark_mass;
-      //static double muR;
-      //static double muF;
       static double mu_r;
       static double mu_f;
       static double m1;
