@@ -1,0 +1,32 @@
+import os
+import ConfigParser
+
+Config = ConfigParser.ConfigParser()
+Config.read("../configure.ini")
+
+env = Environment(ENV = os.environ)
+
+env.Replace( CXX = Config.get('compiler', 'compiler') )
+env.Prepend(
+   CPPPATH = [  
+      os.popen('lhapdf-config --incdir').read().strip(), 
+      Config.get('Cuba', 'inc'), 
+      Config.get('RK', 'inc'),
+      Config.get('LoopTools', 'inc'),
+      '../include'
+   ],
+   # -march=native throws "no such instruction: `vmovd %xmm0, %eax'" errors
+   CXXFLAGS = '-std=c++14 ' + Config.get('compiler', 'flags') # -mno-avx'
+)
+
+env.Program(   
+   '../bin/RSymSQCD', 
+   [ Glob( '*.cpp' ) ], 
+   LIBS = [ 'LHAPDF', 'cuba', 'rk', File(Config.get('LoopTools', 'lib')) ],
+   LIBPATH = [ 
+      os.popen('lhapdf-config --libdir').read().strip(), 
+      Config.get('Cuba', 'lib'), 
+      Config.get('RK', 'lib'),
+      Config.get('compiler', 'libs')
+   ] 
+)
