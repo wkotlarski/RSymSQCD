@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
         << "specified in config.ini!\n" << endl;
         
    boost::property_tree::ptree pt;
-   boost::property_tree::ini_parser::read_ini("config.ini", pt);   
+   boost::property_tree::ini_parser::read_ini( string(argv[7]), pt );   
    
    // local arrays are not aumatically initialized to 0
    // need to use {}
