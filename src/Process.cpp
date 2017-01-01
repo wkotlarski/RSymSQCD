@@ -161,6 +161,21 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       std::array<int, 8> partons = { 1, -1, 3, -3, 4, -4, 5, -5 };
       for( int el : partons) flav.push_back( std::vector<int> {21, el, 2} );
    }   
+   else if(processID == "MRSSM,gu_suLsuLdagger") {
+      sigmaPartTree1 = &Process::sigmaMRSSMTree_uubar_suLsuLdagger;
+      splitting_kernel1 = &Process::Pqg;
+      
+      sigmaPartTree2 = &Process::sigmaMRSSMTree_gg_suLsuLdagger;
+      splitting_kernel2 = &Process::Pgq;
+      
+      matrixelementReal_SC = &Process::matrix_soft_stub;
+      matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru;
+      
+      m1 = MassSuL;
+      m2 = MassSuL;
+      std::array<int, 8> partons = { 2, -2 };
+      for( int el : partons) flav.push_back( std::vector<int> {21, el, 2} );
+   }  
    else if(processID == "MSSM,uubar_suLsuLdagger") {
       matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR;  // matrix elements are identical
       //std::vector<int> row {2, -2};
@@ -338,6 +353,7 @@ double Process::determinant( boost::numeric::ublas::matrix<double>& m ) {
 #include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg_hard.cpp"
 
 #include "matrix_elements_and_xsections/mrssm_gd_suLsuLdaggerd_hard.cpp"
+#include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard.cpp"
 
 #include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_hard.cpp"
 #include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_soft.cpp"

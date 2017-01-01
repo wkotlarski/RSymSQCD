@@ -340,11 +340,18 @@ int main(int argc, char* argv[]) {
          
          double dS_backup = pt.get<double>("technical parameters.dS");
          Process process4("MRSSM,gq_suLsuLdagger", pt);
-         pt.put( "technical parameters.dS", 0. );
+         pt.put( "technical parameters.dS", 1e-13 );
          XSection::init( &process4, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
          xsection_SC4 = sc.integrate();
          xsection_HnonC4 = hc.integrate();
          print( "gq > suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
+         
+         Process process5("MRSSM,gu_suLsuLdagger", pt);
+         pt.put( "technical parameters.dS", 1e-13 );
+         XSection::init( &process4, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
+         xsection_SC5 = sc.integrate();
+         xsection_HnonC5 = hc.integrate();
+         print( "gq > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5 );
          pt.put( "technical parameters.dS", dS_backup );
       } 
                default:
