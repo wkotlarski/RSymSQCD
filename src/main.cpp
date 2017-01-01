@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
    
    cout << "\nPlease do take care of used pdf-set. For LO/NLO calculations "
         << "LO/NLO pdf's are NOT used automatically, but need to be "
-        << "specified in config.ini!\n" << endl;
+        << "specified in run.ini!\n" << endl;
         
    boost::property_tree::ptree pt;
    boost::property_tree::ini_parser::read_ini( string(argv[7]), pt );   
@@ -86,7 +86,8 @@ int main(int argc, char* argv[]) {
            xsection_tree2 {}, xsection_virt2 {}, xsection_SC2 {}, xsection_HnonC2 {},
            xsection_tree3 {}, xsection_virt3 {}, xsection_SC3 {}, xsection_HnonC3 {},
            xsection_tree4 {}, xsection_virt4 {}, xsection_SC4 {}, xsection_HnonC4 {},
-           xsection_tree5 {}, xsection_virt5 {}, xsection_SC5 {}, xsection_HnonC5 {};
+           xsection_tree5 {}, xsection_virt5 {}, xsection_SC5 {}, xsection_HnonC5 {},
+           xsection_tree_total {}, xsection_virt_total {}, xsection_SC_total {}, xsection_HnonC_total {};
    enum Model {
        MRSSM,
        MSSM, 
@@ -276,7 +277,7 @@ int main(int argc, char* argv[]) {
                case pp_suLsuR: 
                   {     
                   Process process1("MRSSM,uu_suLsuR", pt);
-	              XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
+	               XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
                   XSection_Tree tree;
                   xsection_tree1 = tree.integrate();      
                   XSection_Virt virt;
@@ -285,7 +286,20 @@ int main(int argc, char* argv[]) {
                   xsection_SC1 = sc.integrate();
                   XSection_HnonC hc;
                   xsection_HnonC1 = hc.integrate();
-                  print( "uu > suLsuR", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                  print( "uu > suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                  
+                  pt.put( "technical parameters.dS", 1e-13 );                  
+                  Process process2( "MRSSM,gu_suLsuR", pt);
+                  XSection::init( &process2, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );      
+                  xsection_SC2 = sc.integrate();
+                  xsection_HnonC2 = hc.integrate();
+                  print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
+                  
+                  xsection_tree_total = add( xsection_tree1, xsection_tree2);
+                  xsection_virt_total = add( xsection_virt1, xsection_virt2);
+                  xsection_SC_total = add( xsection_SC1, xsection_SC2);
+                  xsection_HnonC_total = add( xsection_HnonC1, xsection_HnonC2);
+                  print( "sum", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total );
                   break;      	
 			      }	
 			   case pp_suLsdR:  // result doubled up, as there is ud and du initial state
@@ -339,15 +353,14 @@ int main(int argc, char* argv[]) {
          //print( "gg > suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
          
          double dS_backup = pt.get<double>("technical parameters.dS");
+         pt.put( "technical parameters.dS", 1e-13 );         
          Process process4("MRSSM,gq_suLsuLdagger", pt);
-         pt.put( "technical parameters.dS", 1e-13 );
          XSection::init( &process4, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
          xsection_SC4 = sc.integrate();
          xsection_HnonC4 = hc.integrate();
          print( "gq > suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
          
          Process process5("MRSSM,gu_suLsuLdagger", pt);
-         pt.put( "technical parameters.dS", 1e-13 );
          XSection::init( &process4, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
          xsection_SC5 = sc.integrate();
          xsection_HnonC5 = hc.integrate();
@@ -481,19 +494,8 @@ int main(int argc, char* argv[]) {
 
 
    auto end = chrono::steady_clock::now();
-   
-   // print out total run time
-   cout << "\nRun summary\n";
    cout << "Time: " << chrono::duration_cast<chrono::minutes>(end-start).count()
-        << " minutes\n";
-   
-   cout << scientific;
-   //print out LO run statistics
-   cout << "---------------------------------------------------------------" << endl;
-   cout << setprecision(5);
-   cout << setw(12) << "tree:" << setw(13) << xsection_tree.at(0) 
-         << " +/- " << setprecision(1) << xsection_tree.at(1)
-         << " fb ( p-value = " << setw(8) << xsection_tree.at(2) << " )\n";
+        << " minutes\n";   
    
    return 0;
 }

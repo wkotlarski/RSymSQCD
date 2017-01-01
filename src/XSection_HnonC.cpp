@@ -69,7 +69,6 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
 	double Ej_max = shat_sqrt/2. - 2. * m_sqr/shat_sqrt;
    
-   // dS < 0 signs that no soft cut should be applied
 	if ( Ej_max < dS * shat_sqrt/2. ) {
 	  ff[0] = 0;
 	  return 0;
@@ -93,7 +92,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
    // check if due to numerics abs(cosx) is not > 1
    if ( cosx > 1 || cosx < -1)  {
-      std::cout << "Warning! cos(x) = " << cosx << " out of bounds. Setting it +/- 1." <<  std::endl;
+      std::cout << "Warning! 1 - |cos(x)| = " << 1 - abs(cosx) << " out of bounds. Setting it +/- 1.";
       cosx = cosx > 0 ? 1.0 : -1.0;
    }
 
@@ -174,10 +173,13 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
       (pow(p[2][0], 2) - pow(p[2][1], 2) - pow(p[2][2], 2) - pow(p[2][3], 2))/(m1 * m1) - 1) < 1e-10 
          && p[2][0] >= m1
    );
-   assert( abs(
-      (pow(p[3][0], 2) - pow(p[3][1], 2) - pow(p[3][2], 2) - pow(p[3][3], 2))/(m2 * m2) - 1) < 1e-10 
-      && p[3][0] >= m2
-   );
+   if( abs(
+      (pow(p[3][0], 2) - pow(p[3][1], 2) - pow(p[3][2], 2) - pow(p[3][3], 2))/(m2 * m2) - 1) > 1e-10 
+      || p[3][0] < m2 ) {
+      std::cout << "Error in kinematics. " <<
+              abs(
+      (pow(p[3][0], 2) - pow(p[3][1], 2) - pow(p[3][2], 2) - pow(p[3][3], 2))/(m2 * m2) - 1) << " " << p[3][0] << '\n';
+   }
   
    // write parton momentum to momentum matrix p
    p.push_back(new double[4]);
@@ -197,7 +199,8 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 	}
         
    double ME2 = (processID->*processID->matrixelementReal_HnonC)(p);
-   assert( ME2 >= 0 );
+   //assert( ME2 >= 0 );
+   if( ME2 < 0 || std::isnan(ME2) ) std::cout << "Warning, negative ME2 " << ME2 << '\n';
    
    // delete (otherwise causes memory leak)
    for(std::vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {

@@ -32,8 +32,11 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 	if(processID == "MRSSM,uu_suLsuR") {
 		matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM 
       matrixelementVirt = &Process::matrixMRSSMVirt_uu_suLsuR;
-      sigmaPartTree1 = &Process::sigmaMRSSMTree_uu_suLsuR; // same as in MSSM
       matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
+      sigmaPartTree1 = &Process::sigmaMRSSMTree_uu_suLsuR;
+      splitting_kernel1 = &Process::Pqq;
+      sigmaPartTree2 = &Process::sigmaMRSSMTree_uu_suLsuR;
+      splitting_kernel2 = &Process::Pqq;
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_uu_suLsuRg;
       m1 = MassSuL;
       m2 = MassSuR;
@@ -175,7 +178,22 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       m2 = MassSuL;
       std::array<int, 8> partons = { 2, -2 };
       for( int el : partons) flav.push_back( std::vector<int> {21, el, 2} );
-   }  
+   }
+   else if(processID == "MRSSM,gu_suLsuR") {
+      sigmaPartTree1 = &Process::sigmaMRSSMTree_uu_suLsuR;
+      splitting_kernel1 = &Process::Pqg;
+      
+      sigmaPartTree2 = &Process::matrix_xsec_stub;
+      splitting_kernel2 = &Process::Pgq;
+      
+      matrixelementReal_SC = &Process::matrix_soft_stub;
+      matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar;
+      
+      m1 = MassSuL;
+      m2 = MassSuL;
+      std::array<int, 8> partons = { 2 };
+      for( int el : partons) flav.push_back( std::vector<int> {21, el, 2} );
+   } 
    else if(processID == "MSSM,uubar_suLsuLdagger") {
       matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR;  // matrix elements are identical
       //std::vector<int> row {2, -2};
@@ -360,6 +378,7 @@ double Process::determinant( boost::numeric::ublas::matrix<double>& m ) {
 
 #include "matrix_elements_and_xsections/mrssm_uu_suLsuRg_soft.cpp"
 #include "matrix_elements_and_xsections/mrssm_uu_suLsuRg_hard.cpp"
+#include "matrix_elements_and_xsections/mrssm_gu_suLsuRubar_hard.cpp"
 
 #include "matrix_elements_and_xsections/simplified_uubar_OOg_soft.cpp"
 #include "matrix_elements_and_xsections/simplified_uubar_OOg_hard.cpp"
