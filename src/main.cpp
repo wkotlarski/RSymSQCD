@@ -64,10 +64,21 @@ void print( string str, array<double,3> tree, array<double,3> virt, array<double
            pow(soft.at(1),2)) << " fb" << endl;   
 }
 
+void print( string str, array<double,3> tree) {
+   cout << "\nResults for subprocess " << str << '\n';
+      cout << scientific;
+   //print out LO run statistics
+   cout << "---------------------------------------------------------------" << endl;
+   cout << setprecision(5);
+   cout << setw(12) << "tree:" << setw(13) << tree.at(0) 
+         << " +/- " << setprecision(1) << tree.at(1)
+         << " fb ( p-value = " << setw(8) << tree.at(2) << " )\n";
+}
+
 int main(int argc, char* argv[]) {
    
 /* invoke programm like 
-   "./RSymSQCD MSSM pp_suLsuR NLO 1 1 1" for  NLO calculation  
+   "./RSymSQCD MSSM pp_suLsuR NLO 1 1 1 run.ini" for  NLO calculation  
        with last three numbers giving the desired accuracy of the virtual,
        soft-collinear and hard-noncollinear part, respectively 
    "./RSymSQCD MSSM pp_suLsuR LO" for  LO calculation  */
@@ -160,6 +171,7 @@ int main(int argc, char* argv[]) {
                   Process process2("sgluons-qqbar_OO", pt);
                   XSection::init( &process2, pt, 1, 1, 1 );
                   xsection_tree = add(tree.integrate(), temp);   
+                  print("pp > OO", xsection_tree);
                   break;
 			      }                  
                case pp_suLsuR: 
@@ -168,6 +180,7 @@ int main(int argc, char* argv[]) {
                   XSection::init( &process1, pt, 1, 1, 1 );
                   XSection_Tree tree;
                   xsection_tree = tree.integrate();
+                  print("uu > suLsuR", xsection_tree);
                   break;      	
 			      }	
 			   case pp_suLsdR: 
