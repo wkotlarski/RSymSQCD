@@ -245,10 +245,13 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 /* -------------------- simpliefied models ---------------------*/
 
    else if(processID == "Simplified,uubar_OO") {
-      sigmaPartTree1 = &Process::sigmaMRSSMTree_uubar_OO;
       matrixelementTree = &Process::matrix_tree_stub;
       matrixelementVirt = &Process::matrix_virt_stub;
       matrixelementReal_SC = &Process::matrixSimplifiedSoft_uubar_OOg;
+      sigmaPartTree1 = &Process::sigmaMRSSMTree_uubar_OO;
+      splitting_kernel1 = &Process::Pgg;
+      sigmaPartTree2 = &Process::sigmaMRSSMTree_uubar_OO;
+      splitting_kernel2 = &Process::Pgg;      
       matrixelementReal_HnonC = &Process::matrixSimplifiedHard_uubar_OOg;
       m1 = MasssigmaO;
       m2 = MasssigmaO;
@@ -333,9 +336,6 @@ double Process::determinant( boost::numeric::ublas::matrix<double>& m ) {
 /* /////////////////////////////////// partonic xsections /////////////////////////////////////// */
 //#include "matrix_elements_and_xsections/mrssm_uu_suLsuR_tree_xsec.cpp"
 #include "matrix_elements_and_xsections/mrssm_partonic_xsections.cpp"
-/* --------------------------------- Sgluon production -------------------------------------------*/
-#include "matrix_elements_and_xsections/mrssm_uubar_OO_tree_xsec.cpp" // is identical for all initial state quarks
-#include "matrix_elements_and_xsections/mrssm_gg_OO_tree_xsec.cpp"
 
 /* -----------------------------------------------------------------------------------------------*/
 /* ------------------------------------------ Virtual --------------------------------------------*/
