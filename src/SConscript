@@ -13,7 +13,12 @@ env.Prepend(
       Config.get('Cuba', 'inc'), 
       Config.get('RK', 'inc'),
       Config.get('LoopTools', 'inc'),
+<<<<<<< HEAD
       '../include',    
+=======
+      '../include',
+      os.environ['BOOST_ROOT']
+>>>>>>> c6bcd07d77df849b6d0971c5d696a5a0d5f4785d
    ],
    # -march=native throws "no such instruction: `vmovd %xmm0, %eax'" errors
    CXXFLAGS = '-std=c++14 ' + Config.get('compiler', 'flags') # -mno-avx'
