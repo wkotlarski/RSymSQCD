@@ -72,10 +72,10 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    constexpr int ncomp = 1;
    constexpr int nvec = 1;
    //constexpr double accuracy_rel = 1e-3;
-   constexpr double accuracy_abs = 1e-12;
+   constexpr double accuracy_abs = 1e-0;
    constexpr int eval_min = 1000;
    constexpr int eval_max = 1000000;
-   constexpr int verbose = 0;        // adjust shown output 0 ... 3
+   constexpr int verbose = 1;        // adjust output 0 ... 3
    int nregions, neval, fail;
    cubareal integral[ncomp], error[ncomp], prob[ncomp];
    // Vegas specific
@@ -87,6 +87,18 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    // Cuhre specific
    constexpr int last = 4;
    constexpr int key = 0;
+   // Divonne specific
+   constexpr int seed = 1;
+   constexpr double border = 1e-9;
+   constexpr int key1 = -47;
+   constexpr int key2 = 1;
+   constexpr int key3 = 1;
+   constexpr int maxpass = 5;
+   constexpr double maxchisq = 10.;
+   constexpr double mindeviation = .25;
+   constexpr int ngiven = 0;
+   constexpr int ldxgiven = ndim;
+   constexpr int nextra = 0;
 
    //  Vegas(ndim, ncomp, integrand, NULL, nvec,
    //  accuracy_rel, accuracy_abs, verbose, seed,
@@ -94,10 +106,18 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    //  grindo, NULL, NULL,
    //  &neval, &fail, integral, error, prob);
 
-   Cuhre( ndim, ncomp, integrand, NULL, nvec,
-      prec_virt, accuracy_abs, verbose | last,
-      eval_min, eval_max, key, NULL, NULL,
-      &nregions, &neval, &fail, integral, error, prob );
+   //   Cuhre( ndim, ncomp, integrand, NULL, nvec,
+   //   prec_virt, accuracy_abs, verbose | last,
+   //   eval_min, eval_max, key, NULL, NULL,
+   //   &nregions, &neval, &fail, integral, error, prob );
+   
+   Divonne(ndim, ncomp, integrand, NULL, nvec,
+        prec_virt, accuracy_abs, verbose, seed,
+        eval_min, eval_max, key1, key2, key3, maxpass,
+        border, maxchisq, mindeviation,
+        ngiven, ldxgiven, NULL, nextra, NULL,
+        NULL, NULL,
+        &nregions, &neval, &fail, integral, error, prob);
 
    std::array <double, 3> result{ integral[0], error[0], prob[0] }; 
 

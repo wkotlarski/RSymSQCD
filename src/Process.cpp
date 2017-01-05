@@ -49,6 +49,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       matrixelementVirt = &Process::matrixMRSSMVirt_ud_suLsdR;
       m1 = MassSuL;
       m2 = MassSuR;
+      // result doubled up, as there is ud and du initial state
       flav.push_back( std::vector<int> {2, 1, 2} );
       k = 2.*2*3*3;
       h = 2.*2;

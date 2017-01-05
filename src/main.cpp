@@ -346,7 +346,7 @@ int main(int argc, char* argv[]) {
                   XSection_Virt virt;                  
                   XSection_SC sc;
                   XSection_HnonC hc;
-                        
+
                   Process process1("MRSSM,uubar_suLsuLdagger", pt);
                   XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );                 
                   xsection_tree1 = tree.integrate();      
@@ -362,7 +362,7 @@ int main(int argc, char* argv[]) {
                   xsection_SC2 = sc.integrate();
                   xsection_HnonC2 = hc.integrate();
                   print( "ddbar > suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
-                  
+
                   Process process3("MRSSM,GG_suLsuLdagger", pt);
                   XSection::init( &process3, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
                   xsection_tree3 = tree.integrate();
@@ -400,6 +400,7 @@ int main(int argc, char* argv[]) {
                   xsection_HnonC_total = add( xsection_HnonC_total, xsection_HnonC5);
                   xsection_virt_total = add( xsection_virt_total, xsection_virt3);
                   print( "total", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total);
+
                   break;
                   } 
                default:
