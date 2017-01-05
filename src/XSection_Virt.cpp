@@ -111,6 +111,12 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    //   eval_min, eval_max, key, NULL, NULL,
    //   &nregions, &neval, &fail, integral, error, prob );
    
+   /*
+    * LoopTools fails for phase space points near the border.
+    * That's why we have to use Divonne with option border.
+    * It's not clear if this is just a sign of numerical instability
+    * of LoopTools or something more serious.
+    */
    Divonne(ndim, ncomp, integrand, NULL, nvec,
         prec_virt, accuracy_abs, verbose, seed,
         eval_min, eval_max, key1, key2, key3, maxpass,
