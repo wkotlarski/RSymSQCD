@@ -10,7 +10,7 @@
 
 using namespace std;
 
-array<double,3> add(array<double,3> x, array<double,3> y) {
+inline array<double,3> operator+(const array<double,3>& x, const array<double,3>& y) {
    return array<double,3> { x.at(0) + y.at(0), sqrt( pow(x.at(1), 2) + pow(y.at(1), 2) ),
      x.at(2) + y.at(2) };
 }
@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
                   temp = tree.integrate();     
                   Process process2("sgluons-qqbar_OO", pt);
                   XSection::init( &process2, pt, 1, 1, 1 );
-                  xsection_tree = add(tree.integrate(), temp);   
+                  xsection_tree = tree.integrate() + temp;   
                   print("pp > OO", xsection_tree);
                   break;
 			      }                  
@@ -210,8 +210,7 @@ int main(int argc, char* argv[]) {
                   xsection_tree3 = tree.integrate();
                   print("qqbar > suLsuLdagger", xsection_tree3);
 
-                  xsection_tree_total = add(xsection_tree1, xsection_tree2);
-                  xsection_tree_total = add(xsection_tree_total, xsection_tree3);
+                  xsection_tree_total = xsection_tree1 + xsection_tree2 + xsection_tree3;
                   print("pp > suLsdLdagger", xsection_tree_total);
                   break; 
                   }
@@ -245,7 +244,7 @@ int main(int argc, char* argv[]) {
                   Process process1("MSSM,ud_suLsdR", pt);
                   XSection::init( &process1, pt, 1, 1, 1 );
                   XSection_Tree tree;
-                  xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
+                  xsection_tree = tree.integrate() + tree.integrate(); // twice as there is ud and du initial state
                   break;      	
 			      }
 			   case pp_suLsdL: 
@@ -253,7 +252,7 @@ int main(int argc, char* argv[]) {
                   Process process1("MSSM,ud_suLsdL", pt);
                   XSection::init( &process1, pt, 1, 1, 1 );
                   XSection_Tree tree;
-                  xsection_tree = add(tree.integrate(), tree.integrate()); // twice as there is ud and du initial state
+                  xsection_tree = tree.integrate() + tree.integrate(); // twice as there is ud and du initial state
                   break;      	
 			      }
 			   case pp_suLsuLdagger:
@@ -316,10 +315,10 @@ int main(int argc, char* argv[]) {
                   xsection_HnonC2 = hc.integrate();
                   print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
                   
-                  xsection_tree_total = add( xsection_tree1, xsection_tree2);
-                  xsection_virt_total = add( xsection_virt1, xsection_virt2);
-                  xsection_SC_total = add( xsection_SC1, xsection_SC2);
-                  xsection_HnonC_total = add( xsection_HnonC1, xsection_HnonC2);
+                  xsection_tree_total = xsection_tree1 + xsection_tree2;
+                  xsection_virt_total = xsection_virt1 + xsection_virt2;
+                  xsection_SC_total = xsection_SC1 + xsection_SC2;
+                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
                   print( "sum", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total );
                   break;      	
 			      }	
@@ -328,13 +327,13 @@ int main(int argc, char* argv[]) {
                   Process process1("MRSSM,ud_suLsdR", pt);
 	              XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
                   XSection_Tree tree;
-                  xsection_tree = add(tree.integrate(),tree.integrate());      
+                  xsection_tree = tree.integrate() + tree.integrate();      
 
                   XSection_Virt virt;
                   xsection_virt = virt.integrate();
                   //cout << "Virtual correction = " << xsection_virt.at(0) << endl;
                   XSection_SC sc;
-                  xsection_SC = add(sc.integrate(),sc.integrate());
+                  xsection_SC = sc.integrate() + sc.integrate();
         
 
                   XSection_HnonC hc;
@@ -386,19 +385,11 @@ int main(int argc, char* argv[]) {
                   print( "gq > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5 );
                   pt.put( "technical parameters.dS", dS_backup );
                   
-                  xsection_tree_total = add( xsection_tree1, xsection_tree2);
-                  xsection_tree_total = add( xsection_tree_total, xsection_tree3);
-                  xsection_virt_total = add( xsection_virt1, xsection_virt2);
-                  xsection_virt_total = add( xsection_virt_total, xsection_virt3);
-                  xsection_SC_total = add( xsection_SC1, xsection_SC2);
-                  xsection_SC_total = add( xsection_SC_total, xsection_SC3);
-                  xsection_SC_total = add( xsection_SC_total, xsection_SC4);
-                  xsection_SC_total = add( xsection_SC_total, xsection_SC5);
-                  xsection_HnonC_total = add( xsection_HnonC1, xsection_HnonC2);
-                  xsection_HnonC_total = add( xsection_HnonC_total, xsection_HnonC3);
-                  xsection_HnonC_total = add( xsection_HnonC_total, xsection_HnonC4);
-                  xsection_HnonC_total = add( xsection_HnonC_total, xsection_HnonC5);
-                  xsection_virt_total = add( xsection_virt_total, xsection_virt3);
+                  xsection_tree_total = xsection_tree1 + xsection_tree2 + xsection_tree3;
+                  xsection_virt_total = xsection_virt1 + xsection_virt2 + xsection_virt3;
+                  xsection_SC_total = xsection_SC1 + xsection_SC2 + xsection_SC3 + xsection_SC4 + xsection_SC5;
+                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2 + xsection_HnonC3 
+                          + xsection_HnonC4 + xsection_HnonC5;
                   print( "total", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total);
 
                   break;
