@@ -72,7 +72,7 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    constexpr int ncomp = 1;
    constexpr int nvec = 1;
    //constexpr double accuracy_rel = 1e-3;
-   constexpr double accuracy_abs = 1e-0;
+   constexpr double accuracy_abs = 1e-12;
    constexpr int eval_min = 1000;
    constexpr int eval_max = 1000000;
    constexpr int verbose = 1;        // adjust output 0 ... 3
