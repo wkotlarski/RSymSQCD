@@ -16,5 +16,8 @@ using boost::math::double_constants::e;
 // physics
 
 constexpr double to_fb { 3.89379e+11 };
+// SU(3) group factors
+constexpr double CF = 4/3.;
+constexpr double CA = 3.;
 
 #endif /* CONSTANTS_HPP_ */

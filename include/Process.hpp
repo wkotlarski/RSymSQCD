@@ -33,19 +33,16 @@ class Process {
       inline double matrix_hard_stub( std::vector< double* >& )  { return 0.; };
       inline double matrix_xsec_stub( double )  { return 0.; };
       
-      double CF = 4/3.;
-      double CA = 3;
-      
-      inline std::array<double, 2> Pqq( double z) { return std::array<double, 2> {
+      std::array<double, 2> Pqq( double z) { return std::array<double, 2> {
          CF * (1 + z * z)/(1 - z), - CF * (1 - z) }; 
       }
-      inline std::array<double, 2> Pgq( double z) { return Pqq(1 - z); }; 
+      std::array<double, 2> Pgq( double z) { return Pqq(1 - z); }; 
       
-      inline std::array<double, 2> Pgg( double z) { return std::array<double, 2> {
+      std::array<double, 2> Pgg( double z) { return std::array<double, 2> {
          2 * CA * (z/(1 - z) + (1 - z)/z + z * (1 - z)), 0 }; 
       }
 
-      inline std::array<double, 2> Pqg( double z) { 
+      std::array<double, 2> Pqg( double z) { 
          return std::array<double, 2> { 1/2. * ( z*z + (1 - z)*(1 - z) ), -z * (1-z) }; 
       }
       
