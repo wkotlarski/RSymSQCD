@@ -21,6 +21,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    mu_r = pt.get<double>("collider setup.mu_r");
    mu_f = pt.get<double>("collider setup.mu_f");
    dS = pt.get<double>("technical parameters.dS");
+   WidthGlu = pt.get<double>("technical parameters.WidthOverMass") * MassGlu;
    pdf = LHAPDF::mkPDF( pt.get<std::string>("collider setup.pdf") , 0);
    
    // @todo remove
@@ -177,7 +178,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       
       m1 = MassSuL;
       m2 = MassSuL;
-      std::array<int, 8> partons = { 2, -2 };
+      std::array<int, 2> partons = { 2, -2 };
       for( int el : partons) flav.push_back( std::vector<int> {21, el, 2} );
    }
    else if(processID == "MRSSM,gu_suLsuR") {
@@ -192,7 +193,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       
       m1 = MassSuL;
       m2 = MassSuL;
-      std::array<int, 8> partons = { 2 };
+      std::array<int, 1> partons = { 2 };
       for( int el : partons) flav.push_back( std::vector<int> {21, el, 2} );
    } 
    else if(processID == "MSSM,uubar_suLsuLdagger") {
@@ -372,7 +373,7 @@ double Process::determinant( boost::numeric::ublas::matrix<double>& m ) {
 #include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg_hard.cpp"
 
 #include "matrix_elements_and_xsections/mrssm_gd_suLsuLdaggerd_hard.cpp"
-#include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DR.cpp"
+#include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DS45.cpp"
 
 #include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_hard.cpp"
 #include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_soft.cpp"

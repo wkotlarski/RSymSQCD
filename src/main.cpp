@@ -15,9 +15,10 @@ using namespace std;
  *    overload + operator to add xsection and errors in quadrature
  *    pvalues are just added
  */
-inline array<double,3> operator+(const array<double,3>& x, const array<double,3>& y) {
-   return array<double,3> { x.at(0) + y.at(0), sqrt( pow(x.at(1), 2) + pow(y.at(1), 2) ),
-     x.at(2) + y.at(2) };
+inline array<double,3> operator+(array<double,3> x, array<double,3> y) {
+   return array<double,3> { 
+      x.at(0) + y.at(0), sqrt(pow(x.at(1),2)+pow(y.at(1),2)), x.at(2) + y.at(2) 
+   };
 }
 
 // why do I have to write this?
@@ -353,7 +354,7 @@ int main(int argc, char* argv[]) {
                   Process process1("MRSSM,uubar_suLsuLdagger", pt);
                   XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );                 
                   //xsection_tree1 = tree.integrate();      
-                  xsection_virt1 = virt.integrate();
+                  //xsection_virt1 = virt.integrate();
                   //xsection_SC1 = sc.integrate();
                   //xsection_HnonC1 = hc.integrate();
                   print( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
@@ -361,7 +362,7 @@ int main(int argc, char* argv[]) {
                   Process process2("MRSSM,ddbar_suLsuLdagger", pt);
                   XSection::init( &process2, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );                    
                   //xsection_tree2 = tree.integrate();
-                  xsection_virt2 = virt.integrate();
+                  //xsection_virt2 = virt.integrate();
                   //xsection_SC2 = sc.integrate();
                   //xsection_HnonC2 = hc.integrate();
                   print( "ddbar > suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
@@ -369,13 +370,13 @@ int main(int argc, char* argv[]) {
                   Process process3("MRSSM,GG_suLsuLdagger", pt);
                   XSection::init( &process3, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
                   //xsection_tree3 = tree.integrate();
-                  xsection_virt3 = virt.integrate();
+                  //xsection_virt3 = virt.integrate();
                   //xsection_SC3 = sc.integrate();
                   //xsection_HnonC3 = hc.integrate();
                   print( "gg > suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
                   
                   double dS_backup = pt.get<double>("technical parameters.dS");
-                  pt.put( "technical parameters.dS", 1e-13 );         
+                  pt.put( "technical parameters.dS", 1e-10 );         
                   Process process4("MRSSM,gq_suLsuLdagger", pt);
                   XSection::init( &process4, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
                   //xsection_SC4 = sc.integrate();
@@ -383,10 +384,10 @@ int main(int argc, char* argv[]) {
                   print( "gq > suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
                   
                   Process process5("MRSSM,gu_suLsuLdagger", pt);
-                  XSection::init( &process4, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
-                  //xsection_SC5 = sc.integrate();
-                  //xsection_HnonC5 = hc.integrate();
-                  print( "gq > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5 );
+                  XSection::init( &process5, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
+                  xsection_SC5 = sc.integrate();
+                  xsection_HnonC5 = hc.integrate();
+                  print( "gu > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5 );
                   pt.put( "technical parameters.dS", dS_backup );
                   
                   xsection_tree_total = xsection_tree1 + xsection_tree2 + xsection_tree3;
@@ -525,8 +526,9 @@ int main(int argc, char* argv[]) {
 
 
    auto end = chrono::steady_clock::now();
-   cout << "Time: " << chrono::duration_cast<chrono::minutes>(end-start).count()
-        << " minutes\n";   
+   cout << "Calculation ended after " 
+      << chrono::duration_cast<chrono::minutes>(end-start).count()
+      << " minutes\n";   
    
    return 0;
 }
