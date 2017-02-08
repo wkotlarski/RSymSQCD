@@ -373,7 +373,7 @@ double Process::determinant( boost::numeric::ublas::matrix<double>& m ) {
 #include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg_hard.cpp"
 
 #include "matrix_elements_and_xsections/mrssm_gd_suLsuLdaggerd_hard.cpp"
-#include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DS45.cpp"
+#include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DR.cpp"
 
 #include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_hard.cpp"
 #include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_soft.cpp"

@@ -21,7 +21,7 @@ class Process {
       double MasssigmaO, MassphiO, MassGlu, MassTop, MassSq,
          MassSuL, MassSuR, MassSdL, MassSdR, MassSsL, MassSsR,
          MassScL, MassScR, MassSbL, MassSbR, MassStL, MassStR, 
-         mu_r, mu_f, dS;
+         mu_r, mu_f, dS, WidthGlu;
       const LHAPDF::PDF* pdf;
        
       /*
