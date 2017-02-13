@@ -101,10 +101,6 @@ class Process {
       //double matrixMRSSMSoft_qqbar_OOg( double, double );
       //double matrixMRSSMSoft_gg_OOg( double, double );
       
-      double det(std::vector< double* >&, int, int, int, int);
-      double determinant( boost::numeric::ublas::matrix<double>& );
-      int determinant_sign(const boost::numeric::ublas::permutation_matrix<std::size_t>& );
-      
    public: 
       Process(std::string,  boost::property_tree::ptree); 
 
