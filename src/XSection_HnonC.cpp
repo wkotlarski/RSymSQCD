@@ -90,10 +90,12 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    double cosx = (shat - 2 * shat_sqrt * ( E1 + Ej ) + 2. * Ej * E1 )/
       (2. * Ej * sqrt( ( E1 - m1 ) * ( E1 + m1 ) ) );
 
-   // check if due to numerics abs(cosx) is not > 1
+   // check if due to numerics |cos(x)| is not > 1
+   // if yes, return 0 and continue
    if ( cosx > 1 || cosx < -1)  {
-      std::cout << "Warning! 1 - |cos(x)| = " << 1 - abs(cosx) << " out of bounds. Setting it +/- 1.";
-      cosx = cosx > 0 ? 1.0 : -1.0;
+      std::cout << "Warning! 1 - |cos(x)| = " << 1 - abs(cosx) << "  - Skipping the phase space point.\n";
+      ff[0] = 0;
+      return 0;
    }
 
    // initialize matrix of particles momenta
@@ -200,7 +202,11 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
         
    double ME2 = (processID->*processID->matrixelementReal_HnonC)(p);
    //assert( ME2 >= 0 );
-   if( ME2 < 0 || std::isnan(ME2) ) std::cout << "Warning, negative ME2 " << ME2 << '\n';
+   if( ME2 < 0 || std::isnan(ME2) ) {
+//      std::cout << "Warning, negative ME2 " << ME2 << '\n';
+//      ff[0] = 0;
+//      return 0;      
+   }
    
    // delete (otherwise causes memory leak)
    for(std::vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {

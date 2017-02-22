@@ -1,4 +1,4 @@
-double Process::matrixMRSSMHard_gu_suLsuLdaggeru( std::vector< double* >& p ) {
+double Process::matrixMRSSMHard_gu_suLsuLdaggeru_DR( std::vector< double* >& p ) {
    double Alfas = pdf->alphasQ( mu_r );
    double Alfas2 = pow(Alfas, 2);
    double Theta = MassGlu > m2 ? 1 : 0;

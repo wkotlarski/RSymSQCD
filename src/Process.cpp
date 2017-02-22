@@ -174,10 +174,23 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       splitting_kernel2 = &Process::Pgq;
       
       matrixelementReal_SC = &Process::matrix_soft_stub;
-      matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru;
-      
       m1 = MassSuL;
       m2 = MassSuL;
+      // if gluino cannot be on-shell use full real ME
+      if( pt.get<double>("collider setup.sqrt_S") < m2 +  MassGlu &&
+          MassGlu > m2 ) {
+         matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru;
+      }
+      else {
+         // otherwise, if WidthGlu < 0 use DR
+         if( WidthGlu < 0) {
+            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DR;
+         }
+         // else use DS
+         else {
+            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DS;
+         }
+      }
       std::array<int, 2> partons = { 2, -2 };
       for( int el : partons) flav.push_back( std::vector<int> {21, el, 2} );
    }
@@ -338,6 +351,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 #include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg_hard.cpp"
 
 #include "matrix_elements_and_xsections/mrssm_gd_suLsuLdaggerd_hard.cpp"
+#include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DS.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DR.cpp"
 
 #include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_hard.cpp"
@@ -345,7 +359,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 
 #include "matrix_elements_and_xsections/mrssm_uu_suLsuRg_soft.cpp"
 #include "matrix_elements_and_xsections/mrssm_uu_suLsuRg_hard.cpp"
-#include "matrix_elements_and_xsections/mrssm_gu_suLsuRubar_hard.cpp"
+#include "matrix_elements_and_xsections/mrssm_gu_suLsuRubar_hard-DR.cpp"
 
 #include "matrix_elements_and_xsections/simplified_uubar_OOg_soft.cpp"
 #include "matrix_elements_and_xsections/simplified_uubar_OOg_hard.cpp"
