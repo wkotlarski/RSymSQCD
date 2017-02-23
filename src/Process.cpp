@@ -177,8 +177,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       m1 = MassSuL;
       m2 = MassSuL;
       // if gluino cannot be on-shell use full real ME
-      if( pt.get<double>("collider setup.sqrt_S") < m2 +  MassGlu &&
-          MassGlu > m2 ) {
+      if( pt.get<double>("collider setup.sqrt_S") < m1 +  MassGlu ||
+          MassGlu < m2 ) {
          matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru;
       }
       else {
@@ -353,6 +353,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 #include "matrix_elements_and_xsections/mrssm_gd_suLsuLdaggerd_hard.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DS.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DR.cpp"
+#include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard.cpp"
 
 #include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_hard.cpp"
 #include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_soft.cpp"
