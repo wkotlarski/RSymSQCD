@@ -11,7 +11,7 @@ std::array<double, 3> XSection_SC::integrate() {
 
    constexpr int neval_min = 10000;
    long long int neval;
-   constexpr long long int neval_max { 100'000'000 }; 
+   constexpr long long int neval_max { 1'000'000'000 }; 
    constexpr int verbose = 0;
 
    int nregions, fail;
