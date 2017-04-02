@@ -23,6 +23,11 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    dS = pt.get<double>("technical parameters.dS");
    WidthGlu = pt.get<double>("technical parameters.WidthOverMass") * MassGlu;
    pdf = LHAPDF::mkPDF( pt.get<std::string>("collider setup.pdf") , 0);
+
+   c1 = 0.;
+   c2 = 1.;
+   c3 = 0.;
+   c4 = 0.;
    
    // @todo remove
    MassSq = MassSuL;
@@ -217,7 +222,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       else {
          // otherwise, if WidthGlu < 0 use DR
          if( WidthGlu < 0) {
-            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DR;
+            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep;
 	    std::cout << "INFO: Using diagram removal for gu_suLsuR channel.\n";
          }
          // else use DS
@@ -383,6 +388,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 #include "matrix_elements_and_xsections/mrssm_uu_suLsuRg_hard.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuRubar_hard.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuRubar_hard-DR.cpp"
+#include "matrix_elements_and_xsections/mrssm_gu_suLsuRubar_hard-DR_wEtaDep.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuRubar_hard-DS_unsympli.cpp"
 
 #include "matrix_elements_and_xsections/simplified_uubar_OOg_soft.cpp"

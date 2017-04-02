@@ -22,12 +22,14 @@ std::array<double, 3> XSection_HnonC::integrate() {
    constexpr int nincrease = 10000;
    constexpr int nbatch = 1000;
    constexpr int gridno = 0;
+   constexpr int flags = 1;
+   constexpr int seed = 0;
    const char* state_file = "";
    int nregions, fail;
 
    cubareal integral[ncomp], error[ncomp], prob[ncomp];
    llVegas( ndim, ncomp, integrand, NULL, 1,
-      accuracy_rel, accuracy_abs, 1, 0,
+      accuracy_rel, accuracy_abs, flags, seed,
       neval_min, neval_max, nstart, nincrease, nbatch,
       gridno, state_file, NULL,
       &neval, &fail, integral, error, prob );

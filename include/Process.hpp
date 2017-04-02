@@ -99,6 +99,7 @@ class Process {
       double matrixMRSSMHard_gu_suLsuLdaggeru( std::vector< double* >& );
       double matrixMRSSMHard_gu_suLsuRubar( std::vector< double* >& );
       double matrixMRSSMHard_gu_suLsuRubar_DR( std::vector< double* >& );
+      double matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep( std::vector< double* >& );
       double matrixMRSSMHard_gu_suLsuRubar_DS( std::vector< double* >& );
       
       // pp > OO
@@ -122,6 +123,7 @@ class Process {
       double (Process::* matrixelementReal_HnonC)(std::vector< double* >& );
       
       double m1, m2;// masses of final state particle 1 and 2, respectively 
+      double c1, c2, c3, c4;
       double k;     // 1/k = average over initial state colors and helicities
       double h;     // h = sum over initial and final state helicities of fermions (_hel = 0 in FormCalc)
       bool partonic;

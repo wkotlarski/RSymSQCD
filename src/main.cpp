@@ -308,8 +308,8 @@ int main(int argc, char* argv[]) {
                   XSection_SC sc;
                   XSection_HnonC hc;
 		  if( atoi(argv[8]) == 1 ) {
-                  xsection_tree1 = tree.integrate();      
-                  xsection_virt1 = virt.integrate();
+                  //xsection_tree1 = tree.integrate();      
+                  //xsection_virt1 = virt.integrate();
                   xsection_SC1 = sc.integrate();
                   xsection_HnonC1 = hc.integrate();
                   print( "uu > suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
