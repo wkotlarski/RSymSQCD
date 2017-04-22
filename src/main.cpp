@@ -3,6 +3,9 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
+#include <boost/program_options.hpp>
+namespace po = boost::program_options;
+
 #include "XSection_Tree.hpp"
 #include "XSection_Virt.hpp"
 #include "XSection_SC.hpp"
@@ -80,18 +83,47 @@ void print( string str, array<double,3> tree) {
 
 int main(int argc, char* argv[]) {
    
+   // program options
+   boost::program_options::options_description desc("Allowed options");
+   desc.add_options()
+      ("help", "produce help message")
+      ("compression", po::value<double>(), "set compression level")
+      ("precision-virt", po::value<int>() -> default_value(4), "")
+      ("precision-sc",   po::value<int>() -> default_value(4), "")
+      ("precision-hard", po::value<int>() -> default_value(4), "")
+      ("enable-born", po::value<bool>() -> default_value(true), "")
+      ("enable-virt", po::value<bool>() -> default_value(true), "")
+      ("enable-sc",   po::value<bool>() -> default_value(true), "")
+      ("enable-hard", po::value<bool>() -> default_value(true), "")
+   ;
+
+   boost::program_options::variables_map vm;        
+   boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
+   boost::program_options::notify(vm);
+
+   if (vm.count("help")) {
+      cout << desc << "\n";
+      return 0;
+   }
+
+   bool enable_born = vm["enable-born"].as<bool>();
+   bool enable_virt = vm["enable-virt"].as<bool>();
+   bool enable_sc = vm["enable-sc"].as<bool>();
+   bool enable_hard = vm["enable-hard"].as<bool>();
+
+   double prec_virt = pow( 10., -vm["precision-virt"].as<int>() );
+   double prec_sc   = pow( 10., -vm["precision-sc"].as<int>() );
+   double prec_hard = pow( 10., -vm["precision-hard"].as<int>() );
+   cout << prec_virt << ' ' << prec_sc << ' ' << prec_hard << '\n';
+
 /* invoke programm like 
    "./RSymSQCD MSSM pp_suLsuR NLO 1 1 1 run.ini" for  NLO calculation  
        with last three numbers giving the desired accuracy of the virtual,
        soft-collinear and hard-noncollinear part, respectively 
    "./RSymSQCD MSSM pp_suLsuR LO" for  LO calculation  */
    
-   cout << "\nPlease do take care of used pdf-set. For LO/NLO calculations "
-        << "LO/NLO pdf's are NOT used automatically, but need to be "
-        << "specified in run.ini!\n" << endl;
-        
    boost::property_tree::ptree pt;
-   boost::property_tree::ini_parser::read_ini( string(argv[7]), pt );   
+   boost::property_tree::ini_parser::read_ini( string(argv[4]), pt );   
 
    cout << "INFO: using dS = " << pt.get<double>("technical parameters.dS")
         << ", dC = " <<  pt.get<double>("technical parameters.dC") << '\n';
@@ -256,13 +288,13 @@ int main(int argc, char* argv[]) {
                   XSection_HnonC hc;
                   
                   // uu > suL suR (+g) process
-		            if( atoi(argv[8]) == 1 || atoi(argv[8]) == 0 ) {
+		            if( atoi(argv[5]) == 1 || atoi(argv[5]) == 0 ) {
                      Process process1("MRSSM,uu_suLsuR", pt);
-	                  XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
-                     xsection_tree1 = tree.integrate();      
-                     xsection_virt1 = virt.integrate();
-                     xsection_SC1 = sc.integrate();
-                     xsection_HnonC1 = hc.integrate();
+	                  XSection::init( &process1, pt, prec_virt, prec_sc, prec_hard );
+                     if(enable_born) xsection_tree1 = tree.integrate();      
+                     if(enable_virt) xsection_virt1 = virt.integrate();
+                     if(enable_sc) xsection_SC1 = sc.integrate();
+                     if(enable_hard) xsection_HnonC1 = hc.integrate();
                      print( "uu > suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
 		            }
                   
@@ -271,11 +303,11 @@ int main(int argc, char* argv[]) {
                   pt.put( "technical parameters.dS", 1e-10 );                  
 
                   // gu > suL suR ubar process
-		            if( atoi(argv[8]) == 2 || atoi(argv[8]) == 0 ) {
+		            if( atoi(argv[5]) == 2 || atoi(argv[5]) == 0 ) {
                      Process process2( "MRSSM,gu_suLsuR", pt);
-                     XSection::init( &process2, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );      
-                     xsection_SC2 = sc.integrate();
-                     xsection_HnonC2 = hc.integrate();
+                     XSection::init( &process2, pt, prec_virt, prec_sc, prec_hard );      
+                     if(enable_sc) xsection_SC2 = sc.integrate();
+                     if(enable_hard) xsection_HnonC2 = hc.integrate();
                      print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
 		            }
                   
@@ -291,33 +323,33 @@ int main(int argc, char* argv[]) {
                   XSection_SC sc;
                   XSection_HnonC hc;
 
-		            if( atoi(argv[8]) == 1 ||  atoi(argv[8]) == 0) {
+		            if( atoi(argv[5]) == 1 ||  atoi(argv[5]) == 0) {
                      Process process1("MRSSM,uubar_suLsuLdagger", pt);
-                     XSection::init( &process1, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );                 
-                     xsection_tree1 = tree.integrate();      
-                     xsection_virt1 = virt.integrate();
-                     xsection_SC1 = sc.integrate();
-                     xsection_HnonC1 = hc.integrate();
+                     XSection::init( &process1, pt, prec_virt, prec_sc, prec_hard );                 
+                     if(enable_born) xsection_tree1 = tree.integrate();      
+                     if(enable_virt) xsection_virt1 = virt.integrate();
+                     if(enable_sc) xsection_SC1 = sc.integrate();
+                     if(enable_hard) xsection_HnonC1 = hc.integrate();
                      print( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
 	    	         }
          
-		            if( atoi(argv[8]) == 2 ||  atoi(argv[8]) == 0) {
+		            if( atoi(argv[5]) == 2 ||  atoi(argv[5]) == 0) {
                      Process process2("MRSSM,ddbar_suLsuLdagger", pt);
-                     XSection::init( &process2, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );                    
-                     xsection_tree2 = tree.integrate();
-                     xsection_virt2 = virt.integrate();
-                     xsection_SC2 = sc.integrate();
-                     xsection_HnonC2 = hc.integrate();
+                     XSection::init( &process2, pt, prec_virt, prec_sc, prec_hard );                    
+                     if(enable_born) xsection_tree2 = tree.integrate();
+                     if(enable_virt) xsection_virt2 = virt.integrate();
+                     if(enable_sc) xsection_SC2 = sc.integrate();
+                     if(enable_hard) xsection_HnonC2 = hc.integrate();
                      print( "ddbar > suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
 		            }
 
-		            if( atoi(argv[8]) == 3 ||  atoi(argv[8]) == 0) {
+		            if( atoi(argv[5]) == 3 ||  atoi(argv[5]) == 0) {
                      Process process3("MRSSM,GG_suLsuLdagger", pt);
-                     XSection::init( &process3, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
-                     xsection_tree3 = tree.integrate();
-                     xsection_virt3 = virt.integrate();
-                     xsection_SC3 = sc.integrate();
-                     xsection_HnonC3 = hc.integrate();
+                     XSection::init( &process3, pt, prec_virt, prec_sc, prec_hard );
+                     if(enable_born) xsection_tree3 = tree.integrate();
+                     if(enable_virt) xsection_virt3 = virt.integrate();
+                     if(enable_sc) xsection_SC3 = sc.integrate();
+                     if(enable_hard) xsection_HnonC3 = hc.integrate();
                      print( "gg > suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
 		            }
                   
@@ -325,20 +357,20 @@ int main(int argc, char* argv[]) {
                   // fails if we are exactly on the threshold
                   pt.put( "technical parameters.dS", 1e-10 );         
 
-  		            if( atoi(argv[8]) == 4 ||  atoi(argv[8]) == 0) {
+  		            if( atoi(argv[5]) == 4 ||  atoi(argv[5]) == 0) {
                      Process process4("MRSSM,gq_suLsuLdagger", pt);
-                     XSection::init( &process4, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
-                     xsection_SC4 = sc.integrate();
-                     xsection_HnonC4 = hc.integrate();
+                     XSection::init( &process4, pt, prec_virt, prec_sc, prec_hard );
+                     if(enable_sc) xsection_SC4 = sc.integrate();
+                     if(enable_hard) xsection_HnonC4 = hc.integrate();
                      print( "gq > suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
                   }
 
                   // g u > suL suLdagger 
-		            if( atoi(argv[8]) == 5 ||  atoi(argv[8]) == 0 ) {
+		            if( atoi(argv[5]) == 5 ||  atoi(argv[5]) == 0 ) {
                      Process process5("MRSSM,gu_suLsuLdagger", pt);
-                     XSection::init( &process5, pt, pow(10, -atoi(argv[4])), pow(10, -atoi(argv[5])), pow(10, -atoi(argv[6])) );
-                     xsection_SC5 = sc.integrate();
-                     xsection_HnonC5 = hc.integrate();
+                     XSection::init( &process5, pt, prec_virt, prec_sc, prec_hard );
+                     if(enable_sc) xsection_SC5 = sc.integrate();
+                     if(enable_hard) xsection_HnonC5 = hc.integrate();
                      print( "gu > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5 );
                   }
                   
