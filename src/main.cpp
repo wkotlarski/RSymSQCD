@@ -95,6 +95,8 @@ int main(int argc, char* argv[]) {
       ("enable-virt", po::value<bool>() -> default_value(true), "")
       ("enable-sc",   po::value<bool>() -> default_value(true), "")
       ("enable-hard", po::value<bool>() -> default_value(true), "")
+      ("card", po::value<string>(), "path to a run card")
+      ("subprocess", po::value<string>() -> default_value(""), "")
    ;
 
    boost::program_options::variables_map vm;        
@@ -116,6 +118,9 @@ int main(int argc, char* argv[]) {
    double prec_hard = pow( 10., -vm["precision-hard"].as<int>() );
    cout << prec_virt << ' ' << prec_sc << ' ' << prec_hard << '\n';
 
+   string card = vm["card"].as<string>();
+   string subprocess = vm["subprocess"].as<string>();
+
 /* invoke programm like 
    "./RSymSQCD MSSM pp_suLsuR NLO 1 1 1 run.ini" for  NLO calculation  
        with last three numbers giving the desired accuracy of the virtual,
@@ -123,7 +128,7 @@ int main(int argc, char* argv[]) {
    "./RSymSQCD MSSM pp_suLsuR LO" for  LO calculation  */
    
    boost::property_tree::ptree pt;
-   boost::property_tree::ini_parser::read_ini( string(argv[4]), pt );   
+   boost::property_tree::ini_parser::read_ini( card, pt );   
 
    cout << "INFO: using dS = " << pt.get<double>("technical parameters.dS")
         << ", dC = " <<  pt.get<double>("technical parameters.dC") << '\n';
@@ -160,7 +165,7 @@ int main(int argc, char* argv[]) {
    Model model = no_model;
    Channel channel = no_channel; 
    
-   if ( string(argv[1]) == "MRSSM" ) {
+   if ( pt.get<string>("process.model") == "MRSSM" ) {
       model = MRSSM;
    } else if ( string(argv[1]) == "MSSM" ) {
       model = MSSM;
@@ -170,25 +175,25 @@ int main(int argc, char* argv[]) {
 	   cout << "\n Model not implemented! \n\n";
    }
    
-   if ( string(argv[2]) == "pp_OsOs" ) {
+   if ( pt.get<string>("process.process") == "pp_OsOs" ) {
       channel = pp_OsOs;  
-   } else if ( string(argv[2]) == "pp_suLsuR" ) {
+   } else if ( pt.get<string>("process.process") == "pp_suLsuR" ) {
       channel = pp_suLsuR;
-   } else if ( string(argv[2]) == "pp_suLsuL" ) {
+   } else if ( pt.get<string>("process.process") == "pp_suLsuL" ) {
       channel = pp_suLsuL;   
-   } else if ( string(argv[2]) == "pp_suLsdR" ) {
+   } else if ( pt.get<string>("process.process") == "pp_suLsdR" ) {
       channel = pp_suLsdR;
-   } else if ( string(argv[2]) == "pp_suLsdL" ) {
+   } else if ( pt.get<string>("process.process") == "pp_suLsdL" ) {
       channel = pp_suLsdL;
-   } else if ( string(argv[2]) == "pp_suLsuLdagger" ) {
+   } else if ( pt.get<string>("process.process") == "pp_suLsuLdagger" ) {
       channel = pp_suLsuLdagger;
-   } else if ( string(argv[2]) == "pp_suLsuRdagger" ) {
+   } else if ( pt.get<string>("process.process") == "pp_suLsuRdagger" ) {
       channel = pp_suLsuRdagger;
-   } else if ( string(argv[2]) == "pp_suLsdLdagger" ) {
+   } else if ( pt.get<string>("process.process") == "pp_suLsdLdagger" ) {
       channel = pp_suLsdLdagger;
-   } else if ( string(argv[2]) == "pp_suLsdRdagger" ) {
+   } else if ( pt.get<string>("process.process") == "pp_suLsdRdagger" ) {
       channel = pp_suLsdRdagger;
-         } else if ( string(argv[2]) == "pp_OO" ) {
+         } else if ( pt.get<string>("process.process") == "pp_OO" ) {
       channel = pp_OO;
    } else {
 	   cout << "\n Process not implemented! \n\n";
@@ -196,7 +201,7 @@ int main(int argc, char* argv[]) {
      
    auto start = chrono::steady_clock::now();
 
-   if( string( argv[3] ) == "LO" ) {
+   if( pt.get<string>("process.order") == "LO" ) {
 	  switch(model) {
          case MRSSM:
             switch(channel) {
@@ -263,15 +268,15 @@ int main(int argc, char* argv[]) {
             break;
          case MSSM:
             switch(channel) {
-			   case pp_suLsuR:  
-			   case pp_suLsuLdagger:
-			   default:
+			   //case pp_suLsuR:  
+			   //case pp_suLsuLdagger:
+			   //default:
             }
          break;								
       }
    }   		 
 
-   else if( string( argv[3] ) == "NLO" ) {
+   else if( pt.get<string>("process.order") == "NLO" ) {
 	  switch(model) {
          case MRSSM:
             switch(channel) {
@@ -288,7 +293,7 @@ int main(int argc, char* argv[]) {
                   XSection_HnonC hc;
                   
                   // uu > suL suR (+g) process
-		            if( atoi(argv[5]) == 1 || atoi(argv[5]) == 0 ) {
+		            if( atoi(argv[5]) == 1 || subprocess == "" ) {
                      Process process1("MRSSM,uu_suLsuR", pt);
 	                  XSection::init( &process1, pt, prec_virt, prec_sc, prec_hard );
                      if(enable_born) xsection_tree1 = tree.integrate();      
@@ -303,7 +308,7 @@ int main(int argc, char* argv[]) {
                   pt.put( "technical parameters.dS", 1e-10 );                  
 
                   // gu > suL suR ubar process
-		            if( atoi(argv[5]) == 2 || atoi(argv[5]) == 0 ) {
+		            if( atoi(argv[5]) == 2 || subprocess == "" ) {
                      Process process2( "MRSSM,gu_suLsuR", pt);
                      XSection::init( &process2, pt, prec_virt, prec_sc, prec_hard );      
                      if(enable_sc) xsection_SC2 = sc.integrate();
@@ -323,7 +328,7 @@ int main(int argc, char* argv[]) {
                   XSection_SC sc;
                   XSection_HnonC hc;
 
-		            if( atoi(argv[5]) == 1 ||  atoi(argv[5]) == 0) {
+		            if( atoi(argv[5]) == 1 || subprocess == "" ) {
                      Process process1("MRSSM,uubar_suLsuLdagger", pt);
                      XSection::init( &process1, pt, prec_virt, prec_sc, prec_hard );                 
                      if(enable_born) xsection_tree1 = tree.integrate();      
@@ -333,7 +338,7 @@ int main(int argc, char* argv[]) {
                      print( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
 	    	         }
          
-		            if( atoi(argv[5]) == 2 ||  atoi(argv[5]) == 0) {
+		            if( atoi(argv[5]) == 2 || subprocess == "") {
                      Process process2("MRSSM,ddbar_suLsuLdagger", pt);
                      XSection::init( &process2, pt, prec_virt, prec_sc, prec_hard );                    
                      if(enable_born) xsection_tree2 = tree.integrate();
@@ -343,7 +348,7 @@ int main(int argc, char* argv[]) {
                      print( "ddbar > suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
 		            }
 
-		            if( atoi(argv[5]) == 3 ||  atoi(argv[5]) == 0) {
+		            if( atoi(argv[5]) == 3 || subprocess == "") {
                      Process process3("MRSSM,GG_suLsuLdagger", pt);
                      XSection::init( &process3, pt, prec_virt, prec_sc, prec_hard );
                      if(enable_born) xsection_tree3 = tree.integrate();
@@ -357,7 +362,7 @@ int main(int argc, char* argv[]) {
                   // fails if we are exactly on the threshold
                   pt.put( "technical parameters.dS", 1e-10 );         
 
-  		            if( atoi(argv[5]) == 4 ||  atoi(argv[5]) == 0) {
+  		            if( atoi(argv[5]) == 4 || subprocess == "") {
                      Process process4("MRSSM,gq_suLsuLdagger", pt);
                      XSection::init( &process4, pt, prec_virt, prec_sc, prec_hard );
                      if(enable_sc) xsection_SC4 = sc.integrate();
@@ -366,7 +371,7 @@ int main(int argc, char* argv[]) {
                   }
 
                   // g u > suL suLdagger 
-		            if( atoi(argv[5]) == 5 ||  atoi(argv[5]) == 0 ) {
+		            if( atoi(argv[5]) == 5 || subprocess == "" ) {
                      Process process5("MRSSM,gu_suLsuLdagger", pt);
                      XSection::init( &process5, pt, prec_virt, prec_sc, prec_hard );
                      if(enable_sc) xsection_SC5 = sc.integrate();
