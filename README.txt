@@ -1,5 +1,5 @@
 1. Licence
-   ask Alex?
+   GPL3
 
 2. Instalation
    To compile RSymSQCD you need a C++14 compiler. The code was succesufully compiled with intel icpc >= 16 and g++ >= 4.9.
