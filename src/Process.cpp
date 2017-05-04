@@ -21,13 +21,13 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    mu_r = pt.get<double>("collider setup.mu_r");
    mu_f = pt.get<double>("collider setup.mu_f");
    dS = pt.get<double>("technical parameters.dS");
+   double eta_sign = pt.get<double>("technical parameters.eta_sign");
+   double delta = pt.get<double>("technical parameters.delta");
    WidthGlu = pt.get<double>("technical parameters.WidthOverMass") * MassGlu;
    pdf = LHAPDF::mkPDF( pt.get<std::string>("collider setup.pdf") , 0);
 
-   c1 = 0.;
-   c2 = 1.;
-   c3 = 0.;
-   c4 = 0.;
+   // choose a gage vector \eta for DR matrix elements
+   eta = {sqrt(1.+delta*delta), 0., delta, eta_sign};
    
    // @todo remove
    MassSq = MassSuL;
@@ -190,7 +190,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       else {
          // otherwise, if WidthGlu < 0 use DR
          if( WidthGlu < 0) {
-            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DR;
+            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DR_wEta;
 	    std::cout << "INFO: Using diagram removal.\n";
          }
          // else use DS
@@ -379,6 +379,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 #include "matrix_elements_and_xsections/mrssm_gd_suLsuLdaggerd_hard.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DS.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DR.cpp"
+#include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DR_wEta_noSimplify.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard.cpp"
 
 #include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_hard.cpp"

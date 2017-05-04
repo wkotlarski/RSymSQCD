@@ -360,7 +360,7 @@ int main(int argc, char* argv[]) {
                   
                   // the matrix element is regular in the limit dS -> 0 but the phase space parametrization
                   // fails if we are exactly on the threshold
-                  pt.put( "technical parameters.dS", 1e-10 );         
+                  pt.put( "technical parameters.dS", 1e-10 );
 
   		            if( atoi(argv[5]) == 4 || subprocess == "") {
                      Process process4("MRSSM,gq_suLsuLdagger", pt);
@@ -371,7 +371,8 @@ int main(int argc, char* argv[]) {
                   }
 
                   // g u > suL suLdagger 
-		            if( atoi(argv[5]) == 5 || subprocess == "" ) {
+                  pt.put( "technical parameters.dS", 1e-10 );
+		            if( subprocess == "gu_suLsuLdaggeru" || subprocess == "" ) {
                      Process process5("MRSSM,gu_suLsuLdagger", pt);
                      XSection::init( &process5, pt, prec_virt, prec_sc, prec_hard );
                      if(enable_sc) xsection_SC5 = sc.integrate();
