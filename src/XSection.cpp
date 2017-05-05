@@ -2,12 +2,10 @@
 
 #include "XSection.hpp"
 
-void XSection::init(Process *processID_init, boost::property_tree::ptree pt_in, double x, double y, double z) {
+void XSection::init(Process *processID_init, boost::property_tree::ptree pt_in, boost::program_options::variables_map vm_in) {
     
    pt = pt_in;
-   prec_virt = x;
-   prec_sc = y;
-   prec_hnc = z;
+   vm = vm_in;
 
    processID = processID_init;
    m1 = processID->m1;

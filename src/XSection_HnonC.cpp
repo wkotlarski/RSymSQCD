@@ -10,7 +10,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
    //  integral dimension, number of integrands
    constexpr int ndim { 7 }, ncomp { 1 };
    //  accuraccy
-   double accuracy_rel { prec_hnc }, 
+   double accuracy_rel { pow( 10., -vm["precision-hard"].as<int>() ) }, 
       accuracy_abs { 1e-12 };
 
    constexpr int neval_min = 10'000;
@@ -22,7 +22,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
    constexpr int nincrease = 10000;
    constexpr int nbatch = 1000;
    constexpr int gridno = 0;
-   constexpr int flags = 1;
+   const int flags = vm["verbosity-hard"].as<int>();
    constexpr int seed = 0;
    const char* state_file = "";
    int nregions, fail;

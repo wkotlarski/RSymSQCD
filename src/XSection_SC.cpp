@@ -5,20 +5,20 @@ std::array<double, 3> XSection_SC::integrate() {
    // integrals dimensions, number of integrands
    constexpr int ndim { 3 }, ncomp { 1 };
    // accuraccy
-   constexpr double accuracy_rel_sc { 1e-7 }, 
-            accuracy_rel_c { 1e-7 };
+   double accuracy_rel_sc { pow( 10., -vm["precision-sc"].as<int>() ) }, 
+            accuracy_rel_c { pow( 10., -vm["precision-sc"].as<int>() ) };
    constexpr double accuracy_abs { 1e-12 };
 
    constexpr int neval_min = 10000;
    long long int neval;
    constexpr long long int neval_max { 1'000'000'000 }; 
-   constexpr int verbose = 0;
+   const int verbose = vm["verbosity-sc"].as<int>();
 
    int nregions, fail;
 
    cubareal integral_sc[ncomp], error_sc[ncomp], prob_sc[ncomp];
    llCuhre(ndim, ncomp, integrand_sc, NULL, 1,
-      prec_sc, accuracy_abs, verbose,
+      accuracy_rel_sc, accuracy_abs, verbose,
       neval_min, neval_max, 1, NULL, NULL,
       &nregions, &neval, &fail, integral_sc, error_sc, prob_sc);
  

@@ -56,7 +56,7 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
    constexpr double accuracy_abs = 1e-12;
    constexpr int eval_min = 1000;
    constexpr int eval_max = 1000000000;
-   constexpr int verbose = 0;        // adjust shown output 0 ... 3
+   const int verbose = vm["verbosity-born"].as<int>();        // adjust shown output 0 ... 3
    constexpr int last = 4;
    constexpr int key = 0;
    int nregions, neval, fail;
@@ -67,7 +67,7 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
       eval_min, eval_max, key, NULL, NULL,
       &nregions, &neval, &fail, integral, error, prob );
 
-   std::array <double, 3> result{integral[0], error[0], prob[0]}; 
+   std::array <double, 3> result{ integral[0], error[0], prob[0] }; 
 
    return result;
 }

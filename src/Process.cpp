@@ -217,18 +217,18 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       if( pt.get<double>("collider setup.sqrt_S") < std::min(m1,m2) +  MassGlu ||
           MassGlu < m2 ) {
          matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar;
-	 std::cout << "INFO: Not using any subtraction for gu_suLsuR channel.\n";
+	      std::cout << "INFO: Not using any subtraction for gu_suLsuR channel.\n";
       }
       else {
          // otherwise, if WidthGlu < 0 use DR
          if( WidthGlu < 0) {
             matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep;
-	    std::cout << "INFO: Using diagram removal for gu_suLsuR channel.\n";
+	         std::cout << "INFO: Using diagram removal for gu_suLsuR channel.\n";
          }
          // else use DS
          else {
-	    std::cout << "INFO: Using diagram subtraction for the gu_suLsuR channel with WoM = "
-		<< pt.get<double>("technical parameters.WidthOverMass") << ".\n";
+	         std::cout << "INFO: Using diagram subtraction for the gu_suLsuR channel with WoM = "
+		         << pt.get<double>("technical parameters.WidthOverMass") << ".\n";
             matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DS;
          }
       }
@@ -377,6 +377,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 #include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg_hard.cpp"
 
 #include "matrix_elements_and_xsections/mrssm_gd_suLsuLdaggerd_hard.cpp"
+// wEta_noSimplify is faster than wEta
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DS.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DR.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DR_wEta_noSimplify.cpp"
