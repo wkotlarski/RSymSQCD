@@ -71,20 +71,12 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    constexpr int ndim = 3;
    constexpr int ncomp = 1;
    constexpr int nvec = 1;
-   //constexpr double accuracy_rel = 1e-3;
    constexpr double accuracy_abs = 1e-12;
    constexpr int eval_min = 1000;
    constexpr int eval_max = 1000000;
    const int verbose = vm["verbosity-virt"].as<int>();        // adjust output 0 ... 3
    int nregions, neval, fail;
    cubareal integral[ncomp], error[ncomp], prob[ncomp];
-   // Vegas specific
-   //int seed = 1;
-   //int nstart = 1000;
-   //int nincrease = 500;
-   //int nbatch = 1000;
-   //int grindo = 0;
-   // Cuhre specific
    constexpr int last = 4;
    constexpr int key = 0;
    // Divonne specific
@@ -101,20 +93,9 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    constexpr int nextra = 0;
    const double prec_virt = pow( 10., -vm["precision-virt"].as<int>());
 
-   //  Vegas(ndim, ncomp, integrand, NULL, nvec,
-   //  accuracy_rel, accuracy_abs, verbose, seed,
-   //  eval_min, eval_max, nstart, nincrease, nbatch, 
-   //  grindo, NULL, NULL,
-   //  &neval, &fail, integral, error, prob);
-
-   //   Cuhre( ndim, ncomp, integrand, NULL, nvec,
-   //   prec_virt, accuracy_abs, verbose | last,
-   //   eval_min, eval_max, key, NULL, NULL,
-   //   &nregions, &neval, &fail, integral, error, prob );
-   
    static bool looptools_initialized = false;
    if(!looptools_initialized) {
-      std::cout << '\n';
+      std::cout << std::endl;
       ltini();
       looptools_initialized = true;
    }
