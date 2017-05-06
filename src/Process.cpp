@@ -35,8 +35,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    
 /* -------------------- Squark-squark production---------------------------------*/
 
-	if(processID == "MRSSM,uu_suLsuR") {
-		matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM 
+   if(processID == "MRSSM,uu_suLsuR") {
+      matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM 
       matrixelementVirt = &Process::matrixMRSSMVirt_uu_suLsuR;
       matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
       sigmaPartTree1 = &Process::sigmaMRSSMTree_uu_suLsuR;
@@ -185,17 +185,17 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       if( pt.get<double>("collider setup.sqrt_S") < m1 +  MassGlu ||
           MassGlu < m2 ) {
          matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru;
-	      std::cout << "\nINFO: Not using any subtraction.\n";
+         std::cout << "\nINFO: Not using any subtraction.\n";
       }
       else {
          // otherwise, if WidthGlu < 0 use DR
          if( WidthGlu < 0) {
             matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DR;//_wEta;
-	         std::cout << "\nINFO: Using diagram removal.\n";
+            std::cout << "\nINFO: Using diagram removal.\n";
          }
          // else use DS
          else {
-	         std::cout << "\nINFO: Using diagram subtraction.\n";
+            std::cout << "\nINFO: Using diagram subtraction.\n";
             matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DS;
          }
       }
@@ -217,18 +217,18 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       if( pt.get<double>("collider setup.sqrt_S") < std::min(m1,m2) +  MassGlu ||
           MassGlu < m2 ) {
          matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar;
-	      std::cout << "INFO: Not using any subtraction for gu_suLsuR channel.\n";
+         std::cout << "INFO: Not using any subtraction for gu_suLsuR channel.\n";
       }
       else {
          // otherwise, if WidthGlu < 0 use DR
          if( WidthGlu < 0) {
             matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep;
-	         std::cout << "INFO: Using diagram removal for gu_suLsuR channel.\n";
+            std::cout << "\nINFO: Using diagram removal for gu_suLsuR channel.\n";
          }
          // else use DS
          else {
-	         std::cout << "INFO: Using diagram subtraction for the gu_suLsuR channel with WoM = "
-		         << pt.get<double>("technical parameters.WidthOverMass") << ".\n";
+            std::cout << "\nINFO: Using diagram subtraction for the gu_suLsuR channel with WoM = "
+               << pt.get<double>("technical parameters.WidthOverMass") << ".\n";
             matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DS;
          }
       }
