@@ -185,17 +185,18 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       if( pt.get<double>("collider setup.sqrt_S") < m1 +  MassGlu ||
           MassGlu < m2 ) {
          matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru;
-         std::cout << "\nINFO: Not using any subtraction.\n";
+         std::cout << "\nINFO: Not using any subtraction for the gu_suLsuLdagger channel.\n";
       }
       else {
          // otherwise, if WidthGlu < 0 use DR
          if( WidthGlu < 0) {
             matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DR;//_wEta;
-            std::cout << "\nINFO: Using diagram removal.\n";
+            std::cout << "\nINFO: Using diagram removal for the gu_suLsuLdagger channel.\n";
          }
          // else use DS
          else {
-            std::cout << "\nINFO: Using diagram subtraction.\n";
+            std::cout << "\nINFO: Using diagram subtraction for the gu_suLsuLdagger channel with WoM = "
+               << pt.get<double>("technical parameters.WidthOverMass") << ".\n";
             matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DS;
          }
       }
@@ -217,13 +218,13 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       if( pt.get<double>("collider setup.sqrt_S") < std::min(m1,m2) +  MassGlu ||
           MassGlu < m2 ) {
          matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar;
-         std::cout << "INFO: Not using any subtraction for gu_suLsuR channel.\n";
+         std::cout << "\nINFO: Not using any subtraction for the gu_suLsuR channel.\n";
       }
       else {
          // otherwise, if WidthGlu < 0 use DR
          if( WidthGlu < 0) {
             matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep;
-            std::cout << "\nINFO: Using diagram removal for gu_suLsuR channel.\n";
+            std::cout << "\nINFO: Using diagram removal for the gu_suLsuR channel.\n";
          }
          // else use DS
          else {
