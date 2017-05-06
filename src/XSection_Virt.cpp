@@ -99,7 +99,7 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    constexpr int ngiven = 0;
    constexpr int ldxgiven = ndim;
    constexpr int nextra = 0;
-   double prec_virt = pow( 10., -vm["precision-virt"].as<int>());
+   const double prec_virt = pow( 10., -vm["precision-virt"].as<int>());
 
    //  Vegas(ndim, ncomp, integrand, NULL, nvec,
    //  accuracy_rel, accuracy_abs, verbose, seed,
@@ -112,6 +112,12 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    //   eval_min, eval_max, key, NULL, NULL,
    //   &nregions, &neval, &fail, integral, error, prob );
    
+   static bool looptools_initialized = false;
+   if(!looptools_initialized) {
+      std::cout << '\n';
+      ltini();
+      looptools_initialized = true;
+   }
    /*
     *    LoopTools fails for phase space points near the border.
     *    That's why we have to use Divonne with option border.

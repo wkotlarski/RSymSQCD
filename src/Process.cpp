@@ -185,17 +185,17 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       if( pt.get<double>("collider setup.sqrt_S") < m1 +  MassGlu ||
           MassGlu < m2 ) {
          matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru;
-	 std::cout << "INFO: Not using any subtraction.\n";
+	      std::cout << "\nINFO: Not using any subtraction.\n";
       }
       else {
          // otherwise, if WidthGlu < 0 use DR
          if( WidthGlu < 0) {
-            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DR_wEta;
-	    std::cout << "INFO: Using diagram removal.\n";
+            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DR;//_wEta;
+	         std::cout << "\nINFO: Using diagram removal.\n";
          }
          // else use DS
          else {
-	    std::cout << "INFO: Using diagram subtraction.\n";
+	         std::cout << "\nINFO: Using diagram subtraction.\n";
             matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DS;
          }
       }

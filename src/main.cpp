@@ -43,8 +43,8 @@ boost::program_options::variables_map XSection::vm;
 const LHAPDF::PDF* XSection::pdf;
 void print( string str, array<double,3> tree, array<double,3> virt, array<double,3> soft, array<double,3> hard) {
    cout << "\nResults for subprocess " << str << '\n';
-      cout << scientific;
-   //print out LO run statistics
+   cout << scientific;
+   // print out LO run statistics
    cout << "---------------------------------------------------------------" << endl;
    cout << setprecision(5);
    cout << setw(12) << "tree:" << setw(13) << tree.at(0) 
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
    cfg.set_entry("Verbosity", 0);
 
    // program options
-   boost::program_options::options_description desc("Allowed options");
+   boost::program_options::options_description desc("Allowed options", 160);
    desc.add_options()
       ("help", "produce help message")
       ("precision-virt", po::value<int>() -> default_value(4), "")
@@ -101,9 +101,9 @@ int main(int argc, char* argv[]) {
       ("card", po::value<string>(), "path to a run card")
       ("subprocess", po::value<string>() -> default_value(""), "")
    ;
-   boost::program_options::options_description verbosity("Verbosity");
 
    // verbosity of the integration routines
+   boost::program_options::options_description verbosity("Verbosity", 160);
    verbosity.add_options()
       ("verbosity-born", po::value<int>() -> default_value(0), "")
       ("verbosity-virt", po::value<int>() -> default_value(0), "")
@@ -117,7 +117,8 @@ int main(int argc, char* argv[]) {
    boost::program_options::notify(vm);
 
    if (vm.count("help")) {
-      cout << desc << "\n";
+      cout << desc << '\n';
+      cout << verbosity << '\n';
       return 0;
    }
 
@@ -125,10 +126,6 @@ int main(int argc, char* argv[]) {
    bool enable_virt = vm["enable-virt"].as<bool>();
    bool enable_sc = vm["enable-sc"].as<bool>();
    bool enable_hard = vm["enable-hard"].as<bool>();
-
-   double prec_virt = pow( 10., -vm["precision-virt"].as<int>() );
-   double prec_sc   = pow( 10., -vm["precision-sc"].as<int>() );
-   double prec_hard = pow( 10., -vm["precision-hard"].as<int>() );
 
    string card = vm["card"].as<string>();
    string subprocess = vm["subprocess"].as<string>();
@@ -412,12 +409,10 @@ int main(int argc, char* argv[]) {
         }
         }
      }
-   } else {
-      cout << "Third command line argument must be 'LO' or 'NLO'." << endl;
-      return 0;
-   }
+   } 
 
    auto end = chrono::steady_clock::now();
+   cout << '\n';
    cout << "Calculation ended after " 
       << chrono::duration_cast<chrono::minutes>(end-start).count()
       << " minutes\n";   
