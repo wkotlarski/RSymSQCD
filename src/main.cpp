@@ -87,6 +87,10 @@ int main(int argc, char* argv[]) {
    LHAPDF::Info& cfg = LHAPDF::getConfig();
    cfg.set_entry("Verbosity", 0);
 
+   // 
+   boost::program_options::positional_options_description p;
+   p.add("card", -1);
+
    // program options
    boost::program_options::options_description desc("Allowed options", 160);
    desc.add_options()
@@ -103,7 +107,7 @@ int main(int argc, char* argv[]) {
    ;
 
    // verbosity of the integration routines
-   boost::program_options::options_description verbosity("Verbosity", 160);
+   boost::program_options::options_description verbosity("Integration verbosity", 160);
    verbosity.add_options()
       ("verbosity-born", po::value<int>() -> default_value(0), "")
       ("verbosity-virt", po::value<int>() -> default_value(0), "")
@@ -113,13 +117,12 @@ int main(int argc, char* argv[]) {
    desc.add(verbosity);
 
    boost::program_options::variables_map vm;        
-   boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
+   boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
    boost::program_options::notify(vm);
 
    if (vm.count("help")) {
       cout << desc << '\n';
-      cout << verbosity << '\n';
-      return 0;
+      return 1;
    }
 
    bool enable_born = vm["enable-born"].as<bool>();
