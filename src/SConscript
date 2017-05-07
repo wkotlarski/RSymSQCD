@@ -23,7 +23,7 @@ env.Prepend(
 env.Program(   
    '../bin/RSymSQCD', 
    [ Glob( '*.cpp' ) ], 
-   LIBS = [ 'stdc++', 'LHAPDF', 'cuba', 'rk', File(Config.get('LoopTools', 'lib')), 'boost_program_options' ],
+   LIBS = [ 'gfortran', 'LHAPDF', 'cuba', 'rk', File(Config.get('LoopTools', 'lib')), 'boost_program_options' ],
    LIBPATH = [ 
       os.popen('lhapdf-config --libdir').read().strip(), 
       Config.get('Cuba', 'lib'), 
