@@ -8,9 +8,6 @@
 #include <array>
 #include <iostream>
 #include <boost/property_tree/ptree.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/io.hpp>
-#include <boost/numeric/ublas/lu.hpp>
 #include <mathematica_wrapper.hpp>
 #include <constants.hpp>
 #include "LHAPDF/LHAPDF.h"
