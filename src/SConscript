@@ -20,10 +20,17 @@ env.Prepend(
    CXXFLAGS = '-std=c++14 ' + Config.get('compiler', 'flags') # -mno-avx'
 )
 
+if 'icpc' in Config.get('compiler', 'compiler'):
+   fortran_libs = [ 'ifcore', 'ifport' ]
+elif 'g++' in Config.get('compiler', 'compiler'):
+   fortran_libs = [ 'gfortran' ]   
+
 env.Program(   
    '../bin/RSymSQCD', 
    [ Glob( '*.cpp' ) ], 
-   LIBS = [ 'stdc++', 'LHAPDF', 'cuba', 'rk', File(Config.get('LoopTools', 'lib')), 'boost_program_options' ],
+   # add 'ifcore', 'ifport' if using intel compiler suite
+   # or gfortran if using gcc suite 
+   LIBS = fortran_libs + [ 'LHAPDF', 'cuba', 'rk', File(Config.get('LoopTools', 'lib')), 'boost_program_options' ],
    LIBPATH = [ 
       os.popen('lhapdf-config --libdir').read().strip(), 
       Config.get('Cuba', 'lib'), 
