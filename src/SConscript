@@ -24,6 +24,10 @@ if 'icpc' in Config.get('compiler', 'compiler'):
    fortran_libs = [ 'ifcore', 'ifport' ]
 elif 'g++' in Config.get('compiler', 'compiler'):
    fortran_libs = [ 'gfortran' ]   
+else:
+   print "Couldn't recognize the compiler. Only GNU g++ and Intel icpc are supported"
+   exit()
+
 
 env.Program(   
    '../bin/RSymSQCD', 
