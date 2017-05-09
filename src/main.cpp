@@ -1,4 +1,5 @@
 #include <chrono>
+using namespace std::chrono_literals;
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
@@ -419,9 +420,12 @@ int main(int argc, char* argv[]) {
 
    auto end = chrono::steady_clock::now();
    cout << '\n';
-   cout << "Calculation ended after " 
-      << chrono::duration_cast<chrono::minutes>(end-start).count()
-      << " minutes\n";   
+   cout << "INFO: Calculation ended after ";
+   if (end - start > 1h)
+      cout << chrono::duration_cast<chrono::hours>(end-start).count() << " hour(s), ";
+   if (end - start > 1min)
+      cout << chrono::duration_cast<chrono::minutes>(end-start).count() %  60 << " minute(s) and ";
+   cout << chrono::duration_cast<chrono::seconds>(end-start).count() % 60 << " second(s)\n";
    
    return 0;
 }
