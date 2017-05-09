@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
    p.add("card", -1);
 
    // program options
-   boost::program_options::options_description desc("Allowed options", 160);
+   boost::program_options::options_description desc("Allowed options");
    desc.add_options()
       ("help", "produce help message")
       ("precision-virt", po::value<int>() -> default_value(3), "")
@@ -111,7 +111,7 @@ int main(int argc, char* argv[]) {
    ;
 
    // verbosity of the integration routines
-   boost::program_options::options_description verbosity("Integration verbosity", 160);
+   boost::program_options::options_description verbosity("Integration verbosity");
    verbosity.add_options()
       ("verbosity-born", po::value<int>() -> default_value(0), "")
       ("verbosity-virt", po::value<int>() -> default_value(0), "")
@@ -309,7 +309,7 @@ int main(int argc, char* argv[]) {
                   XSection_HnonC hc;
                   
                   // uu > suL suR (+g) process
-		            if( atoi(argv[5]) == 1 || subprocess == "" ) {
+		            if( subprocess == "" ) {
                      Process process1("MRSSM,uu_suLsuR", pt);
 	                  XSection::init( &process1, pt, vm );
                      if(enable_born) xsection_tree1 = tree.integrate();      
@@ -324,7 +324,7 @@ int main(int argc, char* argv[]) {
                   pt.put( "technical parameters.dS", 1e-10 );                  
 
                   // gu > suL suR ubar process
-		            if( atoi(argv[5]) == 2 || subprocess == "" ) {
+		            if( subprocess == "" ) {
                      Process process2( "MRSSM,gu_suLsuR", pt);
                      XSection::init( &process2, pt, vm );      
                      if(enable_sc) xsection_SC2 = sc.integrate();
@@ -344,7 +344,7 @@ int main(int argc, char* argv[]) {
                   XSection_SC sc;
                   XSection_HnonC hc;
 
-		            if( atoi(argv[5]) == 1 || subprocess == "" ) {
+		            if( subprocess == "" ) {
                      Process process1("MRSSM,uubar_suLsuLdagger", pt);
                      XSection::init( &process1, pt, vm );                 
                      if(enable_born) xsection_tree1 = tree.integrate();      
@@ -354,7 +354,7 @@ int main(int argc, char* argv[]) {
                      print( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
 	    	         }
          
-		            if( atoi(argv[5]) == 2 || subprocess == "") {
+		            if( subprocess == "") {
                      Process process2("MRSSM,ddbar_suLsuLdagger", pt);
                      XSection::init( &process2, pt, vm );                    
                      if(enable_born) xsection_tree2 = tree.integrate();
@@ -364,7 +364,7 @@ int main(int argc, char* argv[]) {
                      print( "ddbar > suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
 		            }
 
-		            if( atoi(argv[5]) == 3 || subprocess == "") {
+		            if( subprocess == "") {
                      Process process3("MRSSM,GG_suLsuLdagger", pt);
                      XSection::init( &process3, pt, vm );
                      if(enable_born) xsection_tree3 = tree.integrate();
@@ -378,7 +378,7 @@ int main(int argc, char* argv[]) {
                   // fails if we are exactly on the threshold
                   pt.put( "technical parameters.dS", 1e-10 );
 
-  		            if( atoi(argv[5]) == 4 || subprocess == "") {
+  		            if( subprocess == "") {
                      Process process4("MRSSM,gq_suLsuLdagger", pt);
                      XSection::init( &process4, pt, vm );
                      if(enable_sc) xsection_SC4 = sc.integrate();
