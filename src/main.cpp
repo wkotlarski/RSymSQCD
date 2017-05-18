@@ -324,7 +324,7 @@ int main(int argc, char* argv[]) {
                   pt.put( "technical parameters.dS", 1e-10 );                  
 
                   // gu > suL suR ubar process
-		            if( subprocess == "" ) {
+		            if( subprocess == "gu_suLsuRubar" || subprocess == "" ) {
                      Process process2( "MRSSM,gu_suLsuR", pt);
                      XSection::init( &process2, pt, vm );      
                      if(enable_sc) xsection_SC2 = sc.integrate();
@@ -344,7 +344,7 @@ int main(int argc, char* argv[]) {
                   XSection_SC sc;
                   XSection_HnonC hc;
 
-		            if( subprocess == "" ) {
+		            if( subprocess == "" || subprocess == "uubar_suLsuLdagger" ) {
                      Process process1("MRSSM,uubar_suLsuLdagger", pt);
                      XSection::init( &process1, pt, vm );                 
                      if(enable_born) xsection_tree1 = tree.integrate();      
