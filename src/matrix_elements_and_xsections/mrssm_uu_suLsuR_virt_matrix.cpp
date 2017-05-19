@@ -1,6 +1,6 @@
 double Process::matrixMRSSMVirt_uu_suLsuR(double S, double T, 
    const double FiniteGs, const double Dminus4, int divergence) { // agrees with Philip  
-	ltini(); // for LoopTools
+	//ltini(); // for LoopTools
 	setmudim(pow(mu_r,2));
 	setlambda(divergence);   
     double alphaS = pdf->alphasQ( mu_r );
