@@ -13,13 +13,13 @@ std::array<double, 3> XSection_HnonC::integrate() {
    double accuracy_rel { pow( 10., -vm["precision-hard"].as<int>() ) }, 
       accuracy_abs { 1e-12 };
 
-   constexpr int neval_min = 10'000;
+   constexpr int neval_min = 2e+6;
    long long int neval;
    constexpr long long int neval_max { 1'000'000'000'000 }; 
 
    // technical (Vegas specific) stuff
-   constexpr int nstart = 200'000;
-   constexpr int nincrease = 10000;
+   constexpr int nstart = 20'000'000;
+   constexpr int nincrease = 10'000'000;
    constexpr int nbatch = 1000;
    constexpr int gridno = 0;
    const int flags = vm["verbosity-hard"].as<int>();
@@ -28,6 +28,13 @@ std::array<double, 3> XSection_HnonC::integrate() {
    int nregions, fail;
 
    cubareal integral[ncomp], error[ncomp], prob[ncomp];
+   /*
+   llSuave(ndim, ncomp, integrand, NULL, 1,
+      accuracy_rel, accuracy_abs, flags, seed,
+      neval_min, neval_max, 2e+6, 7.e+5, 50,
+      state_file, NULL,
+      &nregions, &neval, &fail, integral, error, prob);
+   */
    llVegas( ndim, ncomp, integrand, NULL, 1,
       accuracy_rel, accuracy_abs, flags, seed,
       neval_min, neval_max, nstart, nincrease, nbatch,
@@ -45,8 +52,8 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    double m_sqr = m1 * m1;
   
    /*
-   * 3-body phase space parametrization based on
-   * http://www.t39.ph.tum.de/T39_files/T39_people_files/duell_files/Dipl-MultiPion.pdf
+   *  3-body phase space parametrization based on
+   *  http://www.t39.ph.tum.de/T39_files/T39_people_files/duell_files/Dipl-MultiPion.pdf
    */
 
    // failsafe (this should never happen)
