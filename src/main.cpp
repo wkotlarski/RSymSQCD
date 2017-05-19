@@ -354,7 +354,7 @@ int main(int argc, char* argv[]) {
                      print( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
 	    	         }
          
-		            if( subprocess == "") {
+                  if( subprocess == "") {
                      Process process2("MRSSM,ddbar_suLsuLdagger", pt);
                      XSection::init( &process2, pt, vm );                    
                      if(enable_born) xsection_tree2 = tree.integrate();
@@ -362,9 +362,9 @@ int main(int argc, char* argv[]) {
                      if(enable_sc) xsection_SC2 = sc.integrate();
                      if(enable_hard) xsection_HnonC2 = hc.integrate();
                      print( "ddbar > suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
-		            }
+                  }
 
-		            if( subprocess == "") {
+                  if( subprocess == "") {
                      Process process3("MRSSM,GG_suLsuLdagger", pt);
                      XSection::init( &process3, pt, vm );
                      if(enable_born) xsection_tree3 = tree.integrate();
@@ -372,13 +372,13 @@ int main(int argc, char* argv[]) {
                      if(enable_sc) xsection_SC3 = sc.integrate();
                      if(enable_hard) xsection_HnonC3 = hc.integrate();
                      print( "gg > suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
-		            }
+                  }
                   
                   // the matrix element is regular in the limit dS -> 0 but the phase space parametrization
                   // fails if we are exactly on the threshold
                   pt.put( "technical parameters.dS", 1e-10 );
 
-  		            if( subprocess == "") {
+                  if( subprocess == "") {
                      Process process4("MRSSM,gq_suLsuLdagger", pt);
                      XSection::init( &process4, pt, vm );
                      if(enable_sc) xsection_SC4 = sc.integrate();
@@ -387,8 +387,8 @@ int main(int argc, char* argv[]) {
                   }
 
                   // g u > suL suLdagger 
-                  pt.put( "technical parameters.dS", 1e-10 );
-		            if( subprocess == "gu_suLsuLdaggeru" || subprocess == "" ) {
+                  pt.put( "technical parameters.dS", 1e-9 );
+                  if( subprocess == "gu_suLsuLdaggeru" || subprocess == "" ) {
                      Process process5("MRSSM,gu_suLsuLdagger", pt);
                      XSection::init( &process5, pt, vm );
                      if(enable_sc) xsection_SC5 = sc.integrate();
