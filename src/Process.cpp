@@ -1,3 +1,4 @@
+#include <Eigen/Dense>
 #include "Process.hpp"
 
 Process::Process(std::string processID, boost::property_tree::ptree pt) {
@@ -195,7 +196,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
          }
          // else use DS
          else {
-            std::cout << "\nINFO: Using diagram subtraction for the gu_suLsuLdagger channel with WoM = "
+            std::cout << "\nINFO: Using diagram subtraction for the gu_suLsuLdagger channel with width/mass = "
                << pt.get<double>("technical parameters.WidthOverMass") << ".\n";
             matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DS;
          }
