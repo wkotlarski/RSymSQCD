@@ -393,7 +393,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuRubar_hard.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuRubar_hard-DR.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuRubar_hard-DR_wEtaDep.cpp"
-#include "matrix_elements_and_xsections/mrssm_gu_suLsuRubar_hard-DS_unsympli.cpp"
+#include "matrix_elements_and_xsections/mrssm_gu_suLsuRubar_hard-DS.cpp"
 
 #include "matrix_elements_and_xsections/simplified_uubar_OOg_soft.cpp"
 #include "matrix_elements_and_xsections/simplified_uubar_OOg_hard.cpp"
