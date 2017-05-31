@@ -15,7 +15,7 @@ env.Prepend(
       Config.get('LoopTools', 'inc'),
       '../include',
       os.environ['BOOST_ROOT'],
-      '/usr/include/eigen3'
+      '/net/people/plgwkotlarski/oprogramowanie/eigen-eigen-67e894c6cd8f'
    ],
    # -march=native throws "no such instruction: `vmovd %xmm0, %eax'" errors
    CXXFLAGS = '-std=c++14 ' + Config.get('compiler', 'flags') # -mno-avx'

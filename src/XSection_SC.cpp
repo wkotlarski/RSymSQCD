@@ -9,7 +9,7 @@ std::array<double, 3> XSection_SC::integrate() {
             accuracy_rel_c { pow( 10., -vm["precision-sc"].as<int>() ) };
    constexpr double accuracy_abs { 1e-12 };
 
-   constexpr int neval_min = 10000;
+   constexpr int neval_min = 10'000;
    long long int neval;
    constexpr long long int neval_max { 1'000'000'000 }; 
    const int verbose = vm["verbosity-sc"].as<int>();
