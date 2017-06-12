@@ -7,7 +7,7 @@
 
 2.1 Dependencies
       If the LHAPDF script called lhapdf-config is in your PATH the scons script will automatically find LHAPDF.
-    Cuba, LoopTools, LHAPDF, rk, boost
+    Cuba, LoopTools, LHAPDF, rk, boost, eigen3
 
 2.2 Compiler settings.
 

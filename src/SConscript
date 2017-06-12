@@ -7,6 +7,8 @@ Config.read("../configure.ini")
 env = Environment(ENV = os.environ)
 
 env.Replace( CXX = Config.get('compiler', 'compiler') )
+# env.Replace( AR = 'xiar' )
+# env.Replace( LINK = 'xild' )
 env.Prepend(
    CPPPATH = [  
       os.popen('lhapdf-config --incdir').read().strip(), 
@@ -15,14 +17,14 @@ env.Prepend(
       Config.get('LoopTools', 'inc'),
       '../include',
       os.environ['BOOST_ROOT'],
-      '/net/people/plgwkotlarski/oprogramowanie/eigen-eigen-67e894c6cd8f'
+      '/usr/include/eigen3'
    ],
    # -march=native throws "no such instruction: `vmovd %xmm0, %eax'" errors
    CXXFLAGS = '-std=c++14 ' + Config.get('compiler', 'flags') # -mno-avx'
 )
 
 if 'icpc' in Config.get('compiler', 'compiler'):
-   fortran_libs = [ 'ifcore', 'ifport' ]
+   fortran_libs = [ 'ifcore', 'ifport', 'gfortran' ]
 elif 'g++' in Config.get('compiler', 'compiler'):
    fortran_libs = [ 'gfortran' ]   
 elif 'clang++' in Config.get('compiler', 'compiler'):

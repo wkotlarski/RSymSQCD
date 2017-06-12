@@ -69,28 +69,30 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 	double shat = x1 * x2 * S;
 	double shat_sqrt = sqrt( shat );
 
-	double Ej_max = shat_sqrt/2. - 2. * m_sqr/shat_sqrt;
+   double s35_min = m1*m1;
+   double s35_max = pow(shat_sqrt - m2, 2);
+   double s35 = s35_min + (s35_max - s35_min) * xx[0];
+	double E2 = -0.5 * (s35 - shat - m1*m1)/shat_sqrt;
    
-	if ( Ej_max < dS * shat_sqrt/2. ) {
-	  ff[0] = 0;
-	  return 0;
-	}
-   
-	double Ej = dS * shat_sqrt/2. + ( Ej_max - dS * shat_sqrt/2.) * xx[0];  
-   
-	double c = shat - 2. * shat_sqrt * Ej;
+	double c = shat - 2 * shat_sqrt * E2 + m1*m1 + m2*m2;
 	// Eq. 4.5
-	double E1_max = ( shat_sqrt - Ej) * c + Ej * sqrt( (c - 2. * m_sqr) 
-    * (c - 2 * m_sqr) - 4. * m_sqr * m_sqr );
-	E1_max /= 2 * c;
-   double E1_min = ( shat_sqrt - Ej) * c - Ej * sqrt( (c - 2 * m_sqr) 
-      * (c - 2. * m_sqr) - 4. * m_sqr * m_sqr );
-   E1_min /= 2. * c;
-	double E1 = E1_min + (E1_max - E1_min) * xx[1];
+	double E1_max = ( shat_sqrt - E2) * c + sqrt(E2*E2-m2*m2) * sqrt( (c - 2. * m_sqr) 
+    * (c - 2 * m_sqr) );
+	E1_max /= 2 * (c - m1*m1);
+   double E1_min = ( shat_sqrt - E2) * c - sqrt(E2*E2-m2*m2) * sqrt( (c - 2 * m_sqr) 
+      * (c - 2. * m_sqr)  );
+   E1_min /= 2. * (c - m1*m1);
 
-	// Eq. 4.2 with E2 = Ej
-   double cosx = (shat - 2 * shat_sqrt * ( E1 + Ej ) + 2. * Ej * E1 )/
-      (2. * Ej * sqrt( ( E1 - m1 ) * ( E1 + m1 ) ) );
+   double s45_min = shat + m2*m2 - 2 * shat_sqrt * E1_max;
+   double s45_max = shat + m2*m2 - 2 * shat_sqrt * E1_min;
+   double s45 = s45_min + (s45_max - s45_min) * xx[1];
+   double E1 = -0.5 * (s45 - shat - m2*m2)/shat_sqrt;
+
+   if ( shat_sqrt - E1 - E2 < 0.5 * dS * shat_sqrt) { ff[0] = 0.; return 0; }
+
+	// eq. 4.2
+   double cosx = (shat - 2 * shat_sqrt * ( E1 + E2 ) + 2 * E2 * E1 + m1*m1 + m2*m2 )/
+      (2. * sqrt( ( E1 - m1 ) * ( E1 + m1 ) ) * sqrt( ( E2 - m2 ) * ( E2 + m2 ) ) );
 
    // check if due to numerics |cos(x)| is not > 1
    // if yes, return 0 and continue
@@ -153,25 +155,25 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    }
 
    geom3::Vector3 p_parton(
-      Ej * sin( parton_theta ) * cos( parton_phi ),
-      Ej * sin( parton_theta ) * sin( parton_phi ),
-      Ej * cos( parton_theta )
+      sqrt(E2*E2-m2*m2) * sin( parton_theta ) * cos( parton_phi ),
+      sqrt(E2*E2-m2*m2) * sin( parton_theta ) * sin( parton_phi ),
+      sqrt(E2*E2-m2*m2) * cos( parton_theta )
    );
 
    // rotate parton momentum
    geom3::Vector3 p_temp = rot.rotate(p_parton);
 
-   // set parton momenta
-   double*  p_temp_2 = new double [4];
-   p_temp_2[0] = Ej;
-   p_temp_2[1] = p_temp.x();
-   p_temp_2[2] = p_temp.y();
-   p_temp_2[3] = p_temp.z();
-
    // 2nd sgluon momenta
    p.push_back(new double[4]);
-   p[3][0] = shat_sqrt - E1 - Ej;
-   for( int i = 1; i < 4; ++i) p[3][i] = - p[2][i] - p_temp_2[i];
+   p[3][0] = E2;
+   p[3][1] = p_temp.x();
+   p[3][2] = p_temp.y();
+   p[3][3] = p_temp.z();
+
+   // parton
+   p.push_back(new double[4]);
+   p[4][0] = shat_sqrt - E1 - E2;
+   for( int i = 1; i < 4; ++i) p[4][i] = - p[2][i] - p[3][i];
   
    assert( abs(
       (pow(p[2][0], 2) - pow(p[2][1], 2) - pow(p[2][2], 2) - pow(p[2][3], 2))/(m1 * m1) - 1) < 1e-10 
@@ -185,10 +187,6 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
       (pow(p[3][0], 2) - pow(p[3][1], 2) - pow(p[3][2], 2) - pow(p[3][3], 2))/(m2 * m2) - 1) << " " << p[3][0] << '\n';
    }
   
-   // write parton momentum to momentum matrix p
-   p.push_back(new double[4]);
-   for(int i = 0; i < 4; ++i) p[4][i] = p_temp_2[i];
-   delete[] p_temp_2;
       
    double t15 = p[0][0] * p[4][0] - p[0][3] * p[4][3];
    t15 = - 2. * t15;
@@ -197,33 +195,25 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
    // check if we are not in the collinear region
    // if yes, return
-   if( -t15 < dC * shat_sqrt * Ej || -t25 < dC * shat_sqrt * Ej ) {
+   if( -t15 < dC * shat_sqrt * p[4][0] || -t25 < dC * shat_sqrt * p[4][0] ) {
       ff[0] = 0;
       return 0;
 	}
         
    double ME2 = (processID->*processID->matrixelementReal_HnonC)(p);
-   //assert( ME2 >= 0 );
+
    if( ME2 < 0 || std::isnan(ME2) ) {
-//      std::cout << "Warning, negative ME2 " << ME2 << '\n';
-//      ff[0] = 0;
-//      return 0;      
+      std::cout << "Warning, negative ME2 " << ME2 << '\n';
+      ff[0] = 0;
+      return 0;      
    }
-   
-   // delete (otherwise causes memory leak)
-   for(std::vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {
-      delete (*i);
-      *i = 0;
-   }
-   p.clear();
-   p.shrink_to_fit();
   
    // some final factors
-   ME2 *= to_fb;
-   ME2 /=  2 * shat;
+   double fac = to_fb;
+   fac /=  2 * shat;
 
-   ME2 *= sin( xx[2] * pi ) * 4;
-   ME2 /= 256 * pi_sqr;
+   fac *= sin( xx[2] * pi ) * 4;
+   fac /= 256 * pi_sqr;
 
    double pdf_flux = 0.0;
    for (const auto& f : processID->flav) {
@@ -231,23 +221,53 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    }
    pdf_flux /= x1 * x2;
 
-   ME2 *=  pdf_flux;
+   fac *=  pdf_flux;
    double xx0 = xx[5];
    double xx1 = xx[6];
    double xx2 = xx[0];
 
-   double jacobian =  (xx0*(-4*dS*pow(m1,2) + (-1 + dS)*xx0*xx1*(-S + 4*pow(m1,2)))*
-     (xx0*xx1*xx2*(S - 4*pow(m1,2)) + 
-       dS*(-1 + xx2)*(-(S*xx0*xx1) + 4*(-1 + xx0*xx1)*pow(m1,2)))*pow(S,-1)*
-     pow(S - 4*pow(m1,2),2)*pow(S*xx0 - 4*(-1 + xx0)*pow(m1,2),-1)*
-     pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),-1)*
-     pow((-1 + dS)*S*xx0*xx1*(-1 + xx2) + 
-       4*(1 + xx0*xx1*(-1 + xx2) - dS*(-1 + xx0*xx1)*(-1 + xx2))*pow(m1,2),-1)*
-     pow((-1 + xx2)*(S*xx0*xx1*(-1 + dS + xx2 - dS*xx2) + 
-         4*(-1 + xx0*xx1 + dS*(-1 + xx0*xx1)*(-1 + xx2) - xx0*xx1*xx2)*pow(m1,2))*
-       (-4*dS*pow(m1,2) + (-1 + dS)*xx0*xx1*(-S + 4*pow(m1,2))),0.5))/4.;
-   
-   ff[0] = ME2 * abs(jacobian);
+   /*    The integration over s35 and s45 is mapped on unit square spanned by [xx0, xx1]
+    *
+    *    Jakobian of transformations:
+    *       xx0 -> s35min + (s35max - s35min) xx0
+    *       xx1 -> s45min + (s45max - s45min) xx1
+    */       
+   double J = -(xx0*xx2*(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2))*pow(S,-1)*pow(S - 4*pow(m1,2),2)*pow(S*xx0 - 4*(-1 + xx0)*pow(m1,2),-1)*
+     (2*m1 - pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5))*
+     (S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2) - 2*m1*pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5))*
+     pow((-1 + xx2)*(S*xx0*xx1*(-1 + xx2) + (-4*xx0*xx1*(-1 + xx2) + 8*xx2)*pow(m1,2) - 
+         4*m1*xx2*pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5)),0.5)*
+     pow(S*xx0*xx1*xx2 + (1 + (4 - 4*xx0*xx1)*xx2)*pow(m1,2) - 2*m1*xx2*pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5),-1));
+   ME2 *= abs(J);
+
+   double MassGlu = 2000.0e+0;
+   if(processID->matrixelementReal_HnonC_CSub1 != nullptr) {
+      double kupa {MassGlu};
+      double J_s35mapped = -(xx0*pow(kupa,-2)*(-pow(kupa,2) + pow(m1,2))*(-(S*xx0*xx1) + 4*(-1 + xx0*xx1)*pow(m1,2))*pow(S,-1)*pow(S - 4*pow(m1,2),2)*
+     pow(S*xx0 - 4*(-1 + xx0)*pow(m1,2),-1)*(2*m1 - pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5))*
+     pow(xx0*xx1*(S - 4*pow(m1,2)) + 2*(-pow(kupa,2) + pow(m1,2)) + 
+       pow(kupa - m1,2)*pow(kupa + m1,2)*pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),-1),0.5));
+      ME2 -= (processID->*processID->matrixelementReal_HnonC_CSub1)(p) * abs(J_s35mapped);
+   }
+
+   if(processID->matrixelementReal_HnonC_CSub2 != nullptr) {
+      double J_s45mapped = -(xx0*xx2*(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2))*pow(S,-1)*pow(S - 4*pow(m1,2),2)*pow(S*xx0 - 4*(-1 + xx0)*pow(m1,2),-1)*
+     (2*m1 - pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5))*
+     (S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2) - 2*m1*pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5))*
+     pow((-1 + xx2)*(S*xx0*xx1*(-1 + xx2) + (-4*xx0*xx1*(-1 + xx2) + 8*xx2)*pow(m1,2) - 
+         4*m1*xx2*pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5)),0.5)*
+     pow(S*xx0*xx1*xx2 + (1 + (4 - 4*xx0*xx1)*xx2)*pow(m1,2) - 2*m1*xx2*pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5),-1));
+      ME2 -= (processID->*processID->matrixelementReal_HnonC_CSub2)(p) * abs(J);
+   }
+   // delete (otherwise causes memory leak)
+   for(std::vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {
+      delete (*i);
+      *i = 0;
+   }
+   p.clear();
+   p.shrink_to_fit();
+
+   ff[0] = fac * ME2 * 0.25/shat;
 
 	return 0;
 }

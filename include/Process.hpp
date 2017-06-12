@@ -102,6 +102,8 @@ class Process {
       double matrixMRSSMHard_gu_suLsuRubar_DR( std::vector< double* >& );
       double matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep( std::vector< double* >& );
       double matrixMRSSMHard_gu_suLsuRubar_DS( std::vector< double* >& );
+      double matrixMRSSMHard_gu_suLsuRubar_DS_CSub1( std::vector< double* >& );
+      double matrixMRSSMHard_gu_suLsuRubar_DS_CSub2( std::vector< double* >& );
       
       // pp > OO
       //double matrixMRSSMSoft_qqbar_OOg( double, double );
@@ -122,6 +124,8 @@ class Process {
       double (Process::* matrixelementReal_HC1)(double, double, double);
       double (Process::* matrixelementReal_HC2)(double, double, double);
       double (Process::* matrixelementReal_HnonC)(std::vector< double* >& );
+      double (Process::* matrixelementReal_HnonC_CSub1)(std::vector< double* >& );
+      double (Process::* matrixelementReal_HnonC_CSub2)(std::vector< double* >& );
       
       double m1, m2;// masses of final state particle 1 and 2, respectively 
       double c1, c2, c3, c4;
