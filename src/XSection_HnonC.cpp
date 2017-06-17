@@ -154,10 +154,11 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
       parton_phi = two_pi * xx[3] + pi;
    }
 
+   double p2 = sqrt ((E2-m2) * (E2+m2));
    geom3::Vector3 p_parton(
-      sqrt(E2*E2-m2*m2) * sin( parton_theta ) * cos( parton_phi ),
-      sqrt(E2*E2-m2*m2) * sin( parton_theta ) * sin( parton_phi ),
-      sqrt(E2*E2-m2*m2) * cos( parton_theta )
+      p2 * sin( parton_theta ) * cos( parton_phi ),
+      p2 * sin( parton_theta ) * sin( parton_phi ),
+      p2 * cos( parton_theta )
    );
 
    // rotate parton momentum
@@ -203,7 +204,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    double ME2 = (processID->*processID->matrixelementReal_HnonC)(p);
 
    if( ME2 < 0 || std::isnan(ME2) ) {
-      std::cout << "Warning, negative ME2 " << ME2 << '\n';
+      std::cout << "Warning, negative ME2 " << ME2 << ' ' << (pi * xx[2] + acos(cosx) < pi) << '\n';
       ff[0] = 0;
       return 0;      
    }
@@ -247,7 +248,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
      pow(S*xx0 - 4*(-1 + xx0)*pow(m1,2),-1)*(2*m1 - pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5))*
      pow(xx0*xx1*(S - 4*pow(m1,2)) + 2*(-pow(kupa,2) + pow(m1,2)) + 
        pow(kupa - m1,2)*pow(kupa + m1,2)*pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),-1),0.5));
-      ME2 -= (processID->*processID->matrixelementReal_HnonC_CSub1)(p) * abs(J_s35mapped);
+      ME2 -= (processID->*processID->matrixelementReal_HnonC_CSub1)(p) * abs(J);
    }
 
    if(processID->matrixelementReal_HnonC_CSub2 != nullptr) {

@@ -7,8 +7,6 @@ Config.read("../configure.ini")
 env = Environment(ENV = os.environ)
 
 env.Replace( CXX = Config.get('compiler', 'compiler') )
-# env.Replace( AR = 'xiar' )
-# env.Replace( LINK = 'xild' )
 env.Prepend(
    CPPPATH = [  
       os.popen('lhapdf-config --incdir').read().strip(), 
@@ -24,7 +22,7 @@ env.Prepend(
 )
 
 if 'icpc' in Config.get('compiler', 'compiler'):
-   fortran_libs = [ 'ifcore', 'ifport', 'gfortran' ]
+   fortran_libs = [ 'ifcore', 'ifport' ]
 elif 'g++' in Config.get('compiler', 'compiler'):
    fortran_libs = [ 'gfortran' ]   
 elif 'clang++' in Config.get('compiler', 'compiler'):
