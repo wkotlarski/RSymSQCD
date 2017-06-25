@@ -185,15 +185,15 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       // if gluino cannot be on-shell use full real ME
       if( pt.get<double>("collider setup.sqrt_S") < m1 +  MassGlu ||
           MassGlu < m2 ) {
+         std::cout << "\nINFO: Not using any subtraction for the gu_suLsuLdagger channel.\n";
          matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru;
          matrixelementReal_HnonC_CSub1 = nullptr;
          matrixelementReal_HnonC_CSub2 = nullptr;
-         std::cout << "\nINFO: Not using any subtraction for the gu_suLsuLdagger channel.\n";
       }
       else {
          // otherwise, if WidthGlu < 0 use DR
          if( WidthGlu < 0) {
-            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DR;//_wEta;
+            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DR2;//_wEta;
             matrixelementReal_HnonC_CSub1 = nullptr;
             matrixelementReal_HnonC_CSub2 = nullptr;
             std::cout << "\nINFO: Using diagram removal for the gu_suLsuLdagger channel.\n";
@@ -202,12 +202,18 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
          else {
             std::cout << "\nINFO: Using diagram subtraction for the gu_suLsuLdagger channel with width/mass = "
                << pt.get<double>("technical parameters.WidthOverMass") << ".\n";
+            /*
             matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DS;
             matrixelementReal_HnonC_CSub1 = nullptr;
             matrixelementReal_HnonC_CSub2 = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DS_CSub2;
+           */
+
+            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gubar_suLsuLdaggerubar_DS;
+            matrixelementReal_HnonC_CSub1 = &Process::matrixMRSSMHard_gubar_suLsuLdaggerubar_DS_CSub1;
+            matrixelementReal_HnonC_CSub2 = nullptr;
          }
       }
-      std::array<int, 2> partons = { 2, -2 };
+      std::array<int, 2> partons { 2, -2 };
       for( int el : partons) flav.push_back( std::vector<int> {21, el, 2} );
    }
    else if(processID == "MRSSM,gu_suLsuR") {
@@ -393,9 +399,12 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 #include "matrix_elements_and_xsections/mrssm_gd_suLsuLdaggerd_hard.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DS.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DS_CSub2.cpp"
-#include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DR.cpp"
+#include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DR2.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DR_wEta_noSimplify.cpp"
 #include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard.cpp"
+
+#include "matrix_elements_and_xsections/mrssm_gubar_suLsuLdaggerubar_hard-DS.cpp"
+#include "matrix_elements_and_xsections/mrssm_gubar_suLsuLdaggerubar_hard-DS_CSub1.cpp"
 
 #include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_hard.cpp"
 #include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_soft.cpp"

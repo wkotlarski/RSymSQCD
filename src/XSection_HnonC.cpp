@@ -4,7 +4,11 @@
 
 // @todo this is absolutely neeed but I don't know why
 using namespace std;
-
+/*
+extern "C" {
+   void reshuffle_momenta_2__ (double[], double*, double*, double*, double*, double[]);
+}
+*/
 std::array<double, 3> XSection_HnonC::integrate() {
 
    //  integral dimension, number of integrands
@@ -203,10 +207,11 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
         
    double ME2 = (processID->*processID->matrixelementReal_HnonC)(p);
 
+   // unleas using scheme like DRII the ME2 should be always positive
    if( ME2 < 0 || std::isnan(ME2) ) {
-      std::cout << "Warning, negative ME2 " << ME2 << ' ' << (pi * xx[2] + acos(cosx) < pi) << '\n';
-      ff[0] = 0;
-      return 0;      
+      //std::cout << "Warning, negative ME2 " << ME2 << '\n';
+      //ff[0] = 0;
+      //return 0;      
    }
   
    // some final factors
@@ -241,14 +246,37 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
      pow(S*xx0*xx1*xx2 + (1 + (4 - 4*xx0*xx1)*xx2)*pow(m1,2) - 2*m1*xx2*pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5),-1));
    ME2 *= abs(J);
 
-   double MassGlu = 2000.0e+0;
-   if(processID->matrixelementReal_HnonC_CSub1 != nullptr) {
-      double kupa {MassGlu};
-      double J_s35mapped = -(xx0*pow(kupa,-2)*(-pow(kupa,2) + pow(m1,2))*(-(S*xx0*xx1) + 4*(-1 + xx0*xx1)*pow(m1,2))*pow(S,-1)*pow(S - 4*pow(m1,2),2)*
-     pow(S*xx0 - 4*(-1 + xx0)*pow(m1,2),-1)*(2*m1 - pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5))*
-     pow(xx0*xx1*(S - 4*pow(m1,2)) + 2*(-pow(kupa,2) + pow(m1,2)) + 
-       pow(kupa - m1,2)*pow(kupa + m1,2)*pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),-1),0.5));
-      ME2 -= (processID->*processID->matrixelementReal_HnonC_CSub1)(p) * abs(J);
+   double MassGlu = 2e+3;
+   if (processID->matrixelementReal_HnonC_CSub1 != nullptr && shat_sqrt > m1 + MassGlu) {
+      /*
+      double mfort_1 = 1500;
+      double mfort_2 = 1500;
+      double mfort_3 = 0;
+      double mfort_4 = 2000.;
+      double p_to_fortran[20] = { 
+         p[0][0], p[0][1], p[0][2], p[0][3],
+         p[1][0], p[1][1], p[1][2], p[1][3],
+         p[2][0], p[2][1], p[2][2], p[2][3],
+         p[3][0], p[3][1], p[3][2], p[3][3],
+         p[4][0], p[4][1], p[4][2], p[4][3],
+      };
+      std::vector< double* > p_mapped;
+      double p_from_fortran[20];
+      reshuffle_momenta_2__(p_to_fortran, &mfort_1, &mfort_2, &mfort_3, &mfort_4, p_from_fortran);
+      p_mapped.push_back(new double[4]);
+      p_mapped.push_back(new double[4]);
+      p_mapped.push_back(new double[4]);
+      p_mapped.push_back(new double[4]);
+      p_mapped.push_back(new double[4]);
+      for(int i=0; i<20; ++i) p_mapped[floor(i/4.)][i % 4] = p_from_fortran[i];
+      */
+      double m {m1};
+      double J_s35mapped = ((m - MassGlu)*(m + MassGlu)*Power(-4*(m*m) + S,2)*xx0*Sqrt(S*xx0*xx1 + m*m*(4 - 4*xx0*xx1))*(-(S*xx0*xx1) + 4*(m*m)*(-1 + xx0*xx1))*
+     Sqrt(2*(m - MassGlu)*(m + MassGlu) + (-4*(m*m) + S)*xx0*xx1 + (Power(m - MassGlu,2)*Power(m + MassGlu,2))/(S*xx0*xx1 + m*m*(4 - 4*xx0*xx1)))*
+     Power(-2*m + Sqrt(S*xx0*xx1 + m*m*(4 - 4*xx0*xx1)),2))/
+   (MassGlu*MassGlu*S*(-4*(m*m)*(-1 + xx0) + S*xx0)*(S*xx0*xx1 + m*m*(4 - 4*xx0*xx1) - 2*m*Sqrt(S*xx0*xx1 + m*m*(4 - 4*xx0*xx1))));
+//      if( shat_sqrt < m1 + MassGlu) std::cout << J_s35mapped << '\n';
+      ME2 -= (processID->*processID->matrixelementReal_HnonC_CSub1)(p) * abs(J_s35mapped);
    }
 
    if(processID->matrixelementReal_HnonC_CSub2 != nullptr) {
@@ -258,6 +286,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
      pow((-1 + xx2)*(S*xx0*xx1*(-1 + xx2) + (-4*xx0*xx1*(-1 + xx2) + 8*xx2)*pow(m1,2) - 
          4*m1*xx2*pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5)),0.5)*
      pow(S*xx0*xx1*xx2 + (1 + (4 - 4*xx0*xx1)*xx2)*pow(m1,2) - 2*m1*xx2*pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5),-1));
+      std::cout << " shouldn't be here\n";
       ME2 -= (processID->*processID->matrixelementReal_HnonC_CSub2)(p) * abs(J);
    }
    // delete (otherwise causes memory leak)
