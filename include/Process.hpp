@@ -29,20 +29,20 @@ class Process {
        */
       inline double matrix_virt_stub( double, double, double, double, int ) { return 0.; };
       inline double matrix_soft_stub( double, double )  { return 0.; };
-      inline double matrix_tree_stub( double, double )  { return 0.; };
+      inline double matrix_tree_stub( double, double ) const  { return 0.; };
       inline double matrix_hard_stub( std::vector< double* >& )  { return 0.; };
       inline double matrix_xsec_stub( double )  { return 0.; };
       
-      std::array<double, 2> Pqq( double z) { return std::array<double, 2> {
+      std::array<double, 2> Pqq( double z) const noexcept { return std::array<double, 2> {
          CF * (1 + z * z)/(1 - z), - CF * (1 - z) }; 
       }
-      std::array<double, 2> Pgq( double z) { return Pqq(1 - z); }; 
+      std::array<double, 2> Pgq( double z) const noexcept { return Pqq(1 - z); }; 
       
-      std::array<double, 2> Pgg( double z) { return std::array<double, 2> {
+      std::array<double, 2> Pgg( double z) const noexcept { return std::array<double, 2> {
          2 * CA * (z/(1 - z) + (1 - z)/z + z * (1 - z)), 0 }; 
       }
 
-      std::array<double, 2> Pqg( double z) { 
+      std::array<double, 2> Pqg( double z) const noexcept { 
          return std::array<double, 2> { 1/2. * ( z*z + (1 - z)*(1 - z) ), -z * (1-z) }; 
       }
       
@@ -53,19 +53,19 @@ class Process {
       double sigmaMRSSMTree_gg_suLsuLdagger( double );
       double sigmaMRSSMTree_uu_suLsuR( double );
       double sigmaMRSSMTree_uubar_OO( double );
-      double matrixMSSMTree_uu_suLsuR( double, double );
-      double matrixMSSMTree_uu_suLsuL( double, double );
-      double matrixMSSMTree_ud_suLsdR( double, double );
-      double matrixMSSMTree_ud_suLsdL( double, double );
+      double matrixMSSMTree_uu_suLsuR( double, double ) const;
+      double matrixMSSMTree_uu_suLsuL( double, double ) const;
+      double matrixMSSMTree_ud_suLsdR( double, double ) const;
+      double matrixMSSMTree_ud_suLsdL( double, double ) const;
 
-      double matrixMRSSMTree_ddbar_suLsuLdagger( double, double );
-      double matrixMRSSMTree_uubar_suLsuLdagger( double, double );
-      double matrixMSSMTree_uubar_suLsuRdagger( double, double );
-      double matrixMRSSMTree_udbar_suLsdLdagger( double, double );
-      double matrixMRSSMTree_GG_suLsuLdagger( double, double );
+      double matrixMRSSMTree_ddbar_suLsuLdagger( double, double ) const;
+      double matrixMRSSMTree_uubar_suLsuLdagger( double, double ) const;
+      double matrixMSSMTree_uubar_suLsuRdagger( double, double ) const;
+      double matrixMRSSMTree_udbar_suLsdLdagger( double, double ) const;
+      double matrixMRSSMTree_GG_suLsuLdagger( double, double ) const;
       
-      inline double matrixSgluonTree_qqbar_OO(double);
-      inline double matrixSgluonTree_gg_OO(double);
+      inline double matrixSgluonTree_qqbar_OO(double) const;
+      inline double matrixSgluonTree_gg_OO(double) const;
 
       
       // loop-level matrix elements
@@ -116,11 +116,11 @@ class Process {
    public: 
       Process(std::string,  boost::property_tree::ptree); 
 
-      double (Process::* matrixelementTree)(double, double); // matrix element squared 
-      double (Process::* sigmaPartTree1)(double); // partonic cross section
-      double (Process::* sigmaPartTree2)(double);
-      std::array<double, 2> (Process::* splitting_kernel1)(double);
-      std::array<double, 2> (Process::* splitting_kernel2)(double);
+      double (Process::* matrixelementTree)(double, double) const; // matrix element squared 
+      double (Process::* sigmaPartTree1) (double); // partonic cross section
+      double (Process::* sigmaPartTree2) (double);
+      std::array<double, 2> (Process::* splitting_kernel1) (double) const noexcept;
+      std::array<double, 2> (Process::* splitting_kernel2) (double) const noexcept;
       double (Process::* matrixelementVirt)(double, double, double, 
          double, int); // Re[M^1L M^(B star)]
 
