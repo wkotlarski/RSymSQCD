@@ -46,7 +46,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
 int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    const int *ncomp, cubareal ff[], void *userdata) {
 
-   double m_sqr = m1 * m1;
+   const double m_sqr = m1 * m1;
   
    /*
    * 3-body phase space parametrization based on
@@ -68,17 +68,17 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
       return 0;
    }
 
-	double x1 = 4. * m_sqr/S + (1. - 4. * m_sqr/S ) * xx[5];
-	double x2 = 4. * m_sqr /(S * x1) + (1. - 4. * m_sqr/(S * x1)) * xx[6];
-	double shat = x1 * x2 * S;
-	double shat_sqrt = sqrt( shat );
+	const double x1 = 4. * m_sqr/S + (1. - 4. * m_sqr/S ) * xx[5];
+	const double x2 = 4. * m_sqr /(S * x1) + (1. - 4. * m_sqr/(S * x1)) * xx[6];
+	const double shat = x1 * x2 * S;
+	const double shat_sqrt = sqrt( shat );
 
-   double s35_min = m1*m1;
-   double s35_max = pow(shat_sqrt - m2, 2);
-   double s35 = s35_min + (s35_max - s35_min) * xx[0];
-	double E2 = -0.5 * (s35 - shat - m1*m1)/shat_sqrt;
+   const double s35_min = m1*m1;
+   const double s35_max = pow(shat_sqrt - m2, 2);
+   const double s35 = s35_min + (s35_max - s35_min) * xx[0];
+	const double E2 = -0.5 * (s35 - shat - m1*m1)/shat_sqrt;
    
-	double c = shat - 2 * shat_sqrt * E2 + m1*m1 + m2*m2;
+	const double c = shat - 2 * shat_sqrt * E2 + m1*m1 + m2*m2;
 	// Eq. 4.5
 	double E1_max = ( shat_sqrt - E2) * c + sqrt(E2*E2-m2*m2) * sqrt( (c - 2. * m_sqr) 
     * (c - 2 * m_sqr) );
@@ -87,15 +87,15 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
       * (c - 2. * m_sqr)  );
    E1_min /= 2. * (c - m1*m1);
 
-   double s45_min = shat + m2*m2 - 2 * shat_sqrt * E1_max;
-   double s45_max = shat + m2*m2 - 2 * shat_sqrt * E1_min;
-   double s45 = s45_min + (s45_max - s45_min) * xx[1];
-   double E1 = -0.5 * (s45 - shat - m2*m2)/shat_sqrt;
+   const double s45_min = shat + m2*m2 - 2 * shat_sqrt * E1_max;
+   const double s45_max = shat + m2*m2 - 2 * shat_sqrt * E1_min;
+   const double s45 = s45_min + (s45_max - s45_min) * xx[1];
+   const double E1 = -0.5 * (s45 - shat - m2*m2)/shat_sqrt;
 
    if ( shat_sqrt - E1 - E2 < 0.5 * dS * shat_sqrt) { ff[0] = 0.; return 0; }
 
 	// eq. 4.2
-   double cosx = (shat - 2 * shat_sqrt * ( E1 + E2 ) + 2 * E2 * E1 + m1*m1 + m2*m2 )/
+   const double cosx = (shat - 2 * shat_sqrt * ( E1 + E2 ) + 2 * E2 * E1 + m1*m1 + m2*m2 )/
       (2. * sqrt( ( E1 - m1 ) * ( E1 + m1 ) ) * sqrt( ( E2 - m2 ) * ( E2 + m2 ) ) );
 
    // check if due to numerics |cos(x)| is not > 1
@@ -193,10 +193,8 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    }
   
       
-   double t15 = p[0][0] * p[4][0] - p[0][3] * p[4][3];
-   t15 = - 2. * t15;
-   double t25 = p[1][0] * p[4][0] - p[1][3] * p[4][3];
-   t25 = - 2. * t25;
+   const double t15 = -2. * (p[0][0] * p[4][0] - p[0][3] * p[4][3]);
+   const double t25 = -2. * (p[1][0] * p[4][0] - p[1][3] * p[4][3]);
 
    // check if we are not in the collinear region
    // if yes, return
@@ -209,9 +207,9 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
    // unleas using scheme like DRII the ME2 should be always positive
    if( ME2 < 0 || std::isnan(ME2) ) {
-      //std::cout << "Warning, negative ME2 " << ME2 << '\n';
-      //ff[0] = 0;
-      //return 0;      
+      std::cout << "Warning, negative ME2 " << ME2 << '\n';
+      ff[0] = 0;
+      return 0;      
    }
   
    // some final factors
@@ -238,12 +236,10 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
     *       xx0 -> s35min + (s35max - s35min) xx0
     *       xx1 -> s45min + (s45max - s45min) xx1
     */       
-   double J = -(xx0*xx2*(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2))*pow(S,-1)*pow(S - 4*pow(m1,2),2)*pow(S*xx0 - 4*(-1 + xx0)*pow(m1,2),-1)*
-     (2*m1 - pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5))*
-     (S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2) - 2*m1*pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5))*
-     pow((-1 + xx2)*(S*xx0*xx1*(-1 + xx2) + (-4*xx0*xx1*(-1 + xx2) + 8*xx2)*pow(m1,2) - 
-         4*m1*xx2*pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5)),0.5)*
-     pow(S*xx0*xx1*xx2 + (1 + (4 - 4*xx0*xx1)*xx2)*pow(m1,2) - 2*m1*xx2*pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),0.5),-1));
+      double m {m1};
+   double J = (Power(-4*Power(m,2) + S,2)*xx0*Sqrt(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1))*Power(-2*m + Sqrt(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1)),2)*xx2*
+     Sqrt((-1 + xx2)*(S*xx0*xx1*(-1 + xx2) - 4*m*Sqrt(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1))*xx2 + Power(m,2)*(-4*xx0*xx1*(-1 + xx2) + 8*xx2))))/
+   (4.*S*(-4*Power(m,2)*(-1 + xx0) + S*xx0)*(S*xx0*xx1*xx2 - 2*m*Sqrt(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1))*xx2 + Power(m,2)*(1 + (4 - 4*xx0*xx1)*xx2)));
    ME2 *= abs(J);
 
    double MassGlu = 2e+3;
@@ -270,12 +266,10 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
       p_mapped.push_back(new double[4]);
       for(int i=0; i<20; ++i) p_mapped[floor(i/4.)][i % 4] = p_from_fortran[i];
       */
-      double m {m1};
-      double J_s35mapped = ((m - MassGlu)*(m + MassGlu)*Power(-4*(m*m) + S,2)*xx0*Sqrt(S*xx0*xx1 + m*m*(4 - 4*xx0*xx1))*(-(S*xx0*xx1) + 4*(m*m)*(-1 + xx0*xx1))*
-     Sqrt(2*(m - MassGlu)*(m + MassGlu) + (-4*(m*m) + S)*xx0*xx1 + (Power(m - MassGlu,2)*Power(m + MassGlu,2))/(S*xx0*xx1 + m*m*(4 - 4*xx0*xx1)))*
-     Power(-2*m + Sqrt(S*xx0*xx1 + m*m*(4 - 4*xx0*xx1)),2))/
-   (MassGlu*MassGlu*S*(-4*(m*m)*(-1 + xx0) + S*xx0)*(S*xx0*xx1 + m*m*(4 - 4*xx0*xx1) - 2*m*Sqrt(S*xx0*xx1 + m*m*(4 - 4*xx0*xx1))));
-//      if( shat_sqrt < m1 + MassGlu) std::cout << J_s35mapped << '\n';
+      double J_s35mapped = -((m - MassGlu)*(m + MassGlu)*Power(-4*Power(m,2) + S,2)*xx0*Sqrt(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1))*
+      Power(-2*m + Sqrt(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1)),2)*
+      Sqrt(2*(m - MassGlu)*(m + MassGlu) + (-4*Power(m,2) + S)*xx0*xx1 - Power(Power(m,2) - Power(MassGlu,2),2)/(-(S*xx0*xx1) + 4*Power(m,2)*(-1 + xx0*xx1))))/
+   (4.*Power(MassGlu,2)*S*(-4*Power(m,2)*(-1 + xx0) + S*xx0)*(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1) - 2*m*Sqrt(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1))));
       ME2 -= (processID->*processID->matrixelementReal_HnonC_CSub1)(p) * abs(J_s35mapped);
    }
 
@@ -297,7 +291,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    p.clear();
    p.shrink_to_fit();
 
-   ff[0] = fac * ME2 * 0.25/shat;
+   ff[0] = fac * ME2;
 
 	return 0;
 }
