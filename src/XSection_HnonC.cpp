@@ -14,8 +14,8 @@ std::array<double, 3> XSection_HnonC::integrate() {
    //  integral dimension, number of integrands
    constexpr int ndim { 7 }, ncomp { 1 };
    //  accuraccy
-   double accuracy_rel { pow( 10., -vm["precision-hard"].as<int>() ) }, 
-      accuracy_abs { 1e-12 };
+   const double accuracy_rel { pow(10., -vm["precision-hard"].as<int>()) };
+   constexpr accuracy_abs { 1e-12 };
 
    constexpr int neval_min = 10'000;
    long long int neval;
@@ -46,13 +46,11 @@ std::array<double, 3> XSection_HnonC::integrate() {
 int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    const int *ncomp, cubareal ff[], void *userdata) {
 
-   const double m_sqr = m1 * m1;
-  
    /*
-   * 3-body phase space parametrization based on
-   * http://www.t39.ph.tum.de/T39_files/T39_people_files/duell_files/Dipl-MultiPion.pdf
+   *  3-body phase space parametrization based on
+   *  http://www.t39.ph.tum.de/T39_files/T39_people_files/duell_files/Dipl-MultiPion.pdf
    */
-
+  
    // failsafe (this should never happen)
    // but sometimes does for suave
    if (
@@ -67,6 +65,8 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
       ff[0] = 0;
       return 0;
    }
+
+   const double m_sqr = m1 * m1;
 
 	const double x1 = 4. * m_sqr/S + (1. - 4. * m_sqr/S ) * xx[5];
 	const double x2 = 4. * m_sqr /(S * x1) + (1. - 4. * m_sqr/(S * x1)) * xx[6];
