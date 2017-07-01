@@ -237,9 +237,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
     *       xx1 -> s45min + (s45max - s45min) xx1
     */       
       double m {m1};
-   double J = (Power(-4*Power(m,2) + S,2)*xx0*Sqrt(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1))*Power(-2*m + Sqrt(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1)),2)*xx2*
-     Sqrt((-1 + xx2)*(S*xx0*xx1*(-1 + xx2) - 4*m*Sqrt(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1))*xx2 + Power(m,2)*(-4*xx0*xx1*(-1 + xx2) + 8*xx2))))/
-   (4.*S*(-4*Power(m,2)*(-1 + xx0) + S*xx0)*(S*xx0*xx1*xx2 - 2*m*Sqrt(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1))*xx2 + Power(m,2)*(1 + (4 - 4*xx0*xx1)*xx2)));
+   double J = ((-Power(m,2) + s35)*(-2*m + Sqrt(shat))*Sqrt(shat)*Sqrt(Power(m,4) + Power(s35 - shat,2) - 2*Power(m,2)*(s35 + shat)))/s35;
    ME2 *= abs(J);
 
    double MassGlu = 2e+3;
@@ -266,10 +264,8 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
       p_mapped.push_back(new double[4]);
       for(int i=0; i<20; ++i) p_mapped[floor(i/4.)][i % 4] = p_from_fortran[i];
       */
-      double J_s35mapped = -((m - MassGlu)*(m + MassGlu)*Power(-4*Power(m,2) + S,2)*xx0*Sqrt(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1))*
-      Power(-2*m + Sqrt(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1)),2)*
-      Sqrt(2*(m - MassGlu)*(m + MassGlu) + (-4*Power(m,2) + S)*xx0*xx1 - Power(Power(m,2) - Power(MassGlu,2),2)/(-(S*xx0*xx1) + 4*Power(m,2)*(-1 + xx0*xx1))))/
-   (4.*Power(MassGlu,2)*S*(-4*Power(m,2)*(-1 + xx0) + S*xx0)*(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1) - 2*m*Sqrt(S*xx0*xx1 + Power(m,2)*(4 - 4*xx0*xx1))));
+      double J_s35mapped = ((-Power(m,2) + Power(MassGlu,2))*(-2*m + Sqrt(shat))*Sqrt(shat)*Sqrt(Power(m,4) + Power(Power(MassGlu,2) - shat,2) - 2*Power(m,2)*(Power(MassGlu,2) + shat)))/
+   Power(MassGlu,2);
       ME2 -= (processID->*processID->matrixelementReal_HnonC_CSub1)(p) * abs(J_s35mapped);
    }
 
@@ -291,7 +287,11 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    p.clear();
    p.shrink_to_fit();
 
-   ff[0] = fac * ME2;
+   // Jakobian of (E2, E1) -> (s35, s45) change
+   ME2 *= 0.25/shat;
+   // Jakobian of Bjorken vars. mapping xx0, xx1 -> x1, x2
+   ME2 *= (Power(-4*Power(m,2) + S,2)*xx0)/(S*(-4*Power(m,2)*(-1 + xx0) + S*xx0));
 
+   ff[0] = ME2 * fac;
 	return 0;
 }
