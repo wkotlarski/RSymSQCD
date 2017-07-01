@@ -1,4 +1,4 @@
-double Process::matrixMRSSMHard_gu_suLsuLdaggeru( std::vector< double* >& p ) {
+double Process::matrixMRSSMHard_gu_suLsuLdaggeru( const std::vector< double* >& p ) const {
    double Alfas = pdf->alphasQ( mu_r );
    double Alfas2 = pow(Alfas, 2);
    double k12 = p[0][0]*p[1][0]-p[0][1]*p[1][1]-p[0][2]*p[1][2]-p[0][3]*p[1][3];
