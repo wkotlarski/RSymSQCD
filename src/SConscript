@@ -6,7 +6,21 @@ Config.read("../configure.ini")
 
 env = Environment(ENV = os.environ)
 
-env.Replace( CXX = Config.get('compiler', 'compiler') )
+# find out if we should use intel or gcc and setup appropriate flags
+compiler = Config.get('compiler', 'compiler')
+cxx_flags = ' -std=c++14 -O2 '
+if compiler == 'icpc':
+   print 'Setting up flags for the intel c++ compiler'
+   # cxx_flags += '-xHost -fp-model extended -fp-model fast=1 '
+elif compiler == 'g++':
+   print 'Setting up flags for the g++ compiler'
+   # cxx_flags = '-march=native ' 
+else:
+   'Unsuported compiler. Currently we support only intel and gcc.'
+   exit(1)
+   
+env.Replace( CXX = compiler ) 
+
 env.Prepend(
    CPPPATH = [  
       os.popen('lhapdf-config --incdir').read().strip(), 
@@ -16,9 +30,7 @@ env.Prepend(
       '../include',
       os.environ['BOOST_ROOT'],
       '/usr/include/eigen3'
-   ],
-   # -march=native throws "no such instruction: `vmovd %xmm0, %eax'" errors
-   CXXFLAGS = '-std=c++14 ' + Config.get('compiler', 'flags') # -mno-avx'
+   ], CXXFLAGS = cxx_flags
 )
 
 if 'icpc' in Config.get('compiler', 'compiler'):
