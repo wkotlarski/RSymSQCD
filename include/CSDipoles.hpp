@@ -9,12 +9,12 @@ private:
    // to costruct a subtraction counter term we need ME with color infromation
    // and dipole indices i j and spectaror index k
    double (*born_me2_)(std::valarray<std::valarray<double>> const&);
-   std::valarray<std::valarray<double>> p_;
+   const std::valarray<std::valarray<double>> p_;
    std::valarray<std::valarray<double>> ptilde_;
    std::valarray<double> q_;
-   int i_ = -1;
-   int j_ = -1;
-   int k_ = -1;
+   const int i_;
+   const int j_;
+   const int k_;
    double mi = 0.;
    double mj = 0.;
    double mk = 0.;

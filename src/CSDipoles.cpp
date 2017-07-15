@@ -7,12 +7,8 @@ using namespace std;
 
 CSDipole::CSDipole(double (*me)(valarray<valarray<double>> const&), 
                    int j, int i, int k,  
-                   valarray<valarray<double>> const& p) {
+                   valarray<valarray<double>> const& p) : i_(i), j_(j), k_(k), p_(p) {
    assert( i != j && i != k && j !=k);
-   i_ = i;
-   j_ = j;
-   k_ = k;
-   p_ = p;
    q_ = p_[i_] + p_[j_] + p_[k_];
    ptilde_ = ff_mom_shuffle();
    born_me2_ = me;
@@ -55,8 +51,8 @@ inline double CSDipole::z( int l ) {
 
 inline double CSDipole::Vijk() {
    return 8 * pi * Alfas * CF * (
-      2/(1 - z(j_)*(1-yijk())) 
-      - beta(ptilde_[i_], ptilde_[k_])/beta(p_[i_]+p_[j_], p_[k_]) * (1 + z(j_) + mi*mi/dot(p_[i_], p_[j_]))
+      2/(1 - z(i_)*(1-yijk())) 
+      - beta(ptilde_[i_], ptilde_[k_])/beta(p_[i_]+p_[j_], p_[k_]) * (1 + z(i_) + mi*mi/dot(p_[i_], p_[j_]))
    );
 }
 
@@ -75,7 +71,7 @@ inline double CSDipole::Born(valarray<valarray<double>> const& p) {
    return Mat(cos,cos) * 8 * Alfa2 * pi_sqr * (mi*mi*k12 + k14*k23 + k13*k24)/(9.*pow(k12,2));
 }
 
-// eq. 5.9: combine particles i & j -> ij using k as the spectator
+// eq. 5.9 from CS'97: combine particles i & j -> ij using k as the spectator
 valarray<valarray<double>> CSDipole::ff_mom_shuffle() {
    const double q2 = dot(q_, q_);
    auto mij {mi};
@@ -91,7 +87,6 @@ valarray<valarray<double>> CSDipole::ff_mom_shuffle() {
 }
 
 double CSDipole::unsu(const valarray<valarray<double>>& p) {
-   
    double k12 = dot(p_[0], p_[1]);
    double k23 = dot(p_[1], p_[2]);
    double k25 = dot(p_[1], p_[4]);
@@ -102,11 +97,7 @@ double CSDipole::unsu(const valarray<valarray<double>>& p) {
    double k13 = dot(p_[0], p_[2]);
    double k14 = dot(p_[0], p_[3]);
    double k15 = dot(p_[0], p_[4]);
-   // double x1 = x(p,2);
-   // double x2 = x(p,3);
-   //double unsu = 1/(1-x2) * (2/(2-x1-x2) - (1+x1)) 
-   //   + 1/(1-x1) * (2/(2-x1-x2) - (1+x2));  
-   double MB2 = pow(0.,2);
+   double MB2 = pow(mi,2);
    double unsu2 = (-512*Alfa2*Alfas*((-2*k14*k24*MB2 - k12*k35*MB2 + k12*MB2*(k12 + MB2) + (-2*k14*k24 + k12*(k14 + k24))*(-k13 - k23 + k34 + MB2))/(4.*(k35*k35)) - 
        (k15*k15*k23 - k15*(k23*k23) - 2*(k12*k12)*(k13 + k23) - k13*k13*k25 - k15*k23*k25 - 2*k15*k23*k35 - 2*k14*k23*MB2 + k13*(k15*(k23 - k25) + k25*(k23 + k25) + 2*(-2*k23 - k25)*k35 - 2*k24*MB2) + 
           k12*(4*(k13*k13) + 4*(k23*k23) + k23*(2*k15 + 3*k25 - 2*k35) - (k15 + k25 - 2*k35)*k35 + k13*(3*k15 - 2*(-2*k23 - k25 + k35)) + (-k15 - k25 + 2*(k34 + k35))*MB2))/(4.*k35*k45) + 
@@ -116,21 +107,6 @@ double CSDipole::unsu(const valarray<valarray<double>>& p) {
    return unsu2;
 }
 double CSDipole::eval_dipole(const valarray<valarray<double>>& p) {
-   double s12 = 2 * dot(p_[0], p_[1]);
-   /*
-   double x1, x2;
-   if (i_ == 2) {
-      x1 = x(p, i_); x2 = x(p, k_); 
-   }
-   else {
-      x1 = x(p, k_); x2 = x(p, i_); 
-   }
-   */
-   double mu = mi/sqrt(s12);
-   double mu2 = pow(mu, 2);
-   //return 1/(1-x2) * (2/(2-x1-x2)-(1+x1))+(1-x1)/x2 
-   //   + 1/(1-x1) * (2/(2-x1-x2) - (1+x2))+(1-x2)/x1;
-   //cout << i_ << ' ' << j_ << ' ' << k_ << ' ' << dot(temp[i_], temp[j_]) << ' ' << dot(p_in[i_], p_in[j_]) << '\n';
    return Born(ptilde_) * Vijk() / (2 * dot(p_[i_], p_[j_]));
 }
 
