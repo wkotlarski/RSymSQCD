@@ -13,9 +13,12 @@ class XSection_HnonC : public virtual XSection {
 
   public:
     std::array<double, 3> integrate();
+    std::array<double, 3> get_partonic_xsection(double);
 
   private:
-    static int integrand(const int *ndim, const cubareal xx[],
+    static int partonic_integrand(const int *ndim, const cubareal xx[],
+              const int *ncomp, cubareal ff[], void *userdata);
+    static int hadronic_integrand(const int *ndim, const cubareal xx[],
               const int *ncomp, cubareal ff[], void *userdata);
 };
 #endif /* XSECTION_HNONC_H_ */
