@@ -2,7 +2,7 @@
 #include "Process.hpp"
 
 Process::Process(std::string processID, boost::property_tree::ptree pt) {
-   
+
    MassTop = pt.get<double>("masses.top");
    MassGlu = pt.get<double>("masses.gluino");
    MasssigmaO = pt.get<double>("masses.pseudoscalar_sgluon");
@@ -44,7 +44,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       splitting_kernel1 = &Process::Pqq;
       sigmaPartTree2 = &Process::sigmaMRSSMTree_uu_suLsuR;
       splitting_kernel2 = &Process::Pqq;
-      // matrixelementReal_HnonC = &Process::matrixMRSSMHard_uu_suLsuRg;
+      matrixelementReal_HnonC = &Process::matrixMRSSMHard_uu_suLsuRg;
       m1 = MassSuL;
       m2 = MassSuR;
       flav.push_back( std::vector<int> {2, 2, 1} );
