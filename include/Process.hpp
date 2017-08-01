@@ -10,20 +10,25 @@
 #include <boost/property_tree/ptree.hpp>
 #include <mathematica_wrapper.hpp>
 #include <constants.hpp>
-#include "LHAPDF/LHAPDF.h"
 
-class Process {
-   private:
+#include "MRSSM.h"
+
+class Process : public MRSSM{
+
+protected:
+    // particle masses
+   double MassSq;
+   const double mu_r;
+   const double mu_f;
+   const double dS;
+   const double WidthGlu;
+   const double delta;
+   const double eta_sign;
+
+private:
       // gauge vector for DR ME
       std::array<double,4> eta; 
 
-      // particle masses
-      double MasssigmaO, MassphiO, MassGlu, MassTop, MassSq,
-         MassSuL, MassSuR, MassSdL, MassSdR, MassSsL, MassSsR,
-         MassScL, MassScR, MassSbL, MassSbR, MassStL, MassStR, 
-         mu_r, mu_f, dS, WidthGlu;
-      const LHAPDF::PDF* pdf;
-       
       /*
        *    for the moment use those functions for missing ME
        */
@@ -108,7 +113,7 @@ class Process {
       double matrixMRSSMHard_gu_suLsuRubar_DS_CSub2( const std::vector< double* >& ) const noexcept;
       
    public: 
-      Process(std::string,  boost::property_tree::ptree); 
+      Process(std::string,  boost::property_tree::ptree);
 
       double (Process::* matrixelementTree)(double, double) const; // matrix element squared 
       double (Process::* sigmaPartTree1) (double); // partonic cross section

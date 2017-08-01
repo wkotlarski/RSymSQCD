@@ -1,32 +1,14 @@
 #include <Eigen/Dense>
 #include "Process.hpp"
 
-Process::Process(std::string processID, boost::property_tree::ptree pt) {
-
-   MassTop = pt.get<double>("masses.top");
-   MassGlu = pt.get<double>("masses.gluino");
-   MasssigmaO = pt.get<double>("masses.pseudoscalar_sgluon");
-   MassphiO  = sqrt( pow(MasssigmaO,2) + 4.0 * pow(MassGlu, 2) );
-   MassSuL = pt.get<double>("masses.suL");
-   MassSuR = pt.get<double>("masses.suR");
-   MassSdL = pt.get<double>("masses.sdL");
-   MassSdR = pt.get<double>("masses.sdR");
-   MassSsL = pt.get<double>("masses.ssL");
-   MassSsR = pt.get<double>("masses.ssR");
-   MassScL = pt.get<double>("masses.scL");
-   MassScR = pt.get<double>("masses.scR");
-   MassSbL = pt.get<double>("masses.sbL");
-   MassSbR = pt.get<double>("masses.sbR");
-   MassStL = pt.get<double>("masses.stL");
-   MassStR = pt.get<double>("masses.stR");
-   mu_r = pt.get<double>("collider setup.mu_r");
-   mu_f = pt.get<double>("collider setup.mu_f");
-   dS = pt.get<double>("technical parameters.dS");
-   double eta_sign = pt.get<double>("technical parameters.eta_sign");
-   double delta = pt.get<double>("technical parameters.delta");
-   WidthGlu = pt.get<double>("technical parameters.WidthOverMass") * MassGlu;
-   pdf = LHAPDF::mkPDF( pt.get<std::string>("collider setup.pdf") , 0);
-
+Process::Process(std::string processID, boost::property_tree::ptree pt) : MRSSM(pt),
+   mu_r(pt.get<double>("collider setup.mu_r")),
+   mu_f(pt.get<double>("collider setup.mu_f")),
+   dS(pt.get<double>("technical parameters.dS")),
+   eta_sign(pt.get<double>("technical parameters.eta_sign")),
+   delta(pt.get<double>("technical parameters.delta")),
+   WidthGlu(pt.get<double>("technical parameters.WidthOverMass") * MassGlu)
+{
    // choose a gage vector \eta for DR matrix elements
    eta = {sqrt(1.+delta*delta), 0., delta, eta_sign};
    

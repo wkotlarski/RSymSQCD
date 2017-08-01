@@ -3,22 +3,25 @@ import ConfigParser
 
 Config = ConfigParser.ConfigParser()
 Config.read("../configure.ini")
-
 env = Environment(ENV = os.environ)
 
 # find out if we should use intel or gcc and setup appropriate flags
 compiler = Config.get('compiler', 'compiler')
-cxx_flags = ' -std=c++14 -O2 '
+cxx_flags = ' -std=c++1z -O2 '
 if compiler == 'icpc':
-   print 'Setting up flags for the intel c++ compiler'
+   print 'rsymsqcd: Setting up flags for the intel c++ compiler'
    # cxx_flags += '-xHost -fp-model extended -fp-model fast=1 '
 elif compiler == 'g++':
-   print 'Setting up flags for the g++ compiler'
+   print 'rsymsqcd: Setting up flags for the g++ compiler'
    # cxx_flags = '-march=native ' 
 else:
    'Unsuported compiler. Currently we support only intel and gcc.'
    exit(1)
    
+mymode = ARGUMENTS.get('mode', 'release')
+if mymode == 'debug':
+   cxx_flags += '-DNDEBUG '
+
 env.Replace( CXX = compiler ) 
 
 env.Prepend(
@@ -28,8 +31,9 @@ env.Prepend(
       Config.get('RK', 'inc'),
       Config.get('LoopTools', 'inc'),
       '../include',
-      os.environ['BOOST_ROOT'],
-      '/usr/include/eigen3'
+      '/usr/include',
+      '/usr/include/eigen3',
+      '/home/wojciech/HEP-software/gcc/ColorFull-1.1/include'
    ], CXXFLAGS = cxx_flags
 )
 
@@ -40,7 +44,7 @@ elif 'g++' in Config.get('compiler', 'compiler'):
 elif 'clang++' in Config.get('compiler', 'compiler'):
    fortran_libs = [ 'gfortran' ]   
 else:
-   print "Couldn't recognize the compiler. Only GNU g++ and Intel icpc are supported"
+   print "Couldn't recognize the compiler. Note that only GNU g++ and intel's icpc are officially supported."
    exit()
 
 
@@ -49,11 +53,14 @@ env.Program(
    [ Glob( '*.cpp' ) ], 
    # add 'ifcore', 'ifport' if using intel compiler suite
    # or gfortran if using gcc suite 
-   LIBS = fortran_libs + [ 'LHAPDF', 'cuba', 'rk', File(Config.get('LoopTools', 'lib')), 'boost_program_options' ],
+   LIBS = fortran_libs + [ 'LHAPDF', 'cuba', 'rk', File(Config.get('LoopTools', 'lib')), 'boost_program_options', 'ColorFull', 'cs_dipole_subtraction' ],
    LIBPATH = [ 
       os.popen('lhapdf-config --libdir').read().strip(), 
       Config.get('Cuba', 'lib'), 
       Config.get('RK', 'lib'),
-      Config.get('compiler', 'libs')
+      Config.get('compiler', 'libs'),
+      '/home/wojciech/HEP-software/gcc/ColorFull-1.1/lib/ColorFull',
+      '/home/wojciech/Dokumenty/IdeaProjects/cs_dipole_subtraction/target/debug',
+      '/usr/lib64'
    ] 
 )

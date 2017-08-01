@@ -2,11 +2,13 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
+#include <valarray>
+#include <array>
+#include <numeric>
 
-#include "CS_FF_Dipoles.hpp"
-
-#include "Vec4D.hpp"
 #include "../include/Vec4D.hpp"
+#include "../include/CSDipole.hpp"
+#include "../include/XSection_HnonC.hpp"
 // @todo this is absolutely neeed but I don't know why
 using namespace std;
 /*
@@ -15,22 +17,14 @@ extern "C" {
 }
 */
 
-extern "C" double* get_cs_dipole(
-      int,
-      double, double, double, double,
-      double, double, double, double,
-      double, double, double, double,
-      double, double, double, double,
-      double, double, double, double,
-      int, int, int
-);
-
 template <typename T>
 void print_momentum(std::vector<Vec4D<T>> p) {
    for(const auto v : p) {
       std::cout << v.t_ << ' ' << v.x_ << ' ' << v.y_ << ' ' << v.z_ << ' ' << v*v << '\n';
    }
 }
+
+std::vector<CSDipole> XSection_HnonC::cs_dipoles;
 
 // return total partonic cross section at CMS energy s
 std::array<double, 3> XSection_HnonC::integrate() {
@@ -79,37 +73,31 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    *  http://www.t39.ph.tum.de/T39_files/T39_people_files/duell_files/Dipl-MultiPion.pdf
    */
 
-   // failsafe (this should never happen)
-   // but sometimes does for suave
-
-   m1 = 1.5e+3; m2 = 1.5e+3;
    const double m_sqr = m1 * m1;
 
-	const double x1 = 4. * m_sqr/S + (1. - 4. * m_sqr/S ) * xx[5];
-	const double x2 = 4. * m_sqr /(S * x1) + (1. - 4. * m_sqr/(S * x1)) * xx[6];
-	double shat = x1*x2*S;
-	const double shat_sqrt = sqrt( shat );
+   const double x1 = 4. * m_sqr/S + (1. - 4. * m_sqr/S ) * xx[5];
+   const double x2 = 4. * m_sqr /(S * x1) + (1. - 4. * m_sqr/(S * x1)) * xx[6];
+   double shat = x1*x2*S;
+   const double shat_sqrt = sqrt( shat );
 
    const double s35_min = m1*m1;
    const double s35_max = pow(shat_sqrt - m2, 2);
    const double s35 = s35_min + (s35_max - s35_min) * xx[0];
-	const double E2 = -0.5 * (s35 - shat - m1*m1)/shat_sqrt;
-   //assert(E2 >= m2);
+   const double E2 = -0.5 * (s35 - shat - m1*m1)/shat_sqrt;
+   assert(E2 >= m2);
 
-	const double c = shat - 2 * shat_sqrt * E2 + m1*m1 + m2*m2;
-	// Eq. 4.5
-	double E1_max = ( shat_sqrt - E2) * c + sqrt(E2*E2-m2*m2) * sqrt( (c - 2. * m_sqr)
-    * (c - 2 * m_sqr) );
-	E1_max /= 2 * (c - m1*m1);
-   double E1_min = ( shat_sqrt - E2) * c - sqrt(E2*E2-m2*m2) * sqrt( (c - 2 * m_sqr)
-      * (c - 2. * m_sqr)  );
+   const double c = shat - 2 * shat_sqrt * E2 + m1*m1 + m2*m2;
+   // Eq. 4.5
+   double E1_max = ( shat_sqrt - E2) * c + sqrt(E2*E2-m2*m2) * sqrt( (c - 2. * m_sqr) * (c - 2 * m_sqr) );
+   E1_max /= 2 * (c - m1*m1);
+   double E1_min = ( shat_sqrt - E2) * c - sqrt(E2*E2-m2*m2) * sqrt( (c - 2 * m_sqr)  * (c - 2. * m_sqr)  );
    E1_min /= 2. * (c - m1*m1);
 
    const double s45_min = shat + m2*m2 - 2 * shat_sqrt * E1_max;
    const double s45_max = shat + m2*m2 - 2 * shat_sqrt * E1_min;
    const double s45 = s45_min + (s45_max - s45_min) * xx[1];
    const double E1 = -0.5 * (s45 - shat - m2*m2)/shat_sqrt;
-   //assert (E1 >= m1);
+   assert (E1 >= m1);
 
    if ( shat_sqrt - E1 - E2 < 0.5 * cut * shat_sqrt) { ff[0] = 0.; return 0; }
 
@@ -198,7 +186,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    p[4][0] = shat_sqrt - E1 - E2;
    //assert (p[4][0] >= 0);
    for( int i = 1; i < 4; ++i) p[4][i] = - p[2][i] - p[3][i];
-   /*
+
    assert( abs(
       (pow(p[2][0], 2) - pow(p[2][1], 2) - pow(p[2][2], 2) - pow(p[2][3], 2))/(m1 * m1) - 1) < 1e-10
          && p[2][0] >= m1
@@ -210,17 +198,8 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
               abs(
       (pow(p[3][0], 2) - pow(p[3][1], 2) - pow(p[3][2], 2) - pow(p[3][3], 2))/(m2 * m2) - 1) << " " << p[3][0] << '\n';
    }
-*/
 
-   vector<Vec4D<double>> q;
-   if( 0 ) q = {
-      Vec4D<double> { 45,    0,       0,  45 },
-      Vec4D<double> { 45,    0,       0, -45 },
-      Vec4D<double> { 30,    25.98,   -15,0},
-      Vec4D<double> { 30,    -25.98,   -15,0},
-      Vec4D<double> { 45.1,    0,       0, 45.1}
-   };
-   else q  = {
+    vector<Vec4D<double>> q = {
       Vec4D<double> { p[0][0], p[0][1], p[0][2], p[0][3] },
       Vec4D<double> { p[1][0], p[1][1], p[1][2], p[1][3] },
       Vec4D<double> { p[2][0], p[2][1], p[2][2], p[2][3] },
@@ -229,254 +208,27 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    };
    const double t15 = - 2. * q[4]*q[0];
    const double t25 = - 2. * q[4]*q[1];
-   const double x35 = 2. * q[4]*q[2];
-   const double x45 = 2. * q[4]*q[3];
 
-   // check if we are not in the collinear region
-   // if yes, return
-   if( -t15 < cut * shat || -t25 < cut * shat || x35 < cut * shat || x45 < cut * shat) {
+   if( -t15 < cut * shat || -t25 < cut * shat || s35 - m1*m1 < cut * shat || s45 - m2*m2 < cut * shat) {
       ff[0] = 0; return 0;
    }
    shat = 2.*q[0]*q[1];
-   double dipole_sum = 0.;
-   // 1
-   auto d1 = get_cs_dipole(
-            1,
-            p[0][0], p[0][1], p[0][2], p[0][3] ,
-            p[1][0], p[1][1], p[1][2], p[1][3] ,
-            p[2][0], p[2][1], p[2][2], p[2][3] ,
-            p[3][0], p[3][1], p[3][2], p[3][3] ,
-            p[4][0], p[4][1], p[4][2], p[4][3],
-            4, 2, 3
+   double dipole_sum = std::accumulate(
+           cs_dipoles.begin(), cs_dipoles.end(), 0.,
+           [&q](double current,  CSDipole& el) {
+               return current + el.eval(q);
+           }
    );
-   auto v = {
-           Vec4D<double> {d1[1], d1[2], d1[3], d1[4]},
-           Vec4D<double> {d1[5], d1[6], d1[7], d1[8]},
-           Vec4D<double> {d1[9], d1[10], d1[11], d1[12]},
-           Vec4D<double> {d1[13], d1[14], d1[15], d1[16]}
-
-   };
-   CS_FF_Dipole cs1 {nullptr, 4, 2, 3, q};
-   dipole_sum += cs1.Born(v)*d1[0];
-   // 2
-   d1 = get_cs_dipole(
-           1,
-           p[0][0], p[0][1], p[0][2], p[0][3] ,
-           p[1][0], p[1][1], p[1][2], p[1][3] ,
-           p[2][0], p[2][1], p[2][2], p[2][3] ,
-           p[3][0], p[3][1], p[3][2], p[3][3] ,
-           p[4][0], p[4][1], p[4][2], p[4][3],
-           4, 3, 2
-   );
-   auto v2 = {
-           Vec4D<double> {d1[1], d1[2], d1[3], d1[4]},
-           Vec4D<double> {d1[5], d1[6], d1[7], d1[8]},
-           Vec4D<double> {d1[9], d1[10], d1[11], d1[12]},
-           Vec4D<double> {d1[13], d1[14], d1[15], d1[16]}
-   };
-   CS_FF_Dipole cs2 {nullptr, 4, 3, 2, q};
-   dipole_sum += cs2.Born(v2)*d1[0];
-   // 3
-   d1 = get_cs_dipole(
-           4,
-           p[0][0], p[0][1], p[0][2], p[0][3] ,
-           p[1][0], p[1][1], p[1][2], p[1][3] ,
-           p[2][0], p[2][1], p[2][2], p[2][3] ,
-           p[3][0], p[3][1], p[3][2], p[3][3] ,
-           p[4][0], p[4][1], p[4][2], p[4][3],
-           4, 2, 0
-   );
-   auto v3 = {
-           Vec4D<double> {d1[1], d1[2], d1[3], d1[4]},
-           Vec4D<double> {d1[5], d1[6], d1[7], d1[8]},
-           Vec4D<double> {d1[9], d1[10], d1[11], d1[12]},
-           Vec4D<double> {d1[13], d1[14], d1[15], d1[16]}
-
-   };
-   CS_FF_Dipole cs3 {nullptr, 4, 2, 0, q};
-   dipole_sum += cs3.Born(v3)*d1[0];
-   // 4
-   d1 = get_cs_dipole(
-           4,
-           p[0][0], p[0][1], p[0][2], p[0][3] ,
-           p[1][0], p[1][1], p[1][2], p[1][3] ,
-           p[2][0], p[2][1], p[2][2], p[2][3] ,
-           p[3][0], p[3][1], p[3][2], p[3][3] ,
-           p[4][0], p[4][1], p[4][2], p[4][3],
-           4, 2, 1
-   );
-   auto v4 = {
-           Vec4D<double> {d1[1], d1[2], d1[3], d1[4]},
-           Vec4D<double> {d1[5], d1[6], d1[7], d1[8]},
-           Vec4D<double> {d1[9], d1[10], d1[11], d1[12]},
-           Vec4D<double> {d1[13], d1[14], d1[15], d1[16]}
-
-   };
-   CS_FF_Dipole cs4 {nullptr, 4, 2, 1, q};
-   dipole_sum += cs4.Born(v4)*d1[0];
-   // 5
-   d1 = get_cs_dipole(
-           4,
-           p[0][0], p[0][1], p[0][2], p[0][3] ,
-           p[1][0], p[1][1], p[1][2], p[1][3] ,
-           p[2][0], p[2][1], p[2][2], p[2][3] ,
-           p[3][0], p[3][1], p[3][2], p[3][3] ,
-           p[4][0], p[4][1], p[4][2], p[4][3],
-           4, 3, 0
-   );
-   auto v5 = {
-           Vec4D<double> {d1[1], d1[2], d1[3], d1[4]},
-           Vec4D<double> {d1[5], d1[6], d1[7], d1[8]},
-           Vec4D<double> {d1[9], d1[10], d1[11], d1[12]},
-           Vec4D<double> {d1[13], d1[14], d1[15], d1[16]}
-
-   };
-   CS_FF_Dipole cs5 {nullptr, 4, 3, 0, q};
-   dipole_sum += cs5.Born(v5)*d1[0];
-   // 6
-   d1 = get_cs_dipole(
-           4,
-           p[0][0], p[0][1], p[0][2], p[0][3] ,
-           p[1][0], p[1][1], p[1][2], p[1][3] ,
-           p[2][0], p[2][1], p[2][2], p[2][3] ,
-           p[3][0], p[3][1], p[3][2], p[3][3] ,
-           p[4][0], p[4][1], p[4][2], p[4][3],
-           4, 3, 1
-   );
-   auto v6 = {
-           Vec4D<double> {d1[1], d1[2], d1[3], d1[4]},
-           Vec4D<double> {d1[5], d1[6], d1[7], d1[8]},
-           Vec4D<double> {d1[9], d1[10], d1[11], d1[12]},
-           Vec4D<double> {d1[13], d1[14], d1[15], d1[16]}
-
-   };
-   CS_FF_Dipole cs6 {nullptr, 4, 3, 1, q};
-   dipole_sum += cs6.Born(v6)*d1[0];
-   // 7
-   d1 = get_cs_dipole(
-           2,
-           p[0][0], p[0][1], p[0][2], p[0][3] ,
-           p[1][0], p[1][1], p[1][2], p[1][3] ,
-           p[2][0], p[2][1], p[2][2], p[2][3] ,
-           p[3][0], p[3][1], p[3][2], p[3][3] ,
-           p[4][0], p[4][1], p[4][2], p[4][3],
-           4, 0, 1
-   );
-   auto v7 = {
-           Vec4D<double> {d1[1], d1[2], d1[3], d1[4]},
-           Vec4D<double> {d1[5], d1[6], d1[7], d1[8]},
-           Vec4D<double> {d1[9], d1[10], d1[11], d1[12]},
-           Vec4D<double> {d1[13], d1[14], d1[15], d1[16]}
-
-   };
-   CS_FF_Dipole cs7 {nullptr, 4, 0, 1, q};
-   dipole_sum += cs7.Born(v7)*d1[0];
-   // 8
-   d1 = get_cs_dipole(
-           2,
-           p[0][0], p[0][1], p[0][2], p[0][3] ,
-           p[1][0], p[1][1], p[1][2], p[1][3] ,
-           p[2][0], p[2][1], p[2][2], p[2][3] ,
-           p[3][0], p[3][1], p[3][2], p[3][3] ,
-           p[4][0], p[4][1], p[4][2], p[4][3],
-           4, 1, 0
-   );
-   auto v8 = {
-           Vec4D<double> {d1[1], d1[2], d1[3], d1[4]},
-           Vec4D<double> {d1[5], d1[6], d1[7], d1[8]},
-           Vec4D<double> {d1[9], d1[10], d1[11], d1[12]},
-           Vec4D<double> {d1[13], d1[14], d1[15], d1[16]}
-
-   };
-   CS_FF_Dipole cs8 {nullptr, 4, 1, 0, q};
-   dipole_sum += cs8.Born(v8)*d1[0];
-   // 9
-   d1 = get_cs_dipole(
-           3,
-           p[0][0], p[0][1], p[0][2], p[0][3] ,
-           p[1][0], p[1][1], p[1][2], p[1][3] ,
-           p[2][0], p[2][1], p[2][2], p[2][3] ,
-           p[3][0], p[3][1], p[3][2], p[3][3] ,
-           p[4][0], p[4][1], p[4][2], p[4][3],
-           4, 0, 2
-   );
-   auto v9 = {
-           Vec4D<double> {d1[1], d1[2], d1[3], d1[4]},
-           Vec4D<double> {d1[5], d1[6], d1[7], d1[8]},
-           Vec4D<double> {d1[9], d1[10], d1[11], d1[12]},
-           Vec4D<double> {d1[13], d1[14], d1[15], d1[16]}
-
-   };
-   CS_FF_Dipole cs9 {nullptr, 4, 0, 2, q};
-   dipole_sum += cs9.Born(v9)*d1[0];
-   // 10
-   d1 = get_cs_dipole(
-           3,
-           p[0][0], p[0][1], p[0][2], p[0][3] ,
-           p[1][0], p[1][1], p[1][2], p[1][3] ,
-           p[2][0], p[2][1], p[2][2], p[2][3] ,
-           p[3][0], p[3][1], p[3][2], p[3][3] ,
-           p[4][0], p[4][1], p[4][2], p[4][3],
-           4, 0, 3
-   );
-   auto v10 = {
-           Vec4D<double> {d1[1], d1[2], d1[3], d1[4]},
-           Vec4D<double> {d1[5], d1[6], d1[7], d1[8]},
-           Vec4D<double> {d1[9], d1[10], d1[11], d1[12]},
-           Vec4D<double> {d1[13], d1[14], d1[15], d1[16]}
-
-   };
-   CS_FF_Dipole cs10 {nullptr, 4, 0, 3, q};
-   dipole_sum += cs10.Born(v10)*d1[0];
-   // 11
-   d1 = get_cs_dipole(
-           3,
-           p[0][0], p[0][1], p[0][2], p[0][3] ,
-           p[1][0], p[1][1], p[1][2], p[1][3] ,
-           p[2][0], p[2][1], p[2][2], p[2][3] ,
-           p[3][0], p[3][1], p[3][2], p[3][3] ,
-           p[4][0], p[4][1], p[4][2], p[4][3],
-           4, 1, 3
-   );
-   auto v11 = {
-           Vec4D<double> {d1[1], d1[2], d1[3], d1[4]},
-           Vec4D<double> {d1[5], d1[6], d1[7], d1[8]},
-           Vec4D<double> {d1[9], d1[10], d1[11], d1[12]},
-           Vec4D<double> {d1[13], d1[14], d1[15], d1[16]}
-
-   };
-   CS_FF_Dipole cs11 {nullptr, 4, 1, 3, q};
-   dipole_sum += cs11.Born(v11)*d1[0];
-   // 12
-   d1 = get_cs_dipole(
-           3,
-           p[0][0], p[0][1], p[0][2], p[0][3] ,
-           p[1][0], p[1][1], p[1][2], p[1][3] ,
-           p[2][0], p[2][1], p[2][2], p[2][3] ,
-           p[3][0], p[3][1], p[3][2], p[3][3] ,
-           p[4][0], p[4][1], p[4][2], p[4][3],
-           4, 1, 2
-   );
-   auto v12 = {
-           Vec4D<double> {d1[1], d1[2], d1[3], d1[4]},
-           Vec4D<double> {d1[5], d1[6], d1[7], d1[8]},
-           Vec4D<double> {d1[9], d1[10], d1[11], d1[12]},
-           Vec4D<double> {d1[13], d1[14], d1[15], d1[16]}
-
-   };
-   CS_FF_Dipole cs12 {nullptr, 4, 1, 2, q};
-   dipole_sum += cs12.Born(v12)*d1[0];
-    delete d1;
    // ----------------------------------------------
-   valarray<double> ME2 = {(processID->*processID->matrixelementReal_HnonC)(p), -dipole_sum};
-   // cout << ME2.sum() << ' ' << ME2[0] << ' ' << ME2[1] << endl;
+   valarray<double> ME2 = {
+           (processID->*processID->matrixelementReal_HnonC)(p), -dipole_sum
+   };
    // delete (otherwise causes memory leak)
    for(std::vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {
       delete (*i); *i = 0;
    }
    p.clear();
    p.shrink_to_fit();
-   //double ME2 = (processID->*processID->matrixelementReal_HnonC)(p);
 
    // unleas using scheme like DRII this ME2 should be always positive
    // it could be negative again after adding subtraction terms
@@ -514,8 +266,8 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    double J = ((-Power(m,2) + s35)*(-2*m + Sqrt(shat))*Sqrt(shat)*Sqrt(Power(m,4) + Power(s35 - shat,2) - 2*Power(m,2)*(s35 + shat)))/s35;
    ME2 *= abs(J);
 
-   double MassGlu = 2e+3;
    /*
+   double MassGlu = 2e+3;
    if (processID->matrixelementReal_HnonC_CSub1 != nullptr && shat_sqrt > m1 + MassGlu) {
       double mfort_1 = 1500;
       double mfort_2 = 1500;
