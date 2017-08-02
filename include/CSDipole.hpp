@@ -18,24 +18,29 @@ enum class DipoleType {
        FF, II, FI, IF
 };
 
+enum class DipoleV {
+   gQ,k
+};
+
 class CSDipole {
 
 public:
-    CSDipole(boost::property_tree::ptree pt, std::string s, DipoleType type, unsigned int i, unsigned int j)
+   CSDipole(boost::property_tree::ptree pt, std::string s, DipoleType type, unsigned int i, unsigned int j)
             : Born_(Color_Connected_MEs(i, j, s, pt)), type_(type), i_(i), j_(j) {
-       std::cout << "Initialized Catani-Seymour dipole of type ";
-       if (type_ == DipoleType::FF) {
-          std::cout << "FF";
-       } else if (type_ == DipoleType::IF) {
-          std::cout << "IF";
-       } else if (type_ == DipoleType::II) {
-          std::cout << "II";
-       } else if (type_ == DipoleType::FI) {
-             std::cout << "FI";
-       }
-       std::cout << " with leg " << i << " as the emitter and leg " << j << " as the spectator " << j << '\n';
-    };
-    double eval(std::vector<Vec4D<double>> const&) const;
+      std::cout << "Initialized Catani-Seymour dipole of type ";
+      if (type_ == DipoleType::FF) {
+         std::cout << "FF";
+      } else if (type_ == DipoleType::IF) {
+         std::cout << "IF";
+      } else if (type_ == DipoleType::II) {
+         std::cout << "II";
+      } else if (type_ == DipoleType::FI) {
+         std::cout << "FI";
+      }
+      std::cout << " with leg " << i << " as the emitter and leg " << j << " as the spectator " << j << '\n';
+   };
+   double eval_unintegrated_dipole(std::vector<Vec4D<double>> const&) const;
+   double eval_integrated_dipole(std::vector<Vec4D<double>> const&) const;
 
 private:
     const DipoleType type_;

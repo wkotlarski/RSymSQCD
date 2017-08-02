@@ -216,7 +216,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    double dipole_sum = std::accumulate(
            cs_dipoles.begin(), cs_dipoles.end(), 0.,
            [&q](double current,  CSDipole& el) {
-               return current + el.eval(q);
+               return current + el.eval_unintegrated_dipole(q);
            }
    );
    // ----------------------------------------------

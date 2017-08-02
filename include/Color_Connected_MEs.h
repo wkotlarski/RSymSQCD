@@ -13,8 +13,11 @@
 class Color_Connected_MEs : public MRSSM {
 
 public:
-    Color_Connected_MEs(unsigned int emitter, unsigned int spectator, std::string s,  boost::property_tree::ptree pt) : MRSSM(pt),
-        mu_r(pt.get<double>("collider setup.mu_r")), emitter_(emitter), spectator_(spectator)
+    Color_Connected_MEs(unsigned int emitter, unsigned int spectator, std::string s,  boost::property_tree::ptree pt) :
+            MRSSM(pt),
+            mu_r(pt.get<double>("collider setup.mu_r")),
+            emitter_(emitter),
+            spectator_(spectator)
     {};
    double get_ME2_value(const std::vector<Vec4D<double>>&) const;
 
@@ -23,7 +26,7 @@ private:
    const unsigned int spectator_;
    const double mu_r;
    double ColorMatrix(const std::string&, const std::string&) const;
-   double uu_suLsuL(const std::vector<Vec4D<double>>&) const;
+   double uu_suLsuR(double, double, double, double, double, double) const;
 };
 
 

@@ -306,31 +306,34 @@ int main(int argc, char* argv[]) {
 
                   // uu > suL suR (+g) process
 		            if( subprocess == "" || subprocess == "uu_suLsuR" ) {
+                     std::vector<std::tuple<DipoleType, unsigned int, unsigned int>> const v {
+                             {DipoleType::FF, 2, 3},
+                             {DipoleType::FF, 3, 2},
+                             {DipoleType::II, 0, 1},
+                             {DipoleType::II, 1, 0},
+                             {DipoleType::IF, 0, 2},
+                             {DipoleType::IF, 0, 3},
+                             {DipoleType::IF, 1, 2},
+                             {DipoleType::IF, 1, 3},
+                             {DipoleType::FI, 2, 0},
+                             {DipoleType::FI, 2, 1},
+                             {DipoleType::FI, 3, 0},
+                             {DipoleType::FI, 3, 1}
+                     };
+                     for(const auto& e : v) {
+                        hc.cs_dipoles.push_back(
+                                CSDipole(pt, "MRSSM,uu_suLsuR", std::get<0>(e), std::get<1>(e), std::get<2>(e))
+                        );
+                        virt.cs_dipoles.push_back(
+                                CSDipole(pt, "MRSSM,uu_suLsuR", std::get<0>(e), std::get<1>(e), std::get<2>(e))
+                        );
+                     }
                      Process process1("MRSSM,uu_suLsuR", pt);
 	                  XSection::init( &process1, pt, vm );
                      if(enable_born) xsection_tree1 = tree.integrate();
                      if(enable_virt) xsection_virt1 = virt.integrate();
                      if(enable_sc) xsection_SC1 = sc.integrate();
                      if(enable_hard) {
-                        std::vector<std::tuple<DipoleType, unsigned int, unsigned int>> const v {
-                           {DipoleType::FF, 2, 3},
-                           {DipoleType::FF, 3, 2},
-                           {DipoleType::II, 0, 1},
-                           {DipoleType::II, 1, 0},
-                           {DipoleType::IF, 0, 2},
-                           {DipoleType::IF, 0, 3},
-                           {DipoleType::IF, 1, 2},
-                           {DipoleType::IF, 1, 3},
-                           {DipoleType::FI, 2, 0},
-                           {DipoleType::FI, 2, 1},
-                           {DipoleType::FI, 3, 0},
-                           {DipoleType::FI, 3, 1}
-                        };
-                        for(const auto& e : v) {
-                           hc.cs_dipoles.push_back(
-                              CSDipole(pt, "MRSSM,uu_suLsuR", std::get<0>(e), std::get<1>(e), std::get<2>(e))
-                           );
-                        }
                         xsection_HnonC1 = hc.integrate();
                      }
                      print( "uu > suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
