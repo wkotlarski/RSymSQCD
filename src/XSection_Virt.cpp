@@ -5,29 +5,33 @@
 std::vector<CSDipole> XSection_Virt::cs_dipoles;
 
 std::vector<Vec4D<double>> mandelstam_to_p (double s, double t) {
-   return {
+   double tp = t - pow(5,2);
+   double p = sqrt(s/4. - pow(5,2));
+   double costh = (s/2. + tp)/(p*sqrt(s));
+   std::vector<Vec4D<double>> temp = {
            Vec4D<double> { sqrt(s)/2., 0, 0, sqrt(s)/2.},
            Vec4D<double> { sqrt(s)/2., 0, 0, -sqrt(s)/2.},
-           Vec4D<double> {1.,0.,0,0},
-           Vec4D<double> {1.,0.,0,0}
+           Vec4D<double> { sqrt(s)/2., 0., p*sqrt(1-costh*costh), p*costh},
+           Vec4D<double> { sqrt(s)/2., 0., -p*sqrt(1-costh*costh), -p*costh}
    };
+   return temp;
 }
 
 int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    const int *ncomp, cubareal ff[], void *userdata) {
 
-   double x1min = 4. * pow( m1, 2 )/S;
-   double xmax = 1.;
-   double x1 = x1min + (xmax - x1min) * xx[1];
-   double x2min = 4. * pow( m1, 2 )/(S*x1);
-   double x2 = x2min + (xmax - x2min) * xx[2];
-   double s = S * x1 * x2;     //partonic
+   //double x1min = 4. * pow( m1, 2 )/S;
+   //double xmax = 1.;
+   //double x1 = x1min + (xmax - x1min) * xx[1];
+   //double x2min = 4. * pow( m1, 2 )/(S*x1);
+   //double x2 = x2min + (xmax - x2min) * xx[2];
+   double s = S; // * x1 * x2;     //partonic
    double Tmin = pow( m1, 2 ) - s/2. - sqrt( pow(s, 2)/4 -
                   pow( m1, 2 )*s);
    double Tmax = pow( m1, 2 ) - s/2. + sqrt( pow(s, 2)/4. -
                   pow( m1, 2 )*s);
    double T = xx[0]*(Tmax-Tmin) + Tmin;
-   double jacobian = (Tmax-Tmin)*(1.-x1min)*(1.-x2min);
+   double jacobian = (Tmax-Tmin); //*(1.-x1min)*(1.-x2min);
 
    int FiniteGs = 1;
    double Dminus4 = 0;
@@ -67,13 +71,13 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
                          (processID->k)/(pow(s,2))
                          *(pow(M_PI,2.)/6.);
 
-   double dSigmaHad = (dSigmaPart1 + dSigmaPart3 + dSigmaPart4);
+   double dSigmaHad = (dSigmaPart1 + 0*dSigmaPart3 + 0*dSigmaPart4);
 
    double pdf_flux = 0.0;
    for (const auto& flav : processID->flav) {
-      pdf_flux += flav.at(2) * pdf->xfxQ( flav.at(0), x1, mu_f ) * pdf->xfxQ( flav.at(1), x2, mu_f );
+      //pdf_flux += flav.at(2) * pdf->xfxQ( flav.at(0), x1, mu_f ) * pdf->xfxQ( flav.at(1), x2, mu_f );
    }
-   pdf_flux /= (x1 * x2);
+   //pdf_flux /= (x1 * x2);
 
    double dipole_sum = std::accumulate(
            cs_dipoles.begin(), cs_dipoles.end(), 0.,
@@ -81,9 +85,9 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
               return current + el.eval_integrated_dipole(mandelstam_to_p(s, T));
            }
    );
-   std::cout << dipole_sum << '\n';
-
-   ff[0] = (dSigmaHad+dipole_sum)*jacobian*to_fb * pdf_flux;   // in femto barn
+   dipole_sum *= 0*2.*M_PI/(pow(4.*M_PI,2))/
+                                    (processID->k)/(pow(s,2));
+   ff[0] = (dSigmaHad+dipole_sum)*jacobian*to_fb; //* pdf_flux;   // in femto barn
    return 0;
 }
 

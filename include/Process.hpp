@@ -80,7 +80,11 @@ private:
       double matrixMRSSMVirt_uubar_suLsuLdagger(double, double, double, double, int);
       double matrixMRSSMVirt_ddbar_suLsuLdagger(double, double, double, double, int);
       double matrixMRSSMVirt_GG_suLsuLdagger(double, double, double, double, int);
-      
+      // @todo: move to separate class
+      double matrixSMVirt_eebar_ttbar (double, double, double, double, int);
+      double matrixSMHard_eebar_ttbarg (const std::vector< double* >&) const;
+      double matrixSMTree_eebar_ttbar( double, double ) const;
+
       // soft matrix elements
       double matrixMRSSMSoft_uu_suLsuRg(double, double);
       double matrixMRSSMHard_uu_suLsuRg( const std::vector< double* >& ) const ;

@@ -29,14 +29,10 @@ public:
       MassSbL (pt.get<double>("masses.sbL")),
       MassSbR (pt.get<double>("masses.sbR")),
       MassStL (pt.get<double>("masses.stL")),
-      MassStR (pt.get<double>("masses.stR"))
-   {
-
-      std::cout << "Model parameters:\n";
-    };
+      MassStR (pt.get<double>("masses.stR")) {};
+   const LHAPDF::PDF* pdf;
 
 protected:
-   const LHAPDF::PDF* pdf;
    const double MasssigmaO;
    const double MassphiO;
    const double MassGlu;

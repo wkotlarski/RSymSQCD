@@ -30,7 +30,7 @@ std::vector<CSDipole> XSection_HnonC::cs_dipoles;
 std::array<double, 3> XSection_HnonC::integrate() {
 
    //  integral dimension, number of integrands
-   constexpr int ndim { 7 };
+   constexpr int ndim {5}; //{ 7 };
    constexpr int ncomp { 1 };
    //  accuraccy
    const double accuracy_rel { pow(10., -vm["precision-hard"].as<int>()) };
@@ -74,10 +74,9 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    */
 
    const double m_sqr = m1 * m1;
-
-   const double x1 = 4. * m_sqr/S + (1. - 4. * m_sqr/S ) * xx[5];
-   const double x2 = 4. * m_sqr /(S * x1) + (1. - 4. * m_sqr/(S * x1)) * xx[6];
-   double shat = x1*x2*S;
+   // const double x1 = 4. * m_sqr/S + (1. - 4. * m_sqr/S ) * xx[5];
+   // const double x2 = 4. * m_sqr /(S * x1) + (1. - 4. * m_sqr/(S * x1)) * xx[6];
+   double shat = S; //x1*x2*S;
    const double shat_sqrt = sqrt( shat );
 
    const double s35_min = m1*m1;
@@ -191,13 +190,13 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
       (pow(p[2][0], 2) - pow(p[2][1], 2) - pow(p[2][2], 2) - pow(p[2][3], 2))/(m1 * m1) - 1) < 1e-10
          && p[2][0] >= m1
    );
-   if( abs(
-      (pow(p[3][0], 2) - pow(p[3][1], 2) - pow(p[3][2], 2) - pow(p[3][3], 2))/(m2 * m2) - 1) > 1e-10
-      || p[3][0] < m2 ) {
-      std::cout << "Error in kinematics. " <<
-              abs(
-      (pow(p[3][0], 2) - pow(p[3][1], 2) - pow(p[3][2], 2) - pow(p[3][3], 2))/(m2 * m2) - 1) << " " << p[3][0] << '\n';
-   }
+//   if( abs(
+//      (pow(p[3][0], 2) - pow(p[3][1], 2) - pow(p[3][2], 2) - pow(p[3][3], 2))/(m2 * m2) - 1) > 1e-10
+//      || p[3][0] < m2 ) {
+//      std::cout << "Error in kinematics. " <<
+//              abs(
+//      (pow(p[3][0], 2) - pow(p[3][1], 2) - pow(p[3][2], 2) - pow(p[3][3], 2))/(m2 * m2) - 1) << " " << p[3][0] << '\n';
+//   }
 
     vector<Vec4D<double>> q = {
       Vec4D<double> { p[0][0], p[0][1], p[0][2], p[0][3] },
@@ -209,7 +208,12 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    const double t15 = - 2. * q[4]*q[0];
    const double t25 = - 2. * q[4]*q[1];
 
-   if( -t15 < cut * shat || -t25 < cut * shat || s35 - m1*m1 < cut * shat || s45 - m2*m2 < cut * shat) {
+   if(
+           -t15 < cut * shat
+           || -t25 < cut * shat
+           || s35 - m1*m1 < cut * shat
+           || s45 - m2*m2 < cut * shat
+           ) {
       ff[0] = 0; return 0;
    }
    shat = 2.*q[0]*q[1];
@@ -247,11 +251,11 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
    double pdf_flux = 0.0;
    for (const auto& f : processID->flav) {
-      pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x1, mu_f ) * pdf->xfxQ( f.at(1), x2, mu_f );
+      //pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x1, mu_f ) * pdf->xfxQ( f.at(1), x2, mu_f );
    }
-   pdf_flux /= x1 * x2;
+   //pdf_flux /= x1 * x2;
 
-   fac *=  pdf_flux;
+   //fac *=  pdf_flux;
    double xx0 = xx[5];
    double xx1 = xx[6];
    double xx2 = xx[0];
@@ -308,7 +312,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    // Jakobian of (E2, E1) -> (s35, s45) change
    ME2 *= 0.25/shat;
    // Jakobian of Bjorken vars. mapping xx0, xx1 -> x1, x2
-   ME2 *= (Power(-4*Power(m,2) + S,2)*xx0)/(S*(-4*Power(m,2)*(-1 + xx0) + S*xx0));
+   // ME2 *= (Power(-4*Power(m,2) + S,2)*xx0)/(S*(-4*Power(m,2)*(-1 + xx0) + S*xx0));
 
    ME2 *= fac;
 

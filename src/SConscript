@@ -7,7 +7,7 @@ env = Environment(ENV = os.environ)
 
 # find out if we should use intel or gcc and setup appropriate flags
 compiler = Config.get('compiler', 'compiler')
-cxx_flags = ' -std=c++1z -O2 '
+cxx_flags = ' -std=c++1z '
 if compiler == 'icpc':
    print 'rsymsqcd: Setting up flags for the intel c++ compiler'
    # cxx_flags += '-xHost -fp-model extended -fp-model fast=1 '
@@ -18,9 +18,11 @@ else:
    'Unsuported compiler. Currently we support only intel and gcc.'
    exit(1)
    
-mymode = ARGUMENTS.get('mode', 'release')
-if mymode == 'debug':
-   cxx_flags += '-DNDEBUG '
+mymode = ARGUMENTS.get('mode', 'debug')
+if mymode == 'release':
+   cxx_flags += '-DNDEBUG -O2 '
+else:
+   cxx_flags += '-O0 '
 
 env.Replace( CXX = compiler ) 
 
@@ -59,7 +61,8 @@ env.Program(
       Config.get('Cuba', 'lib'), 
       Config.get('RK', 'lib'),
       Config.get('compiler', 'libs'),
-      '/home/wojciech/HEP-software/gcc/ColorFull-1.1/lib/ColorFull',
+#      '/home/wojciech/HEP-software/gcc/ColorFull-1.1/lib/ColorFull',
+      '/usr/lib64/ColorFull',
       '/home/wojciech/Dokumenty/IdeaProjects/cs_dipole_subtraction/target/debug',
       '/usr/lib64'
    ] 

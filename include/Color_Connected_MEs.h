@@ -16,17 +16,17 @@ public:
     Color_Connected_MEs(unsigned int emitter, unsigned int spectator, std::string s,  boost::property_tree::ptree pt) :
             MRSSM(pt),
             mu_r(pt.get<double>("collider setup.mu_r")),
-            emitter_(emitter),
-            spectator_(spectator)
+            mu_f(pt.get<double>("collider setup.mu_f"))
     {};
-   double get_ME2_value(const std::vector<Vec4D<double>>&) const;
+   double get_ME2_value(unsigned int, unsigned int, const std::vector<Vec4D<double>>&) const;
+   const double mu_r;
+   const double mu_f;
 
 private:
-   const unsigned int emitter_;
-   const unsigned int spectator_;
-   const double mu_r;
-   double ColorMatrix(const std::string&, const std::string&) const;
-   double uu_suLsuR(double, double, double, double, double, double) const;
+   double ColorMatrix( int,  int, const std::string&, const std::string&) const;
+
+   double uu_suLsuR(unsigned int, unsigned int, double, double, double, double, double, double) const;
+   double eebar_ttbar(unsigned int, unsigned int, double, double, double, double, double, double) const;
 };
 
 

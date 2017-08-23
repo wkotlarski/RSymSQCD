@@ -154,12 +154,11 @@ int main(int argc, char* argv[]) {
            xsection_tree4 {}, xsection_virt4 {}, xsection_SC4 {}, xsection_HnonC4 {},
            xsection_tree5 {}, xsection_virt5 {}, xsection_SC5 {}, xsection_HnonC5 {},
            xsection_tree_total {}, xsection_virt_total {}, xsection_SC_total {}, xsection_HnonC_total {};
+
    enum Model {
-       MRSSM,
-       MSSM,
-       Simplified,
-       no_model
+      SM, Simplified, MSSM, MRSSM, no_model
    };
+
    enum Channel {
        pp_OO,
        pp_OsOs,
@@ -171,6 +170,7 @@ int main(int argc, char* argv[]) {
        pp_suLsuRdagger,
        pp_suLsdLdagger,
        pp_suLsdRdagger,
+      eebar_ttbar,
        no_channel
    };
 
@@ -183,6 +183,8 @@ int main(int argc, char* argv[]) {
       model = MSSM;
    } else if ( string(argv[1]) == "Simplified" ) {
       model = Simplified;
+   } else if ( pt.get<string>("process.model") == "SM" ) {
+      model = SM;
    } else {
 	   cout << "\n Model not implemented! \n\n";
    }
@@ -205,8 +207,10 @@ int main(int argc, char* argv[]) {
       channel = pp_suLsdLdagger;
    } else if ( pt.get<string>("process.process") == "pp_suLsdRdagger" ) {
       channel = pp_suLsdRdagger;
-         } else if ( pt.get<string>("process.process") == "pp_OO" ) {
+   } else if ( pt.get<string>("process.process") == "pp_OO" ) {
       channel = pp_OO;
+   } else if ( pt.get<string>("process.process") == "eebar_ttbar" ) {
+      channel = eebar_ttbar;
    } else {
 	   cout << "\n Process not implemented! \n\n";
    }
@@ -290,6 +294,38 @@ int main(int argc, char* argv[]) {
 
    else if( pt.get<string>("process.order") == "NLO" ) {
 	  switch(model) {
+        case SM:
+           switch (channel) {
+              case eebar_ttbar:
+                 XSection_Tree tree;
+                 XSection_Virt virt;
+                 XSection_SC sc;
+                 XSection_HnonC hc;
+                 std::vector <std::tuple<DipoleType, unsigned int, unsigned int>> const v{
+                         {DipoleType::FF, 2, 3},
+                         {DipoleType::FF, 3, 2}
+                 };
+                 for (const auto &e : v) {
+                    hc.cs_dipoles.push_back(
+                            CSDipole(pt, "SM,eebar_ttbar", std::get<0>(e), std::get<1>(e), std::get<2>(e))
+                    );
+                    virt.cs_dipoles.push_back(
+                            CSDipole(pt, "SM,eebar_ttbar", std::get<0>(e), std::get<1>(e), std::get<2>(e))
+                    );
+                    //sc.cs_dipoles.push_back(
+                    //        CSDipole(pt, "SM,eebar_ttbar", std::get<0>(e), std::get<1>(e), std::get<2>(e))
+                    //);
+                 }
+                 Process process1("SM,eebar_ttbar", pt);
+                 XSection::init(&process1, pt, vm);
+                 if (enable_born) xsection_tree1 = tree.integrate();
+                 if (enable_virt) xsection_virt1 = virt.integrate();
+                 if (enable_sc) xsection_SC1 = sc.integrate();
+                 if (enable_hard) {
+                    xsection_HnonC1 = hc.integrate();
+                 }
+                 print("uu > suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+           }
          case MRSSM:
             switch(channel) {
                case pp_OsOs:
@@ -325,6 +361,9 @@ int main(int argc, char* argv[]) {
                                 CSDipole(pt, "MRSSM,uu_suLsuR", std::get<0>(e), std::get<1>(e), std::get<2>(e))
                         );
                         virt.cs_dipoles.push_back(
+                                CSDipole(pt, "MRSSM,uu_suLsuR", std::get<0>(e), std::get<1>(e), std::get<2>(e))
+                        );
+                        sc.cs_dipoles.push_back(
                                 CSDipole(pt, "MRSSM,uu_suLsuR", std::get<0>(e), std::get<1>(e), std::get<2>(e))
                         );
                      }

@@ -15,7 +15,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) : MRSSM(
    // @todo remove
    MassSq = MassSuL;
    partonic = false; // calculate sigma_had with |M|^2 and not sigma_part
-   
+
 /* -------------------- Squark-squark production---------------------------------*/
 
    if(processID == "MRSSM,uu_suLsuR") {
@@ -32,6 +32,21 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) : MRSSM(
       flav.push_back( std::vector<int> {2, 2, 1} );
       k = 2.*2*3*3;
       h = 2.*2;
+   }
+   else if (processID == "SM,eebar_ttbar") {
+      matrixelementTree = &Process::matrixSMTree_eebar_ttbar;
+      matrixelementVirt = &Process::matrixSMVirt_eebar_ttbar;
+      matrixelementReal_SC = nullptr;
+      sigmaPartTree1 = nullptr;
+      splitting_kernel1 = &Process::Pqq;
+      sigmaPartTree2 = nullptr;
+      splitting_kernel2 = &Process::Pqq;
+      matrixelementReal_HnonC = &Process::matrixSMHard_eebar_ttbarg;
+      m1 = 5;
+      m2 = 5;
+      //flav.push_back( std::vector<int> {2, 2, 1} );
+      k = 1;
+      h = 1;
    }
    else if(processID == "MRSSM,ud_suLsdR") { // same as in MSSM
       matrixelementTree = &Process::matrixMSSMTree_ud_suLsdR;
@@ -405,3 +420,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) : MRSSM(
 
 #include "matrix_elements_and_xsections/simplified_gg_OOg_soft.cpp"
 #include "matrix_elements_and_xsections/simplified_gg_OOg_hard.cpp"
+
+// SM test
+#include "matrix_elements_and_xsections/sm_eebar_ttbar_virt_matrix.cpp"
+#include "matrix_elements_and_xsections/sm_eebar_ttbar_hard.cpp"
+#include "matrix_elements_and_xsections/sm_eebar_ttbar_tree_matrix.cpp"
