@@ -46,7 +46,7 @@ public:
       std::cout << " with leg " << i << " as the emitter and leg " << j << " as the spectator " << '\n';
    };
    double eval_unintegrated_dipole(std::vector<Vec4D<double>> const&) const;
-   double eval_integrated_dipole(std::vector<Vec4D<double>> const&) const;
+   double eval_integrated_dipole(int, std::vector<Vec4D<double>> const&) const;
    double eval_P(std::vector<Vec4D<double>> const&, double) const;
    double eval_K(std::vector<Vec4D<double>> const&, double) const;
    unsigned int get_emitter() const { return emit_; }

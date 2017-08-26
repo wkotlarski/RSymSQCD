@@ -299,7 +299,6 @@ int main(int argc, char* argv[]) {
               case eebar_ttbar:
                  XSection_Tree tree;
                  XSection_Virt virt;
-                 XSection_SC sc;
                  XSection_HnonC hc;
                  std::vector <std::tuple<DipoleType, unsigned int, unsigned int>> const v{
                          {DipoleType::FF, 2, 3},
@@ -320,7 +319,6 @@ int main(int argc, char* argv[]) {
                  XSection::init(&process1, pt, vm);
                  if (enable_born) xsection_tree1 = tree.integrate();
                  if (enable_virt) xsection_virt1 = virt.integrate();
-                 if (enable_sc) xsection_SC1 = sc.integrate();
                  if (enable_hard) {
                     xsection_HnonC1 = hc.integrate();
                  }

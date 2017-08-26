@@ -58,7 +58,7 @@ double Color_Connected_MEs::eebar_ttbar(
         unsigned int emitter, unsigned int spectator,
         double k12, double k23, double k24, double k13, double k14, double k34
 ) const {
-   const double MB2 = 5*5;
+   const double MB2 = MassSuL*MassSuL;
    const double Alfa2 = pow (137., -2);
    const double T = MB2 - 2*k13;
    const double U = MB2 - 2*k23;

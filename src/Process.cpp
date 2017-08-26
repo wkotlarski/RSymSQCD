@@ -42,8 +42,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) : MRSSM(
       sigmaPartTree2 = nullptr;
       splitting_kernel2 = &Process::Pqq;
       matrixelementReal_HnonC = &Process::matrixSMHard_eebar_ttbarg;
-      m1 = 5;
-      m2 = 5;
+      m1 = MassSuL;
+      m2 = MassSuL;
       //flav.push_back( std::vector<int> {2, 2, 1} );
       k = 1;
       h = 1;

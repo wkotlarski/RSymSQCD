@@ -5,8 +5,9 @@
 std::vector<CSDipole> XSection_Virt::cs_dipoles;
 
 std::vector<Vec4D<double>> mandelstam_to_p (double s, double t) {
-   double tp = t - pow(5,2);
-   double p = sqrt(s/4. - pow(5,2));
+   double mass = 5;
+   double tp = t - pow(mass,2);
+   double p = sqrt(s/4. - pow(mass,2));
    double costh = (s/2. + tp)/(p*sqrt(s));
    std::vector<Vec4D<double>> temp = {
            Vec4D<double> { sqrt(s)/2., 0, 0, sqrt(s)/2.},
@@ -37,20 +38,30 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    double Dminus4 = 0;
    int Divergence = 0;     // O(eps)
      
-   //using Func = double (Process::* double)(double, double, int, double, int);
-   //Func* f_ptr = processID->*processID->matrixelementVirt;
-    
    double squaredMReal = (processID->*processID->matrixelementVirt)(
       s, T, FiniteGs, Dminus4, Divergence);
     
-   double dSigmaPart1 = 2.*squaredMReal*(processID->h)*M_PI/(pow(4.*M_PI,2))/
-                         (processID->k)/(pow(s,2));
+   double dSigmaPart1 = squaredMReal*M_PI/pow(4.*M_PI,2)/pow(s,2);
     
    // contraction with O(eps) from Dminus4
    Divergence = -1;           // O(eps)
    FiniteGs = 0;
    squaredMReal = (processID->*processID->matrixelementVirt)(
       s, T, FiniteGs, Dminus4, Divergence);
+
+   // in debug mode check cancelation of single poles
+   //assert(
+      std::cout <<
+      abs(std::accumulate(
+         cs_dipoles.begin(), cs_dipoles.end(), 0.,
+         [s,T](double current,  CSDipole& el) {
+            return current + el.eval_integrated_dipole(-1, mandelstam_to_p(s, T));
+         }
+      )
+      + squaredMReal)
+      // < 1e-15
+      << std::endl;
+   //);
     
    Dminus4 = -2.;
    double squaredMRealMinus2 = (processID->*processID->matrixelementVirt)(
@@ -66,7 +77,17 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    Dminus4 = 0;
    squaredMReal = (processID->*processID->matrixelementVirt)(
       s, T, FiniteGs, Dminus4, Divergence);
-    
+   // in debug mode check cancelation of double poles
+   assert(
+           abs(std::accumulate(
+                   cs_dipoles.begin(), cs_dipoles.end(), 0.,
+                   [s,T](double current,  CSDipole& el) {
+                      return current + el.eval_integrated_dipole(-2, mandelstam_to_p(s, T));
+                   }
+           )
+           + squaredMReal) < 1e-16
+   );
+
    double dSigmaPart4 = 2.*squaredMReal*(processID->h)*M_PI/(pow(4.*M_PI,2))/
                          (processID->k)/(pow(s,2))
                          *(pow(M_PI,2.)/6.);
@@ -82,18 +103,19 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    double dipole_sum = std::accumulate(
            cs_dipoles.begin(), cs_dipoles.end(), 0.,
            [s,T](double current,  CSDipole& el) {
-              return current + el.eval_integrated_dipole(mandelstam_to_p(s, T));
+              return current + el.eval_integrated_dipole(0, mandelstam_to_p(s, T));
            }
    );
-   dipole_sum *= 0*2.*M_PI/(pow(4.*M_PI,2))/
+   dipole_sum *= M_PI/(pow(4.*M_PI,2))/
                                     (processID->k)/(pow(s,2));
    ff[0] = (dSigmaHad+dipole_sum)*jacobian*to_fb; //* pdf_flux;   // in femto barn
    return 0;
+
 }
 
 
  std::array<double, 3> XSection_Virt::integrate() {
-   constexpr int ndim = 3;
+   constexpr int ndim = 2;
    constexpr int ncomp = 1;
    constexpr int nvec = 1;
    constexpr double accuracy_abs = 1e-12;
@@ -106,7 +128,7 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    constexpr int key = 0;
    // Divonne specific
    constexpr int seed = 1;
-   constexpr double border = 1e-6; // don't go lower than 1e-6 for 1e-4 relative accuraccy
+   constexpr double border = 1e-9; // don't go lower than 1e-6 for 1e-4 relative accuraccy
    constexpr int key1 = 47;
    constexpr int key2 = 1;
    constexpr int key3 = 1;

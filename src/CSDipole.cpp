@@ -26,6 +26,7 @@ extern "C" double* c_unintegrated_dipoles(
 
 extern "C" double c_integrated_dipoles(
         int,
+        int,
         double,
         double, double, double, double,
         double, double, double, double,
@@ -62,7 +63,7 @@ double CSDipole::eval_unintegrated_dipole(std::vector<Vec4D<double>> const& p) c
    return res;
 }
 
-double CSDipole::eval_integrated_dipole(std::vector<Vec4D<double>> const& p) const {
+double CSDipole::eval_integrated_dipole(int coeff, std::vector<Vec4D<double>> const& p) const {
    int type_to_int;
    if (type_ == DipoleType::FF) {
       type_to_int = 1;
@@ -76,7 +77,8 @@ double CSDipole::eval_integrated_dipole(std::vector<Vec4D<double>> const& p) con
 
    double d1 = c_integrated_dipoles(
            type_to_int,
-           Born_.pdf->alphasQ(Born_.mu_r),
+           coeff,
+           0.12, //Born_.pdf->alphasQ(Born_.mu_r),
            p[0].t_, p[0].x_, p[0].y_, p[0].z_,
            p[1].t_, p[1].x_, p[1].y_, p[1].z_,
            p[2].t_, p[2].x_, p[2].y_, p[2].z_,
@@ -84,7 +86,6 @@ double CSDipole::eval_integrated_dipole(std::vector<Vec4D<double>> const& p) con
            4, emit_, spec_
    );
    auto res = Born_.get_ME2_value(emit_, spec_, p)*d1;
-   std::cout << "I: " << res << std::endl;
    return res;
 }
 

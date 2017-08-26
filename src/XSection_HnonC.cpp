@@ -65,7 +65,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
 int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    const int *ncomp, cubareal ff[], void *userdata) {
 
-   constexpr double cut {1e-7};
+   constexpr double cut {1e-9};
 
 
    /*
@@ -209,9 +209,10 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    const double t25 = - 2. * q[4]*q[1];
 
    if(
-           -t15 < cut * shat
-           || -t25 < cut * shat
-           || s35 - m1*m1 < cut * shat
+           //-t15 < cut * shat
+           //|| -t25 < cut * shat
+   //        ||
+   s35 - m1*m1 < cut * shat
            || s45 - m2*m2 < cut * shat
            ) {
       ff[0] = 0; return 0;

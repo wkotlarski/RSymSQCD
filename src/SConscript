@@ -9,7 +9,7 @@ env = Environment(ENV = os.environ)
 compiler = Config.get('compiler', 'compiler')
 cxx_flags = ' -std=c++1z '
 if compiler == 'icpc':
-   print 'rsymsqcd: Setting up flags for the intel c++ compiler'
+   print 'rsymsqcd: setting up flags for the intel c++ compiler'
    # cxx_flags += '-xHost -fp-model extended -fp-model fast=1 '
 elif compiler == 'g++':
    print 'rsymsqcd: Setting up flags for the g++ compiler'
@@ -20,8 +20,10 @@ else:
    
 mymode = ARGUMENTS.get('mode', 'debug')
 if mymode == 'release':
+   print "rsymsqcd: compiling in RELEASE model"
    cxx_flags += '-DNDEBUG -O2 '
 else:
+   print "rsymsqcd: compiling in DEBUG mode"
    cxx_flags += '-O0 '
 
 env.Replace( CXX = compiler ) 
