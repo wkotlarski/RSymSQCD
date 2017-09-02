@@ -1,4 +1,5 @@
 #include <vector>
+#include <numeric>
 #include "XSection_Virt.hpp"
 #include "../include/Vec4D.hpp"
 

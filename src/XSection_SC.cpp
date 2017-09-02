@@ -1,3 +1,4 @@
+#include <numeric>
 #include "XSection_SC.hpp"
 
 std::vector<CSDipole> XSection_SC::cs_dipoles;
