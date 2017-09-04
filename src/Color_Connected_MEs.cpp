@@ -6,13 +6,14 @@
 double Color_Connected_MEs::get_ME2_value(
       unsigned int emitter,
       unsigned int spectator,
+      EpsExpansion ord,
       std::vector<Vec4D<double>> const& p
    ) const {
 
    auto [k12, k23, k24, k13, k14, k34] = std::tuple(
            p[0]*p[1], p[1]*p[2], p[1]*p[3], p[0]*p[2], p[0]*p[3], p[2]*p[3]
    );
-   return eebar_ttbar(emitter, spectator, k12, k23, k24, k13, k14, k34);
+   return eebar_ttbar(emitter, spectator, ord, k12, k23, k24, k13, k14, k34);
 }
 
 double Color_Connected_MEs::ColorMatrix( int emitter,  int spectator, std::string const& col_str1, std::string const& col_str2 ) const {
@@ -56,6 +57,7 @@ double Color_Connected_MEs::uu_suLsuR(
 
 double Color_Connected_MEs::eebar_ttbar(
         unsigned int emitter, unsigned int spectator,
+        EpsExpansion ord,
         double k12, double k23, double k24, double k13, double k14, double k34
 ) const {
    const double MB2 = MassSuL*MassSuL;
@@ -63,8 +65,12 @@ double Color_Connected_MEs::eebar_ttbar(
    const double T = MB2 - 2*k13;
    const double U = MB2 - 2*k23;
    const double S = 2*k12;
-   double temp = 4*(8*Alfa2*ColorMatrix(emitter, spectator, "[{3,4}]","[{3,4}]")*pow(pi,2)*pow(S,-2)*(2*MB2*(S - T - U) + 2*pow(MB2,2) + pow(T,2) + pow(U,2)))/9.;
-   return temp;
+   switch (ord) {
+      case EpsExpansion::Finite:
+      return 4*(8*Alfa2*ColorMatrix(emitter, spectator, "[{3,4}]","[{3,4}]")*pow(pi,2)*pow(S,-2)*(2*MB2*(S - T - U) + 2*pow(MB2,2) + pow(T,2) + pow(U,2)))/9.;
+      case EpsExpansion::OrdEps:
+      return 4*(8*Alfa2*ColorMatrix(emitter, spectator, "[{3,4}]","[{3,4}]")*pow(pi,2))*MB2/(9.*S) * (-1);
+   }
 }
 
 

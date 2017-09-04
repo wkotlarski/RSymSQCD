@@ -65,7 +65,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
 int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    const int *ncomp, cubareal ff[], void *userdata) {
 
-   constexpr double cut {1e-9};
+   constexpr double cut {1e-14};
 
 
    /*
@@ -98,7 +98,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    const double E1 = -0.5 * (s45 - shat - m2*m2)/shat_sqrt;
    assert (E1 >= m1);
 
-   if ( shat_sqrt - E1 - E2 < 0.5 * cut * shat_sqrt) { ff[0] = 0.; return 0; }
+   //if ( shat_sqrt - E1 - E2 < 0.5 * cut * shat_sqrt) { ff[0] = 0.; return 0; }
 
 	// eq. 4.2
    const double cosx = (shat - 2 * shat_sqrt * ( E1 + E2 ) + 2 * E2 * E1 + m1*m1 + m2*m2 )/
@@ -257,9 +257,9 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    //pdf_flux /= x1 * x2;
 
    //fac *=  pdf_flux;
-   double xx0 = xx[5];
-   double xx1 = xx[6];
-   double xx2 = xx[0];
+   //double xx0 = xx[5];
+   //double xx1 = xx[6];
+   double xx0 = xx[0];
 
    /*    The integration over s35 and s45 is mapped on unit square spanned by [xx0, xx1]
     *
@@ -268,7 +268,9 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
     *       xx1 -> s45min + (s45max - s45min) xx1
     */
    double m {m1};
-   double J = ((-Power(m,2) + s35)*(-2*m + Sqrt(shat))*Sqrt(shat)*Sqrt(Power(m,4) + Power(s35 - shat,2) - 2*Power(m,2)*(s35 + shat)))/s35;
+   //double J = ((-Power(m,2) + s35)*(-2*m + Sqrt(shat))*Sqrt(shat)*Sqrt(Power(m,4) + Power(s35 - shat,2) - 2*Power(m,2)*(s35 + shat)))/s35;
+   double J = (Power(-2*m + Sqrt(shat),2)*Power(shat,1.5)*xx0*Sqrt((-1 + xx0)*(4*Power(m,2) - shat + Power(-2*m + Sqrt(shat),2)*xx0)))/
+   (Power(m,2) - 2*m*Sqrt(shat)*xx0 + shat*xx0);
    ME2 *= abs(J);
 
    /*

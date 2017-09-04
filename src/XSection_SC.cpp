@@ -110,8 +110,8 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
       if (dipole.get_emitter() < 2 && dipole.get_spectator() > 1) {
          sja = 2.*p[dipole.get_emitter()]*p[dipole.get_spectator()];
          Qja2 = sja + mj2;
-         double sig = dipole.Born_.get_ME2_value(-1, -1, s12_and_costh_to_p(s12, costh));
-         double sigij = dipole.Born_.get_ME2_value(dipole.get_spectator() , dipole.get_emitter() , s12_and_costh_to_p(s12, costh));
+         double sig = 1.; //dipole.Born_.get_ME2_value(-1, -1, s12_and_costh_to_p(s12, costh));
+         double sigij = 1; //dipole.Born_.get_ME2_value(dipole.get_spectator() , dipole.get_emitter() , s12_and_costh_to_p(s12, costh));
          ff[0] -= Alfas/(2.*pi) * (
             // z=1 part of K
             - (3/2.*CF + (7./2. - pi*pi/6.)*CF - 5/6.*pi*pi*CF) * sig
@@ -129,8 +129,8 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
    for (const auto& dipole : cs_dipoles) {
       // eq. 6.68 of CS'02
       if (dipole.get_emitter() < 2 && dipole.get_spectator() < 2) {
-         ff[0] += Alfas/(2.*pi) * (pi*pi/3.)
-                  * dipole.Born_.get_ME2_value(dipole.get_spectator() , dipole.get_emitter() , s12_and_costh_to_p(s12, costh));
+         //ff[0] += Alfas/(2.*pi) * (pi*pi/3.)
+         //         * dipole.Born_.get_ME2_value(dipole.get_spectator() , dipole.get_emitter() , s12_and_costh_to_p(s12, costh));
       }
    }
 
@@ -197,10 +197,10 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
       // eq. 6.68 of CS'02
       if (dipole.get_emitter() < 2 && dipole.get_spectator() < 2) {
          ff[0] += Alfas/(2.*pi) * (
-         dipole.Born_.get_ME2_value(dipole.get_spectator() , dipole.get_emitter() , s12_and_costh_to_p(z*s12, costh))
-                    * (-(1.+z)*log(1-z) + 2.*log(1-z)/(1-z)) -
-             dipole.Born_.get_ME2_value(dipole.get_spectator() , dipole.get_emitter() , s12_and_costh_to_p(s12, costh))
-            * 2.*log(1-z)/(1-z)
+         //dipole.Born_.get_ME2_value(dipole.get_spectator() , dipole.get_emitter() , s12_and_costh_to_p(z*s12, costh))
+                   1 * (-(1.+z)*log(1-z) + 2.*log(1-z)/(1-z)) -
+            // dipole.Born_.get_ME2_value(dipole.get_spectator() , dipole.get_emitter() , s12_and_costh_to_p(s12, costh))
+           1 * 2.*log(1-z)/(1-z)
          );
       }
    }
@@ -212,11 +212,11 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
          // eq. 6.68 of CS'02
          if (dipole.get_emitter() < 2 && dipole.get_spectator() > 1) {
             sja = 2.*p[dipole.get_emitter()]*p[dipole.get_spectator()];
-            double diff = dipole.Born_.get_ME2_value(-1, -1 , s12_and_costh_to_p(z*s12, costh)) - dipole.Born_.get_ME2_value(-1, -1 , s12_and_costh_to_p(s12, costh));
-            double sz =  dipole.Born_.get_ME2_value(-1, -1 , s12_and_costh_to_p(z*s12, costh));
-            double sz1 = dipole.Born_.get_ME2_value(-1, -1 , s12_and_costh_to_p(s12, costh));
-            double szij =  dipole.Born_.get_ME2_value(dipole.get_spectator(), dipole.get_emitter() , s12_and_costh_to_p(z*s12, costh));
-            double sz1ij = dipole.Born_.get_ME2_value(dipole.get_spectator(), dipole.get_emitter(), s12_and_costh_to_p(s12, costh));
+            double diff = 1; //dipole.Born_.get_ME2_value(-1, -1 , s12_and_costh_to_p(z*s12, costh)) - dipole.Born_.get_ME2_value(-1, -1 , s12_and_costh_to_p(s12, costh));
+            double sz =  1; //dipole.Born_.get_ME2_value(-1, -1 , s12_and_costh_to_p(z*s12, costh));
+            double sz1 = 1; //dipole.Born_.get_ME2_value(-1, -1 , s12_and_costh_to_p(s12, costh));
+            double szij =  1; //dipole.Born_.get_ME2_value(dipole.get_spectator(), dipole.get_emitter() , s12_and_costh_to_p(z*s12, costh));
+            double sz1ij = 1; //dipole.Born_.get_ME2_value(dipole.get_spectator(), dipole.get_emitter(), s12_and_costh_to_p(s12, costh));
             double diffij = szij - sz1ij;
             // eq. 6.55
             ff[0] += Alfas/(2.*pi) * (

@@ -1,6 +1,5 @@
 double Process::matrixSMHard_eebar_ttbarg (const std::vector< double* >& p) const {
-   double Alfas = pdf->alphasQ(mu_r);
-   double Alfas2 = pow(Alfas, 2);
+   double Alfas = 0.12;
    double Alfa2 = pow(137., -2);
    double k12 = p[0][0] * p[1][0] - p[0][1] * p[1][1] - p[0][2] * p[1][2] - p[0][3] * p[1][3];
    double k35 = p[2][0] * p[4][0] - p[2][1] * p[4][1] - p[2][2] * p[4][2] - p[2][3] * p[4][3];
@@ -17,7 +16,7 @@ double Process::matrixSMHard_eebar_ttbarg (const std::vector< double* >& p) cons
    double S45 = m2 * m2 + 2 * k45;
    double T = m1 * m1 - 2. * k13;
    double T14 = m2 * m2 - 2. * k14;
-   double MB2 = m1*m1;
+   double MB2 = 5*5;
    return 4*(-512*Alfa2*Alfas*((-2*k14*k24*MB2 - k12*k35*MB2 + k12*MB2*(k12 + MB2) +
                               (-2*k14*k24 + k12*(k14 + k24))*(-k13 - k23 + k34 + MB2))/(4.*(k35*k35)) -
                              (k15*k15*k23 - k15*(k23*k23) - 2*(k12*k12)*(k13 + k23) - k13*k13*k25 - k15*k23*k25 - 2*k15*k23*k35 - 2*k14*k23*MB2 +

@@ -28,6 +28,7 @@ extern "C" double c_integrated_dipoles(
         int,
         int,
         double,
+        double,
         double, double, double, double,
         double, double, double, double,
         double, double, double, double,
@@ -58,7 +59,7 @@ double CSDipole::eval_unintegrated_dipole(std::vector<Vec4D<double>> const& p) c
            p[4].t_, p[4].x_, p[4].y_, p[4].z_,
            4, emit_, spec_
    );
-   auto res = Born_.get_ME2_value(emit_, spec_, d_to_vec_2(d1))*d1[0]/CF;
+   auto res = Born_.get_ME2_value(emit_, spec_, EpsExpansion::Finite, d_to_vec_2(d1))*d1[0]/CF;
    free_mom(d1);
    return res;
 }
@@ -79,14 +80,31 @@ double CSDipole::eval_integrated_dipole(int coeff, std::vector<Vec4D<double>> co
            type_to_int,
            coeff,
            0.12, //Born_.pdf->alphasQ(Born_.mu_r),
+           Born_.mu_r,
            p[0].t_, p[0].x_, p[0].y_, p[0].z_,
            p[1].t_, p[1].x_, p[1].y_, p[1].z_,
            p[2].t_, p[2].x_, p[2].y_, p[2].z_,
            p[3].t_, p[3].x_, p[3].y_, p[3].z_,
            4, emit_, spec_
    );
-   auto res = Born_.get_ME2_value(emit_, spec_, p)*d1;
-   return res;
+   double d2 = c_integrated_dipoles(
+           type_to_int,
+           -1,
+           0.12, //Born_.pdf->alphasQ(Born_.mu_r),
+           Born_.mu_r,
+           p[0].t_, p[0].x_, p[0].y_, p[0].z_,
+           p[1].t_, p[1].x_, p[1].y_, p[1].z_,
+           p[2].t_, p[2].x_, p[2].y_, p[2].z_,
+           p[3].t_, p[3].x_, p[3].y_, p[3].z_,
+           4, emit_, spec_
+   );
+   switch (coeff) {
+      case -1:
+   return Born_.get_ME2_value(emit_, spec_, EpsExpansion::Finite, p)*d1;
+      case 0:
+   return Born_.get_ME2_value(emit_, spec_, EpsExpansion::Finite, p)*d1
+      - Born_.get_ME2_value(emit_, spec_, EpsExpansion::OrdEps, p)*d2;
+   }
 }
 
 double CSDipole::eval_P(std::vector<Vec4D<double>> const& p, double x) const {
@@ -96,7 +114,7 @@ double CSDipole::eval_P(std::vector<Vec4D<double>> const& p, double x) const {
    double mu_f = Born_.mu_f;
    double alpha_s = Born_.pdf->alphasQ(Born_.mu_r);
    // eq. 6.54 of CS'02
-   return alpha_s/(2.*pi) * 1./CF * Born_.get_ME2_value(spec_, emit_, p)*log(mu_f/sja);
+   return alpha_s/(2.*pi) * 1./CF * Born_.get_ME2_value(spec_, emit_, EpsExpansion::Finite, p)*log(mu_f/sja);
 }
 
 double CSDipole::eval_K(std::vector<Vec4D<double>> const& p, double x) const {

@@ -3,29 +3,22 @@ import ConfigParser
 
 Config = ConfigParser.ConfigParser()
 Config.read("../configure.ini")
+
 env = Environment(ENV = os.environ)
 
 # find out if we should use intel or gcc and setup appropriate flags
 compiler = Config.get('compiler', 'compiler')
-cxx_flags = ' -std=c++1z '
+cxx_flags = ' -std=c++17 -O0 '
 if compiler == 'icpc':
-   print 'rsymsqcd: setting up flags for the intel c++ compiler'
+   print 'Setting up flags for the intel c++ compiler'
    # cxx_flags += '-xHost -fp-model extended -fp-model fast=1 '
 elif compiler == 'g++':
-   print 'rsymsqcd: Setting up flags for the g++ compiler'
+   print 'Setting up flags for the g++ compiler'
    # cxx_flags = '-march=native ' 
 else:
    'Unsuported compiler. Currently we support only intel and gcc.'
    exit(1)
    
-mymode = ARGUMENTS.get('mode', 'debug')
-if mymode == 'release':
-   print "rsymsqcd: compiling in RELEASE model"
-   cxx_flags += '-DNDEBUG -O2 '
-else:
-   print "rsymsqcd: compiling in DEBUG mode"
-   cxx_flags += '-O0 '
-
 env.Replace( CXX = compiler ) 
 
 env.Prepend(
@@ -35,21 +28,21 @@ env.Prepend(
       Config.get('RK', 'inc'),
       Config.get('LoopTools', 'inc'),
       '../include',
-      '/usr/include',
-      '/usr/include/eigen3',
-      '/home/wojciech/HEP-software/gcc/ColorFull-1.1/include'
+      '/Users/Navir/Fizyka/programy/gcc/ColorFull-1.1/include',
+      '/opt/local/include/eigen3',
+      '/Users/Navir/Fizyka/programy/gcc/boost-1.65.0/include'
    ], CXXFLAGS = cxx_flags
 )
 
 if 'icpc' in Config.get('compiler', 'compiler'):
-   fortran_libs = [ 'ifcore', 'ifport' ]
+   fortran_libs = [ 'stdc++', 'ifcore', 'ifport' ]
 elif 'g++' in Config.get('compiler', 'compiler'):
    fortran_libs = [ 'gfortran' ]   
 elif 'clang++' in Config.get('compiler', 'compiler'):
-   fortran_libs = [ 'gfortran' ]   
+   fortran_libs = [ 'gfortran', 'ifcore', 'ifport' ]   
 else:
-   print "Couldn't recognize the compiler. Note that only GNU g++ and intel's icpc are officially supported."
-   exit()
+   print "Couldn't recognize the compiler. Only GNU g++ and Intel icpc are supported"
+#   exit()
 
 
 env.Program(   
@@ -57,7 +50,10 @@ env.Program(
    [ Glob( '*.cpp' ) ], 
    # add 'ifcore', 'ifport' if using intel compiler suite
    # or gfortran if using gcc suite 
-   LIBS = fortran_libs + [ 'LHAPDF', 'cuba', 'rk', File(Config.get('LoopTools', 'lib')), 'boost_program_options', 'ColorFull', 'cs_dipole_subtraction' ],
+   LIBS = fortran_libs + [ 'LHAPDF', 'cuba', 'rk', File(Config.get('LoopTools', 'lib')), 'ColorFull', 'gfortran',
+      File('/Users/Navir/Fizyka/programy/gcc/boost-1.65.0/lib/libboost_program_options.a'),
+      'cs_dipole_subtraction'
+   ],
    LIBPATH = [ 
       # for macOS don't use boost from MacPorts
       # see https://stackoverflow.com/questions/19912862/compiling-boostprogram-options-on-mac-os-x-with-g-4-8-mac-ports
@@ -67,9 +63,7 @@ env.Program(
       Config.get('Cuba', 'lib'), 
       Config.get('RK', 'lib'),
       Config.get('compiler', 'libs'),
-#      '/home/wojciech/HEP-software/gcc/ColorFull-1.1/lib/ColorFull',
-      '/usr/lib64/ColorFull',
-      '/home/wojciech/Dokumenty/IdeaProjects/cs_dipole_subtraction/target/debug',
-      '/usr/lib64'
+      '/Users/Navir/Fizyka/Programowanie/rust/catani-seymour-dipole-subtraction/target/debug',
+      '/Users/Navir/Fizyka/Programowanie/rust/catani-seymour-dipole-subtraction/target/debug/deps'
    ] 
 )

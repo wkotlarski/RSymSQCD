@@ -35,15 +35,11 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    double T = xx[0]*(Tmax-Tmin) + Tmin;
    double jacobian = (Tmax-Tmin); //*(1.-x1min)*(1.-x2min);
 
+    
    int FiniteGs = 1;
    double Dminus4 = 0;
    int Divergence = 0;     // O(eps)
-     
-   double squaredMReal = (processID->*processID->matrixelementVirt)(
-      s, T, FiniteGs, Dminus4, Divergence);
-    
-   double dSigmaPart1 = squaredMReal*M_PI/pow(4.*M_PI,2)/pow(s,2);
-    
+double squaredMReal;
    // contraction with O(eps) from Dminus4
    Divergence = -1;           // O(eps)
    FiniteGs = 0;
@@ -51,8 +47,8 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
       s, T, FiniteGs, Dminus4, Divergence);
 
    // in debug mode check cancelation of single poles
-   //assert(
-      std::cout <<
+   assert(
+   //   std::cout <<  
       abs(std::accumulate(
          cs_dipoles.begin(), cs_dipoles.end(), 0.,
          [s,T](double current,  CSDipole& el) {
@@ -60,16 +56,16 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
          }
       )
       + squaredMReal)
-      // < 1e-15
-      << std::endl;
-   //);
+       < 1e-15
+   //   << std::endl;
+   );
     
    Dminus4 = -2.;
    double squaredMRealMinus2 = (processID->*processID->matrixelementVirt)(
                          s, T, FiniteGs, Dminus4, Divergence);
     
    double dSigmaPart3 = 2.*(squaredMRealMinus2 - squaredMReal)*
-                         (processID->h)*M_PI/(pow(4.*M_PI,2))/
+                         (processID->h)*pi/(pow(4.*pi,2))/
                          (processID->k)/(pow(s,2));
 
    // contraction with O(eps^2) prefactor of loop integral
@@ -88,12 +84,16 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
            )
            + squaredMReal) < 1e-16
    );
+   // -------------------------
 
-   double dSigmaPart4 = 2.*squaredMReal*(processID->h)*M_PI/(pow(4.*M_PI,2))/
-                         (processID->k)/(pow(s,2))
-                         *(pow(M_PI,2.)/6.);
-
-   double dSigmaHad = (dSigmaPart1 + 0*dSigmaPart3 + 0*dSigmaPart4);
+   FiniteGs = 1;
+   Dminus4 = 0;
+   Divergence = 0;     // O(eps)
+     
+   squaredMReal = (processID->*processID->matrixelementVirt)(
+      s, T, FiniteGs, Dminus4, Divergence);
+    
+   double dSigmaPart1 = squaredMReal*pi/pow(4.*pi,2)/pow(s,2);
 
    double pdf_flux = 0.0;
    for (const auto& flav : processID->flav) {
@@ -107,9 +107,7 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
               return current + el.eval_integrated_dipole(0, mandelstam_to_p(s, T));
            }
    );
-   dipole_sum *= M_PI/(pow(4.*M_PI,2))/
-                                    (processID->k)/(pow(s,2));
-   ff[0] = (dSigmaHad+dipole_sum)*jacobian*to_fb; //* pdf_flux;   // in femto barn
+   ff[0] = (squaredMReal + dipole_sum) * pi/pow(4.*pi,2)/pow(s,2) * jacobian * to_fb; //* pdf_flux;   // in femto barn
    return 0;
 
 }
