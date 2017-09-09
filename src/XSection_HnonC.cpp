@@ -6,9 +6,14 @@
 #include <array>
 #include <numeric>
 
+// needed for Euler rotation
+#include "rk/rk.hh"
+#include "rk/geom3.hh"
+
 #include "../include/Vec4D.hpp"
 #include "../include/CSDipole.hpp"
 #include "../include/XSection_HnonC.hpp"
+
 // @todo this is absolutely neeed but I don't know why
 using namespace std;
 /*
