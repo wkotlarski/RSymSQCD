@@ -1,4 +1,5 @@
 #include "XSection_Tree.hpp"
+#include "constants.hpp"
 
 /*
  * E1 = sqrtS/2 (1 + (m1^2 - m2^2)/s)
@@ -36,9 +37,7 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
 //   }
    //pdf_flux /= (x1 * x2);
     
-   std::vector<Particle> particles {Particle::e, Particle::ebar, Particle::b, Particle::bbar};
-
-   double squaredM = (model->BornME)(particles, s, T);
+   double squaredM = (model->BornME)(particles[0], s, T);
    double dSigmaPart = squaredM*M_PI/(pow(4.*pi,2))/(pow(s,2));
            
    ff[0] = dSigmaPart /* * pdf_flux */ * jacobian * to_fb;

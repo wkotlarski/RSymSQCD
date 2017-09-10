@@ -136,7 +136,7 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
 
    double beta = sqrt(1. - 4*1500*1500/s12);
    ff[0] *= pdf_flux * to_fb/(2.*s12) * beta/(16*pi);
-   ff[0] *= 2.*(Power(-4*pow(m1, 2) + S,2)*xx[0])/(S*(-4*pow(m1, 2)*(-1 + xx[0]) + S*xx[0]));
+   ff[0] *= 2.*(pow(-4*pow(m1, 2) + S,2)*xx[0])/(S*(-4*pow(m1, 2)*(-1 + xx[0]) + S*xx[0]));
 
     
    return 0;

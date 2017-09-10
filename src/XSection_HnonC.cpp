@@ -233,7 +233,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    );
    // ----------------------------------------------
    valarray<double> ME2 = {
-           (model->RealME)(vector<Particle> {Particle::e, Particle::ebar, Particle::b, Particle::bbar}, q), -dipole_sum
+           (model->RealME)(particles[0], q), -dipole_sum
    };
    // delete (otherwise causes memory leak)
    for(std::vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {
@@ -275,9 +275,9 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
     *       xx1 -> s45min + (s45max - s45min) xx1
     */
    double m {m1};
-   //double J = ((-Power(m,2) + s35)*(-2*m + Sqrt(shat))*Sqrt(shat)*Sqrt(Power(m,4) + Power(s35 - shat,2) - 2*Power(m,2)*(s35 + shat)))/s35;
-   double J = (Power(-2*m + Sqrt(shat),2)*Power(shat,1.5)*xx3*Sqrt((-1 + xx3)*(4*Power(m,2) - shat + Power(-2*m + Sqrt(shat),2)*xx3)))/
-   (Power(m,2) - 2*m*Sqrt(shat)*xx3 + shat*xx3);
+   //double J = ((-Power(m,2) + s35)*(-2*m + sqrt(shat))*sqrt(shat)*sqrt(Power(m,4) + Power(s35 - shat,2) - 2*Power(m,2)*(s35 + shat)))/s35;
+   double J = (pow(-2*m + sqrt(shat),2)*pow(shat,1.5)*xx3*sqrt((-1 + xx3)*(4*pow(m,2) - shat + pow(-2*m + sqrt(shat),2)*xx3)))/
+   (pow(m,2) - 2*m*sqrt(shat)*xx3 + shat*xx3);
    ME2 *= abs(J);
 
    /*
@@ -325,7 +325,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    if (pt.get<std::string>("collider setup.collider") == "pp"
        || pt.get<std::string>("collider setup.collider") == "ppbar") {
       // Jakobian of Bjorken vars. mapping xx0, xx1 -> x1, x2
-      ME2 *= (Power(-4*Power(m,2) + S,2)*xx0)/(S*(-4*Power(m,2)*(-1 + xx0) + S*xx0));
+      ME2 *= (pow(-4*pow(m,2) + S,2)*xx0)/(S*(-4*pow(m,2)*(-1 + xx0) + S*xx0));
    }
 
    ME2 *= fac;

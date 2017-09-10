@@ -34,7 +34,7 @@ enum class DipoleV {
 class CSDipole {
 
 public:
-   CSDipole(boost::property_tree::ptree pt, std::string s, DipoleType type, unsigned int i, unsigned int j)
+   CSDipole(boost::property_tree::ptree pt, DipoleType type, unsigned int i, unsigned int j)
             : model_(IMatrixElements::create_process(pt)), type_(type), emit_(i), spec_(j) {
       std::cout << "Initialized Catani-Seymour dipole of type ";
       if (type_ == DipoleType::FF) {

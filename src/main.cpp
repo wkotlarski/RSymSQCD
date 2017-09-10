@@ -41,6 +41,7 @@ double XSection::m2;
 double XSection::S;
 double XSection::S_sqrt;
 double XSection::dC;
+std::vector<std::vector<Particle>> XSection::particles; 
 double XSection::dS;
 boost::property_tree::ptree XSection::pt;
 boost::program_options::variables_map XSection::vm;
@@ -160,66 +161,9 @@ int main(int argc, char* argv[]) {
       SM, Simplified, MSSM, MRSSM, no_model
    };
 
-   enum Channel {
-       pp_OO,
-       pp_OsOs,
-       pp_suLsuR,
-       pp_suLsuL,
-       pp_suLsdR,
-       pp_suLsdL,
-       pp_suLsuLdagger,
-       pp_suLsuRdagger,
-       pp_suLsdLdagger,
-       pp_suLsdRdagger,
-      eebar_ttbar,
-       no_channel
-   };
-
-   Model model = no_model;
-   Channel channel = no_channel;
-
-   if ( pt.get<string>("process.model") == "MRSSM" ) {
-      model = MRSSM;
-   } else if ( string(argv[1]) == "MSSM" ) {
-      model = MSSM;
-   } else if ( string(argv[1]) == "Simplified" ) {
-      model = Simplified;
-   } else if ( pt.get<string>("process.model") == "SM" ) {
-      model = SM;
-   } else {
-	   cout << "\n Model not implemented! \n\n";
-   }
-
-   if ( pt.get<string>("process.process") == "pp_OsOs" ) {
-      channel = pp_OsOs;
-   } else if ( pt.get<string>("process.process") == "pp_suLsuR" ) {
-      channel = pp_suLsuR;
-   } else if ( pt.get<string>("process.process") == "pp_suLsuL" ) {
-      channel = pp_suLsuL;
-   } else if ( pt.get<string>("process.process") == "pp_suLsdR" ) {
-      channel = pp_suLsdR;
-   } else if ( pt.get<string>("process.process") == "pp_suLsdL" ) {
-      channel = pp_suLsdL;
-   } else if ( pt.get<string>("process.process") == "pp_suLsuLdagger" ) {
-      channel = pp_suLsuLdagger;
-   } else if ( pt.get<string>("process.process") == "pp_suLsuRdagger" ) {
-      channel = pp_suLsuRdagger;
-   } else if ( pt.get<string>("process.process") == "pp_suLsdLdagger" ) {
-      channel = pp_suLsdLdagger;
-   } else if ( pt.get<string>("process.process") == "pp_suLsdRdagger" ) {
-      channel = pp_suLsdRdagger;
-   } else if ( pt.get<string>("process.process") == "pp_OO" ) {
-      channel = pp_OO;
-   } else if ( pt.get<string>("process.process") == "eebar_ttbar" ) {
-      channel = eebar_ttbar;
-   } else {
-	   cout << "\n Process not implemented! \n\n";
-   }
-
    auto start = chrono::steady_clock::now();
 
-   IMatrixElements* me = IMatrixElements::create_process(pt);
-   XSection::init(me, pt, vm);
+   XSection::init(pt, vm);
    XSection_Tree tree;
    xsection_tree = tree.integrate();
    XSection_Virt virt;
@@ -230,14 +174,11 @@ int main(int argc, char* argv[]) {
    };
    for (const auto &e : v) {
       hc.cs_dipoles.push_back(
-            CSDipole(pt, "SM,eebar_ttbar", std::get<0>(e), std::get<1>(e), std::get<2>(e))
+         CSDipole(pt, std::get<0>(e), std::get<1>(e), std::get<2>(e))
       );
       virt.cs_dipoles.push_back(
-            CSDipole(pt, "SM,eebar_ttbar", std::get<0>(e), std::get<1>(e), std::get<2>(e))
+         CSDipole(pt, std::get<0>(e), std::get<1>(e), std::get<2>(e))
       );
-      //sc.cs_dipoles.push_back(
-      //        CSDipole(pt, "SM,eebar_ttbar", std::get<0>(e), std::get<1>(e), std::get<2>(e))
-      //);
    }
    xsection_virt = virt.integrate();
    xsection_HnonC = hc.integrate();

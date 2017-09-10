@@ -4,6 +4,7 @@
 #include "../include/Vec4D.hpp"
 #include "../include/IMatrixElements.h"
 
+#include "clooptools.h"
 std::vector<CSDipole> XSection_Virt::cs_dipoles;
 
 std::vector<Vec4D<double>> mandelstam_to_p (double s, double t) {
@@ -43,7 +44,6 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    double T = xx[0]*(Tmax-Tmin) + Tmin;
    double jacobian = (Tmax-Tmin) * (1.-x1min) * (1.-x2min);
 
-   std::vector<Particle> particles {Particle::e, Particle::ebar, Particle::b, Particle::bbar};
 
    // in debug mode check cancelation of double poles
    assert(
@@ -53,7 +53,7 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
                      [s,T](double current,  CSDipole& el) {
                         return current + el.eval_integrated_dipole(-2, mandelstam_to_p(s, T));
                      }
-               ) + (model->VirtualME)(particles, EpsOrd::DoublePole, s, T)
+               ) + (model->VirtualME)(particles[0], EpsOrd::DoublePole, s, T)
          ) < 1e-16
    );
    // and single poles
@@ -64,7 +64,7 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
                      [s,T](double current,  CSDipole& el) {
                         return current + el.eval_integrated_dipole(-1, mandelstam_to_p(s, T));
                      }
-               ) + (model->VirtualME)(particles, EpsOrd::SinglePole, s, T)
+               ) + (model->VirtualME)(particles[0], EpsOrd::SinglePole, s, T)
          ) < 1e-16
    );
 
@@ -96,7 +96,7 @@ double squaredMReal;
    Dminus4 = 0;
    Divergence = 0;     // O(eps)
 
-   squaredMReal = (model->VirtualME)(particles, EpsOrd::Eps0, s, T);
+   squaredMReal = (model->VirtualME)(particles[0], EpsOrd::Eps0, s, T);
 
    double pdf_flux = 0.0;
 //   for (const auto& flav : processID->flav) {
