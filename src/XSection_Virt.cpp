@@ -23,21 +23,52 @@ std::vector<Vec4D<double>> mandelstam_to_p (double s, double t) {
 int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    const int *ncomp, cubareal ff[], void *userdata) {
 
-   //double x1min = 4. * pow( m1, 2 )/S;
-   //double xmax = 1.;
-   //double x1 = x1min + (xmax - x1min) * xx[1];
-   //double x2min = 4. * pow( m1, 2 )/(S*x1);
-   //double x2 = x2min + (xmax - x2min) * xx[2];
    double m1 = 5;
-   double s = S; // * x1 * x2;     //partonic
+   double x1 = 1;
+   double x2 = 1;
+   double x1min = 0;
+   double x2min = 0;
+   if (pt.get<std::string>("collider setup.collider") == "pp"
+       || pt.get<std::string>("collider setup.collider") == "ppbar") {
+      double x1min = 4. * pow(m1, 2) / S;
+      x1 = x1min + (1. - x1min) * xx[*ndim-2];
+      double x2min = 4. * pow(m1, 2) / (S * x1);
+      x2 = x2min + (1. - x2min) * xx[*ndim-1];
+   }
+   double s = x1 * x2 * S;     //partonic
    double Tmin = pow( m1, 2 ) - s/2. - sqrt( pow(s, 2)/4 -
                   pow( m1, 2 )*s);
    double Tmax = pow( m1, 2 ) - s/2. + sqrt( pow(s, 2)/4. -
                   pow( m1, 2 )*s);
    double T = xx[0]*(Tmax-Tmin) + Tmin;
-   double jacobian = (Tmax-Tmin); //*(1.-x1min)*(1.-x2min);
+   double jacobian = (Tmax-Tmin) * (1.-x1min) * (1.-x2min);
 
-    
+   std::vector<Particle> particles {Particle::e, Particle::ebar, Particle::b, Particle::bbar};
+
+   // in debug mode check cancelation of double poles
+   assert(
+         abs(
+               std::accumulate(
+                     cs_dipoles.begin(), cs_dipoles.end(), 0.,
+                     [s,T](double current,  CSDipole& el) {
+                        return current + el.eval_integrated_dipole(-2, mandelstam_to_p(s, T));
+                     }
+               ) + (model->VirtualME)(particles, EpsOrd::DoublePole, s, T)
+         ) < 1e-16
+   );
+   // and single poles
+   assert(
+         abs(
+               std::accumulate(
+                     cs_dipoles.begin(), cs_dipoles.end(), 0.,
+                     [s,T](double current,  CSDipole& el) {
+                        return current + el.eval_integrated_dipole(-1, mandelstam_to_p(s, T));
+                     }
+               ) + (model->VirtualME)(particles, EpsOrd::SinglePole, s, T)
+         ) < 1e-16
+   );
+
+
    int FiniteGs = 1;
    double Dminus4 = 0;
    int Divergence = 0;     // O(eps)
@@ -45,24 +76,7 @@ double squaredMReal;
    // contraction with O(eps) from Dminus4
    Divergence = -1;           // O(eps)
    FiniteGs = 0;
-   std::vector<Particle> particles {Particle::e, Particle::ebar, Particle::b, Particle::bbar};
-   squaredMReal =
-         (model->VirtualME)(particles, EpsOrd::SinglePole, s, T);
 
-   // in debug mode check cancelation of single poles
-//   assert(
-////      std::cout <<
-//      abs(std::accumulate(
-//         cs_dipoles.begin(), cs_dipoles.end(), 0.,
-//         [s,T](double current,  CSDipole& el) {
-//            return current + el.eval_integrated_dipole(-1, mandelstam_to_p(s, T));
-//         }
-//      )
-//      + squaredMReal)
-//       < 1e-15
-////      << std::endl;
-//   );
-    
    Dminus4 = -2.;
 //   double squaredMRealMinus2 = (processID->*processID->matrixelementVirtual)(
 //                         s, T, FiniteGs, Dminus4, Divergence);
@@ -75,18 +89,7 @@ double squaredMReal;
    // and with product of O(eps) prefactors of phase space and loop integral
    Divergence = -2;
    Dminus4 = 0;
-   squaredMReal =
-         (model->VirtualME)(particles, EpsOrd::DoublePole, s, T);
-   // in debug mode check cancelation of double poles
-//   assert(
-//           abs(std::accumulate(
-//                   cs_dipoles.begin(), cs_dipoles.end(), 0.,
-//                   [s,T](double current,  CSDipole& el) {
-//                      return current + el.eval_integrated_dipole(-2, mandelstam_to_p(s, T));
-//                   }
-//           )
-//           + squaredMReal) < 1e-16
-//   );
+
    // -------------------------
 
    FiniteGs = 1;
@@ -151,7 +154,6 @@ double squaredMReal;
     *    It's not clear if this is just a sign of numerical instability
     *    of LoopTools or something more serious.
     */
-    std::cout << "start integration" << std::endl;
    Divonne(ndim, ncomp, integrand, NULL, nvec,
         prec_virt, accuracy_abs, verbose, seed,
         eval_min, eval_max, key1, key2, key3, maxpass,
@@ -160,8 +162,7 @@ double squaredMReal;
         NULL, NULL,
         &nregions, &neval, &fail, integral, error, prob);
 
-    std::cout << "finished integration" << std::endl;
-   std::array <double, 3> result{ integral[0], error[0], prob[0] }; 
+   std::array <double, 3> result{ integral[0], error[0], prob[0] };
 
    return result;
 }
