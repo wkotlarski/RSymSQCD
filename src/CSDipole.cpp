@@ -51,7 +51,7 @@ double CSDipole::eval_unintegrated_dipole(std::vector<Vec4D<double>> const& p) c
 
    double* d1 = c_unintegrated_dipoles(
            type_to_int,
-           Born_.pdf->alphasQ(Born_.mu_r),
+           0.12,
            p[0].t_, p[0].x_, p[0].y_, p[0].z_,
            p[1].t_, p[1].x_, p[1].y_, p[1].z_,
            p[2].t_, p[2].x_, p[2].y_, p[2].z_,
@@ -59,7 +59,8 @@ double CSDipole::eval_unintegrated_dipole(std::vector<Vec4D<double>> const& p) c
            p[4].t_, p[4].x_, p[4].y_, p[4].z_,
            4, emit_, spec_
    );
-   auto res = Born_.get_ME2_value(emit_, spec_, EpsExpansion::Finite, d_to_vec_2(d1))*d1[0]/CF;
+   auto res = model_->BornCCME(std::vector<Particle> {Particle::e, Particle::ebar, Particle::b, Particle::bbar},
+                               emit_, spec_, EpsOrd::Eps0, d_to_vec_2(d1))*d1[0]/CF;
    free_mom(d1);
    return res;
 }
@@ -80,7 +81,7 @@ double CSDipole::eval_integrated_dipole(int coeff, std::vector<Vec4D<double>> co
            type_to_int,
            coeff,
            0.12, //Born_.pdf->alphasQ(Born_.mu_r),
-           Born_.mu_r,
+           91.1876,
            p[0].t_, p[0].x_, p[0].y_, p[0].z_,
            p[1].t_, p[1].x_, p[1].y_, p[1].z_,
            p[2].t_, p[2].x_, p[2].y_, p[2].z_,
@@ -91,7 +92,7 @@ double CSDipole::eval_integrated_dipole(int coeff, std::vector<Vec4D<double>> co
            type_to_int,
            -1,
            0.12, //Born_.pdf->alphasQ(Born_.mu_r),
-           Born_.mu_r,
+           91.1876,
            p[0].t_, p[0].x_, p[0].y_, p[0].z_,
            p[1].t_, p[1].x_, p[1].y_, p[1].z_,
            p[2].t_, p[2].x_, p[2].y_, p[2].z_,
@@ -99,11 +100,13 @@ double CSDipole::eval_integrated_dipole(int coeff, std::vector<Vec4D<double>> co
            4, emit_, spec_
    );
    switch (coeff) {
+      case -2:
+         return model_->BornCCME(std::vector<Particle> {Particle::e, Particle::ebar, Particle::b, Particle::bbar},emit_, spec_, EpsOrd::Eps0, p)*d1;
       case -1:
-   return Born_.get_ME2_value(emit_, spec_, EpsExpansion::Finite, p)*d1;
+         return model_->BornCCME(std::vector<Particle> {Particle::e, Particle::ebar, Particle::b, Particle::bbar},emit_, spec_, EpsOrd::Eps0, p)*d1;
       case 0:
-   return Born_.get_ME2_value(emit_, spec_, EpsExpansion::Finite, p)*d1
-      - Born_.get_ME2_value(emit_, spec_, EpsExpansion::OrdEps, p)*d2;
+         return model_->BornCCME(std::vector<Particle> {Particle::e, Particle::ebar, Particle::b, Particle::bbar},emit_, spec_, EpsOrd::Eps0, p)*d1
+      - model_->BornCCME(std::vector<Particle> {Particle::e, Particle::ebar, Particle::b, Particle::bbar},emit_, spec_, EpsOrd::Eps1, p)*d2;
    }
 }
 
@@ -111,17 +114,17 @@ double CSDipole::eval_P(std::vector<Vec4D<double>> const& p, double x) const {
    // P-term appears only for the initial state emitters
    if (type_ == DipoleType::FF || type_ == DipoleType::FI) return 0.;
    double sja = 2.*p[emit_]*p[spec_];
-   double mu_f = Born_.mu_f;
-   double alpha_s = Born_.pdf->alphasQ(Born_.mu_r);
+   double mu_f = model_->mu_f;
+   double alpha_s = model_->pdf->alphasQ(model_->mu_r);
    // eq. 6.54 of CS'02
-   return alpha_s/(2.*pi) * 1./CF * Born_.get_ME2_value(spec_, emit_, EpsExpansion::Finite, p)*log(mu_f/sja);
+   return alpha_s/(2.*pi) * 1./CF * model_->BornCCME(std::vector<Particle> {Particle::e, Particle::ebar, Particle::b, Particle::bbar},spec_, emit_, EpsOrd::Eps0, p)*log(mu_f/sja);
 }
 
 double CSDipole::eval_K(std::vector<Vec4D<double>> const& p, double x) const {
    // K-term appears only for the initial state emitters
    if (type_ == DipoleType::FF || type_ == DipoleType::FI) return 0.;
    double sja = 2.*p[emit_]*p[spec_];
-   double alpha_s = Born_.pdf->alphasQ(Born_.mu_r);
+   double alpha_s = model_->pdf->alphasQ(model_->mu_r);
    // eq. 6.55 of CS'02
    return alpha_s/(2.*pi);
 }

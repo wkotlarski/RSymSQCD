@@ -1,9 +1,9 @@
 #ifndef RSYMSQCD_MSSM_H
 #define RSYMSQCD_MSSM_H
 
-#include "IModel.h"
+#include "IMatrixElements.h"
 
-class MSSM : public IModel {
+class MSSM : public IMatrixElements {
 
 public:
    MSSM(boost::property_tree::ptree const&);

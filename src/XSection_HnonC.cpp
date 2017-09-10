@@ -73,6 +73,8 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    *  http://www.t39.ph.tum.de/T39_files/T39_people_files/duell_files/Dipl-MultiPion.pdf
    */
 
+   double m1 = 5;
+   double m2 = 5;
    const double m_sqr = m1 * m1;
    // const double x1 = 4. * m_sqr/S + (1. - 4. * m_sqr/S ) * xx[5];
    // const double x2 = 4. * m_sqr /(S * x1) + (1. - 4. * m_sqr/(S * x1)) * xx[6];
@@ -226,7 +228,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    );
    // ----------------------------------------------
    valarray<double> ME2 = {
-           (processID->*processID->matrixelementReal_HnonC)(p), -dipole_sum
+           (model->RealME)(vector<Particle> {Particle::e, Particle::ebar, Particle::b, Particle::bbar}, q), -dipole_sum
    };
    // delete (otherwise causes memory leak)
    for(std::vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {
@@ -251,9 +253,9 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    fac /= 256 * pi_sqr;
 
    double pdf_flux = 0.0;
-   for (const auto& f : processID->flav) {
+//   for (const auto& f : processID->flav) {
       //pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x1, mu_f ) * pdf->xfxQ( f.at(1), x2, mu_f );
-   }
+//   }
    //pdf_flux /= x1 * x2;
 
    //fac *=  pdf_flux;

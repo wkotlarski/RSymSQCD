@@ -2,6 +2,7 @@
 #include <numeric>
 #include "XSection_Virt.hpp"
 #include "../include/Vec4D.hpp"
+#include "../include/IMatrixElements.h"
 
 std::vector<CSDipole> XSection_Virt::cs_dipoles;
 
@@ -27,6 +28,7 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    //double x1 = x1min + (xmax - x1min) * xx[1];
    //double x2min = 4. * pow( m1, 2 )/(S*x1);
    //double x2 = x2min + (xmax - x2min) * xx[2];
+   double m1 = 5;
    double s = S; // * x1 * x2;     //partonic
    double Tmin = pow( m1, 2 ) - s/2. - sqrt( pow(s, 2)/4 -
                   pow( m1, 2 )*s);
@@ -43,62 +45,60 @@ double squaredMReal;
    // contraction with O(eps) from Dminus4
    Divergence = -1;           // O(eps)
    FiniteGs = 0;
-   squaredMReal = (processID->*processID->matrixelementVirt)(
-      s, T, FiniteGs, Dminus4, Divergence);
+   std::vector<Particle> particles {Particle::e, Particle::ebar, Particle::b, Particle::bbar};
+   squaredMReal =
+         (model->VirtualME)(particles, EpsOrd::SinglePole, s, T);
 
    // in debug mode check cancelation of single poles
-   assert(
-   //   std::cout <<  
-      abs(std::accumulate(
-         cs_dipoles.begin(), cs_dipoles.end(), 0.,
-         [s,T](double current,  CSDipole& el) {
-            return current + el.eval_integrated_dipole(-1, mandelstam_to_p(s, T));
-         }
-      )
-      + squaredMReal)
-       < 1e-15
-   //   << std::endl;
-   );
+//   assert(
+////      std::cout <<
+//      abs(std::accumulate(
+//         cs_dipoles.begin(), cs_dipoles.end(), 0.,
+//         [s,T](double current,  CSDipole& el) {
+//            return current + el.eval_integrated_dipole(-1, mandelstam_to_p(s, T));
+//         }
+//      )
+//      + squaredMReal)
+//       < 1e-15
+////      << std::endl;
+//   );
     
    Dminus4 = -2.;
-   double squaredMRealMinus2 = (processID->*processID->matrixelementVirt)(
-                         s, T, FiniteGs, Dminus4, Divergence);
-    
-   double dSigmaPart3 = 2.*(squaredMRealMinus2 - squaredMReal)*
-                         (processID->h)*pi/(pow(4.*pi,2))/
-                         (processID->k)/(pow(s,2));
+//   double squaredMRealMinus2 = (processID->*processID->matrixelementVirtual)(
+//                         s, T, FiniteGs, Dminus4, Divergence);
+//
+//   double dSigmaPart3 = 2.*(squaredMRealMinus2 - squaredMReal)*
+//                         (processID->h)*pi/(pow(4.*pi,2))/
+//                         (processID->k)/(pow(s,2));
 
    // contraction with O(eps^2) prefactor of loop integral
    // and with product of O(eps) prefactors of phase space and loop integral
    Divergence = -2;
    Dminus4 = 0;
-   squaredMReal = (processID->*processID->matrixelementVirt)(
-      s, T, FiniteGs, Dminus4, Divergence);
+   squaredMReal =
+         (model->VirtualME)(particles, EpsOrd::DoublePole, s, T);
    // in debug mode check cancelation of double poles
-   assert(
-           abs(std::accumulate(
-                   cs_dipoles.begin(), cs_dipoles.end(), 0.,
-                   [s,T](double current,  CSDipole& el) {
-                      return current + el.eval_integrated_dipole(-2, mandelstam_to_p(s, T));
-                   }
-           )
-           + squaredMReal) < 1e-16
-   );
+//   assert(
+//           abs(std::accumulate(
+//                   cs_dipoles.begin(), cs_dipoles.end(), 0.,
+//                   [s,T](double current,  CSDipole& el) {
+//                      return current + el.eval_integrated_dipole(-2, mandelstam_to_p(s, T));
+//                   }
+//           )
+//           + squaredMReal) < 1e-16
+//   );
    // -------------------------
 
    FiniteGs = 1;
    Dminus4 = 0;
    Divergence = 0;     // O(eps)
-     
-   squaredMReal = (processID->*processID->matrixelementVirt)(
-      s, T, FiniteGs, Dminus4, Divergence);
-    
-   double dSigmaPart1 = squaredMReal*pi/pow(4.*pi,2)/pow(s,2);
+
+   squaredMReal = (model->VirtualME)(particles, EpsOrd::Eps0, s, T);
 
    double pdf_flux = 0.0;
-   for (const auto& flav : processID->flav) {
+//   for (const auto& flav : processID->flav) {
       //pdf_flux += flav.at(2) * pdf->xfxQ( flav.at(0), x1, mu_f ) * pdf->xfxQ( flav.at(1), x2, mu_f );
-   }
+//   }
    //pdf_flux /= (x1 * x2);
 
    double dipole_sum = std::accumulate(
@@ -151,6 +151,7 @@ double squaredMReal;
     *    It's not clear if this is just a sign of numerical instability
     *    of LoopTools or something more serious.
     */
+    std::cout << "start integration" << std::endl;
    Divonne(ndim, ncomp, integrand, NULL, nvec,
         prec_virt, accuracy_abs, verbose, seed,
         eval_min, eval_max, key1, key2, key3, maxpass,
@@ -159,6 +160,7 @@ double squaredMReal;
         NULL, NULL,
         &nregions, &neval, &fail, integral, error, prob);
 
+    std::cout << "finished integration" << std::endl;
    std::array <double, 3> result{ integral[0], error[0], prob[0] }; 
 
    return result;

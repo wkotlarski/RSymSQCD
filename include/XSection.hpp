@@ -9,6 +9,7 @@
 #include "LHAPDF/LHAPDF.h"
 #include "include/cuba.h"
 
+#include "IMatrixElements.h"
 #include "Process.hpp"
 
 // every class with at least one pure virtual function 
@@ -19,8 +20,8 @@ class XSection {
       // pure virtual function (abstract function)
       virtual std::array<double, 3> integrate() = 0;
       
-      static void init (Process*, boost::property_tree::ptree, boost::program_options::variables_map);
-      static Process* processID;
+      static void init (IMatrixElements*, boost::property_tree::ptree, boost::program_options::variables_map);
+      static IMatrixElements* model;
 
    protected:
       static double dS;

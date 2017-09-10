@@ -1,9 +1,9 @@
 #ifndef RSYMSQCD_SM_H
 #define RSYMSQCD_SM_H
 
-#include "IModel.h"
+#include "IMatrixElements.h"
 
-class SM : public IModel {
+class SM : public IMatrixElements {
 
 public:
    SM(boost::property_tree::ptree const& ptree);

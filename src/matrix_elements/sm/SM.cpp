@@ -2,7 +2,7 @@
 #include "constants.hpp"
 
 #include "dilog.hpp"
-#include "../../../include/IModel.h"
+#include "../../../include/IMatrixElements.h"
 
 SM::SM(boost::property_tree::ptree const& ptree) :
       MB_(ptree.get<double>("masses.b")),
@@ -123,3 +123,5 @@ double SM::eebar_bbbar_R (std::vector<Vec4D<double>> const& p) const noexcept {
                                 k12*(MB2*MB2 + k15*(k13 + MB2) + k25*(k23 + MB2) - k35*(k13 + k23 + MB2)))/(4.*(k45*k45)))*pow(pi,3))/
           (9.*(k12*k12));
 }
+
+// --------------------------------- uubar -> e+e- --------------------------------

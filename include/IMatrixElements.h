@@ -24,7 +24,7 @@ enum class Particle {
    suR, suRdagger
 };
 
-class IModel {
+class IMatrixElements {
 
 public:
    const LHAPDF::PDF* pdf = LHAPDF::mkPDF( "MMHT2014nlo68cl", 0);
@@ -34,7 +34,7 @@ public:
    virtual double VirtualME(std::vector<Particle>, EpsOrd, double, double) const noexcept = 0;
    virtual double RealME(std::vector<Particle>, std::vector<Vec4D<double>> const&) const noexcept = 0;
 
-   static IModel* create_process(boost::property_tree::ptree const&);
+   static IMatrixElements* create_process(boost::property_tree::ptree const&);
 
 protected:
    double ColorMatrix( int emitter,  int spectator, std::string const& col_str1, std::string const& col_str2 ) const noexcept {
