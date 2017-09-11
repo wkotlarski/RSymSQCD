@@ -6,21 +6,7 @@ Config.read("../configure.ini")
 
 env = Environment(ENV = os.environ)
 
-# find out if we should use intel or gcc and setup appropriate flags
-compiler = Config.get('compiler', 'compiler')
-cxx_flags = ' -std=c++17 -O0 '
-if compiler == 'icpc':
-   print 'Setting up flags for the intel c++ compiler'
-   # cxx_flags += '-xHost -fp-model extended -fp-model fast=1 '
-elif compiler == 'g++':
-   print 'Setting up flags for the g++ compiler'
-   # cxx_flags = '-march=native ' 
-else:
-   'Unsuported compiler. Currently we support only intel and gcc.'
-   exit(1)
-   
-env.Replace( CXX = compiler ) 
-
+env.Replace( CXX = Config.get('compiler', 'compiler') )
 env.Prepend(
    CPPPATH = [  
       os.popen('lhapdf-config --incdir').read().strip(), 
@@ -28,42 +14,38 @@ env.Prepend(
       Config.get('RK', 'inc'),
       Config.get('LoopTools', 'inc'),
       '../include',
-      '/Users/Navir/Fizyka/programy/gcc/ColorFull-1.1/include',
-      '/opt/local/include/eigen3',
-      '/Users/Navir/Fizyka/programy/gcc/boost-1.65.0/include'
-   ], CXXFLAGS = cxx_flags
+	'/usr/include',
+	'/usr/include/eigen3',
+	'/home/wojciechk1/HEP-software/gcc/ColorFull-1.1/include',
+	'/home/wojciechk1/HEP-software/gcc/rk-1.7/include'
+   ],
+   # -march=native throws "no such instruction: `vmovd %xmm0, %eax'" errors
+   CXXFLAGS = '-std=c++17 ' + Config.get('compiler', 'flags') # -mno-avx'
 )
 
 if 'icpc' in Config.get('compiler', 'compiler'):
-   fortran_libs = [ 'stdc++', 'ifcore', 'ifport' ]
+   fortran_libs = [ 'ifcore', 'ifport' ]
 elif 'g++' in Config.get('compiler', 'compiler'):
    fortran_libs = [ 'gfortran' ]   
 elif 'clang++' in Config.get('compiler', 'compiler'):
-   fortran_libs = [ 'gfortran', 'ifcore', 'ifport' ]   
+   fortran_libs = [ 'gfortran' ]   
 else:
    print "Couldn't recognize the compiler. Only GNU g++ and Intel icpc are supported"
-#   exit()
+   exit()
 
 
 env.Program(   
    '../bin/RSymSQCD', 
-   [ Glob( '*.cpp' ) ], 
+   [ Glob('*.cpp'), Glob( 'matrix_elements/*/*.cpp' ), Glob('matrix_elements/*.cpp') ],
    # add 'ifcore', 'ifport' if using intel compiler suite
    # or gfortran if using gcc suite 
-   LIBS = fortran_libs + [ 'LHAPDF', 'cuba', 'rk', File(Config.get('LoopTools', 'lib')), 'ColorFull', 'gfortran',
-      File('/Users/Navir/Fizyka/programy/gcc/boost-1.65.0/lib/libboost_program_options.a'),
-      'cs_dipole_subtraction'
-   ],
+   LIBS = fortran_libs + [ 'LHAPDF', 'cuba', 'rk', File(Config.get('LoopTools', 'lib')), 'boost_program_options', 'ColorFull', 'cs_dipole_subtraction'],
    LIBPATH = [ 
-      # for macOS don't use boost from MacPorts
-      # see https://stackoverflow.com/questions/19912862/compiling-boostprogram-options-on-mac-os-x-with-g-4-8-mac-ports
-      '/Users/Navir/Fizyka/programy/gcc/boost-1.65.0/lib',
-      '/Users/Navir/Fizyka/programy/gcc/ColorFull-1.1/lib/ColorFull',
       os.popen('lhapdf-config --libdir').read().strip(), 
       Config.get('Cuba', 'lib'), 
       Config.get('RK', 'lib'),
       Config.get('compiler', 'libs'),
-      '/Users/Navir/Fizyka/Programowanie/rust/catani-seymour-dipole-subtraction/target/debug',
-      '/Users/Navir/Fizyka/Programowanie/rust/catani-seymour-dipole-subtraction/target/debug/deps'
+	'/home/wojciechk1/HEP-software/gcc/ColorFull-1.1/lib/ColorFull',
+	'/home/wojciechk1/Programowanie/rust/catani-seymour-dipole-subtraction/target/debug'
    ] 
 )

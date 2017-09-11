@@ -1,4 +1,5 @@
 #include "XSection_Tree.hpp"
+#include "constants.hpp"
 
 /*
  * E1 = sqrtS/2 (1 + (m1^2 - m2^2)/s)
@@ -10,40 +11,36 @@
 int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
     const int *ncomp, cubareal ff[], void *userdata) {
 
-   //double x1min = 4. * pow(processID->m1,2)/S;
-   //double xmax = 1.;
-   //double x1 = x1min + (xmax - x1min ) * xx[0];
-   //double x2min = 4. * pow(processID->m1,2)/(S*x1);
-   //double x2 = x2min + (xmax - x2min) * xx[1];
-   double s = S; // * x1 * x2;     //partonic
+   double m1 = 5;
+   double x1 = 1;
+   double x2 = 1;
+   double x1min = 0;
+   double x2min = 0;
+   if (pt.get<std::string>("collider setup.collider") == "pp"
+       || pt.get<std::string>("collider setup.collider") == "ppbar") {
+      double x1min = 4. * pow(m1, 2) / S;
+      x1 = x1min + (1. - x1min) * xx[*ndim-2];
+      double x2min = 4. * pow(m1, 2) / (S * x1);
+      x2 = x2min + (1. - x2min) * xx[*ndim-1];
+   }
+   double s = x1 * x2 * S;     //partonic
+   double Tmin = pow( m1, 2 ) - s/2. - sqrt( pow(s, 2)/4 -
+                                             pow( m1, 2 )*s);
+   double Tmax = pow( m1, 2 ) - s/2. + sqrt( pow(s, 2)/4. -
+                                             pow( m1, 2 )*s);
+   double T = xx[0]*(Tmax-Tmin) + Tmin;
+   double jacobian = (Tmax-Tmin) * (1.-x1min) * (1.-x2min);
 
    double pdf_flux = 0.0;
-   for (const auto& inner : processID->flav) {
+//   for (const auto& inner : processID->flav) {
       //pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f ) * pdf->xfxQ( inner.at(1), x2, mu_f );
-   }
+//   }
    //pdf_flux /= (x1 * x2);
     
-   /* integration of |M^B|^2 */
-   if( processID->partonic == false ) {
-      double Tmin = pow( processID->m1, 2 ) - s/2. - sqrt( pow(s, 2)/4 -
-                      pow( processID->m1, 2 )*s);
-      double Tmax = pow( processID->m1, 2 ) - s/2. + sqrt( pow(s, 2)/4. -
-                      pow( processID->m1, 2 )*s);
-      double T = xx[0]*(Tmax-Tmin) + Tmin;
-      double jacobian = (Tmax-Tmin); //*(xmax-x1min)*(xmax-x2min);
-      double squaredM = (processID->*processID->matrixelementTree)(
-                           s, T);
-      double dSigmaPart = squaredM*(processID->h)*M_PI/(pow(4.*pi,2))/
-                         (processID->k)/(pow(s,2));
+   double squaredM = (model->BornME)(particles[0], s, T);
+   double dSigmaPart = squaredM*M_PI/(pow(4.*pi,2))/(pow(s,2));
            
-      ff[0] = dSigmaPart /* * pdf_flux */ * jacobian * to_fb;
-   }
-   /* integration of partonic cross section */
-   else {    
-      ff[0] = (processID->*processID->sigmaPartTree1)(s) * to_fb; // * pdf_flux; // *
-         //pow(-4.*pow(m1, 2) + S, 2)*xx[0] /
-         //(S*(-4*pow(m1, 2)*(-1 + xx[0]) + S*xx[0]));
-   }   
+   ff[0] = dSigmaPart /* * pdf_flux */ * jacobian * to_fb;
 
    return 0;
 }

@@ -78,10 +78,17 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    *  http://www.t39.ph.tum.de/T39_files/T39_people_files/duell_files/Dipl-MultiPion.pdf
    */
 
+   double m1 = 5;
+   double m2 = 5;
    const double m_sqr = m1 * m1;
-   // const double x1 = 4. * m_sqr/S + (1. - 4. * m_sqr/S ) * xx[5];
-   // const double x2 = 4. * m_sqr /(S * x1) + (1. - 4. * m_sqr/(S * x1)) * xx[6];
-   double shat = S; //x1*x2*S;
+   double x1 = 1;
+   double x2 = 1;
+   if (pt.get<std::string>("collider setup.collider") == "pp"
+       || pt.get<std::string>("collider setup.collider") == "ppbar") {
+      x1 = 4. * m_sqr/S + (1. - 4. * m_sqr/S ) * xx[*ndim-2];
+      x2 = 4. * m_sqr /(S * x1) + (1. - 4. * m_sqr/(S * x1)) * xx[*ndim-1];
+   }
+   double shat = x1*x2*S;
    const double shat_sqrt = sqrt( shat );
 
    const double s35_min = m1*m1;
@@ -231,7 +238,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    );
    // ----------------------------------------------
    valarray<double> ME2 = {
-           (processID->*processID->matrixelementReal_HnonC)(p), -dipole_sum
+           (model->RealME)(particles[0], q), -dipole_sum
    };
    // delete (otherwise causes memory leak)
    for(std::vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {
@@ -256,15 +263,15 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    fac /= 256 * pi_sqr;
 
    double pdf_flux = 0.0;
-   for (const auto& f : processID->flav) {
+//   for (const auto& f : processID->flav) {
       //pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x1, mu_f ) * pdf->xfxQ( f.at(1), x2, mu_f );
-   }
+//   }
    //pdf_flux /= x1 * x2;
 
    //fac *=  pdf_flux;
-   //double xx0 = xx[5];
-   //double xx1 = xx[6];
-   double xx0 = xx[0];
+   double xx0 = xx[*ndim-2];
+   double xx1 = xx[*ndim-1];
+   double xx3 = xx[0];
 
    /*    The integration over s35 and s45 is mapped on unit square spanned by [xx0, xx1]
     *
@@ -273,9 +280,9 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
     *       xx1 -> s45min + (s45max - s45min) xx1
     */
    double m {m1};
-   //double J = ((-Power(m,2) + s35)*(-2*m + Sqrt(shat))*Sqrt(shat)*Sqrt(Power(m,4) + Power(s35 - shat,2) - 2*Power(m,2)*(s35 + shat)))/s35;
-   double J = (Power(-2*m + Sqrt(shat),2)*Power(shat,1.5)*xx0*Sqrt((-1 + xx0)*(4*Power(m,2) - shat + Power(-2*m + Sqrt(shat),2)*xx0)))/
-   (Power(m,2) - 2*m*Sqrt(shat)*xx0 + shat*xx0);
+   //double J = ((-Power(m,2) + s35)*(-2*m + sqrt(shat))*sqrt(shat)*sqrt(Power(m,4) + Power(s35 - shat,2) - 2*Power(m,2)*(s35 + shat)))/s35;
+   double J = (pow(-2*m + sqrt(shat),2)*pow(shat,1.5)*xx3*sqrt((-1 + xx3)*(4*pow(m,2) - shat + pow(-2*m + sqrt(shat),2)*xx3)))/
+   (pow(m,2) - 2*m*sqrt(shat)*xx3 + shat*xx3);
    ME2 *= abs(J);
 
    /*
@@ -319,8 +326,12 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
    // Jakobian of (E2, E1) -> (s35, s45) change
    ME2 *= 0.25/shat;
-   // Jakobian of Bjorken vars. mapping xx0, xx1 -> x1, x2
-   // ME2 *= (Power(-4*Power(m,2) + S,2)*xx0)/(S*(-4*Power(m,2)*(-1 + xx0) + S*xx0));
+
+   if (pt.get<std::string>("collider setup.collider") == "pp"
+       || pt.get<std::string>("collider setup.collider") == "ppbar") {
+      // Jakobian of Bjorken vars. mapping xx0, xx1 -> x1, x2
+      ME2 *= (pow(-4*pow(m,2) + S,2)*xx0)/(S*(-4*pow(m,2)*(-1 + xx0) + S*xx0));
+   }
 
    ME2 *= fac;
 

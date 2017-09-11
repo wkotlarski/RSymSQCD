@@ -15,6 +15,9 @@
 #include "Color_Connected_MEs.h"
 
 #include "dilog.hpp"
+#include "constants.hpp"
+
+#include "IMatrixElements.h"
 
 constexpr double K_q = (7/2. - pi*pi/6.)*CF;
 constexpr double K_sq = (4 - pi*pi/6.)*CF;
@@ -31,8 +34,8 @@ enum class DipoleV {
 class CSDipole {
 
 public:
-   CSDipole(boost::property_tree::ptree pt, std::string s, DipoleType type, unsigned int i, unsigned int j)
-            : Born_(Color_Connected_MEs(i, j, s, pt)), type_(type), emit_(i), spec_(j) {
+   CSDipole(boost::property_tree::ptree pt, DipoleType type, unsigned int i, unsigned int j)
+            : model_(IMatrixElements::create_process(pt)), type_(type), emit_(i), spec_(j) {
       std::cout << "Initialized Catani-Seymour dipole of type ";
       if (type_ == DipoleType::FF) {
          std::cout << "FF";
@@ -51,7 +54,8 @@ public:
    double eval_K(std::vector<Vec4D<double>> const&, double) const;
    unsigned int get_emitter() const { return emit_; }
    unsigned int get_spectator() const { return spec_; }
-   const Color_Connected_MEs Born_;
+   IMatrixElements const * const model_;
+   //const Color_Connected_MEs Born_;
 
 private:
    const DipoleType type_;

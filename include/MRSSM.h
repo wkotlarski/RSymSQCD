@@ -5,15 +5,14 @@
 #include <cmath>
 #include <iostream>
 
-#include <boost/property_tree/ptree.hpp>
 
-#include "LHAPDF/LHAPDF.h"
+#include "IMatrixElements.h"
 
-class MRSSM {
+class MRSSM : public IMatrixElements {
 
 public:
-   MRSSM(boost::property_tree::ptree pt) :
-      pdf (LHAPDF::mkPDF( pt.get<std::string>("collider setup.pdf") , 0)),
+   MRSSM(boost::property_tree::ptree const& pt) :
+//      pdf (LHAPDF::mkPDF( pt.get<std::string>("collider setup.pdf") , 0)),
       MassTop (pt.get<double>("masses.top")),
       MassGlu (pt.get<double>("masses.gluino")),
       MasssigmaO (pt.get<double>("masses.pseudoscalar_sgluon")),
@@ -30,7 +29,11 @@ public:
       MassSbR (pt.get<double>("masses.sbR")),
       MassStL (pt.get<double>("masses.stL")),
       MassStR (pt.get<double>("masses.stR")) {};
-   const LHAPDF::PDF* pdf;
+
+   double BornME(std::vector<Particle>, double, double) const noexcept {return 0.;}
+   double BornCCME(std::vector<Particle>, int, int, EpsOrd, std::vector<Vec4D<double>> const&) const noexcept {return 0.;}
+   double VirtualME(std::vector<Particle>, EpsOrd, double, double) const noexcept {return 0.;}
+   double RealME(std::vector<Particle>, std::vector<Vec4D<double>> const&) const noexcept {return 0.;}
 
 protected:
    const double MasssigmaO;

@@ -17,6 +17,7 @@ namespace po = boost::program_options;
 #include "LHAPDF/Config.h"
 #include "../include/XSection_HnonC.hpp"
 
+#include "IMatrixElements.h"
 using namespace std;
 
 /*
@@ -32,7 +33,7 @@ inline array<double,3> operator+(array<double,3> x, array<double,3> y) {
 
 // why do I have to write this?
 // why isn't init() enough?
-Process *XSection::processID;
+IMatrixElements *XSection::model;
 double XSection::mu_r;
 double XSection::mu_f;
 double XSection::m1;
@@ -40,6 +41,7 @@ double XSection::m2;
 double XSection::S;
 double XSection::S_sqrt;
 double XSection::dC;
+std::vector<std::vector<Particle>> XSection::particles; 
 double XSection::dS;
 boost::property_tree::ptree XSection::pt;
 boost::program_options::variables_map XSection::vm;
@@ -159,321 +161,285 @@ int main(int argc, char* argv[]) {
       SM, Simplified, MSSM, MRSSM, no_model
    };
 
-   enum Channel {
-       pp_OO,
-       pp_OsOs,
-       pp_suLsuR,
-       pp_suLsuL,
-       pp_suLsdR,
-       pp_suLsdL,
-       pp_suLsuLdagger,
-       pp_suLsuRdagger,
-       pp_suLsdLdagger,
-       pp_suLsdRdagger,
-      eebar_ttbar,
-       no_channel
-   };
-
-   Model model = no_model;
-   Channel channel = no_channel;
-
-   if ( pt.get<string>("process.model") == "MRSSM" ) {
-      model = MRSSM;
-   } else if ( string(argv[1]) == "MSSM" ) {
-      model = MSSM;
-   } else if ( string(argv[1]) == "Simplified" ) {
-      model = Simplified;
-   } else if ( pt.get<string>("process.model") == "SM" ) {
-      model = SM;
-   } else {
-	   cout << "\n Model not implemented! \n\n";
-   }
-
-   if ( pt.get<string>("process.process") == "pp_OsOs" ) {
-      channel = pp_OsOs;
-   } else if ( pt.get<string>("process.process") == "pp_suLsuR" ) {
-      channel = pp_suLsuR;
-   } else if ( pt.get<string>("process.process") == "pp_suLsuL" ) {
-      channel = pp_suLsuL;
-   } else if ( pt.get<string>("process.process") == "pp_suLsdR" ) {
-      channel = pp_suLsdR;
-   } else if ( pt.get<string>("process.process") == "pp_suLsdL" ) {
-      channel = pp_suLsdL;
-   } else if ( pt.get<string>("process.process") == "pp_suLsuLdagger" ) {
-      channel = pp_suLsuLdagger;
-   } else if ( pt.get<string>("process.process") == "pp_suLsuRdagger" ) {
-      channel = pp_suLsuRdagger;
-   } else if ( pt.get<string>("process.process") == "pp_suLsdLdagger" ) {
-      channel = pp_suLsdLdagger;
-   } else if ( pt.get<string>("process.process") == "pp_suLsdRdagger" ) {
-      channel = pp_suLsdRdagger;
-   } else if ( pt.get<string>("process.process") == "pp_OO" ) {
-      channel = pp_OO;
-   } else if ( pt.get<string>("process.process") == "eebar_ttbar" ) {
-      channel = eebar_ttbar;
-   } else {
-	   cout << "\n Process not implemented! \n\n";
-   }
-
    auto start = chrono::steady_clock::now();
 
-   if( pt.get<string>("process.order") == "LO" ) {
-	  switch(model) {
-         case MRSSM:
-            switch(channel) {
-               case pp_OsOs:
-                  {
-                  Process process1("sgluons-gg_OO", pt);
-                  XSection::init( &process1, pt, vm );
-                  XSection_Tree tree;
-                  temp = tree.integrate();
-                  Process process2("sgluons-qqbar_OO", pt);
-                  XSection::init( &process2, pt, vm );
-                  xsection_tree = tree.integrate() + temp;
-                  print("pp > OO", xsection_tree);
-                  break;
-			      }
-               case pp_suLsuR:
-                  {                                                     // checked with MadGraph and Philip
-                  Process process1("MRSSM,uu_suLsuR", pt);
-                  XSection::init( &process1, pt, vm );
-                  XSection_Tree tree;
-                  xsection_tree = tree.integrate();
-                  print("uu > suLsuR", xsection_tree);
-                  break;
-			      }
-			   case pp_suLsdR:
-                  {
-				                                                        // checked with MadGraph and Philip
-                  Process process1("MRSSM,ud_suLsdR", pt);
-                  XSection::init( &process1, pt, vm );
-                  XSection_Tree tree;
-                  xsection_tree = tree.integrate();
-                  print("uu > suLsdR", xsection_tree);
-                  break;
-			      }
-
-               case pp_suLsuLdagger:
-                  {
-                  Process process1("MRSSM,GG_suLsuLdagger", pt);
-                  XSection::init( &process1, pt, vm );
-                  XSection_Tree tree;
-                  xsection_tree1 = tree.integrate();
-                  print("GG > suLsdLdagger", xsection_tree1);
-
-                  Process process2("MRSSM,uubar_suLsuLdagger", pt);
-                  XSection::init( &process2, pt, vm );
-                  xsection_tree2 = tree.integrate();
-                  print("uubar > suLsdLdagger", xsection_tree2);
-
-                  Process process3("MRSSM,ddbar_suLsuLdagger", pt);
-                  XSection::init( &process3, pt, vm );
-                  xsection_tree3 = tree.integrate();
-                  print("qqbar > suLsuLdagger", xsection_tree3);
-
-                  xsection_tree_total = xsection_tree1 + xsection_tree2 + xsection_tree3;
-                  print("pp > suLsdLdagger", xsection_tree_total);
-                  break;
-                  }
-			   default:
-			      {
-			      xsection_tree = {0,0,0};
-			      break;
-			      }
-            }
-            break;
-         case MSSM:
-            switch(channel) {
-			   //case pp_suLsuR:
-			   //case pp_suLsuLdagger:
-			   //default:
-            }
-         break;
-      }
+   XSection::init(pt, vm);
+   XSection_Tree tree;
+   xsection_tree = tree.integrate();
+   XSection_Virt virt;
+   XSection_HnonC hc;
+   std::vector <std::tuple<DipoleType, unsigned int, unsigned int>> const v{
+         {DipoleType::FF, 2, 3},
+         {DipoleType::FF, 3, 2}
+   };
+   for (const auto &e : v) {
+      hc.cs_dipoles.push_back(
+         CSDipole(pt, std::get<0>(e), std::get<1>(e), std::get<2>(e))
+      );
+      virt.cs_dipoles.push_back(
+         CSDipole(pt, std::get<0>(e), std::get<1>(e), std::get<2>(e))
+      );
    }
-
-   else if( pt.get<string>("process.order") == "NLO" ) {
-	  switch(model) {
-        case SM:
-           switch (channel) {
-              case eebar_ttbar:
-                 XSection_Tree tree;
-                 XSection_Virt virt;
-                 XSection_HnonC hc;
-                 std::vector <std::tuple<DipoleType, unsigned int, unsigned int>> const v{
-                         {DipoleType::FF, 2, 3},
-                         {DipoleType::FF, 3, 2}
-                 };
-                 for (const auto &e : v) {
-                    hc.cs_dipoles.push_back(
-                            CSDipole(pt, "SM,eebar_ttbar", std::get<0>(e), std::get<1>(e), std::get<2>(e))
-                    );
-                    virt.cs_dipoles.push_back(
-                            CSDipole(pt, "SM,eebar_ttbar", std::get<0>(e), std::get<1>(e), std::get<2>(e))
-                    );
-                    //sc.cs_dipoles.push_back(
-                    //        CSDipole(pt, "SM,eebar_ttbar", std::get<0>(e), std::get<1>(e), std::get<2>(e))
-                    //);
-                 }
-                 Process process1("SM,eebar_ttbar", pt);
-                 XSection::init(&process1, pt, vm);
-                 if (enable_born) xsection_tree1 = tree.integrate();
-                 if (enable_virt) xsection_virt1 = virt.integrate();
-                 if (enable_hard) {
-                    xsection_HnonC1 = hc.integrate();
-                 }
-                 print("uu > suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
-           }
-         case MRSSM:
-            switch(channel) {
-               case pp_OsOs:
-                  {
-                  // todo
-                  break;
-			      }
-               case pp_suLsuR:
-                  {
-                  XSection_Tree tree;
-                  XSection_Virt virt;
-                  XSection_SC sc;
-                  XSection_HnonC hc;
-
-                  // uu > suL suR (+g) process
-		            if( subprocess == "" || subprocess == "uu_suLsuR" ) {
-                     std::vector<std::tuple<DipoleType, unsigned int, unsigned int>> const v {
-                             {DipoleType::FF, 2, 3},
-                             {DipoleType::FF, 3, 2},
-                             {DipoleType::II, 0, 1},
-                             {DipoleType::II, 1, 0},
-                             {DipoleType::IF, 0, 2},
-                             {DipoleType::IF, 0, 3},
-                             {DipoleType::IF, 1, 2},
-                             {DipoleType::IF, 1, 3},
-                             {DipoleType::FI, 2, 0},
-                             {DipoleType::FI, 2, 1},
-                             {DipoleType::FI, 3, 0},
-                             {DipoleType::FI, 3, 1}
-                     };
-                     for(const auto& e : v) {
-                        hc.cs_dipoles.push_back(
-                                CSDipole(pt, "MRSSM,uu_suLsuR", std::get<0>(e), std::get<1>(e), std::get<2>(e))
-                        );
-                        virt.cs_dipoles.push_back(
-                                CSDipole(pt, "MRSSM,uu_suLsuR", std::get<0>(e), std::get<1>(e), std::get<2>(e))
-                        );
-                        sc.cs_dipoles.push_back(
-                                CSDipole(pt, "MRSSM,uu_suLsuR", std::get<0>(e), std::get<1>(e), std::get<2>(e))
-                        );
-                     }
-                     Process process1("MRSSM,uu_suLsuR", pt);
-	                  XSection::init( &process1, pt, vm );
-                     if(enable_born) xsection_tree1 = tree.integrate();
-                     if(enable_virt) xsection_virt1 = virt.integrate();
-                     if(enable_sc) xsection_SC1 = sc.integrate();
-                     if(enable_hard) {
-                        xsection_HnonC1 = hc.integrate();
-                     }
-                     print( "uu > suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
-		            }
-
-                  // the matrix element is regular in the limit dS -> 0 but the phase space parametrization
-                  // fails if we are exactly on the threshold
-                  pt.put( "technical parameters.dS", 1e-10 );
-
-                  // gu > suL suR ubar process
-		            if( subprocess == "gu_suLsuRubar" || subprocess == "" ) {
-                     Process process2( "MRSSM,gu_suLsuR", pt);
-                     XSection::init( &process2, pt, vm );
-                     if(enable_sc) xsection_SC2 = sc.integrate();
-                     if(enable_hard) xsection_HnonC2 = hc.integrate();
-                     print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
-		            }
-
-                  xsection_SC_total = xsection_SC1 + xsection_SC2;
-                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
-                  print( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
-                  break;
-			      }
-               case pp_suLsuLdagger:
-                  {
-                  XSection_Tree tree;
-                  XSection_Virt virt;
-                  XSection_SC sc;
-                  XSection_HnonC hc;
-
-		            if( subprocess == "" || subprocess == "uubar_suLsuLdagger" ) {
-                     Process process1("MRSSM,uubar_suLsuLdagger", pt);
-                     XSection::init( &process1, pt, vm );
-                     if(enable_born) xsection_tree1 = tree.integrate();
-                     if(enable_virt) xsection_virt1 = virt.integrate();
-                     if(enable_sc) xsection_SC1 = sc.integrate();
-                     if(enable_hard) xsection_HnonC1 = hc.integrate();
-                     print( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
-	    	         }
-
-                  if( subprocess == "") {
-                     Process process2("MRSSM,ddbar_suLsuLdagger", pt);
-                     XSection::init( &process2, pt, vm );
-                     if(enable_born) xsection_tree2 = tree.integrate();
-                     if(enable_virt) xsection_virt2 = virt.integrate();
-                     if(enable_sc) xsection_SC2 = sc.integrate();
-                     if(enable_hard) xsection_HnonC2 = hc.integrate();
-                     print( "ddbar > suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
-                  }
-
-                  if( subprocess == "") {
-                     Process process3("MRSSM,GG_suLsuLdagger", pt);
-                     XSection::init( &process3, pt, vm );
-                     if(enable_born) xsection_tree3 = tree.integrate();
-                     if(enable_virt) xsection_virt3 = virt.integrate();
-                     if(enable_sc) xsection_SC3 = sc.integrate();
-                     if(enable_hard) xsection_HnonC3 = hc.integrate();
-                     print( "gg > suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
-                  }
-
-                  // the matrix element is regular in the limit dS -> 0 but the phase space parametrization
-                  // fails if we are exactly on the threshold
-                  pt.put( "technical parameters.dS", 1e-10 );
-
-                  if( subprocess == "") {
-                     Process process4("MRSSM,gq_suLsuLdagger", pt);
-                     XSection::init( &process4, pt, vm );
-                     if(enable_sc) xsection_SC4 = sc.integrate();
-                     if(enable_hard) xsection_HnonC4 = hc.integrate();
-                     print( "gq > suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
-                  }
-
-                  // g u > suL suLdagger
-                  pt.put( "technical parameters.dS", 1e-5 );
-                  if( subprocess == "gu_suLsuLdaggeru" || subprocess == "" ) {
-                     Process process5("MRSSM,gu_suLsuLdagger", pt);
-                     XSection::init( &process5, pt, vm );
-                     //if(enable_sc) xsection_SC5 = sc.integrate();
-                     if(enable_hard) xsection_HnonC5 = hc.integrate();
-                     print( "gu > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5 );
-                  }
-
-                  xsection_tree_total = xsection_tree1 + xsection_tree2 + xsection_tree3;
-                  xsection_virt_total = xsection_virt1 + xsection_virt2 + xsection_virt3;
-                  xsection_SC_total = xsection_SC1 + xsection_SC2 + xsection_SC3 + xsection_SC4 + xsection_SC5;
-                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2 + xsection_HnonC3
-                          + xsection_HnonC4 + xsection_HnonC5;
-                  print( "total", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total);
-                  break;
-                  }
-               default:
-                  cout << "NLO process not implemented\n";
-            }
-     case Simplified:
-        switch(channel) {
-           case pp_OO:
-           {
-              {
-           }
-        }
-        }
-     }
-   }
+   xsection_virt = virt.integrate();
+   xsection_HnonC = hc.integrate();
+   print("", xsection_tree, xsection_virt, xsection_SC1, xsection_HnonC);
+//   if( pt.get<string>("process.order") == "LO" ) {
+//	  switch(model) {
+//         case MRSSM:
+//            switch(channel) {
+//               case pp_OsOs:
+//                  {
+//                  Process process1("sgluons-gg_OO", pt);
+//                  XSection::init( &process1, pt, vm );
+//                  XSection_Tree tree;
+//                  temp = tree.integrate();
+//                  Process process2("sgluons-qqbar_OO", pt);
+//                  XSection::init( &process2, pt, vm );
+//                  xsection_tree = tree.integrate() + temp;
+//                  print("pp > OO", xsection_tree);
+//                  break;
+//			      }
+//               case pp_suLsuR:
+//                  {                                                     // checked with MadGraph and Philip
+//                  Process process1("MRSSM,uu_suLsuR", pt);
+//                  XSection::init( &process1, pt, vm );
+//                  XSection_Tree tree;
+//                  xsection_tree = tree.integrate();
+//                  print("uu > suLsuR", xsection_tree);
+//                  break;
+//			      }
+//			   case pp_suLsdR:
+//                  {
+//				                                                        // checked with MadGraph and Philip
+//                  Process process1("MRSSM,ud_suLsdR", pt);
+//                  XSection::init( &process1, pt, vm );
+//                  XSection_Tree tree;
+//                  xsection_tree = tree.integrate();
+//                  print("uu > suLsdR", xsection_tree);
+//                  break;
+//			      }
+//
+//               case pp_suLsuLdagger:
+//                  {
+//                  Process process1("MRSSM,GG_suLsuLdagger", pt);
+//                  XSection::init( &process1, pt, vm );
+//                  XSection_Tree tree;
+//                  xsection_tree1 = tree.integrate();
+//                  print("GG > suLsdLdagger", xsection_tree1);
+//
+//                  Process process2("MRSSM,uubar_suLsuLdagger", pt);
+//                  XSection::init( &process2, pt, vm );
+//                  xsection_tree2 = tree.integrate();
+//                  print("uubar > suLsdLdagger", xsection_tree2);
+//
+//                  Process process3("MRSSM,ddbar_suLsuLdagger", pt);
+//                  XSection::init( &process3, pt, vm );
+//                  xsection_tree3 = tree.integrate();
+//                  print("qqbar > suLsuLdagger", xsection_tree3);
+//
+//                  xsection_tree_total = xsection_tree1 + xsection_tree2 + xsection_tree3;
+//                  print("pp > suLsdLdagger", xsection_tree_total);
+//                  break;
+//                  }
+//			   default:
+//			      {
+//			      xsection_tree = {0,0,0};
+//			      break;
+//			      }
+//            }
+//            break;
+//         case MSSM:
+//            switch(channel) {
+//			   //case pp_suLsuR:
+//			   //case pp_suLsuLdagger:
+//			   //default:
+//            }
+//         break;
+//      }
+//   }
+//
+//   else if( pt.get<string>("process.order") == "NLO" ) {
+//	  switch(model) {
+//        case SM:
+//           switch (channel) {
+//              case eebar_ttbar:
+//                 XSection_Tree tree;
+//                 XSection_Virt virt;
+//                 XSection_HnonC hc;
+//                 std::vector <std::tuple<DipoleType, unsigned int, unsigned int>> const v{
+//                         {DipoleType::FF, 2, 3},
+//                         {DipoleType::FF, 3, 2}
+//                 };
+//                 for (const auto &e : v) {
+//                    hc.cs_dipoles.push_back(
+//                            CSDipole(pt, "SM,eebar_ttbar", std::get<0>(e), std::get<1>(e), std::get<2>(e))
+//                    );
+//                    virt.cs_dipoles.push_back(
+//                            CSDipole(pt, "SM,eebar_ttbar", std::get<0>(e), std::get<1>(e), std::get<2>(e))
+//                    );
+//                    //sc.cs_dipoles.push_back(
+//                    //        CSDipole(pt, "SM,eebar_ttbar", std::get<0>(e), std::get<1>(e), std::get<2>(e))
+//                    //);
+//                 }
+//                 Process process1("SM,eebar_ttbar", pt);
+//                 XSection::init(&process1, pt, vm);
+//                 if (enable_born) xsection_tree1 = tree.integrate();
+//                 if (enable_virt) xsection_virt1 = virt.integrate();
+//                 if (enable_hard) {
+//                    xsection_HnonC1 = hc.integrate();
+//                 }
+//                 print("uu > suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+//           }
+//         case MRSSM:
+//            switch(channel) {
+//               case pp_OsOs:
+//                  {
+//                  // todo
+//                  break;
+//			      }
+//               case pp_suLsuR:
+//                  {
+//                  XSection_Tree tree;
+//                  XSection_Virt virt;
+//                  XSection_SC sc;
+//                  XSection_HnonC hc;
+//
+//                  // uu > suL suR (+g) process
+//		            if( subprocess == "" || subprocess == "uu_suLsuR" ) {
+//                     std::vector<std::tuple<DipoleType, unsigned int, unsigned int>> const v {
+//                             {DipoleType::FF, 2, 3},
+//                             {DipoleType::FF, 3, 2},
+//                             {DipoleType::II, 0, 1},
+//                             {DipoleType::II, 1, 0},
+//                             {DipoleType::IF, 0, 2},
+//                             {DipoleType::IF, 0, 3},
+//                             {DipoleType::IF, 1, 2},
+//                             {DipoleType::IF, 1, 3},
+//                             {DipoleType::FI, 2, 0},
+//                             {DipoleType::FI, 2, 1},
+//                             {DipoleType::FI, 3, 0},
+//                             {DipoleType::FI, 3, 1}
+//                     };
+//                     for(const auto& e : v) {
+//                        hc.cs_dipoles.push_back(
+//                                CSDipole(pt, "MRSSM,uu_suLsuR", std::get<0>(e), std::get<1>(e), std::get<2>(e))
+//                        );
+//                        virt.cs_dipoles.push_back(
+//                                CSDipole(pt, "MRSSM,uu_suLsuR", std::get<0>(e), std::get<1>(e), std::get<2>(e))
+//                        );
+//                        sc.cs_dipoles.push_back(
+//                                CSDipole(pt, "MRSSM,uu_suLsuR", std::get<0>(e), std::get<1>(e), std::get<2>(e))
+//                        );
+//                     }
+//                     Process process1("MRSSM,uu_suLsuR", pt);
+//	                  XSection::init( &process1, pt, vm );
+//                     if(enable_born) xsection_tree1 = tree.integrate();
+//                     if(enable_virt) xsection_virt1 = virt.integrate();
+//                     if(enable_sc) xsection_SC1 = sc.integrate();
+//                     if(enable_hard) {
+//                        xsection_HnonC1 = hc.integrate();
+//                     }
+//                     print( "uu > suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+//		            }
+//
+//                  // the matrix element is regular in the limit dS -> 0 but the phase space parametrization
+//                  // fails if we are exactly on the threshold
+//                  pt.put( "technical parameters.dS", 1e-10 );
+//
+//                  // gu > suL suR ubar process
+//		            if( subprocess == "gu_suLsuRubar" || subprocess == "" ) {
+//                     Process process2( "MRSSM,gu_suLsuR", pt);
+//                     XSection::init( &process2, pt, vm );
+//                     if(enable_sc) xsection_SC2 = sc.integrate();
+//                     if(enable_hard) xsection_HnonC2 = hc.integrate();
+//                     print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
+//		            }
+//
+//                  xsection_SC_total = xsection_SC1 + xsection_SC2;
+//                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
+//                  print( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
+//                  break;
+//			      }
+//               case pp_suLsuLdagger:
+//                  {
+//                  XSection_Tree tree;
+//                  XSection_Virt virt;
+//                  XSection_SC sc;
+//                  XSection_HnonC hc;
+//
+//		            if( subprocess == "" || subprocess == "uubar_suLsuLdagger" ) {
+//                     Process process1("MRSSM,uubar_suLsuLdagger", pt);
+//                     XSection::init( &process1, pt, vm );
+//                     if(enable_born) xsection_tree1 = tree.integrate();
+//                     if(enable_virt) xsection_virt1 = virt.integrate();
+//                     if(enable_sc) xsection_SC1 = sc.integrate();
+//                     if(enable_hard) xsection_HnonC1 = hc.integrate();
+//                     print( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+//	    	         }
+//
+//                  if( subprocess == "") {
+//                     Process process2("MRSSM,ddbar_suLsuLdagger", pt);
+//                     XSection::init( &process2, pt, vm );
+//                     if(enable_born) xsection_tree2 = tree.integrate();
+//                     if(enable_virt) xsection_virt2 = virt.integrate();
+//                     if(enable_sc) xsection_SC2 = sc.integrate();
+//                     if(enable_hard) xsection_HnonC2 = hc.integrate();
+//                     print( "ddbar > suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+//                  }
+//
+//                  if( subprocess == "") {
+//                     Process process3("MRSSM,GG_suLsuLdagger", pt);
+//                     XSection::init( &process3, pt, vm );
+//                     if(enable_born) xsection_tree3 = tree.integrate();
+//                     if(enable_virt) xsection_virt3 = virt.integrate();
+//                     if(enable_sc) xsection_SC3 = sc.integrate();
+//                     if(enable_hard) xsection_HnonC3 = hc.integrate();
+//                     print( "gg > suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
+//                  }
+//
+//                  // the matrix element is regular in the limit dS -> 0 but the phase space parametrization
+//                  // fails if we are exactly on the threshold
+//                  pt.put( "technical parameters.dS", 1e-10 );
+//
+//                  if( subprocess == "") {
+//                     Process process4("MRSSM,gq_suLsuLdagger", pt);
+//                     XSection::init( &process4, pt, vm );
+//                     if(enable_sc) xsection_SC4 = sc.integrate();
+//                     if(enable_hard) xsection_HnonC4 = hc.integrate();
+//                     print( "gq > suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
+//                  }
+//
+//                  // g u > suL suLdagger
+//                  pt.put( "technical parameters.dS", 1e-5 );
+//                  if( subprocess == "gu_suLsuLdaggeru" || subprocess == "" ) {
+//                     Process process5("MRSSM,gu_suLsuLdagger", pt);
+//                     XSection::init( &process5, pt, vm );
+//                     //if(enable_sc) xsection_SC5 = sc.integrate();
+//                     if(enable_hard) xsection_HnonC5 = hc.integrate();
+//                     print( "gu > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5 );
+//                  }
+//
+//                  xsection_tree_total = xsection_tree1 + xsection_tree2 + xsection_tree3;
+//                  xsection_virt_total = xsection_virt1 + xsection_virt2 + xsection_virt3;
+//                  xsection_SC_total = xsection_SC1 + xsection_SC2 + xsection_SC3 + xsection_SC4 + xsection_SC5;
+//                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2 + xsection_HnonC3
+//                          + xsection_HnonC4 + xsection_HnonC5;
+//                  print( "total", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total);
+//                  break;
+//                  }
+//               default:
+//                  cout << "NLO process not implemented\n";
+//            }
+//     case Simplified:
+//        switch(channel) {
+//           case pp_OO:
+//           {
+//              {
+//           }
+//        }
+//        }
+//     }
+//   }
 
    auto end = chrono::steady_clock::now();
    cout << '\n';
