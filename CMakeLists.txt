@@ -4,16 +4,16 @@ project (RSymSQCD CXX)
 
 set (CMAKE_CXX_STANDARD 17)
 
-# locate boost instalation
-FIND_PACKAGE(Boost)
-if(Boost_FOUND)
-   include_directories(${Boost_INCLUDE_DIRS})
-   link_directories(${Boost_LIBRARY_DIRS})
-endif()
+file (GLOB SOURCES
+   "src/*.cpp"
+   "src/matrix_elements/*.cpp"
+   "src/matrix_elements/*/*.cpp"
+)
+
 
 include_directories (
    include 
-   /Users/Navir/Fizyka/programy/gcc/boost-1.65.0/include ${LHAPDF6}/include 
+   ${LHAPDF6}/include 
    ${COLORFULL}/include
    ${Cuba}
    ${LT}/include
@@ -21,32 +21,32 @@ include_directories (
 )
 
 link_directories(
-   /Users/Navir/Fizyka/programy/gcc/boost-1.65.0/lib
    ${COLORFULL}/lib/ColorFull
-   ${Cuba}/lib
-   ${LT}/lib
+   ${Cuba}/lib64
+   ${LT}/lib64
    ${LHAPDF6}/lib
-   /opt/local/lib
-   /Users/Navir/Fizyka/Programowanie/rust/catani-seymour-dipole-subtraction/target/debug
-   /Users/Navir/Fizyka/Programowanie/rust/catani-seymour-dipole-subtraction/target/debug/deps
-   )
-
-
-file (GLOB SOURCES 
-   "src/*.cpp"
-   "src/matrix_elements/*.cpp"
-   "src/matrix_elements/*/*.cpp"
+   $ENV{HOME}/Dokumenty/IdeaProjects/cs_dipole_subtraction/target/debug
+   $ENV{HOME}/Dokumenty/IdeaProjects/cs_dipole_subtraction/target/debug/deps
 )
 
-
+# why does it have to be after above include and link?
 add_executable(RSymSQCD ${SOURCES})
+
+# locate boost instalation
+FIND_PACKAGE(Boost)
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    link_directories(${Boost_LIBRARY_DIRS})
+    target_link_libraries(RSymSQCD boost_program_options)
+endif()
+
 target_link_libraries(
    RSymSQCD
    cuba
-   boost_program_options
    ooptools
    gfortran
    LHAPDF
    ColorFull
    cs_dipole_subtraction
 )
+
