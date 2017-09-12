@@ -65,17 +65,15 @@ double SM::eebar_bbbar_V(EpsOrd ord, double S, double T) const noexcept {
    double U = 2 * MB2 - S - T;
    double b = sqrt(1 - 4 * MB2 / S);
    double CF = 4 / 3.;
-   const double born =
-         4. * (8 * Alfa2 * (pi * pi) * (S * S + 2 * (MB2 * MB2 - 2 * MB2 * T + T * (S + T)))) / (3. * (S * S));
-// eq. 3.24 of Harris & Owens '02
+   // eq. 3.24 of Harris & Owens '02
    const double A1 = -2 * CF * (1 - (1 + b * b) / (2 * b) * log((1 + b) / (1 - b)));
    switch (ord) {
       case EpsOrd::DoublePole:
          return 0.;
       case EpsOrd::SinglePole:
-         return born * alphaS / (2. * pi) * A1;
+         return eebar_bbbar_B(S, T) * alphaS / (2. * pi) * A1;
       case EpsOrd::Eps0:
-         return born * alphaS / (2. * pi) * (
+         return eebar_bbbar_B(S, T) * alphaS / (2. * pi) * (
                A1 * log(91.188 * 91.188 / S) +
                CF * (-2 * (1 - (1 + b * b) / (2 * b) * log((1 + b) / (1 - b))) * log(S / MB2)
                      + 3 * b * log((1 + b) / (1 - b)) - 4 + (1 + b * b) / b * (-0.5 * pow(log((1 - b) / (1 + b)), 2)
