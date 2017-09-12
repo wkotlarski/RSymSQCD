@@ -5,10 +5,6 @@
 #include "constants.hpp"
 #include "CSDipole.hpp"
 
-// neede to do Euler rotation
-#include "rk/rk.hh"
-#include "rk/geom3.hh"
-
 class XSection_HnonC : public virtual XSection {
 
 public:
