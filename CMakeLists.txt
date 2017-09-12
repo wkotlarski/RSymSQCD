@@ -1,7 +1,16 @@
-cmake_minimum_required (VERSION 3.9)
-project (RSymSQCD)
+cmake_minimum_required (VERSION 3.8)
+
+project (RSymSQCD CXX)
 
 set (CMAKE_CXX_STANDARD 17)
+
+# locate boost instalation
+FIND_PACKAGE(Boost)
+if(Boost_FOUND)
+   include_directories(${Boost_INCLUDE_DIRS})
+   link_directories(${Boost_LIBRARY_DIRS})
+endif()
+
 include_directories (
    include 
    /Users/Navir/Fizyka/programy/gcc/boost-1.65.0/include ${LHAPDF6}/include 
@@ -9,7 +18,7 @@ include_directories (
    ${Cuba}
    ${LT}/include
    ${rk}/include
-   )
+)
 
 link_directories(
    /Users/Navir/Fizyka/programy/gcc/boost-1.65.0/lib
@@ -27,7 +36,7 @@ file (GLOB SOURCES
    "src/*.cpp"
    "src/matrix_elements/*.cpp"
    "src/matrix_elements/*/*.cpp"
-   )
+)
 
 
 add_executable(RSymSQCD ${SOURCES})
@@ -40,4 +49,4 @@ target_link_libraries(
    LHAPDF
    ColorFull
    cs_dipole_subtraction
-   )
+)
