@@ -60,4 +60,5 @@ if (DOXYGEN_FOUND)
 endif()
 
 # gtests
+enable_testing()
 add_subdirectory(test)

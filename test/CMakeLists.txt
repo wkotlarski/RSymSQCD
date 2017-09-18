@@ -22,4 +22,6 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
 set (EXECUTABLE_OUTPUT_PATH ../../bin/tests)
 
 add_executable(test1 main.cpp test_test.cpp)
-target_link_libraries(test1 gtest_main)
+target_link_libraries(test1 gtest_main pthread)
+
+add_test(NAME test1 COMMAND test1)
