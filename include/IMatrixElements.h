@@ -1,5 +1,5 @@
-#ifndef RSYMSQCD_PROCESS2_H
-#define RSYMSQCD_PROCESS2_H
+#ifndef RSYMSQCD_IMATRIXELEMENTS_H
+#define RSYMSQCD_IMATRIXELEMENTS_H
 
 #include <vector>
 #include <boost/property_tree/ptree.hpp>
@@ -37,7 +37,11 @@ public:
    static IMatrixElements* create_process(boost::property_tree::ptree const&);
 
 protected:
-   double ColorMatrix( int emitter,  int spectator, std::string const& col_str1, std::string const& col_str2 ) const noexcept {
+   double ColorMatrix(
+         int emitter,  int spectator,
+         std::string const& col_str1, std::string const& col_str2
+   ) const noexcept {
+
       ColorFull::Col_amp Ca1(col_str1);
       ColorFull::Col_amp Ca2(col_str2);
 
@@ -58,4 +62,4 @@ protected:
       }
    }
 };
-#endif //RSYMSQCD_PROCESS2_H
+#endif //RSYMSQCD_IMATRIXELEMENTS_H
