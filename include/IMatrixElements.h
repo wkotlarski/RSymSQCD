@@ -6,9 +6,11 @@
 #include "Vec4D.hpp"
 
 #include "LHAPDF/LHAPDF.h"
-#include "../include/Color_Connected_MEs.h"
 #include "ColorFull/Core/Tree_level_gluon_basis.h"
 
+/**
+ *    @param
+ */
 enum class EpsOrd {
    DoublePole,
    SinglePole,
@@ -34,9 +36,21 @@ public:
    virtual double VirtualME(std::vector<Particle>, EpsOrd, double, double) const noexcept = 0;
    virtual double RealME(std::vector<Particle>, std::vector<Vec4D<double>> const&) const noexcept = 0;
 
+/**
+ * 
+ * @return
+ */
    static IMatrixElements* create_process(boost::property_tree::ptree const&);
 
 protected:
+   /**
+    *
+    * @param emitter - emitting particle
+    * @param spectator
+    * @param col_str1
+    * @param col_str2
+    * @return
+    */
    double ColorMatrix(
          int emitter,  int spectator,
          std::string const& col_str1, std::string const& col_str2
