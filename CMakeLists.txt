@@ -4,12 +4,13 @@ project (RSymSQCD CXX)
 
 set (CMAKE_CXX_STANDARD 17)
 
+set (EXECUTABLE_OUTPUT_PATH ../bin)
+
 file (GLOB SOURCES
    "src/*.cpp"
    "src/matrix_elements/*.cpp"
    "src/matrix_elements/*/*.cpp"
 )
-
 
 include_directories (
    include 
@@ -22,23 +23,24 @@ include_directories (
 
 link_directories(
    ${COLORFULL}/lib/ColorFull
-   ${Cuba}/lib64
+   ${Cuba}/lib
    ${LT}/lib64
    ${LHAPDF6}/lib
-   $ENV{HOME}/Dokumenty/IdeaProjects/cs_dipole_subtraction/target/debug
-   $ENV{HOME}/Dokumenty/IdeaProjects/cs_dipole_subtraction/target/debug/deps
+   $ENV{HOME}/Programowanie/rust/catani-seymour-dipole-subtraction/target/debug
+   $ENV{HOME}/Programowanie/rust/catani-seymour-dipole-subtraction/target/debug/deps
 )
 
 # why does it have to be after above include and link?
 add_executable(RSymSQCD ${SOURCES})
 
 # locate boost instalation
-FIND_PACKAGE(Boost)
+find_package(Boost)
 if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-    link_directories(${Boost_LIBRARY_DIRS})
-    target_link_libraries(RSymSQCD boost_program_options)
+   include_directories(${Boost_INCLUDE_DIRS})
+   link_directories(${Boost_LIBRARY_DIRS})
+   target_link_libraries(RSymSQCD boost_program_options)
 endif()
+
 
 target_link_libraries(
    RSymSQCD
@@ -50,3 +52,13 @@ target_link_libraries(
    cs_dipole_subtraction
 )
 
+###################### other
+
+# doxygen
+find_package(Doxygen)
+if (DOXYGEN_FOUND)
+endif()
+
+# gtests
+enable_testing()
+add_subdirectory(test)
