@@ -4,14 +4,32 @@
 #include "dilog.hpp"
 #include "../../../include/IMatrixElements.h"
 
+#include <complex>
+#include "clooptools.h"
+
+double delta = 0E-4;
+std::vector<Vec4D<double>> mandelstam_to_p2 (double s, double t) {
+   double mass = 5;
+   double tp = t - pow(mass,2);
+   double p = sqrt(s/4. - pow(mass,2));
+   double costh = (s/2. + tp)/(p*sqrt(s));
+   std::vector<Vec4D<double>> temp = {
+           Vec4D<double> { sqrt(s)/2., 0, 0, sqrt(s)/2.},
+           Vec4D<double> { sqrt(s)/2., 0, 0, -sqrt(s)/2.},
+           Vec4D<double> { sqrt(s)/2., 0., p*sqrt(1-costh*costh), p*costh},
+           Vec4D<double> { sqrt(s)/2., 0., -p*sqrt(1-costh*costh), -p*costh}
+   };
+   return temp;
+}
+
 SM::SM(boost::property_tree::ptree const& ptree) :
       MB_(ptree.get<double>("masses.b")),
       Alfa_(1./ptree.get<double>("couplings.inv_alpha_em")){
 }
 
-double SM::BornME(std::vector<Particle> part, double S, double T) const noexcept {
+double SM::BornME(std::vector<Particle> part, EpsOrd ord, double S, double T) const noexcept {
    if (part[0] == Particle::e && part[1] == Particle::ebar && part[2] == Particle::b && part[3] == Particle::bbar) {
-      return eebar_bbbar_B(S, T);
+      return eebar_bbbar_B(ord, mandelstam_to_p2(S, T));
    }
    else {
       throw std::runtime_error("Requested unknown Born matrix element");
@@ -28,7 +46,12 @@ double SM::BornCCME(std::vector<Particle> part, int emitter, int spectator, EpsO
 
 double SM::VirtualME(std::vector<Particle> part, EpsOrd ord, double S, double T) const noexcept {
    if (part[0] == Particle::e && part[1] == Particle::ebar && part[2] == Particle::b && part[3] == Particle::bbar) {
-      return eebar_bbbar_V(ord, S, T);
+//      return eebar_bbbar_V_OS(ord, S, T);
+      //std::cout << eebar_bbbar_V_MSbar(ord, mandelstam_to_p2(S, T))/eebar_bbbar_V_OS(ord, S, T) << std::endl;
+      double os = eebar_bbbar_V_OS(ord, S, T);
+      double ms = eebar_bbbar_V_MSbar(ord, mandelstam_to_p2(S, T));
+//      std::cout << os << ' ' << os/ms << std::endl;
+      return ms;
    }
 }
 
@@ -39,10 +62,25 @@ double SM::RealME(std::vector<Particle> part, std::vector<Vec4D<double>> const& 
 }
 
 // --------------------------------- e+e- -> bbbar --------------------------------
-double SM::eebar_bbbar_B(double S, double T) const noexcept {
+double SM::eebar_bbbar_B(EpsOrd ord, std::vector<Vec4D<double>> const& p) const noexcept {
+   double k12 = p[0]*p[1];
+   double k14 = p[0]*p[3];
+   double k34 = p[2]*p[3];
+   double k44 = p[3]*p[3];
+   double k23 = p[1]*p[2];
+   double k24 = p[1]*p[3];
+   double k33 = p[2]*p[2];
+   double k13 = p[0]*p[2];
    const double Alfa2 = pow(Alfa_, 2);
-   const double MB2 = pow(MB_, 2);
-   return 4.*(8*Alfa2*(pi*pi)*(S*S + 2*(MB2*MB2 - 2*MB2*T + T*(S + T))))/(3.*(S*S));
+   const double MB2 = pow(5-delta, 2);
+   switch (ord) {
+      case EpsOrd::Eps0:
+         //return 4. * (8 * Alfa2 * (pi * pi) * (S * S + 2 * (MB2 * MB2 - 2 * MB2 * T + T * (S + T)))) / (3. * (S * S));
+         return 42.666666666666664*Alfa2*(k14*k23 + k13*k24 + k12*MB2)*pow(0.5/k12,2.)*pow(pi,2.);
+      case EpsOrd::Eps1:
+         // @todo: this is not 0
+         return 0.;
+   }
 }
 
 double SM::eebar_bbbar_CCB(int emitter, int spectator, EpsOrd ord, double S, double T) const noexcept {
@@ -57,7 +95,7 @@ double SM::eebar_bbbar_CCB(int emitter, int spectator, EpsOrd ord, double S, dou
    }
 }
 
-double SM::eebar_bbbar_V(EpsOrd ord, double S, double T) const noexcept {
+double SM::eebar_bbbar_V_OS(EpsOrd ord, double S, double T) const noexcept {
    using dilogarithm::dilog;
    double alphaS = 0.12;
    double Alfa2 = pow(Alfa_, 2);
@@ -71,9 +109,9 @@ double SM::eebar_bbbar_V(EpsOrd ord, double S, double T) const noexcept {
       case EpsOrd::DoublePole:
          return 0.;
       case EpsOrd::SinglePole:
-         return eebar_bbbar_B(S, T) * alphaS / (2. * pi) * A1;
+         return eebar_bbbar_B(EpsOrd::Eps0, mandelstam_to_p2(S, T)) * alphaS / (2. * pi) * A1;
       case EpsOrd::Eps0:
-         return eebar_bbbar_B(S, T) * alphaS / (2. * pi) * (
+         return eebar_bbbar_B(EpsOrd::Eps0, mandelstam_to_p2(S, T)) * alphaS / (2. * pi) * (
                A1 * log(91.188 * 91.188 / S) +
                CF * (-2 * (1 - (1 + b * b) / (2 * b) * log((1 + b) / (1 - b))) * log(S / MB2)
                      + 3 * b * log((1 + b) / (1 - b)) - 4 + (1 + b * b) / b * (-0.5 * pow(log((1 - b) / (1 + b)), 2)
@@ -90,9 +128,64 @@ double SM::eebar_bbbar_V(EpsOrd ord, double S, double T) const noexcept {
    }
 }
 
+double SM::eebar_bbbar_V_MSbar(EpsOrd ord, std::vector<Vec4D<double>> const& p) const noexcept {
+   std::complex<double> temp = 0;
+   ltini();
+   setmudim (pow(91.188,2));
+   setdelta(0e+7);
+//   switch (ord) {
+//      case EpsOrd::DoublePole:
+//         setlambda(-2);
+//         Finite = 0;
+//         break;
+//      case EpsOrd::SinglePole:
+//           setlambda(-1);
+//           Finite = 0;
+//           break;
+//      case EpsOrd::Eps0:
+           setlambda(0);
+//           break;
+//   }
+   double Alfas = 0.12;
+   double Alfa2 = pow(Alfa_, 2);
+   double MB2 = pow(5, 2);
+   double k12 = p[0]*p[1];
+   double k14 = p[0]*p[3];
+   double k34 = p[2]*p[3];
+   double k44 = p[3]*p[3];
+   double k23 = p[1]*p[2];
+   double k24 = p[1]*p[3];
+   double k33 = p[2]*p[2];
+   double k13 = p[0]*p[2];
+   // Dminus4 * 1/epsIR
+   if(ord == EpsOrd::DoublePole)
+         return 0.;
+   if (ord  == EpsOrd::SinglePole) {
+      setlambda(-1);
+      setuvdiv(0);
+      std::complex<double> temp1 = Alfa2 * Alfas * (22.340214425527417 * ((-2. * (-2. * k13 * k23 + k12 * MB2) *
+                                                                           (-1. * (k34 + MB2) * A0i(aa0, MB2) +
+                                                                            MB2 * ((k12 - 2. * (k34 + MB2)) *
+                                                                                   B0i(bb0, 2. * k12, MB2, MB2) +
+                                                                                   2. * (k34 + MB2) *
+                                                                                   B0i(bb0, MB2, 0., MB2)))) /
+                                                                          (-1. * (k34 * k34) + MB2 * MB2) +
+                                                                          (k14 * k23 + k13 * k24 + k12 * MB2) *
+                                                                          (-3. * B0i(bb0, 2. * k12, MB2, MB2) +
+                                                                           4. * B0i(bb0, MB2, 0., MB2) -
+                                                                           4. * k34 *
+                                                                           C0i(cc0, MB2, 2. * k12, MB2, 0., MB2,
+                                                                               MB2)))) / (k12 * k12);
+      return (temp1.real() - 2 * 2 * eebar_bbbar_B(EpsOrd::Eps0, p) * Alfas / (3 * pi));
+   }
+   if (ord == EpsOrd::Eps0)
+         return 0.;
+//   std::cout << "A " << temp1.real()  << ' ' <<  3*eebar_bbbar_B(EpsOrd::Eps0, p) * Alfas/(2*pi) << std::endl;
+}
+
 double SM::eebar_bbbar_R (std::vector<Vec4D<double>> const& p) const noexcept {
    double Alfas = 0.12;
-   double Alfa2 = pow(137., -2);
+   double Alfa2 = pow(Alfa_, 2);
    double k12 = p[0]*p[1];
    double k35 = p[2]*p[4];
    double k25 = p[1]*p[4];
@@ -103,23 +196,29 @@ double SM::eebar_bbbar_R (std::vector<Vec4D<double>> const& p) const noexcept {
    double k23 = p[1]*p[2];
    double k14 = p[0]*p[3];
    double k34 = p[2]*p[3];
-   double S12 = 2. * k12;
-   double m1 = 5;
-   double m2 = 5;
-   double S35 = m1 * m1 + 2 * k35;
-   double S45 = m2 * m2 + 2 * k45;
-   double T = m1 * m1 - 2. * k13;
-   double T14 = m2 * m2 - 2. * k14;
-   double MB2 = 5*5;
-   return 4*(-512*Alfa2*Alfas*((-2*k14*k24*MB2 - k12*k35*MB2 + k12*MB2*(k12 + MB2) +
-                                (-2*k14*k24 + k12*(k14 + k24))*(-k13 - k23 + k34 + MB2))/(4.*(k35*k35)) -
-                               (k15*k15*k23 - k15*(k23*k23) - 2*(k12*k12)*(k13 + k23) - k13*k13*k25 - k15*k23*k25 - 2*k15*k23*k35 - 2*k14*k23*MB2 +
-                                k13*(k15*(k23 - k25) + k25*(k23 + k25) + 2*(-2*k23 - k25)*k35 - 2*k24*MB2) +
-                                k12*(4*(k13*k13) + 4*(k23*k23) + k23*(2*k15 + 3*k25 - 2*k35) - (k15 + k25 - 2*k35)*k35 +
-                                     k13*(3*k15 - 2*(-2*k23 - k25 + k35)) + (-k15 - k25 + 2*(k34 + k35))*MB2))/(4.*k35*k45) +
-                               (k15*(-(k13*k23) + k23*k23) + k13*k13*k25 - k13*k23*k25 + 2*k13*k23*k35 + k12*k12*MB2 - 2*k13*k23*MB2 +
-                                k12*(MB2*MB2 + k15*(k13 + MB2) + k25*(k23 + MB2) - k35*(k13 + k23 + MB2)))/(4.*(k45*k45)))*pow(pi,3))/
-          (9.*(k12*k12));
+   double k44 = p[3]*p[3];
+   double k33 = p[2]*p[2];
+   double MB2 = pow(5 - delta, 2);
+   return -4*Alfa2*Alfas*pow(1/(2.*k12),2)*((1024*pow(1/(k33 + 2*k35 - MB2),2)*
+                                             (-2*(-2*k15*k23 - 2*k15*k25 - 2*k13*(k23 + k25) + k12*(k13 + k15 + k23 + k25))*
+                                              k35 + MB2*(-4*k14*k24 + k12*(-2*k13 - 2*k23 + 2*k33 + 2*k34 + k44) +
+                                                         2*pow(k12,2)) + k12*pow(MB2,2)))/9. -
+                                            (512*((-2*(2*k15*k23*k25 - 2*k15*k23*k33 - 4*k15*k25*k33 + 4*k15*k23*k35 +
+                                                       (6*k14*k23 + 6*k13*k24 + 4*k14*k24 -
+                                                        k12*(3*k13 + k14 + 3*k23 + k24 - 3*k33 + 6*k34 + k44))*MB2 +
+                                                       2*k25*pow(k13,2) - 2*k23*pow(k15,2) + 2*k15*pow(k23,2) -
+                                                       k13*(2*k15*(k23 - k25) + 2*k23*k25 + 2*k25*k33 - 8*k23*k35 -
+                                                            4*k25*k35 + 2*pow(k25,2)) +
+                                                       k12*(-2*k13*(k15 - 2*k33) - 2*k23*(k25 - 2*k33) + 3*k15*k33 +
+                                                            3*k25*k33 + 2*k15*k35 + 2*k25*k35 - 4*k33*k35 - 4*pow(k13,2) -
+                                                            4*pow(k23,2) - 2*pow(k33,2) - 4*pow(k35,2))) + 4*k12*pow(MB2,2))/
+                                                  ((k33 + 2*k35 - MB2)*(k44 + 2*k45 - MB2)) +
+                                                  pow(1/(k44 + 2*k45 - MB2),2)*
+                                                  (2*((k33 + k34 + k35)*(k15*k44 - 2*k14*k45) +
+                                                      k13*(-2*k15*k44 + k35*k44 + 4*k14*k45 - 2*k34*k45 - k44*k45 -
+                                                           2*pow(k45,2))) -
+                                                   2*(MB2*(-6*k13*k23 - k14*k23 - k13*k24 - k12*(k13 + k23 - 2*k33 + k44) +
+                                                           4*pow(k12,2)) + k12*pow(MB2,2)))))/9.)*pow(pi,3);
 }
 
 // --------------------------------- uubar -> e+e- --------------------------------

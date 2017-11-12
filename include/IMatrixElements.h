@@ -29,7 +29,7 @@ class IMatrixElements {
 public:
    const LHAPDF::PDF* pdf = LHAPDF::mkPDF( "MMHT2014nlo68cl", 0);
    double mu_r, mu_f;
-   virtual double BornME(std::vector<Particle>, double, double) const noexcept = 0;
+   virtual double BornME(std::vector<Particle>, EpsOrd, double, double) const noexcept = 0;
    virtual double BornCCME(std::vector<Particle>, int, int, EpsOrd, std::vector<Vec4D<double>> const&) const noexcept = 0;
    virtual double VirtualME(std::vector<Particle>, EpsOrd, double, double) const noexcept = 0;
    virtual double RealME(std::vector<Particle>, std::vector<Vec4D<double>> const&) const noexcept = 0;
