@@ -78,8 +78,7 @@ double SM::eebar_bbbar_B(EpsOrd ord, std::vector<Vec4D<double>> const& p) const 
          //return 4. * (8 * Alfa2 * (pi * pi) * (S * S + 2 * (MB2 * MB2 - 2 * MB2 * T + T * (S + T)))) / (3. * (S * S));
          return 42.666666666666664*Alfa2*(k14*k23 + k13*k24 + k12*MB2)*pow(0.5/k12,2.)*pow(pi,2.);
       case EpsOrd::Eps1:
-         // @todo: this is not 0
-         return 0.;
+         return Alfa2*(-105.27578027828648*(k34 + MB2))/k12;
    }
 }
 
