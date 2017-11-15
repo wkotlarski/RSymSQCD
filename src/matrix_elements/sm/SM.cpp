@@ -7,7 +7,7 @@
 #include <complex>
 #include "clooptools.h"
 
-double delta = 0E-4;
+double delta = 0.;
 std::vector<Vec4D<double>> mandelstam_to_p2 (double s, double t) {
    double mass = 5;
    double tp = t - pow(mass,2);
@@ -50,7 +50,7 @@ double SM::VirtualME(std::vector<Particle> part, EpsOrd ord, double S, double T)
       //std::cout << eebar_bbbar_V_MSbar(ord, mandelstam_to_p2(S, T))/eebar_bbbar_V_OS(ord, S, T) << std::endl;
       double os = eebar_bbbar_V_OS(ord, S, T);
       double ms = eebar_bbbar_V_MSbar(ord, mandelstam_to_p2(S, T));
-//      std::cout << os << ' ' << os/ms << ' ' << ms - os << std::endl;
+      std::cout << os << ' ' << ms << ' ' << os/ms << std::endl;
       return ms;
    }
 }
@@ -76,9 +76,9 @@ double SM::eebar_bbbar_B(EpsOrd ord, std::vector<Vec4D<double>> const& p) const 
    switch (ord) {
       case EpsOrd::Eps0:
          //return 4. * (8 * Alfa2 * (pi * pi) * (S * S + 2 * (MB2 * MB2 - 2 * MB2 * T + T * (S + T)))) / (3. * (S * S));
-         return 42.666666666666664*Alfa2*(k14*k23 + k13*k24 + k12*MB2)*pow(0.5/k12,2.)*pow(pi,2.);
+         return Alfa2*(16*(2*(k14*k23 + k13*k24) + 2*k12*MB2)*(pi*pi))/(3.*(k12*k12));
       case EpsOrd::Eps1:
-         return Alfa2*(-105.27578027828648*(k34 + MB2))/k12;
+         return Alfa2*(-32*(k34 + MB2)*(pi*pi))/(3.*k12);
    }
 }
 
@@ -129,10 +129,9 @@ double SM::eebar_bbbar_V_OS(EpsOrd ord, double S, double T) const noexcept {
 
 double SM::eebar_bbbar_V_MSbar(EpsOrd ord, std::vector<Vec4D<double>> const& p) const noexcept {
    ltini();
-   setmudim (91.188*91.188);
    double Alfas = 0.12;
    double Alfa2 = pow(Alfa_, 2);
-   double MB2 = pow(5, 2);
+   double MB2 = pow(MB_, 2);
    double k12 = p[0]*p[1];
    double k14 = p[0]*p[3];
    double k34 = p[2]*p[3];
@@ -144,8 +143,8 @@ double SM::eebar_bbbar_V_MSbar(EpsOrd ord, std::vector<Vec4D<double>> const& p) 
    if(ord == EpsOrd::DoublePole)
          return 0.;
    if (ord  == EpsOrd::SinglePole) {
-      setlambda(-1);
       setuvdiv(0);
+      setlambda(-1);
       std::complex<double> temp1 = Alfa2 * Alfas * (22.340214425527417 * ((-2. * (-2. * k13 * k23 + k12 * MB2) *
                                                                            (-1. * (k34 + MB2) * A0i(aa0, MB2) +
                                                                             MB2 * ((k12 - 2. * (k34 + MB2)) *
@@ -164,14 +163,15 @@ double SM::eebar_bbbar_V_MSbar(EpsOrd ord, std::vector<Vec4D<double>> const& p) 
    }
    if (ord == EpsOrd::Eps0) {
       // check UV-finiteness
-      setuvdiv(0);
-      setdelta(0e+6);
-      setmudim(91.188*91.188);
+      setuvdiv(1);
+      setdelta(0e+12);
 
       // finite part
+      setmudim(pow(91.188,2));
       setlambda(0);
       //    - triangle
-      std::complex<double> temp1 = Alfa2 * Alfas * (22.340214425527417 * ((-2. * (-2. * k13 * k23 + k12 * MB2) *
+      std::complex<double> temp1 = Alfa2 * Alfas * (22.340214425527417 * (
+                                                                               (-2. * (-2. * k13 * k23 + k12 * MB2) *
                                                                            (-1. * (k34 + MB2) * A0i(aa0, MB2) +
                                                                             MB2 * ((k12 - 2. * (k34 + MB2)) *
                                                                                    B0i(bb0, 2. * k12, MB2, MB2) +
@@ -183,7 +183,8 @@ double SM::eebar_bbbar_V_MSbar(EpsOrd ord, std::vector<Vec4D<double>> const& p) 
                                                                            4. * B0i(bb0, MB2, 0., MB2) -
                                                                            4. * k34 *
                                                                            C0i(cc0, MB2, 2. * k12, MB2, 0., MB2,
-                                                                               MB2)))) / (k12 * k12);
+                                                                               MB2)))) / (k12 * k12
+                                                                                                                                            );
       //    - CT apart from Dminus4
       std::complex<double> temp3 =  +2.*eebar_bbbar_B(EpsOrd::Eps0, p) *
             (-0.2122065907891938*Alfas*(Re(B0i(bb0,MB2,0.,MB2)) + Re(B0i(bb1,MB2,0.,MB2)) +
@@ -195,21 +196,26 @@ double SM::eebar_bbbar_V_MSbar(EpsOrd ord, std::vector<Vec4D<double>> const& p) 
       setlambda(-1);
 
       // Dminus4 coeff. times triangle pole
-      std::complex<double> temp2 = Alfa2 * Alfas *
-            (
-                  (-22.340214425527417*((k34 - 1.*MB2)*(2.*k14*k23 + 2.*k13*k24 - 1.*k12*(3.*k34 + MB2))*
-                                        B0i(bb0,2.*k12,MB2,MB2) - 4.*
-                                                                  (k12*(-1.*(k34*k34) + MB2*MB2)*B0i(bb0,MB2,0.,MB2) +
-                                                                   k12*k34*(k34*k34 - 1.*(MB2*MB2))*C0i(cc0,MB2,2.*k12,MB2,0.,MB2,MB2) +
-                                                                   MB2*(2.*k13*k23 - 1.*k12*MB2)*
-                                                                   (2.*C0i(cc00,MB2,2.*k12,MB2,0.,MB2,MB2) -
-                                                                    1.*(k34 - 1.*MB2)*(C0i(cc11,MB2,2.*k12,MB2,0.,MB2,MB2) +
-                                                                                       2.*C0i(cc12,MB2,2.*k12,MB2,0.,MB2,MB2) +
-                                                                                       C0i(cc22,MB2,2.*k12,MB2,0.,MB2,MB2))))))/(k12*k12*(k34 - 1.*MB2))
-            );
+      std::complex<double> temp2 = Alfa2 * Alfas * (
+                                                         (-44.680428851054835*((k14*k23 + k13*k24 + k12*(k34 + 2.*MB2))*
+                                                                               B0i(bb0,2.*k12,MB2,MB2) - 2.*
+                                                                                                         (k12*k34*(k34 + MB2)*C0i(cc0,MB2,2.*k12,MB2,0.,MB2,MB2) +
+                                                                                                          (k14*k23 + k13*k24 + k12*k34 + 2.*k12*MB2)*
+                                                                                                          C0i(cc00,MB2,2.*k12,MB2,0.,MB2,MB2) +
+                                                                                                          k12*(k34*k34)*C0i(cc1,MB2,2.*k12,MB2,0.,MB2,MB2) -
+                                                                                                          1.*k12*(MB2*MB2)*C0i(cc1,MB2,2.*k12,MB2,0.,MB2,MB2) -
+                                                                                                          2.*k13*k23*MB2*C0i(cc11,MB2,2.*k12,MB2,0.,MB2,MB2) +
+                                                                                                          k12*(MB2*MB2)*C0i(cc11,MB2,2.*k12,MB2,0.,MB2,MB2) -
+                                                                                                          4.*k13*k23*MB2*C0i(cc12,MB2,2.*k12,MB2,0.,MB2,MB2) +
+                                                                                                          2.*k12*(MB2*MB2)*C0i(cc12,MB2,2.*k12,MB2,0.,MB2,MB2) +
+                                                                                                          k12*(k34*k34)*C0i(cc2,MB2,2.*k12,MB2,0.,MB2,MB2) -
+                                                                                                          1.*k12*(MB2*MB2)*C0i(cc2,MB2,2.*k12,MB2,0.,MB2,MB2) -
+                                                                                                          2.*k13*k23*MB2*C0i(cc22,MB2,2.*k12,MB2,0.,MB2,MB2) +
+                                                                                                          k12*(MB2*MB2)*C0i(cc22,MB2,2.*k12,MB2,0.,MB2,MB2))))/(k12*k12)
+                                                   );
       // Dminus4 x the ren. const. pole time 4d born
-      std::complex<double> temp4 =  +2*eebar_bbbar_B(EpsOrd::Eps0, p) *
-            (0.2122065907891938*Alfas*(Re(B0i(bb0,MB2,0.,MB2)) + Re(B0i(bb1,MB2,0.,MB2)) +
+      std::complex<double> temp4 =  +2*eebar_bbbar_B(EpsOrd::Eps0, p) * (
+                                                                              0.2122065907891938*Alfas*(Re(B0i(bb0,MB2,0.,MB2)) + Re(B0i(bb1,MB2,0.,MB2)) +
                                        2.*MB2*Re(B0i(dbb1,MB2,0.,MB2)))
             );
       // Dd born times  ren const pole
