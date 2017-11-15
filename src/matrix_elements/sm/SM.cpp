@@ -50,7 +50,7 @@ double SM::VirtualME(std::vector<Particle> part, EpsOrd ord, double S, double T)
       //std::cout << eebar_bbbar_V_MSbar(ord, mandelstam_to_p2(S, T))/eebar_bbbar_V_OS(ord, S, T) << std::endl;
       double os = eebar_bbbar_V_OS(ord, S, T);
       double ms = eebar_bbbar_V_MSbar(ord, mandelstam_to_p2(S, T));
-//      std::cout << os << ' ' << os/ms << std::endl;
+//      std::cout << os << ' ' << os/ms << ' ' << ms - os << std::endl;
       return ms;
    }
 }
@@ -128,23 +128,8 @@ double SM::eebar_bbbar_V_OS(EpsOrd ord, double S, double T) const noexcept {
 }
 
 double SM::eebar_bbbar_V_MSbar(EpsOrd ord, std::vector<Vec4D<double>> const& p) const noexcept {
-   std::complex<double> temp = 0;
    ltini();
-   setmudim (pow(91.188,2));
-   setdelta(0e+7);
-//   switch (ord) {
-//      case EpsOrd::DoublePole:
-//         setlambda(-2);
-//         Finite = 0;
-//         break;
-//      case EpsOrd::SinglePole:
-//           setlambda(-1);
-//           Finite = 0;
-//           break;
-//      case EpsOrd::Eps0:
-           setlambda(0);
-//           break;
-//   }
+   setmudim (91.188*91.188);
    double Alfas = 0.12;
    double Alfa2 = pow(Alfa_, 2);
    double MB2 = pow(5, 2);
@@ -156,7 +141,6 @@ double SM::eebar_bbbar_V_MSbar(EpsOrd ord, std::vector<Vec4D<double>> const& p) 
    double k24 = p[1]*p[3];
    double k33 = p[2]*p[2];
    double k13 = p[0]*p[2];
-   // Dminus4 * 1/epsIR
    if(ord == EpsOrd::DoublePole)
          return 0.;
    if (ord  == EpsOrd::SinglePole) {
@@ -175,10 +159,68 @@ double SM::eebar_bbbar_V_MSbar(EpsOrd ord, std::vector<Vec4D<double>> const& p) 
                                                                            4. * k34 *
                                                                            C0i(cc0, MB2, 2. * k12, MB2, 0., MB2,
                                                                                MB2)))) / (k12 * k12);
+      // add IR part from the Zb to the vertex
       return (temp1.real() - 2 * 2 * eebar_bbbar_B(EpsOrd::Eps0, p) * Alfas / (3 * pi));
    }
-   if (ord == EpsOrd::Eps0)
-         return 0.;
+   if (ord == EpsOrd::Eps0) {
+      // check UV-finiteness
+      setuvdiv(0);
+      setdelta(0e+6);
+      setmudim(91.188*91.188);
+
+      // finite part
+      setlambda(0);
+      //    - triangle
+      std::complex<double> temp1 = Alfa2 * Alfas * (22.340214425527417 * ((-2. * (-2. * k13 * k23 + k12 * MB2) *
+                                                                           (-1. * (k34 + MB2) * A0i(aa0, MB2) +
+                                                                            MB2 * ((k12 - 2. * (k34 + MB2)) *
+                                                                                   B0i(bb0, 2. * k12, MB2, MB2) +
+                                                                                   2. * (k34 + MB2) *
+                                                                                   B0i(bb0, MB2, 0., MB2)))) /
+                                                                          (-1. * (k34 * k34) + MB2 * MB2) +
+                                                                          (k14 * k23 + k13 * k24 + k12 * MB2) *
+                                                                          (-3. * B0i(bb0, 2. * k12, MB2, MB2) +
+                                                                           4. * B0i(bb0, MB2, 0., MB2) -
+                                                                           4. * k34 *
+                                                                           C0i(cc0, MB2, 2. * k12, MB2, 0., MB2,
+                                                                               MB2)))) / (k12 * k12);
+      //    - CT apart from Dminus4
+      std::complex<double> temp3 =  +2.*eebar_bbbar_B(EpsOrd::Eps0, p) *
+            (-0.2122065907891938*Alfas*(Re(B0i(bb0,MB2,0.,MB2)) + Re(B0i(bb1,MB2,0.,MB2)) +
+                                                                     2.*MB2*(-1.*Re(B0i(dbb0,MB2,0.,MB2)) + Re(B0i(dbb1,MB2,0.,MB2))))
+            );
+      // -----------------------------------------------------
+
+      // eps time poles
+      setlambda(-1);
+
+      // Dminus4 coeff. times triangle pole
+      std::complex<double> temp2 = Alfa2 * Alfas *
+            (
+                  (-22.340214425527417*((k34 - 1.*MB2)*(2.*k14*k23 + 2.*k13*k24 - 1.*k12*(3.*k34 + MB2))*
+                                        B0i(bb0,2.*k12,MB2,MB2) - 4.*
+                                                                  (k12*(-1.*(k34*k34) + MB2*MB2)*B0i(bb0,MB2,0.,MB2) +
+                                                                   k12*k34*(k34*k34 - 1.*(MB2*MB2))*C0i(cc0,MB2,2.*k12,MB2,0.,MB2,MB2) +
+                                                                   MB2*(2.*k13*k23 - 1.*k12*MB2)*
+                                                                   (2.*C0i(cc00,MB2,2.*k12,MB2,0.,MB2,MB2) -
+                                                                    1.*(k34 - 1.*MB2)*(C0i(cc11,MB2,2.*k12,MB2,0.,MB2,MB2) +
+                                                                                       2.*C0i(cc12,MB2,2.*k12,MB2,0.,MB2,MB2) +
+                                                                                       C0i(cc22,MB2,2.*k12,MB2,0.,MB2,MB2))))))/(k12*k12*(k34 - 1.*MB2))
+            );
+      // Dminus4 x the ren. const. pole time 4d born
+      std::complex<double> temp4 =  +2*eebar_bbbar_B(EpsOrd::Eps0, p) *
+            (0.2122065907891938*Alfas*(Re(B0i(bb0,MB2,0.,MB2)) + Re(B0i(bb1,MB2,0.,MB2)) +
+                                       2.*MB2*Re(B0i(dbb1,MB2,0.,MB2)))
+            );
+      // Dd born times  ren const pole
+      std::complex<double> temp5 =  +2*eebar_bbbar_B(EpsOrd::Eps1, p) *
+            (-0.2122065907891938*Alfas*(Re(B0i(bb0,MB2,0.,MB2)) + Re(B0i(bb1,MB2,0.,MB2)) +
+                                        2.*MB2*(-1.*Re(B0i(dbb0,MB2,0.,MB2)) + Re(B0i(dbb1,MB2,0.,MB2))))
+            );
+//      std::cout << temp1.real() << ' ' << temp2.real() << ' ' << temp3.real() << ' ' << temp4.real() <<
+//          ' ' << temp5.real() << " sum: " << (temp1+temp2+temp3+temp4+temp5).real() << std::endl;
+      return (1.*(temp1+temp3) + 1.*(temp2+temp4+temp5)).real();
+   }
 //   std::cout << "A " << temp1.real()  << ' ' <<  3*eebar_bbbar_B(EpsOrd::Eps0, p) * Alfas/(2*pi) << std::endl;
 }
 
