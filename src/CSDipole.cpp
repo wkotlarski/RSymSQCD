@@ -99,14 +99,15 @@ double CSDipole::eval_integrated_dipole(int coeff, std::vector<Vec4D<double>> co
            p[3].t_, p[3].x_, p[3].y_, p[3].z_,
            4, emit_, spec_
    );
+   auto proc = std::vector<Particle> {Particle::e, Particle::ebar, Particle::b, Particle::bbar};
    switch (coeff) {
       case -2:
-         return model_->BornCCME(std::vector<Particle> {Particle::e, Particle::ebar, Particle::b, Particle::bbar},emit_, spec_, EpsOrd::Eps0, p)*d1;
+         return model_->BornCCME(proc, emit_, spec_, EpsOrd::Eps0, p)*d1;
       case -1:
-         return model_->BornCCME(std::vector<Particle> {Particle::e, Particle::ebar, Particle::b, Particle::bbar},emit_, spec_, EpsOrd::Eps0, p)*d1;
+         return model_->BornCCME(proc, emit_, spec_, EpsOrd::Eps0, p)*d1;
       case 0:
-         return model_->BornCCME(std::vector<Particle> {Particle::e, Particle::ebar, Particle::b, Particle::bbar},emit_, spec_, EpsOrd::Eps0, p)*d1
-      - model_->BornCCME(std::vector<Particle> {Particle::e, Particle::ebar, Particle::b, Particle::bbar},emit_, spec_, EpsOrd::Eps1, p)*d2;
+         return model_->BornCCME(proc,emit_, spec_, EpsOrd::Eps0, p)*d1
+      + model_->BornCCME(proc, emit_, spec_, EpsOrd::Eps1, p)*d2;
    }
 }
 
