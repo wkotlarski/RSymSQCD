@@ -238,7 +238,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    );
    // ----------------------------------------------
    valarray<double> ME2 = {
-           (model->RealME)(particles[0], q), -dipole_sum
+           (model->RealME)(particles[0], q), -dipole_sum*1
    };
    // delete (otherwise causes memory leak)
    for(std::vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {

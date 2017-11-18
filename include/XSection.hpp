@@ -12,6 +12,7 @@
 
 #include "IMatrixElements.h"
 
+
 class XSection {
 
 public:
@@ -34,5 +35,29 @@ protected:
    static double m2;
    
    static const LHAPDF::PDF* pdf;
+static int particle_to_int (Particle p) {
+   switch (p) {
+      case Particle::d:
+         return 1;
+      case Particle::dbar:
+         return -1;
+      case Particle::u:
+         return 2;
+      case Particle::ubar:
+         return -2;
+      case Particle::s:
+         return 3;
+      case Particle::sbar:
+         return -3;
+      case Particle::c:
+         return 4;
+      case Particle::cbar:
+         return -4;
+      case Particle::b:
+         return 5;
+      case Particle::bbar:
+         return -5;
+   }
+}
 };
 #endif /* XSECTION_H_ */
