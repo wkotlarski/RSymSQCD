@@ -54,14 +54,31 @@ std::array<double, 3> XSection_HnonC::integrate() {
    constexpr int seed = 0;
    const char* state_file = "";
    int nregions, fail;
+    constexpr double border = 1e-6; // don't go lower than 1e-6 for 1e-4 relative accuraccy
+    constexpr int key1 = 200000;
+    constexpr int key2 = 1;
+    constexpr int key3 = 1;
+    constexpr int maxpass = 5;
+    constexpr double maxchisq = 10.;
+    constexpr double mindeviation = .25;
+    constexpr int ngiven = 0;
+    constexpr int ldxgiven = ndim;
+    constexpr int nextra = 0;
 
    cubareal integral[ncomp], error[ncomp], prob[ncomp];
-   llVegas( ndim, ncomp, integrand, NULL, 1,
-      accuracy_rel, accuracy_abs, flags, seed,
-      neval_min, neval_max, nstart, nincrease, nbatch,
-      gridno, state_file, NULL,
-      &neval, &fail, integral, error, prob );
+//   llVegas( ndim, ncomp, integrand, NULL, 1,
+//      accuracy_rel, accuracy_abs, flags, seed,
+//      neval_min, neval_max, nstart, nincrease, nbatch,
+//      gridno, state_file, NULL,
+//      &neval, &fail, integral, error, prob );
 
+   llDivonne(ndim, ncomp, integrand, NULL, ncomp,
+           accuracy_rel, accuracy_abs, flags, seed,
+           neval_min, neval_max, key1, key2, key3, maxpass,
+           border, maxchisq, mindeviation,
+           ngiven, ldxgiven, NULL, nextra, NULL,
+           NULL, NULL,
+           &nregions, &neval, &fail, integral, error, prob);
    std::array <double, 3> result_finite
       { integral[0], error[0], prob[0] };
    return result_finite;
@@ -70,7 +87,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
 int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    const int *ncomp, cubareal ff[], void *userdata) {
 
-   constexpr double cut {1e-14};
+   constexpr double cut {0e-15};
 
 
    /*
