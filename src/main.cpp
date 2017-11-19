@@ -47,28 +47,29 @@ boost::property_tree::ptree XSection::pt;
 boost::program_options::variables_map XSection::vm;
 const LHAPDF::PDF* XSection::pdf;
 void print( string str, array<double,3> tree, array<double,3> virt, array<double,3> soft, array<double,3> hard) {
+    const int incr_prec_of_out = 3;
    cout << "\nResults for subprocess " << str << '\n';
    cout << scientific;
    // print out LO run statistics
    cout << "---------------------------------------------------------------" << endl;
-   cout << setprecision(5);
-   cout << setw(12) << "tree:" << setw(13) << tree.at(0)
+   cout << setprecision(5+incr_prec_of_out);
+   cout << setw(12) << "tree:" << setw(13+incr_prec_of_out) << tree.at(0)
          << " +/- " << setprecision(1) << tree.at(1)
          << " fb ( p-value = " << setw(8) << tree.at(2) << " )\n";
-   cout << setprecision(5);
-   cout << setw(12) << "virtual:" << setw(13) << virt.at(0) << " +/- "
+   cout << setprecision(5+incr_prec_of_out);
+   cout << setw(12) << "virtual:" << setw(13+incr_prec_of_out) << virt.at(0) << " +/- "
            << setprecision(1) << virt.at(1) << " fb ( p-value = "
            << setw(8) << virt.at(2) << " )\n";
 
-      cout << setprecision(5);
-      cout << setw(12) << "real (soft):" << setw(13) << soft.at(0) << " +/- " << setprecision(1) << soft.at(1)
+      cout << setprecision(5+incr_prec_of_out);
+      cout << setw(12) << "real (soft):" << setw(13+incr_prec_of_out) << soft.at(0) << " +/- " << setprecision(1) << soft.at(1)
            << " fb ( p-value = " << setw(8) << soft.at(2) << " )\n";
-      cout << setprecision(5);
-      cout << setw(12) << "real (hard):" << setw(13) << hard.at(0) << " +/- " << setprecision(1) << hard.at(1)
+      cout << setprecision(5+incr_prec_of_out);
+      cout << setw(12) << "real (hard):" << setw(13+incr_prec_of_out) << hard.at(0) << " +/- " << setprecision(1) << hard.at(1)
            << " fb ( p-value = " << setw(8) << hard.at(2) << " )\n";
       cout << "---------------------------------------------------------------" << endl;
-      cout << setprecision(5);
-      cout << setw(12) << "sum:" << setw(13)
+      cout << setprecision(5+incr_prec_of_out);
+      cout << setw(12) << "sum:" << setw(13+incr_prec_of_out)
            << tree.at(0) + virt.at(0) + hard.at(0) + soft.at(0)
            << " +/- " << setprecision(1) << sqrt(pow(tree.at(1),2) +
            pow(virt.at(1),2) + pow(hard.at(1),2) +
