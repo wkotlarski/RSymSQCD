@@ -70,7 +70,7 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
                      }
                ) + (model->VirtualME)(particles[0], EpsOrd::SinglePole, s, T)
          )
-                       // < 1e-16
+                        < 1e-15
 //      << std::endl;
    );
 
