@@ -170,8 +170,8 @@ int main(int argc, char* argv[]) {
    XSection_Virt virt;
    XSection_HnonC hc;
    std::vector <std::tuple<DipoleType, unsigned int, unsigned int>> const v{
-         {DipoleType::FF, 2, 3},
-         {DipoleType::FF, 3, 2}
+         std::make_tuple(DipoleType::FF, 2, 3),
+         std::make_tuple(DipoleType::FF, 3, 2)
    };
    for (const auto &e : v) {
       hc.cs_dipoles.push_back(
