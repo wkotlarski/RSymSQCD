@@ -92,7 +92,6 @@ double SM::eebar_bbbar_CCB(int emitter, int spectator, EpsOrd ord, double S, dou
       case EpsOrd::Eps0:
          return 4*(8*Alfa2*ColorMatrix(emitter, spectator, "[{3,4}]","[{3,4}]")*pow(pi,2)*pow(S,-2)*(2*MB2*(S - T - U) + 2*pow(MB2,2) + pow(T,2) + pow(U,2)))/9.;
       case EpsOrd::Eps1:
-//         return 4*(8*Alfa2*ColorMatrix(emitter, spectator, "[{3,4}]","[{3,4}]")*pow(pi,2))*MB2/(9.*S) * (-1);
          return 4*(-8*Alfa2*ColorMatrix(emitter, spectator, "[{3,4}]","[{3,4}]")*pow(pi,2))/9.;
    }
 }
