@@ -54,16 +54,16 @@ std::array<double, 3> XSection_HnonC::integrate() {
    constexpr int seed = 0;
    const char* state_file = "";
    int nregions, fail;
-    constexpr double border = 1e-6; // don't go lower than 1e-6 for 1e-4 relative accuraccy
-    constexpr int key1 = 200000;
-    constexpr int key2 = 1;
-    constexpr int key3 = 1;
-    constexpr int maxpass = 5;
-    constexpr double maxchisq = 10.;
-    constexpr double mindeviation = .25;
-    constexpr int ngiven = 0;
-    constexpr int ldxgiven = ndim;
-    constexpr int nextra = 0;
+   constexpr double border {1e-5};
+   constexpr int key1 = 200000;
+   constexpr int key2 = 1;
+   constexpr int key3 = 1;
+   constexpr int maxpass = 5;
+   constexpr double maxchisq = 10.;
+   constexpr double mindeviation = .25;
+   constexpr int ngiven = 0;
+   constexpr int ldxgiven = ndim;
+   constexpr int nextra = 0;
 
    cubareal integral[ncomp], error[ncomp], prob[ncomp];
 //   llVegas( ndim, ncomp, integrand, NULL, 1,
