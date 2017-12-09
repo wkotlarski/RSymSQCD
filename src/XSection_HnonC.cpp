@@ -22,16 +22,8 @@ extern "C" {
 }
 */
 
-template <typename T>
-void print_momentum(std::vector<Vec4D<T>> p) {
-   for(const auto v : p) {
-      std::cout << v.t_ << ' ' << v.x_ << ' ' << v.y_ << ' ' << v.z_ << ' ' << v*v << '\n';
-   }
-}
-
 std::vector<CSDipole> XSection_HnonC::cs_dipoles;
 
-// return total partonic cross section at CMS energy s
 std::array<double, 3> XSection_HnonC::integrate() {
 
    //  integral dimension, number of integrands
@@ -255,7 +247,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    );
    // ----------------------------------------------
    valarray<double> ME2 = {
-           (model->RealME)(particles[0], q), -dipole_sum*1
+           (model->RealME)(particles[0], q), -dipole_sum*0
    };
    // delete (otherwise causes memory leak)
    for(std::vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {

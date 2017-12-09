@@ -60,19 +60,19 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
 //      << std::endl;
    //);
    // and single poles
-   assert(
+//   assert(
 //      std::cout << "single " <<
-         abs(
-               std::accumulate(
-                     cs_dipoles.begin(), cs_dipoles.end(), 0.,
-                     [s,T](double current,  CSDipole& el) {
-                        return current + el.eval_integrated_dipole(-1, mandelstam_to_p(s, T));
-                     }
-               ) + (model->VirtualME)(particles[0], EpsOrd::SinglePole, s, T)
-         )
-                        < 1e-15
+//         abs(
+//               std::accumulate(
+//                     cs_dipoles.begin(), cs_dipoles.end(), 0.,
+//                     [s,T](double current,  CSDipole& el) {
+//                        return current + el.eval_integrated_dipole(-1, mandelstam_to_p(s, T));
+//                     }
+//               ) + (model->VirtualME)(particles[0], EpsOrd::SinglePole, s, T)
+//         )
+//                        < 1e-15
 //      << std::endl;
-   );
+//   );
 
 
    int FiniteGs = 1;
@@ -116,7 +116,7 @@ double squaredMReal;
               return current + el.eval_integrated_dipole(0, mandelstam_to_p(s, T));
            }
    );
-   ff[0] = (squaredMReal + 1*dipole_sum) * pi/pow(4.*pi,2)/pow(s,2) * jacobian * to_fb; //* pdf_flux;   // in femto barn
+   ff[0] = (squaredMReal + 0*dipole_sum) * pi/pow(4.*pi,2)/pow(s,2) * jacobian * to_fb; //* pdf_flux;   // in femto barn
    return 0;
 
 }

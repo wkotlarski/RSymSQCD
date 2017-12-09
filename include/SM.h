@@ -20,6 +20,7 @@ private:
    double eebar_bbbar_B(EpsOrd, std::vector<Vec4D<double>> const&) const noexcept;
    double eebar_bbbar_CCB(int, int, EpsOrd, double, double) const noexcept;
    double eebar_bbbar_V_OS(EpsOrd, double, double) const noexcept;
+   double eebar_bbbar_V_OS2(EpsOrd, std::vector<Vec4D<double>> const&) const noexcept;
    double eebar_bbbar_V_MSbar(EpsOrd, std::vector<Vec4D<double>> const&) const noexcept;
    double eebar_bbbar_R (std::vector<Vec4D<double>> const&) const noexcept;
 
