@@ -100,6 +100,11 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    double shat = x1*x2*S;
    const double shat_sqrt = sqrt( shat );
 
+   /* s35   = (p3 + p5)^2 = (p1 + p2 - p4)^2
+    *       = S - 2 (p1 + p2) * p4 + m2^2
+    * since p1 + p2 doesn't have 3-momentum component, the result depends only on energy
+    *       = S - 2 sqrtS * E2 + m2^2
+    */
    const double s35_min = m1*m1;
    const double s35_max = pow(shat_sqrt - m2, 2);
    const double s35 = s35_min + (s35_max - s35_min) * xx[0];
@@ -113,6 +118,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    double E1_min = ( shat_sqrt - E2) * c - sqrt(E2*E2-m2*m2) * sqrt( (c - 2 * m_sqr)  * (c - 2. * m_sqr)  );
    E1_min /= 2. * (c - m1*m1);
 
+   // analogusly to s35, s45 = S - 2 sqrtS * E1 + m1^2
    const double s45_min = shat + m2*m2 - 2 * shat_sqrt * E1_max;
    const double s45_max = shat + m2*m2 - 2 * shat_sqrt * E1_min;
    const double s45 = s45_min + (s45_max - s45_min) * xx[1];
