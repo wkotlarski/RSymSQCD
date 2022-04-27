@@ -12,10 +12,13 @@ namespace po = boost::program_options;
 #include "XSection_SC.hpp"
 #include "XSection_HnonC.hpp"
 
-
 #include "LHAPDF/Info.h"
 #include "LHAPDF/Config.h"
+
+#include <nlohmann/json.hpp>
+
 using namespace std;
+using json = nlohmann::json;
 
 /*
  *    XSection_* return results in the form xsection, its error, erros's pvalue
@@ -83,12 +86,12 @@ void print( string str, array<double,3> tree) {
 }
 
 int main(int argc, char* argv[]) {
-   
+
    // disable printint LHAPDF header since it gets printed twice
    LHAPDF::Info& cfg = LHAPDF::getConfig();
    cfg.set_entry("Verbosity", 0);
 
-   // 
+   //
    boost::program_options::positional_options_description p;
    p.add("card", -1);
 
@@ -120,7 +123,7 @@ int main(int argc, char* argv[]) {
    ;
    desc.add(verbosity);
 
-   boost::program_options::variables_map vm;        
+   boost::program_options::variables_map vm;
    boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
    boost::program_options::notify(vm);
 
@@ -144,11 +147,11 @@ int main(int argc, char* argv[]) {
    "./RSymSQCD MSSM pp_suLsuR LO" for  LO calculation  */
    
    boost::property_tree::ptree pt;
-   boost::property_tree::ini_parser::read_ini( card, pt );   
+   boost::property_tree::ini_parser::read_ini( card, pt );
 
    cout << "INFO: Using phase space slicing parameters dS = " << pt.get<double>("technical parameters.dS")
         << ", dC = " <<  pt.get<double>("technical parameters.dC") << '\n';
-   
+
    // local arrays are not aumatically initialized to 0
    // need to use {}
    array<double,3> temp {}, xsection_tree {}, xsection_virt {}, xsection_SC {}, xsection_HnonC {},
@@ -158,6 +161,7 @@ int main(int argc, char* argv[]) {
            xsection_tree4 {}, xsection_virt4 {}, xsection_SC4 {}, xsection_HnonC4 {},
            xsection_tree5 {}, xsection_virt5 {}, xsection_SC5 {}, xsection_HnonC5 {},
            xsection_tree_total {}, xsection_virt_total {}, xsection_SC_total {}, xsection_HnonC_total {};
+
    enum Model {
        MRSSM,
        MSSM, 
@@ -331,7 +335,9 @@ int main(int argc, char* argv[]) {
                      if(enable_hard) xsection_HnonC2 = hc.integrate();
                      print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
 		            }
-                  
+
+                  xsection_tree_total = xsection_tree1;
+                  xsection_virt_total = xsection_virt1;
                   xsection_SC_total = xsection_SC1 + xsection_SC2;
                   xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
                   print( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
@@ -426,6 +432,34 @@ int main(int argc, char* argv[]) {
    if (end - start > 1min)
       cout << chrono::duration_cast<chrono::minutes>(end-start).count() %  60 << " minute(s) and ";
    cout << chrono::duration_cast<chrono::seconds>(end-start).count() % 60 << " second(s)\n";
-   
+
+   json j;
+   j["process"] = pt.get<string>("process.process");
+   j["sqrt(S)"] = pt.get<double>("collider setup.sqrt_S");
+   j["mu_r"] = pt.get<double>("collider setup.mu_r");
+   j["mu_f"] = pt.get<double>("collider setup.mu_f");
+   j["pdf"] = pt.get<string>("collider setup.pdf");
+   j["cross section"] = {
+      {"tree", {{"res", xsection_tree_total.at(0)}, {"err", xsection_tree_total.at(1)}, {"p-val", xsection_tree_total.at(2)}}},
+      {"virtual", {{"res", xsection_virt_total.at(0)}, {"err", xsection_virt_total.at(1)}, {"p-val", xsection_virt_total.at(2)}}},
+      {"SC", {{"res", xsection_SC_total.at(0)}, {"err", xsection_SC_total.at(1)}, {"p-val", xsection_SC_total.at(2)}}},
+      {"HnonC", {{"res", xsection_HnonC_total.at(0)}, {"err", xsection_HnonC_total.at(1)}, {"p-val", xsection_HnonC_total.at(2)}}}
+   };
+   j["masses"] = {
+      {"gluino", pt.get<double>("masses.gluino")},
+      {"pseudoscalar sgluon", pt.get<double>("masses.pseudoscalar_sgluon")},
+      {"top", pt.get<double>("masses.top")},
+      {"left squark", pt.get<double>("masses.left_squark")},
+      {"right squark", pt.get<double>("masses.right_squark")}
+   };
+   std::ofstream o(
+      pt.get<string>("process.process") + "_" +
+      pt.get<string>("collider setup.sqrt_S") + "_" +
+      pt.get<string>("collider setup.mu_r") + "_" +
+      pt.get<string>("collider setup.mu_f") + "_" +
+      pt.get<string>("collider setup.pdf") +
+      ".json");
+   o << std::setw(3) << j << std::endl;
+
    return 0;
 }
