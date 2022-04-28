@@ -53,4 +53,7 @@ target_link_libraries(
    nlohmann_json::nlohmann_json
 )
 
-add_subdirectory(test)
+if(ENABLE_TESTS)
+   enable_testing()
+   add_subdirectory(test)
+endif()
