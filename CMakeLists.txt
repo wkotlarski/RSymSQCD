@@ -41,12 +41,20 @@ file (GLOB SOURCES
 
 add_executable(RSymSQCD ${SOURCES})
 
+# we link against LoopTools which requires a fortran library
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+   # assume that if we're using GCC or Clang then LoopTools was compiled with GCC
+   set(FORTRAN_LIBS gfortran)
+elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+   set(FORTRAN_LIBS "ifcore;ifport")
+endif()
+
 target_link_libraries(
    RSymSQCD
    Boost::program_options
    ${LIBCUBA_LIBRARY}
    ${LIBLOOPTOOLS_LIBRARY}
-   gfortran
+   ${FORTRAN_LIBS}
    ${LIBLHAPDF_LIBRARY}
    ${LIBCOLORFULL_LIBRARY}
    Eigen3::Eigen
