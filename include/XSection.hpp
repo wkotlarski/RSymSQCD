@@ -7,18 +7,18 @@
 #include <boost/program_options/variables_map.hpp>
 
 #include "LHAPDF/LHAPDF.h"
-#include "include/cuba.h"
+#include "cuba.h"
 
 #include "Process.hpp"
 
-// every class with at least one pure virtual function 
+// every class with at least one pure virtual function
 // is an abstract base class
 class XSection {
 
    public:
       // pure virtual function (abstract function)
       virtual std::array<double, 3> integrate() = 0;
-      
+
       static void init (Process*, boost::property_tree::ptree, boost::program_options::variables_map);
       static Process* processID;
 
@@ -33,7 +33,7 @@ class XSection {
       static double mu_f;
       static double m1;
       static double m2;
-    
+
       static const LHAPDF::PDF* pdf;
 };
 
