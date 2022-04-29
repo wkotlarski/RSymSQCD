@@ -79,7 +79,7 @@ class Process {
       
       // soft matrix elements
       double matrixMRSSMSoft_uu_suLsuRg(double, double);
-      double matrixMRSSMHard_uu_suLsuRg( std::vector< double* >& );
+      double matrixMRSSMHard_uu_suLsuRg(std::vector<double*> const&) const;
       //double matrixMRSSMSoft_ud_suLsdRg(double, double);
       
       // pp > suL suL*
@@ -87,21 +87,21 @@ class Process {
       double matrixMRSSMSoft_ddbar_suLsuLdaggerg( double, double );
       double matrixMRSSMSoft_uubar_suLsuLdaggerg( double, double );
       double matrixSimplifiedSoft_uubar_OOg( double, double );
-      double matrixSimplifiedHard_uubar_OOg( std::vector< double* >& );
+      double matrixSimplifiedHard_uubar_OOg(std::vector<double*> const&) const;
       double matrixSimplifiedSoft_gg_OOg( double, double );
-      double matrixSimplifiedHard_gg_OOg( std::vector< double* >& );
-      double matrixMRSSMHard_gg_suLsuLdaggerg( std::vector< double* >& );
-      double matrixMRSSMHard_uubar_suLsuLdaggerg( std::vector< double* >& );
-      double matrixMRSSMHard_ddbar_suLsuLdaggerg( std::vector< double* >& );
-      double matrixMRSSMHard_gd_suLsuLdaggerd( std::vector< double* >& );
-      double matrixMRSSMHard_gu_suLsuLdaggeru_DR( std::vector< double* >& );
-      double matrixMRSSMHard_gu_suLsuLdaggeru_DR_wEta( std::vector< double* >& );
-      double matrixMRSSMHard_gu_suLsuLdaggeru_DS( std::vector< double* >& );
-      double matrixMRSSMHard_gu_suLsuLdaggeru( std::vector< double* >& );
-      double matrixMRSSMHard_gu_suLsuRubar( std::vector< double* >& );
-      double matrixMRSSMHard_gu_suLsuRubar_DR( std::vector< double* >& );
-      double matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep( std::vector< double* >& );
-      double matrixMRSSMHard_gu_suLsuRubar_DS( std::vector< double* >& );
+      double matrixSimplifiedHard_gg_OOg(std::vector<double*> const&) const;
+      double matrixMRSSMHard_gg_suLsuLdaggerg(std::vector<double*> const&) const;
+      double matrixMRSSMHard_uubar_suLsuLdaggerg(std::vector<double*> const&) const;
+      double matrixMRSSMHard_ddbar_suLsuLdaggerg(std::vector<double*> const&) const;
+      double matrixMRSSMHard_gd_suLsuLdaggerd(std::vector<double*> const&) const;
+      double matrixMRSSMHard_gu_suLsuLdaggeru_DR(std::vector<double*> const&) const;
+      double matrixMRSSMHard_gu_suLsuLdaggeru_DR_wEta(std::vector<double*> const&) const;
+      double matrixMRSSMHard_gu_suLsuLdaggeru_DS(std::vector<double*> const&) const;
+      double matrixMRSSMHard_gu_suLsuLdaggeru(std::vector<double*> const&) const;
+      double matrixMRSSMHard_gu_suLsuRubar(std::vector<double*> const&) const;
+      double matrixMRSSMHard_gu_suLsuRubar_DR(std::vector<double*> const&) const;
+      double matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep(std::vector<double*> const&) const;
+      double matrixMRSSMHard_gu_suLsuRubar_DS(std::vector<double*> const&) const;
       
       // pp > OO
       //double matrixMRSSMSoft_qqbar_OOg( double, double );
@@ -121,7 +121,7 @@ class Process {
       double (Process::* matrixelementReal_SC)(double, double);
       double (Process::* matrixelementReal_HC1)(double, double, double);
       double (Process::* matrixelementReal_HC2)(double, double, double);
-      double (Process::* matrixelementReal_HnonC)(std::vector< double* >& );
+      double (Process::* matrixelementReal_HnonC)(std::vector<double*> const&) const;
       
       double m1, m2;// masses of final state particle 1 and 2, respectively 
       double c1, c2, c3, c4;
