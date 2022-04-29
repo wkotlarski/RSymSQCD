@@ -31,6 +31,16 @@ inline array<double,3> operator+(array<double,3> x, array<double,3> y) {
    };
 }
 
+
+void xsec_to_json(json& j, string str, array<double,3> tree, array<double,3> virt, array<double,3> soft, array<double,3> hard) {
+   j["cross sections"][str] = {
+      {"tree", {{"res", tree.at(0)}, {"err", tree.at(1)}, {"p-val", tree.at(2)}}},
+      {"virtual", {{"res", virt.at(0)}, {"err", virt.at(1)}, {"p-val", virt.at(2)}}},
+      {"SC", {{"res", soft.at(0)}, {"err", soft.at(1)}, {"p-val", soft.at(2)}}},
+      {"HnonC", {{"res", hard.at(0)}, {"err", hard.at(1)}, {"p-val", hard.at(2)}}}
+   };
+}
+
 // why do I have to write this?
 // why isn't init() enough?
 Process *XSection::processID; 
@@ -217,9 +227,22 @@ int main(int argc, char* argv[]) {
       channel = pp_OO;
    } else {
 	   cout << "\n Process not implemented! \n\n";
-   } 
-     
+   }
+
    auto start = chrono::steady_clock::now();
+
+   json j;
+   j["process"] = pt.get<string>("process.process");
+   j["sqrt(S)"] = pt.get<double>("collider setup.sqrt_S");
+   j["mu_r"] = pt.get<double>("collider setup.mu_r");
+   j["mu_f"] = pt.get<double>("collider setup.mu_f");
+   j["pdf"] = pt.get<string>("collider setup.pdf");
+   j["masses"] = {
+      {"gluino", pt.get<double>("masses.gluino")},
+      {"pseudoscalar sgluon", pt.get<double>("masses.pseudoscalar_sgluon")},
+      {"top", pt.get<double>("masses.top")},
+      {"squarks", pt.get<double>("masses.squarks")}
+   };
 
    if( pt.get<string>("process.order") == "LO" ) {
 	  switch(model) {
@@ -321,6 +344,7 @@ int main(int argc, char* argv[]) {
                      if(enable_sc) xsection_SC1 = sc.integrate();
                      if(enable_hard) xsection_HnonC1 = hc.integrate();
                      print( "uu > suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     xsec_to_json(j, "uu->suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
 		            }
                   
                   // the matrix element is regular in the limit dS -> 0 but the phase space parametrization
@@ -330,10 +354,11 @@ int main(int argc, char* argv[]) {
                   // gu > suL suR ubar process
 		            if( subprocess == "gu_suLsuRubar" || subprocess == "" ) {
                      Process process2( "MRSSM,gu_suLsuR", pt);
-                     XSection::init( &process2, pt, vm );      
+                     XSection::init( &process2, pt, vm );
                      if(enable_sc) xsection_SC2 = sc.integrate();
                      if(enable_hard) xsection_HnonC2 = hc.integrate();
                      print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
+                     xsec_to_json(j, "gu->suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
 		            }
 
                   xsection_tree_total = xsection_tree1;
@@ -358,8 +383,9 @@ int main(int argc, char* argv[]) {
                      if(enable_sc) xsection_SC1 = sc.integrate();
                      if(enable_hard) xsection_HnonC1 = hc.integrate();
                      print( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     xsec_to_json(j, "uubar->suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
 	    	         }
-         
+
                   if( subprocess == "") {
                      Process process2("MRSSM,ddbar_suLsuLdagger", pt);
                      XSection::init( &process2, pt, vm );                    
@@ -367,7 +393,8 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) xsection_virt2 = virt.integrate();
                      if(enable_sc) xsection_SC2 = sc.integrate();
                      if(enable_hard) xsection_HnonC2 = hc.integrate();
-                     print( "ddbar > suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+                     print( "ddbar->suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+                     xsec_to_json(j, "ddbar->suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
                   }
 
                   if( subprocess == "") {
@@ -378,8 +405,9 @@ int main(int argc, char* argv[]) {
                      if(enable_sc) xsection_SC3 = sc.integrate();
                      if(enable_hard) xsection_HnonC3 = hc.integrate();
                      print( "gg > suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
+                     xsec_to_json(j, "gg->suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
                   }
-                  
+
                   // the matrix element is regular in the limit dS -> 0 but the phase space parametrization
                   // fails if we are exactly on the threshold
                   pt.put( "technical parameters.dS", 1e-10 );
@@ -390,6 +418,7 @@ int main(int argc, char* argv[]) {
                      if(enable_sc) xsection_SC4 = sc.integrate();
                      if(enable_hard) xsection_HnonC4 = hc.integrate();
                      print( "gq > suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
+                     xsec_to_json(j, "gq->suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
                   }
 
                   // g u > suL suLdagger 
@@ -400,8 +429,9 @@ int main(int argc, char* argv[]) {
                      if(enable_sc) xsection_SC5 = sc.integrate();
                      if(enable_hard) xsection_HnonC5 = hc.integrate();
                      print( "gu > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5 );
+                     xsec_to_json(j, "gu->suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5);
                   }
-                  
+
                   xsection_tree_total = xsection_tree1 + xsection_tree2 + xsection_tree3;
                   xsection_virt_total = xsection_virt1 + xsection_virt2 + xsection_virt3;
                   xsection_SC_total = xsection_SC1 + xsection_SC2 + xsection_SC3 + xsection_SC4 + xsection_SC5;
@@ -433,30 +463,14 @@ int main(int argc, char* argv[]) {
       cout << chrono::duration_cast<chrono::minutes>(end-start).count() %  60 << " minute(s) and ";
    cout << chrono::duration_cast<chrono::seconds>(end-start).count() % 60 << " second(s)\n";
 
-   json j;
-   j["process"] = pt.get<string>("process.process");
-   j["sqrt(S)"] = pt.get<double>("collider setup.sqrt_S");
-   j["mu_r"] = pt.get<double>("collider setup.mu_r");
-   j["mu_f"] = pt.get<double>("collider setup.mu_f");
-   j["pdf"] = pt.get<string>("collider setup.pdf");
-   j["cross section"] = {
-      {"tree", {{"res", xsection_tree_total.at(0)}, {"err", xsection_tree_total.at(1)}, {"p-val", xsection_tree_total.at(2)}}},
-      {"virtual", {{"res", xsection_virt_total.at(0)}, {"err", xsection_virt_total.at(1)}, {"p-val", xsection_virt_total.at(2)}}},
-      {"SC", {{"res", xsection_SC_total.at(0)}, {"err", xsection_SC_total.at(1)}, {"p-val", xsection_SC_total.at(2)}}},
-      {"HnonC", {{"res", xsection_HnonC_total.at(0)}, {"err", xsection_HnonC_total.at(1)}, {"p-val", xsection_HnonC_total.at(2)}}}
-   };
-   j["masses"] = {
-      {"gluino", pt.get<double>("masses.gluino")},
-      {"pseudoscalar sgluon", pt.get<double>("masses.pseudoscalar_sgluon")},
-      {"top", pt.get<double>("masses.top")},
-      {"left squark", pt.get<double>("masses.left_squark")},
-      {"right squark", pt.get<double>("masses.right_squark")}
-   };
    std::ofstream o(
       pt.get<string>("process.process") + "_" +
-      pt.get<string>("collider setup.sqrt_S") + "_" +
-      pt.get<string>("collider setup.mu_r") + "_" +
-      pt.get<string>("collider setup.mu_f") + "_" +
+      to_string(pt.get<double>("masses.squarks")) + "_" +
+      to_string(pt.get<double>("masses.gluino")) + "_" +
+      to_string(pt.get<double>("masses.pseudoscalar_sgluon")) + "_" +
+      to_string(pt.get<double>("collider setup.sqrt_S")) + "_" +
+      to_string(pt.get<double>("collider setup.mu_r")) + "_" +
+      to_string(pt.get<double>("collider setup.mu_f")) + "_" +
       pt.get<string>("collider setup.pdf") +
       ".json");
    o << std::setw(3) << j << std::endl;

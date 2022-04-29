@@ -7,18 +7,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    MassGlu = pt.get<double>("masses.gluino");
    MasssigmaO = pt.get<double>("masses.pseudoscalar_sgluon");
    MassphiO  = sqrt( pow(MasssigmaO,2) + 4.0 * pow(MassGlu, 2) );
-   MassSuL = pt.get<double>("masses.suL");
-   MassSuR = pt.get<double>("masses.suR");
-   MassSdL = pt.get<double>("masses.sdL");
-   MassSdR = pt.get<double>("masses.sdR");
-   MassSsL = pt.get<double>("masses.ssL");
-   MassSsR = pt.get<double>("masses.ssR");
-   MassScL = pt.get<double>("masses.scL");
-   MassScR = pt.get<double>("masses.scR");
-   MassSbL = pt.get<double>("masses.sbL");
-   MassSbR = pt.get<double>("masses.sbR");
-   MassStL = pt.get<double>("masses.stL");
-   MassStR = pt.get<double>("masses.stR");
+   MassSquarks = pt.get<double>("masses.squarks");
    mu_r = pt.get<double>("collider setup.mu_r");
    mu_f = pt.get<double>("collider setup.mu_f");
    dS = pt.get<double>("technical parameters.dS");
@@ -31,7 +20,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    eta = {sqrt(1.+delta*delta), 0., delta, eta_sign};
    
    // @todo remove
-   MassSq = MassSuL;
+   MassSq = MassSquarks;
    partonic = false; // calculate sigma_had with |M|^2 and not sigma_part
    
 /* -------------------- Squark-squark production---------------------------------*/
@@ -45,8 +34,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       sigmaPartTree2 = &Process::sigmaMRSSMTree_uu_suLsuR;
       splitting_kernel2 = &Process::Pqq;
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_uu_suLsuRg;
-      m1 = MassSuL;
-      m2 = MassSuR;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       flav.push_back( std::vector<int> {2, 2, 1} );
       k = 2.*2*3*3;
       h = 2.*2;
@@ -54,8 +43,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    else if(processID == "MRSSM,ud_suLsdR") { // same as in MSSM
       matrixelementTree = &Process::matrixMSSMTree_ud_suLsdR;
       matrixelementVirt = &Process::matrixMRSSMVirt_ud_suLsdR;
-      m1 = MassSuL;
-      m2 = MassSuR;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       // result doubled up, as there is ud and du initial state
       flav.push_back( std::vector<int> {2, 1, 2} );
       k = 2.*2*3*3;
@@ -68,8 +57,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       //matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
       matrixelementReal_SC = &Process::matrix_soft_stub;
       flav.push_back( std::vector<int> {2, 2, 1} );
-      m1 = MassSuL;
-      m2 = MassSuR;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       k = 2.*2*3*3;
       h = 2.*2;
    }
@@ -78,24 +67,24 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       //matrixelementVirt = &Process::matrixMSSMVirt_uu_suLsuL;
       //matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuLg;
       matrixelementReal_SC = &Process::matrix_soft_stub;
-      m1 = MassSuL;
-      m2 = MassSuR;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       k = 2.*2*3*3;
       h = 2.*2;
    }
    else if(processID == "MSSM,ud_suLsdR") {
       matrixelementTree = &Process::matrixMSSMTree_ud_suLsdR;
       matrixelementVirt = &Process::matrixMSSMVirt_ud_suLsdR;
-      m1 = MassSuL;
-      m2 = MassSuR;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       k = 2.*2*3*3;
       h = 2.*2;
    }
    else if(processID == "MSSM,ud_suLsdL") {
       matrixelementTree = &Process::matrixMSSMTree_ud_suLsdL;
       //matrixelementVirt = &matrixMSSMVirt_ud_suLsdL;
-      m1 = MassSuL;
-      m2 = MassSuR;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       k = 2.*2*3*3;
       h = 2.*2;
    }
@@ -111,8 +100,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       splitting_kernel1 = &Process::Pqq;
       splitting_kernel2 = &Process::Pqq;
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_uubar_suLsuLdaggerg;
-      m1 = MassSuL;
-      m2 = MassSuL;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       flav.push_back( std::vector<int> {2, -2, 2} );
       k = 2.*2*3*3;
       h = 2.*2;
@@ -126,8 +115,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       splitting_kernel1 = &Process::Pqq;
       splitting_kernel2 = &Process::Pqq;
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_ddbar_suLsuLdaggerg;
-      m1 = MassSuL;
-      m2 = MassSuL;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       flav.push_back( std::vector<int> {1, -1, 2} );
       flav.push_back( std::vector<int> {3, -3, 2} );
       flav.push_back( std::vector<int> {4, -4, 2} );
@@ -137,8 +126,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    }
    else if(processID == "MRSSM,udbar_suLsdLdagger") {
       matrixelementTree = &Process::matrixMSSMTree_ud_suLsdR;  // matrix elements are identical
-      m1 = MassSuL;
-      m2 = MassSuR;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       k = 2.*2*3*3;
       h = 2.*2;
    }
@@ -151,8 +140,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       splitting_kernel1 = &Process::Pgg;
       splitting_kernel2 = &Process::Pgg;
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_gg_suLsuLdaggerg;
-      m1 = MassSuL;
-      m2 = MassSuL;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       flav.push_back( std::vector<int> {21, 21, 1} );
       k = 2.*2*8*8;
       h = 1.;
@@ -167,8 +156,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       matrixelementReal_SC = &Process::matrix_soft_stub;
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_gd_suLsuLdaggerd;
       
-      m1 = MassSuL;
-      m2 = MassSuL;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       std::array<int, 8> partons = { 1, -1, 3, -3, 4, -4, 5, -5 };
       for( int el : partons) flav.push_back( std::vector<int> {21, el, 2} );
    }   
@@ -180,8 +169,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       splitting_kernel2 = &Process::Pgq;
       
       matrixelementReal_SC = &Process::matrix_soft_stub;
-      m1 = MassSuL;
-      m2 = MassSuL;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       // if gluino cannot be on-shell use full real ME
       if( pt.get<double>("collider setup.sqrt_S") < m1 +  MassGlu ||
           MassGlu < m2 ) {
@@ -213,8 +202,8 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       
       matrixelementReal_SC = &Process::matrix_soft_stub;
       
-      m1 = MassSuL;
-      m2 = MassSuL;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       // if gluino cannot be on-shell use full real ME
       if( pt.get<double>("collider setup.sqrt_S") < std::min(m1,m2) +  MassGlu ||
           MassGlu < m2 ) {
@@ -241,44 +230,44 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR;  // matrix elements are identical
       //std::vector<int> row {2, -2};
       flav.push_back( std::vector<int> {2, -2, 2} );
-      m1 = MassSuL;
-      m2 = MassSuL;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       k = 2.*2*3*3;
       h = 2.*2;
    }
    else if(processID == "MSSM,uubar_suLsuRdagger") {
       matrixelementTree = &Process::matrixMSSMTree_uubar_suLsuRdagger;
       flav.push_back( std::vector<int> {2, -2, 2} );
-      m1 = MassSuL;
-      m2 = MassSuR;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       k = 2.*2*3*3;
       h = 2.*2;
    }
    else if(processID == "MSSM,udbar_suLsdLdagger") {
       matrixelementTree = &Process::matrixMSSMTree_ud_suLsdR;  // matrix elements are identical
-      m1 = MassSuL;
-      m2 = MassSuR;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       k = 2.*2*3*3;
       h = 2.*2;
    }
    else if(processID == "MSSM,udbar_suLsdRdagger") {
       matrixelementTree = &Process::matrixMSSMTree_uubar_suLsuRdagger; // matrix elements are identical
-      m1 = MassSuL;
-      m2 = MassSuR;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       k = 2.*2*3*3;
       h = 2.*2;
    }
    else if(processID == "MSSM,ddbar_suLsuLdagger") {
       matrixelementTree = &Process::matrixMRSSMTree_ddbar_suLsuLdagger; // matrix elements are identical
-      m1 = MassSuL;
-      m2 = MassSuR;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       k = 2.*2*3*3;
       h = 2.*2;
    }
 /*      else if(processID == "MSSM,GG_suLsuLdagger") {
       matrixelementTree = &Process::matrixMRSSMTree_GG_suLsuLdagger; // matrix elements are identical
-      m1 = MassSuL;
-      m2 = MassSuL;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
       f1 = 0;
       f2 = 0;
       k = 2.*2*8*8;

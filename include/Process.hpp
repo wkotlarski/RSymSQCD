@@ -18,9 +18,7 @@ class Process {
       std::array<double,4> eta; 
 
       // particle masses
-      double MasssigmaO, MassphiO, MassGlu, MassTop, MassSq,
-         MassSuL, MassSuR, MassSdL, MassSdR, MassSsL, MassSsR,
-         MassScL, MassScR, MassSbL, MassSbR, MassStL, MassStR, 
+      double MasssigmaO, MassphiO, MassGlu, MassTop, MassSq, MassSquarks,
          mu_r, mu_f, dS, WidthGlu;
       const LHAPDF::PDF* pdf;
        
