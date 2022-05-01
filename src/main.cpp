@@ -26,8 +26,8 @@ using json = nlohmann::json;
  *    pvalues are just added
  */
 inline array<double,3> operator+(array<double,3> x, array<double,3> y) {
-   return array<double,3> { 
-      x.at(0) + y.at(0), sqrt(pow(x.at(1),2)+pow(y.at(1),2)), x.at(2) + y.at(2) 
+   return array<double,3> {
+      x.at(0) + y.at(0), sqrt(pow(x.at(1),2)+pow(y.at(1),2)), x.at(2) + y.at(2)
    };
 }
 
@@ -43,7 +43,7 @@ void xsec_to_json(json& j, string str, array<double,3> tree, array<double,3> vir
 
 // why do I have to write this?
 // why isn't init() enough?
-Process *XSection::processID; 
+Process *XSection::processID;
 double XSection::mu_r;
 double XSection::mu_f;
 double XSection::m1;
@@ -61,27 +61,27 @@ void print( string str, array<double,3> tree, array<double,3> virt, array<double
    // print out LO run statistics
    cout << "---------------------------------------------------------------" << endl;
    cout << setprecision(5);
-   cout << setw(12) << "tree:" << setw(13) << tree.at(0) 
+   cout << setw(12) << "tree:" << setw(13) << tree.at(0)
          << " +/- " << setprecision(1) << tree.at(1)
          << " fb ( p-value = " << setw(8) << tree.at(2) << " )\n";
    cout << setprecision(5);
-   cout << setw(12) << "virtual:" << setw(13) << virt.at(0) << " +/- " 
-           << setprecision(1) << virt.at(1) << " fb ( p-value = " 
+   cout << setw(12) << "virtual:" << setw(13) << virt.at(0) << " +/- "
+           << setprecision(1) << virt.at(1) << " fb ( p-value = "
            << setw(8) << virt.at(2) << " )\n";
 
       cout << setprecision(5);
       cout << setw(12) << "real (soft):" << setw(13) << soft.at(0) << " +/- " << setprecision(1) << soft.at(1)
-           << " fb ( p-value = " << setw(8) << soft.at(2) << " )\n"; 
+           << " fb ( p-value = " << setw(8) << soft.at(2) << " )\n";
       cout << setprecision(5);
       cout << setw(12) << "real (hard):" << setw(13) << hard.at(0) << " +/- " << setprecision(1) << hard.at(1)
            << " fb ( p-value = " << setw(8) << hard.at(2) << " )\n";
       cout << "---------------------------------------------------------------" << endl;
       cout << setprecision(5);
       cout << setw(12) << "sum:" << setw(13)
-           << tree.at(0) + virt.at(0) + hard.at(0) + soft.at(0) 
-           << " +/- " << setprecision(1) << sqrt(pow(tree.at(1),2) + 
+           << tree.at(0) + virt.at(0) + hard.at(0) + soft.at(0)
+           << " +/- " << setprecision(1) << sqrt(pow(tree.at(1),2) +
            pow(virt.at(1),2) + pow(hard.at(1),2) +
-           pow(soft.at(1),2)) << " fb" << endl;   
+           pow(soft.at(1),2)) << " fb" << endl;
 }
 
 void print( string str, array<double,3> tree) {
@@ -90,7 +90,7 @@ void print( string str, array<double,3> tree) {
    //print out LO run statistics
    cout << "---------------------------------------------------------------" << endl;
    cout << setprecision(5);
-   cout << setw(12) << "tree:" << setw(13) << tree.at(0) 
+   cout << setw(12) << "tree:" << setw(13) << tree.at(0)
          << " +/- " << setprecision(1) << tree.at(1)
          << " fb ( p-value = " << setw(8) << tree.at(2) << " )\n";
 }
@@ -150,12 +150,6 @@ int main(int argc, char* argv[]) {
    string card = vm["card"].as<string>();
    string subprocess = vm["subprocess"].as<string>();
 
-/* invoke programm like 
-   "./RSymSQCD MSSM pp_suLsuR NLO 1 1 1 run.ini" for  NLO calculation  
-       with last three numbers giving the desired accuracy of the virtual,
-       soft-collinear and hard-noncollinear part, respectively 
-   "./RSymSQCD MSSM pp_suLsuR LO" for  LO calculation  */
-   
    boost::property_tree::ptree pt;
    boost::property_tree::ini_parser::read_ini( card, pt );
 
@@ -174,14 +168,14 @@ int main(int argc, char* argv[]) {
 
    enum Model {
        MRSSM,
-       MSSM, 
+       MSSM,
        Simplified,
        no_model
    };
    enum Channel {
        pp_OO,
        pp_OsOs,
-       pp_suLsuR,  
+       pp_suLsuR,
        pp_suLsuL,
        pp_suLsdR,
        pp_suLsdL,
@@ -190,11 +184,11 @@ int main(int argc, char* argv[]) {
        pp_suLsdLdagger,
        pp_suLsdRdagger,
        no_channel
-   };  
-   
+   };
+
    Model model = no_model;
-   Channel channel = no_channel; 
-   
+   Channel channel = no_channel;
+
    if ( pt.get<string>("process.model") == "MRSSM" ) {
       model = MRSSM;
    } else if ( string(argv[1]) == "MSSM" ) {
@@ -204,13 +198,13 @@ int main(int argc, char* argv[]) {
    } else {
 	   cout << "\n Model not implemented! \n\n";
    }
-   
+
    if ( pt.get<string>("process.process") == "pp_OsOs" ) {
-      channel = pp_OsOs;  
+      channel = pp_OsOs;
    } else if ( pt.get<string>("process.process") == "pp_suLsuR" ) {
       channel = pp_suLsuR;
    } else if ( pt.get<string>("process.process") == "pp_suLsuL" ) {
-      channel = pp_suLsuL;   
+      channel = pp_suLsuL;
    } else if ( pt.get<string>("process.process") == "pp_suLsdR" ) {
       channel = pp_suLsdR;
    } else if ( pt.get<string>("process.process") == "pp_suLsdL" ) {
@@ -250,35 +244,35 @@ int main(int argc, char* argv[]) {
             switch(channel) {
                case pp_OsOs:
                   {
-                  Process process1("sgluons-gg_OO", pt);  
+                  Process process1("sgluons-gg_OO", pt);
                   XSection::init( &process1, pt, vm );
                   XSection_Tree tree;
-                  temp = tree.integrate();     
+                  temp = tree.integrate();
                   Process process2("sgluons-qqbar_OO", pt);
                   XSection::init( &process2, pt, vm );
-                  xsection_tree = tree.integrate() + temp;   
+                  xsection_tree = tree.integrate() + temp;
                   print("pp > OO", xsection_tree);
                   break;
-			      }                  
-               case pp_suLsuR: 
+			      }
+               case pp_suLsuR:
                   {                                                     // checked with MadGraph and Philip
                   Process process1("MRSSM,uu_suLsuR", pt);
                   XSection::init( &process1, pt, vm );
                   XSection_Tree tree;
                   xsection_tree = tree.integrate();
                   print("uu > suLsuR", xsection_tree);
-                  break;      	
-			      }	
-			   case pp_suLsdR: 
-                  {  
-				                                                        // checked with MadGraph and Philip 
+                  break;
+			      }
+			   case pp_suLsdR:
+                  {
+				                                                        // checked with MadGraph and Philip
                   Process process1("MRSSM,ud_suLsdR", pt);
                   XSection::init( &process1, pt, vm );
                   XSection_Tree tree;
                   xsection_tree = tree.integrate();
                   print("uu > suLsdR", xsection_tree);
-                  break;      	
-			      }	
+                  break;
+			      }
 
                case pp_suLsuLdagger:
                   {
@@ -287,12 +281,12 @@ int main(int argc, char* argv[]) {
                   XSection_Tree tree;
                   xsection_tree1 = tree.integrate();
                   print("GG > suLsdLdagger", xsection_tree1);
-                  
+
                   Process process2("MRSSM,uubar_suLsuLdagger", pt);
                   XSection::init( &process2, pt, vm );
                   xsection_tree2 = tree.integrate();
                   print("uubar > suLsdLdagger", xsection_tree2);
-                  
+
                   Process process3("MRSSM,ddbar_suLsuLdagger", pt);
                   XSection::init( &process3, pt, vm );
                   xsection_tree3 = tree.integrate();
@@ -300,24 +294,24 @@ int main(int argc, char* argv[]) {
 
                   xsection_tree_total = xsection_tree1 + xsection_tree2 + xsection_tree3;
                   print("pp > suLsdLdagger", xsection_tree_total);
-                  break; 
+                  break;
                   }
 			   default:
 			      {
 			      xsection_tree = {0,0,0};
 			      break;
-			      }		
+			      }
             }
             break;
          case MSSM:
             switch(channel) {
-			   //case pp_suLsuR:  
+			   //case pp_suLsuR:
 			   //case pp_suLsuLdagger:
 			   //default:
             }
-         break;								
+         break;
       }
-   }   		 
+   }
 
    else if( pt.get<string>("process.order") == "NLO" ) {
 	  switch(model) {
@@ -325,31 +319,31 @@ int main(int argc, char* argv[]) {
             switch(channel) {
                case pp_OsOs:
                   {
-                  // todo   
+                  // todo
                   break;
-			      }                  
-               case pp_suLsuR: 
-                  {     
+			      }
+               case pp_suLsuR:
+                  {
                   XSection_Tree tree;
                   XSection_Virt virt;
                   XSection_SC sc;
                   XSection_HnonC hc;
-                  
+
                   // uu > suL suR (+g) process
 		            if( subprocess == "" ) {
                      Process process1("MRSSM,uu_suLsuR", pt);
 	                  XSection::init( &process1, pt, vm );
-                     if(enable_born) xsection_tree1 = tree.integrate();      
+                     if(enable_born) xsection_tree1 = tree.integrate();
                      if(enable_virt) xsection_virt1 = virt.integrate();
                      if(enable_sc) xsection_SC1 = sc.integrate();
                      if(enable_hard) xsection_HnonC1 = hc.integrate();
                      print( "uu > suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      xsec_to_json(j, "uu->suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
 		            }
-                  
+
                   // the matrix element is regular in the limit dS -> 0 but the phase space parametrization
                   // fails if we are exactly on the threshold
-                  pt.put( "technical parameters.dS", 1e-10 );                  
+                  pt.put( "technical parameters.dS", 1e-10 );
 
                   // gu > suL suR ubar process
 		            if( subprocess == "gu_suLsuRubar" || subprocess == "" ) {
@@ -366,19 +360,19 @@ int main(int argc, char* argv[]) {
                   xsection_SC_total = xsection_SC1 + xsection_SC2;
                   xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
                   print( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
-                  break;      	
-			      }	
+                  break;
+			      }
                case pp_suLsuLdagger:
-                  {   					          
+                  {
                   XSection_Tree tree;
-                  XSection_Virt virt;                  
+                  XSection_Virt virt;
                   XSection_SC sc;
                   XSection_HnonC hc;
 
 		            if( subprocess == "" || subprocess == "uubar_suLsuLdagger" ) {
                      Process process1("MRSSM,uubar_suLsuLdagger", pt);
-                     XSection::init( &process1, pt, vm );                 
-                     if(enable_born) xsection_tree1 = tree.integrate();      
+                     XSection::init( &process1, pt, vm );
+                     if(enable_born) xsection_tree1 = tree.integrate();
                      if(enable_virt) xsection_virt1 = virt.integrate();
                      if(enable_sc) xsection_SC1 = sc.integrate();
                      if(enable_hard) xsection_HnonC1 = hc.integrate();
@@ -388,7 +382,7 @@ int main(int argc, char* argv[]) {
 
                   if( subprocess == "") {
                      Process process2("MRSSM,ddbar_suLsuLdagger", pt);
-                     XSection::init( &process2, pt, vm );                    
+                     XSection::init( &process2, pt, vm );
                      if(enable_born) xsection_tree2 = tree.integrate();
                      if(enable_virt) xsection_virt2 = virt.integrate();
                      if(enable_sc) xsection_SC2 = sc.integrate();
@@ -435,11 +429,11 @@ int main(int argc, char* argv[]) {
                   xsection_tree_total = xsection_tree1 + xsection_tree2 + xsection_tree3;
                   xsection_virt_total = xsection_virt1 + xsection_virt2 + xsection_virt3;
                   xsection_SC_total = xsection_SC1 + xsection_SC2 + xsection_SC3 + xsection_SC4 + xsection_SC5;
-                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2 + xsection_HnonC3 
+                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2 + xsection_HnonC3
                           + xsection_HnonC4 + xsection_HnonC5;
                   print( "total", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total);
                   break;
-                  } 
+                  }
                default:
                   cout << "NLO process not implemented\n";
             }
@@ -447,12 +441,12 @@ int main(int argc, char* argv[]) {
         switch(channel) {
            case pp_OO:
            {
-              {     
+              {
            }
         }
         }
      }
-   } 
+   }
 
    auto end = chrono::steady_clock::now();
    cout << '\n';
