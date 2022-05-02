@@ -2,7 +2,7 @@ message(STATUS "Enabling tests")
 
 find_package(GTest REQUIRED)
 
-add_executable(foo foo.cpp)
-target_link_libraries(foo GTest::gtest GTest::gtest_main)
+add_executable(tree_matrix_elements tree_matrix_elements.cpp)
+target_link_libraries(tree_matrix_elements GTest::gtest GTest::gtest_main RSymSQCDlib)
 
-add_test(AllTestsInFoo foo)
+add_test(TreeMatrixElements tree_matrix_elements)
