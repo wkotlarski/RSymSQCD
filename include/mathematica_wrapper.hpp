@@ -28,9 +28,12 @@ template <typename Arg> inline double Sin (Arg arg) {
     return sin(arg);
 }
 
-inline std::complex<double> PolyLog ( int i, double arg ) {
-    std::complex<double> z (arg, 0.);
-    return dilogarithm::dilog( z );
+inline std::complex<double> PolyLog(int i, double arg) {
+   if (i != 2) {
+      throw std::invalid_argument("We handle only dilogarithms");
+   }
+   std::complex<double> z(arg, 0.);
+   return dilogarithm::dilog(z);
 }
 
 #endif /* MATHEMATICA_WRAPPER_HPP_ */
