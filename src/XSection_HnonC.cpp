@@ -1,6 +1,11 @@
-#include "XSection_HnonC.hpp"
 #include <cassert>
 #include <iostream>
+
+#include "XSection_HnonC.hpp"
+#include "constants.hpp"
+// needed to do Euler rotation
+#include "rk/rk.hh"
+#include "rk/geom3.hh"
 
 // @todo this is absolutely neeed but I don't know why
 using namespace std;

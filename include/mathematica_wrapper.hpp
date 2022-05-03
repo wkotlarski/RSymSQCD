@@ -36,4 +36,4 @@ inline std::complex<double> PolyLog(int i, double arg) {
    return dilogarithm::dilog(z);
 }
 
-#endif /* MATHEMATICA_WRAPPER_HPP_ */
+#endif // MATHEMATICA_WRAPPER_HPP_

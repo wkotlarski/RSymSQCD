@@ -1,13 +1,9 @@
 #ifndef XSECTION_HNONC_H_
 #define XSECTION_HNONC_H_
 
+#include "cuba.h"
+
 #include "XSection.hpp"
-#include "constants.hpp"
-
-// neede to do Euler rotation
-#include "rk/rk.hh"
-#include "rk/geom3.hh"
-
 
 class XSection_HnonC : public virtual XSection {
 
@@ -18,4 +14,5 @@ class XSection_HnonC : public virtual XSection {
     static int integrand(const int *ndim, const cubareal xx[],
               const int *ncomp, cubareal ff[], void *userdata);
 };
-#endif /* XSECTION_HNONC_H_ */
+
+#endif // XSECTION_HNONC_H_

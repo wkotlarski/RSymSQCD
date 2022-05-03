@@ -1,10 +1,9 @@
 #ifndef XSECTION_TREE_MRSSM_H_
 #define XSECTION_TREE_MRSSM_H_
 
-#include <iostream>
 #include "XSection.hpp"
 
-#include "LHAPDF/LHAPDF.h"
+#include "cuba.h"
 
 class XSection_Tree : public virtual XSection {
    private:
@@ -16,4 +15,4 @@ class XSection_Tree : public virtual XSection {
       void show_settings();
 };
 
-#endif /* XSECTION_TREE_MRSSM_H_ */
+#endif // XSECTION_TREE_MRSSM_H_

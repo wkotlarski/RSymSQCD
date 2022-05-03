@@ -7,7 +7,6 @@
 #include <boost/program_options/variables_map.hpp>
 
 #include "LHAPDF/LHAPDF.h"
-#include "cuba.h"
 
 #include "Process.hpp"
 

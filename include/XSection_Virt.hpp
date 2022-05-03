@@ -1,7 +1,7 @@
 #ifndef XSECTION_VIRT_H_
 #define XSECTION_VIRT_H_
 
-#include "LHAPDF/LHAPDF.h"
+#include "cuba.h"
 
 #include "XSection.hpp"
 
@@ -14,4 +14,4 @@ class XSection_Virt : public virtual XSection {
       std::array<double, 3> integrate();
 };
 
-#endif /* XSECTION_VIRT_H_ */
+#endif // XSECTION_VIRT_H_

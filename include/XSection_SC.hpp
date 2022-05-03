@@ -1,15 +1,9 @@
 #ifndef SRC_XSECTION_SC_H_
 #define SRC_XSECTION_SC_H_
 
-#include "XSection.hpp"
-// @todo: we probably cannot redistribute this package
-#include "dilog.hpp"
-// to get min(x,y) function
-#include <algorithm>
+#include "cuba.h"
 
-//extern "C" {
-//   double qq_s3Ls3R(double*, double*, double*, double*);
-//}
+#include "XSection.hpp"
 
 class XSection_SC: public XSection {
 
@@ -26,4 +20,4 @@ class XSection_SC: public XSection {
               const int*, cubareal[], void*);
 };
 
-#endif /* SRC_XSECTION_SC_H_ */
+#endif // SRC_XSECTION_SC_H_
