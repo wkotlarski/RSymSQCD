@@ -166,13 +166,29 @@ int main(int argc, char* argv[]) {
            xsection_tree5 {}, xsection_virt5 {}, xsection_SC5 {}, xsection_HnonC5 {},
            xsection_tree_total {}, xsection_virt_total {}, xsection_SC_total {}, xsection_HnonC_total {};
 
-   enum Model {
+   enum class Model {
        MRSSM,
        MSSM,
        Simplified,
        no_model
    };
-   enum Channel {
+
+   Model model = Model::no_model;
+   if (pt.get<string>("process.model") == "MRSSM") {
+      model = Model::MRSSM;
+   }
+   else if (pt.get<string>("process.model") == "MSSM") {
+      model = Model::MSSM;
+   }
+   else if (pt.get<string>("process.model") == "Simplified") {
+      model = Model::Simplified;
+   }
+   else {
+      std::cout << "\nModel not implemented!\n\n";
+      return 1;
+   }
+
+   enum class Channel {
        pp_OO,
        pp_OsOs,
        pp_suLsuR,
@@ -186,44 +202,30 @@ int main(int argc, char* argv[]) {
        no_channel
    };
 
-   Model model = no_model;
-   Channel channel = no_channel;
-
-   if ( pt.get<string>("process.model") == "MRSSM" ) {
-      model = MRSSM;
-   } else if ( string(argv[1]) == "MSSM" ) {
-      model = MSSM;
-   } else if ( string(argv[1]) == "Simplified" ) {
-      model = Simplified;
-   } else {
-	   cout << "\n Model not implemented! \n\n";
-   }
-
+   Channel channel = Channel::no_channel;
    if ( pt.get<string>("process.process") == "pp_OsOs" ) {
-      channel = pp_OsOs;
+      channel = Channel::pp_OsOs;
    } else if ( pt.get<string>("process.process") == "pp_suLsuR" ) {
-      channel = pp_suLsuR;
+      channel = Channel::pp_suLsuR;
    } else if ( pt.get<string>("process.process") == "pp_suLsuL" ) {
-      channel = pp_suLsuL;
+      channel = Channel::pp_suLsuL;
    } else if ( pt.get<string>("process.process") == "pp_suLsdR" ) {
-      channel = pp_suLsdR;
+      channel = Channel::pp_suLsdR;
    } else if ( pt.get<string>("process.process") == "pp_suLsdL" ) {
-      channel = pp_suLsdL;
+      channel = Channel::pp_suLsdL;
    } else if ( pt.get<string>("process.process") == "pp_suLsuLdagger" ) {
-      channel = pp_suLsuLdagger;
+      channel = Channel::pp_suLsuLdagger;
    } else if ( pt.get<string>("process.process") == "pp_suLsuRdagger" ) {
-      channel = pp_suLsuRdagger;
+      channel = Channel::pp_suLsuRdagger;
    } else if ( pt.get<string>("process.process") == "pp_suLsdLdagger" ) {
-      channel = pp_suLsdLdagger;
+      channel = Channel::pp_suLsdLdagger;
    } else if ( pt.get<string>("process.process") == "pp_suLsdRdagger" ) {
-      channel = pp_suLsdRdagger;
+      channel = Channel::pp_suLsdRdagger;
          } else if ( pt.get<string>("process.process") == "pp_OO" ) {
-      channel = pp_OO;
+      channel = Channel::pp_OO;
    } else {
 	   cout << "\n Process not implemented! \n\n";
    }
-
-   auto start = chrono::steady_clock::now();
 
    json j;
    j["process"] = pt.get<string>("process.process");
@@ -238,11 +240,13 @@ int main(int argc, char* argv[]) {
       {"squarks", pt.get<double>("masses.squarks")}
    };
 
+   auto start = chrono::steady_clock::now();
+
    if( pt.get<string>("process.order") == "LO" ) {
 	  switch(model) {
-         case MRSSM:
+        case Model::MRSSM:
             switch(channel) {
-               case pp_OsOs:
+               case Channel::pp_OsOs:
                   {
                   Process process1("sgluons-gg_OO", pt);
                   XSection::init( &process1, pt, vm );
@@ -254,7 +258,7 @@ int main(int argc, char* argv[]) {
                   print("pp > OO", xsection_tree);
                   break;
 			      }
-               case pp_suLsuR:
+               case Channel::pp_suLsuR:
                   {                                                     // checked with MadGraph and Philip
                   Process process1("MRSSM,uu_suLsuR", pt);
                   XSection::init( &process1, pt, vm );
@@ -263,7 +267,7 @@ int main(int argc, char* argv[]) {
                   print("uu > suLsuR", xsection_tree);
                   break;
 			      }
-			   case pp_suLsdR:
+			   case Channel::pp_suLsdR:
                   {
 				                                                        // checked with MadGraph and Philip
                   Process process1("MRSSM,ud_suLsdR", pt);
@@ -274,7 +278,7 @@ int main(int argc, char* argv[]) {
                   break;
 			      }
 
-               case pp_suLsuLdagger:
+               case Channel::pp_suLsuLdagger:
                   {
                   Process process1("MRSSM,GG_suLsuLdagger", pt);
                   XSection::init( &process1, pt, vm );
@@ -303,7 +307,7 @@ int main(int argc, char* argv[]) {
 			      }
             }
             break;
-         case MSSM:
+        case Model::MSSM:
             switch(channel) {
 			   //case pp_suLsuR:
 			   //case pp_suLsuLdagger:
@@ -315,14 +319,14 @@ int main(int argc, char* argv[]) {
 
    else if( pt.get<string>("process.order") == "NLO" ) {
 	  switch(model) {
-         case MRSSM:
+        case Model::MRSSM:
             switch(channel) {
-               case pp_OsOs:
+               case Channel::pp_OsOs:
                   {
                   // todo
                   break;
 			      }
-               case pp_suLsuR:
+               case Channel::pp_suLsuR:
                   {
                   XSection_Tree tree;
                   XSection_Virt virt;
@@ -362,7 +366,7 @@ int main(int argc, char* argv[]) {
                   print( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
                   break;
 			      }
-               case pp_suLsuLdagger:
+               case Channel::pp_suLsuLdagger:
                   {
                   XSection_Tree tree;
                   XSection_Virt virt;
@@ -437,9 +441,9 @@ int main(int argc, char* argv[]) {
                default:
                   cout << "NLO process not implemented\n";
             }
-     case Simplified:
+        case Model::Simplified:
         switch(channel) {
-           case pp_OO:
+           case Channel::pp_OO:
            {
               {
            }
