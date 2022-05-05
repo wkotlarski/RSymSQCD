@@ -243,11 +243,11 @@ int main(int argc, char* argv[]) {
    auto start = chrono::steady_clock::now();
 
    if( pt.get<string>("process.order") == "LO" ) {
-	  switch(model) {
-        case Model::MRSSM:
+      switch(model) {
+         case Model::MRSSM:
             switch(channel) {
                case Channel::pp_OsOs:
-                  {
+               {
                   Process process1("sgluons-gg_OO", pt);
                   XSection::init( &process1, pt, vm );
                   XSection_Tree tree;
@@ -259,7 +259,7 @@ int main(int argc, char* argv[]) {
                   break;
 			      }
                case Channel::pp_suLsuR:
-                  {                                                     // checked with MadGraph and Philip
+               {                                                     // checked with MadGraph and Philip
                   Process process1("MRSSM,uu_suLsuR", pt);
                   XSection::init( &process1, pt, vm );
                   XSection_Tree tree;
@@ -267,9 +267,8 @@ int main(int argc, char* argv[]) {
                   print("uu > suLsuR", xsection_tree);
                   break;
 			      }
-			   case Channel::pp_suLsdR:
-                  {
-				                                                        // checked with MadGraph and Philip
+               case Channel::pp_suLsdR:
+               {                                                     // checked with MadGraph and Philip
                   Process process1("MRSSM,ud_suLsdR", pt);
                   XSection::init( &process1, pt, vm );
                   XSection_Tree tree;
@@ -277,9 +276,8 @@ int main(int argc, char* argv[]) {
                   print("uu > suLsdR", xsection_tree);
                   break;
 			      }
-
                case Channel::pp_suLsuLdagger:
-                  {
+               {
                   Process process1("MRSSM,GG_suLsuLdagger", pt);
                   XSection::init( &process1, pt, vm );
                   XSection_Tree tree;
@@ -299,35 +297,34 @@ int main(int argc, char* argv[]) {
                   xsection_tree_total = xsection_tree1 + xsection_tree2 + xsection_tree3;
                   print("pp > suLsdLdagger", xsection_tree_total);
                   break;
-                  }
-			   default:
+               }
+			      default:
 			      {
-			      xsection_tree = {0,0,0};
-			      break;
+			         xsection_tree = {0,0,0};
+   			      break;
 			      }
             }
             break;
-        case Model::MSSM:
+         case Model::MSSM:
             switch(channel) {
-			   //case pp_suLsuR:
-			   //case pp_suLsuLdagger:
-			   //default:
+               //case pp_suLsuR:
+               //case pp_suLsuLdagger:
+               //default:
             }
          break;
       }
    }
-
    else if( pt.get<string>("process.order") == "NLO" ) {
-	  switch(model) {
-        case Model::MRSSM:
+	   switch(model) {
+         case Model::MRSSM:
             switch(channel) {
                case Channel::pp_OsOs:
-                  {
+               {
                   // todo
                   break;
 			      }
                case Channel::pp_suLsuR:
-                  {
+               {
                   XSection_Tree tree;
                   XSection_Virt virt;
                   XSection_SC sc;
@@ -419,7 +416,7 @@ int main(int argc, char* argv[]) {
                      xsec_to_json(j, "gq->suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
                   }
 
-                  // g u > suL suLdagger 
+                  // g u > suL suLdagger
                   pt.put( "technical parameters.dS", 1e-9 );
                   if( subprocess == "gu_suLsuLdaggeru" || subprocess == "" ) {
                      Process process5("MRSSM,gu_suLsuLdagger", pt);
@@ -441,15 +438,15 @@ int main(int argc, char* argv[]) {
                default:
                   cout << "NLO process not implemented\n";
             }
-        case Model::Simplified:
-        switch(channel) {
-           case Channel::pp_OO:
-           {
-              {
-           }
-        }
-        }
-     }
+         case Model::Simplified:
+            switch(channel) {
+               case Channel::pp_OO:
+               {
+                  {
+                  }
+               }
+            }
+      }
    }
 
    auto end = chrono::steady_clock::now();
