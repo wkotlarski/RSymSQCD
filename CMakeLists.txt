@@ -1,7 +1,7 @@
-cmake_minimum_required (VERSION 3.8)
-project (RSymSQCD)
+cmake_minimum_required (VERSION 3.13)
+project (RSymSQCD VERSION 0.1 LANGUAGES CXX)
 
-set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD 14)
 
 include(FetchContent)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.10.5/json.tar.xz)
@@ -22,6 +22,7 @@ find_library(LIBLHAPDF_LIBRARY NAMES libLHAPDF.so)
 find_path(LIBRK_INCLUDE_DIR NAMES rk/rk.hh)
 find_library(LIBRK_LIBRARY NAMES librk.so)
 
+find_path(LIBCOLORFULL_INCLUDE_DIRS NAMES ColorFull/Core/Tree_level_gluon_basis.h)
 find_library(LIBCOLORFULL_LIBRARY NAMES ColorFull/libColorFull.so)
 
 include_directories (
@@ -44,8 +45,6 @@ file (GLOB SOURCES
    "src/matrix_elements/*/*.cpp"
 )
 
-add_executable(RSymSQCD ${SOURCES})
-
 # we link against LoopTools which requires a fortran library
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
    # assume that if we're using GCC or Clang then LoopTools was compiled with GCC
@@ -54,8 +53,9 @@ elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
    set(FORTRAN_LIBS "ifcore;ifport")
 endif()
 
+add_library(RSymSQCDlib STATIC ${SOURCES})
 target_link_libraries(
-   RSymSQCD
+   RSymSQCDlib
    Boost::program_options
    ${LIBCUBA_LIBRARY}
    ${LIBLOOPTOOLS_LIBRARY}
@@ -66,6 +66,10 @@ target_link_libraries(
    nlohmann_json::nlohmann_json
    cs_dipole_subtraction
 )
+target_include_directories(RSymSQCDlib PUBLIC include)
+
+add_executable(RSymSQCD src/main.cpp)
+target_link_libraries(RSymSQCD PUBLIC RSymSQCDlib)
 
 if(ENABLE_TESTS)
    enable_testing()
