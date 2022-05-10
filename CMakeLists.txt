@@ -45,6 +45,7 @@ if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL 
    set(FORTRAN_LIBS gfortran)
 elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
    set(FORTRAN_LIBS "ifcore;ifport")
+   add_compile_options(-fp-model precise)
 endif()
 
 add_library(RSymSQCDlib STATIC ${SOURCES})
