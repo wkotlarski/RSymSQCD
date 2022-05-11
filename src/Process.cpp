@@ -2,7 +2,7 @@
 #include "Process.hpp"
 
 Process::Process(std::string processID, boost::property_tree::ptree pt) {
-   
+
    MassTop = pt.get<double>("masses.top");
    MassGlu = pt.get<double>("masses.gluino");
    MasssigmaO = pt.get<double>("masses.pseudoscalar_sgluon");
@@ -18,15 +18,15 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 
    // choose a gage vector \eta for DR matrix elements
    eta = {sqrt(1.+delta*delta), 0., delta, eta_sign};
-   
+
    // @todo remove
    MassSq = MassSquarks;
    partonic = false; // calculate sigma_had with |M|^2 and not sigma_part
-   
+
 /* -------------------- Squark-squark production---------------------------------*/
 
    if(processID == "MRSSM,uu_suLsuR") {
-      matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM 
+      matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM
       matrixelementVirt = &Process::matrixMRSSMVirt_uu_suLsuR;
       matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
       sigmaPartTree1 = &Process::sigmaMRSSMTree_uu_suLsuR;
@@ -185,7 +185,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
          }
          // else use DS
          else {
-            std::cout << "\nINFO: Using diagram subtraction for the gu_suLsuLdagger channel with width/mass = "
+            std::cout << "\nINFO: Using diagram subtraction for the gu_suLsuLdagger channel with Γ/M = "
                << pt.get<double>("technical parameters.WidthOverMass") << ".\n";
             matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DS;
          }
@@ -218,7 +218,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
          }
          // else use DS
          else {
-            std::cout << "\nINFO: Using diagram subtraction for the gu_suLsuR channel with WoM = "
+            std::cout << "\nINFO: Using diagram subtraction for the gu_suLsuR channel with Γ/M = "
                << pt.get<double>("technical parameters.WidthOverMass") << ".\n";
             matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DS;
          }
@@ -283,12 +283,12 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       sigmaPartTree1 = &Process::sigmaMRSSMTree_uubar_OO;
       splitting_kernel1 = &Process::Pgg;
       sigmaPartTree2 = &Process::sigmaMRSSMTree_uubar_OO;
-      splitting_kernel2 = &Process::Pgg;      
+      splitting_kernel2 = &Process::Pgg;
       matrixelementReal_HnonC = &Process::matrixSimplifiedHard_uubar_OOg;
       m1 = MasssigmaO;
       m2 = MasssigmaO;
       flav.push_back( std::vector<int> {1, -1, 2} );
-      flav.push_back( std::vector<int> {2, -2, 2} );      
+      flav.push_back( std::vector<int> {2, -2, 2} );
       flav.push_back( std::vector<int> {3, -3, 2} );
       flav.push_back( std::vector<int> {4, -4, 2} );
       flav.push_back( std::vector<int> {5, -5, 2} );
@@ -317,7 +317,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 #include "matrix_elements_and_xsections/mssm_uu_suLsuR_tree_matrix.cpp"
 #include "matrix_elements_and_xsections/mssm_uu_suLsuL_tree_matrix.cpp"
 #include "matrix_elements_and_xsections/mssm_ud_suLsdR_tree_matrix.cpp"
-#include "matrix_elements_and_xsections/mssm_ud_suLsdL_tree_matrix.cpp"                
+#include "matrix_elements_and_xsections/mssm_ud_suLsdL_tree_matrix.cpp"
 
 /* -------------------- Squark-antisquark production: q+q^bar > sq+sq^dagger ---------------------*/
 #include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdagger_tree_matrix.cpp"
