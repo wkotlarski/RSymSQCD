@@ -42,7 +42,11 @@ file (GLOB SOURCES
 # we link against LoopTools which requires a fortran library
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
    # assume that if we're using GCC or Clang then LoopTools was compiled with GCC
-   set(FORTRAN_LIBS gfortran)
+   if(APPLE)
+      find_library(FORTRAN_LIBS NAMES "libgfortran.dylib")
+   elseif(UNIX)
+      find_library(FORTRAN_LIBS NAMES "libgfortran.so.5")
+   endif()
 elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
    set(FORTRAN_LIBS "ifcore;ifport")
    add_compile_options(-fp-model precise)
