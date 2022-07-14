@@ -20,9 +20,18 @@ find_path(LIBLHAPDF_INCLUDE_DIR NAMES LHAPDF/LHAPDF.h)
 find_library(LIBLHAPDF_LIBRARY NAMES libLHAPDF.so)
 
 find_path(LIBRK_INCLUDE_DIR NAMES rk/rk.hh)
-find_library(LIBRK_LIBRARY NAMES librk.so)
+if(APPLE)
+   find_library(LIBRK_LIBRARY NAMES librk.dylib)
+elseif(UNIX)
+   find_library(LIBRK_LIBRARY NAMES librk.so)
+endif()
 
-find_library(LIBCOLORFULL_LIBRARY NAMES ColorFull/libColorFull.so)
+find_path(LIBCOLORFULL_INCLUDE_DIRS NAMES ColorFull/Core/Tree_level_gluon_basis.h)
+if(APPLE)
+   find_library(LIBCOLORFULL_LIBRARY NAMES ColorFull/libColorFull.dylib)
+elseif(UNIX)
+   find_library(LIBCOLORFULL_LIBRARY NAMES ColorFull/libColorFull.so)
+endif()
 
 include_directories (
    include
@@ -31,6 +40,7 @@ include_directories (
    ${LIBLHAPDF_INCLUDE_DIR}
    ${LIBRK_INCLUDE_DIR}
    ${Boost_INCLUDE_DIRS}
+   ${LIBCOLORFULL_INCLUDE_DIRS}
 )
 
 file (GLOB SOURCES
