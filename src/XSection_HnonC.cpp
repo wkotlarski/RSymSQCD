@@ -96,7 +96,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
    // check if due to numerics |cos(x)| is not > 1
    // if yes but reasonable, return 0 and continue
-   assert(std::abs(cosx) - 1. < 1e-7);
+   // assert(std::abs(cosx) - 1. < 1e-7);
    if (cosx > 1. || cosx < -1.)  {
       ff[0] = 0;
       return 0;
