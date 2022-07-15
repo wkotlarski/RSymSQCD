@@ -106,24 +106,21 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    }
 
    // initialize matrix of particles momenta
-   std::vector< double* > p;
+   std::array<std::array<double, 4>, 5> p;
 
    // incoming parton 1 momenta
-   p.push_back(new double[4]);
    p[0][0] = shat_sqrt/2;
    p[0][1] = 0;
    p[0][2] = 0;
    p[0][3] = shat_sqrt/2;
 
    // incoming parton 2 momenta
-   p.push_back(new double[4]);
    p[1][0] = shat_sqrt/2;
    p[1][1] = 0;
    p[1][2] = 0;
    p[1][3] = - shat_sqrt/2;
 
    // 1st sgluons momenta
-   p.push_back(new double[4]);
    p[2][0] = E1;
    double p1 = sqrt( ( E1 - m1 ) * ( E1 + m1 ) );
    p[2][1] = p1 * sin( pi * xx[2] ) * cos( two_pi * xx[3] );
@@ -167,14 +164,9 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    geom3::Vector3 p_temp = rot.rotate(p_parton);
 
    // set parton momenta
-   double*  p_temp_2 = new double [4];
-   p_temp_2[0] = Ej;
-   p_temp_2[1] = p_temp.x();
-   p_temp_2[2] = p_temp.y();
-   p_temp_2[3] = p_temp.z();
+   std::array<double, 4> p_temp_2 = {Ej, p_temp.x(), p_temp.y(), p_temp.z()};
 
    // 2nd sgluon momenta
-   p.push_back(new double[4]);
    p[3][0] = shat_sqrt - E1 - Ej;
    for( int i = 1; i < 4; ++i) p[3][i] = - p[2][i] - p_temp_2[i];
   
@@ -191,9 +183,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    }
   
    // write parton momentum to momentum matrix p
-   p.push_back(new double[4]);
    for(int i = 0; i < 4; ++i) p[4][i] = p_temp_2[i];
-   delete[] p_temp_2;
       
    double t15 = p[0][0] * p[4][0] - p[0][3] * p[4][3];
    t15 = - 2. * t15;
@@ -214,14 +204,6 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 //      ff[0] = 0;
 //      return 0;      
    }
-   
-   // delete (otherwise causes memory leak)
-   for(std::vector<double*>::iterator i = p.begin(); i != p.end(); ++i) {
-      delete (*i);
-      *i = 0;
-   }
-   p.clear();
-   p.shrink_to_fit();
   
    // some final factors
    ME2 *= to_fb;
