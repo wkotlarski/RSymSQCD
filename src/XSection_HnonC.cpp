@@ -7,28 +7,26 @@
 #include "rk/rk.hh"
 #include "rk/geom3.hh"
 
-// @todo this is absolutely neeed but I don't know why
-using namespace std;
-
 std::array<double, 3> XSection_HnonC::integrate() {
 
    //  integral dimension, number of integrands
-   constexpr int ndim { 7 }, ncomp { 1 };
+   static constexpr int ndim = 7;
+   static constexpr int ncomp = 1;
    //  accuraccy
-   double accuracy_rel { pow( 10., -vm["precision-hard"].as<int>() ) }, 
-      accuracy_abs { 1e-12 };
+   const double accuracy_rel {std::pow(10., -vm["precision-hard"].as<int>())};
+   static constexpr double accuracy_abs {1e-12};
 
-   constexpr int neval_min = 10'000;
+   static constexpr int neval_min = 10'000;
    long long int neval;
-   constexpr long long int neval_max { 1'000'000'000'000 }; 
+   static constexpr long long int neval_max {1'000'000'000'000};
 
    // technical (Vegas specific) stuff
-   constexpr int nstart = 200'000;
-   constexpr int nincrease = 10000;
-   constexpr int nbatch = 1000;
-   constexpr int gridno = 0;
+   static constexpr int nstart = 200'000;
+   static constexpr int nincrease = 10000;
+   static constexpr int nbatch = 1000;
+   static constexpr int gridno = 0;
    const int flags = vm["verbosity-hard"].as<int>();
-   constexpr int seed = 0;
+   static constexpr int seed = 0;
    const char* state_file = "";
    int nregions, fail;
 
@@ -38,9 +36,10 @@ std::array<double, 3> XSection_HnonC::integrate() {
       neval_min, neval_max, nstart, nincrease, nbatch,
       gridno, state_file, NULL,
       &neval, &fail, integral, error, prob );
-   
+
    std::array <double, 3> result_finite
-      { integral[0], error[0], prob[0] };
+      {integral[0], error[0], prob[0]};
+
    return result_finite;
 }
 
@@ -50,8 +49,8 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    double m_sqr = m1 * m1;
   
    /*
-   * 3-body phase space parametrization based on
-   * http://www.t39.ph.tum.de/T39_files/T39_people_files/duell_files/Dipl-MultiPion.pdf
+   *  3-body phase space parametrization based on
+   *  http://www.t39.ph.tum.de/T39_files/T39_people_files/duell_files/Dipl-MultiPion.pdf
    */
 
    // failsafe (this should never happen)
@@ -134,8 +133,8 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    );
 
    // construct rotation by angle xx[4] * two_pi
-   // around sgluon momentum
-   geom3::Rotation3 rot( rotation_axis, xx[4] * two_pi);
+   // around final state momentum
+   geom3::Rotation3 rot(rotation_axis, xx[4]*two_pi);
 
    /*
     *  kinematics was solved for the cosx of angle
@@ -161,7 +160,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    );
 
    // rotate parton momentum
-   geom3::Vector3 p_temp = rot.rotate(p_parton);
+   const geom3::Vector3 p_temp = rot.rotate(p_parton);
 
    // set parton momenta
    std::array<double, 4> p_temp_2 = {Ej, p_temp.x(), p_temp.y(), p_temp.z()};
@@ -214,7 +213,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
    double pdf_flux = 0.0;
    for (const auto& f : processID->flav) {
-      pdf_flux += f.at(2) * pdf->xfxQ( f.at(0), x1, mu_f ) * pdf->xfxQ( f.at(1), x2, mu_f );
+      pdf_flux += f.at(2) * pdf->xfxQ(f.at(0), x1, mu_f) * pdf->xfxQ(f.at(1), x2, mu_f);
    }
    pdf_flux /= x1 * x2;
 
