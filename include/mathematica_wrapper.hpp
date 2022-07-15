@@ -1,7 +1,7 @@
 #ifndef MATHEMATICA_WRAPPER_HPP_
 #define MATHEMATICA_WRAPPER_HPP_
 
-#include "dilog.hpp"
+#include "Li2.hpp"
 
 template <typename Base, typename Exponent>
 inline Base Power(Base base, Exponent exp) {
@@ -18,25 +18,24 @@ inline double Abs(double x) {
 
 template <typename Arg>
 inline double Log (Arg arg) {
-   return log(arg);
+   return std::log(arg);
 }
 
 template <typename Arg>
 inline double Cos (Arg arg) {
-   return cos(arg);
+   return std::cos(arg);
 }
 
 template <typename Arg>
 inline double Sin (Arg arg) {
-   return sin(arg);
+   return std::sin(arg);
 }
 
-inline std::complex<double> PolyLog(int i, double arg) {
+inline double PolyLog(int i, double x) {
    if (i != 2) {
       throw std::invalid_argument("We handle only dilogarithms");
    }
-   std::complex<double> z(arg, 0.);
-   return dilogarithm::dilog(z);
+   return polylogarithm::Li2(x);
 }
 
 #endif // MATHEMATICA_WRAPPER_HPP_
