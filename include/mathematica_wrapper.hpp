@@ -3,6 +3,18 @@
 
 #include "Li2.hpp"
 
+template <typename T>
+constexpr std::complex<T> Sqr(const std::complex<T>& a) noexcept
+{
+   return a * a;
+}
+
+template <typename T, class = std::enable_if_t<std::is_arithmetic<T>::value,T>>
+constexpr T Sqr(T a) noexcept
+{
+   return a * a;
+}
+
 template <typename Base, typename Exponent>
 inline Base Power(Base base, Exponent exp) {
    return std::pow(base, exp);
