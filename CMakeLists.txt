@@ -5,6 +5,13 @@ set (CMAKE_CXX_STANDARD 14)
 # use -std=c++ instead of -std=gnu
 set (CMAKE_CXX_EXTENSIONS OFF)
 
+# build type
+set (default_build_type "Release")
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message (STATUS "Setting build type to '${default_build_type}' as none was specified")
+  set (CMAKE_BUILD_TYPE "${default_build_type}")
+endif()
+
 include(FetchContent)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.10.5/json.tar.xz)
 FetchContent_MakeAvailable(json)
