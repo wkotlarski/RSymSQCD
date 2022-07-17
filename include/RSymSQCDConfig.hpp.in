@@ -1,0 +1,4 @@
+// the configured options and settings for RSymSQCD
+#define RSymSQCD_VERSION_MAJOR @RSymSQCD_VERSION_MAJOR@
+#define RSymSQCD_VERSION_MINOR @RSymSQCD_VERSION_MINOR@
+#define RSymSQCD_VERSION_PATCH @RSymSQCD_VERSION_PATCH@

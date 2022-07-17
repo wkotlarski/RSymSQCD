@@ -1,7 +1,11 @@
 cmake_minimum_required (VERSION 3.13)
-project (RSymSQCD VERSION 0.1 LANGUAGES CXX)
+
+project (RSymSQCD VERSION 0.9.0 LANGUAGES CXX)
+configure_file(include/RSymSQCDConfig.hpp.in include/RSymSQCDConfig.hpp)
 
 set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD_REQUIRED True)
+
 # use -std=c++ instead of -std=gnu
 set (CMAKE_CXX_EXTENSIONS OFF)
 
@@ -40,6 +44,11 @@ if(APPLE)
    find_library(LIBCOLORFULL_LIBRARY NAMES ColorFull/libColorFull.dylib)
 elseif(UNIX)
    find_library(LIBCOLORFULL_LIBRARY NAMES ColorFull/libColorFull.so)
+endif()
+
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
 endif()
 
 include_directories (
