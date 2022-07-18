@@ -1,4 +1,10 @@
-// the configured options and settings for RSymSQCD
+#ifndef CONFIG_GUARD
+#define CONFIG_GUARD
+
+#define RSymSQCD_NAME "@PROJECT_NAME@"
+#define RSymSQCD_VERSION  "@PROJECT_VERSION@"
 #define RSymSQCD_VERSION_MAJOR @RSymSQCD_VERSION_MAJOR@
 #define RSymSQCD_VERSION_MINOR @RSymSQCD_VERSION_MINOR@
 #define RSymSQCD_VERSION_PATCH @RSymSQCD_VERSION_PATCH@
+
+#endif // CONFIG_GUARD
