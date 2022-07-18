@@ -92,7 +92,7 @@ target_link_libraries(
    Eigen3::Eigen
    nlohmann_json::nlohmann_json
 )
-target_include_directories(RSymSQCDlib PUBLIC include)
+target_include_directories(RSymSQCDlib PUBLIC include "${PROJECT_BINARY_DIR}")
 
 add_executable(RSymSQCD src/main.cpp)
 target_link_libraries(RSymSQCD PUBLIC RSymSQCDlib)

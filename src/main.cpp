@@ -1,3 +1,4 @@
+#include "include/RSymSQCDConfig.hpp"
 #include <chrono>
 using namespace std::chrono_literals;
 
@@ -109,6 +110,7 @@ int main(int argc, char* argv[]) {
    boost::program_options::options_description desc("Allowed options");
    desc.add_options()
       ("help", "produce help message")
+      ("version,v", "display the version number")
       ("precision-virt", po::value<int>() -> default_value(3), "")
       // gu_suLsuLdaggeru with SC precision 5 for BMP2 gives p-value 1
       ("precision-sc",   po::value<int>() -> default_value(6), "")
@@ -139,7 +141,11 @@ int main(int argc, char* argv[]) {
 
    if (vm.count("help")) {
       cout << desc << '\n';
-      return 1;
+      return 0;
+   }
+   if (vm.count("version")) {
+      std::cout << RSymSQCD_VERSION_MAJOR << '.' << RSymSQCD_VERSION_MINOR << '.' << RSymSQCD_VERSION_PATCH << std::endl;
+      return 0;
    }
 
    bool enable_born = vm["enable-born"].as<bool>();
