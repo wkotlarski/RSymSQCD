@@ -30,7 +30,11 @@ find_path(LIBLOOPTOOLS_INCLUDE_DIR NAMES clooptools.h)
 find_library(LIBLOOPTOOLS_LIBRARY NAMES libooptools.a)
 
 find_path(LIBLHAPDF_INCLUDE_DIR NAMES LHAPDF/LHAPDF.h)
-find_library(LIBLHAPDF_LIBRARY NAMES libLHAPDF.so)
+if (APPLE)
+   find_library(LIBLHAPDF_LIBRARY NAMES libLHAPDF.dylib)
+elseif (UNIX)
+   find_library(LIBLHAPDF_LIBRARY NAMES libLHAPDF.so)
+endif()
 
 find_path(LIBRK_INCLUDE_DIR NAMES rk/rk.hh)
 if(APPLE)
