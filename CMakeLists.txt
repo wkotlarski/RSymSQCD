@@ -1,9 +1,20 @@
 cmake_minimum_required (VERSION 3.13)
-project (RSymSQCD VERSION 0.1 LANGUAGES CXX)
+
+project (RSymSQCD VERSION 0.9.0 LANGUAGES CXX)
+configure_file(include/RSymSQCDConfig.hpp.in include/RSymSQCDConfig.hpp)
 
 set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD_REQUIRED True)
+
 # use -std=c++ instead of -std=gnu
 set (CMAKE_CXX_EXTENSIONS OFF)
+
+# build type
+set (default_build_type "Release")
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message (STATUS "Setting build type to '${default_build_type}' as none was specified")
+  set (CMAKE_BUILD_TYPE "${default_build_type}")
+endif()
 
 include(FetchContent)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.10.5/json.tar.xz)
@@ -19,7 +30,11 @@ find_path(LIBLOOPTOOLS_INCLUDE_DIR NAMES clooptools.h)
 find_library(LIBLOOPTOOLS_LIBRARY NAMES libooptools.a)
 
 find_path(LIBLHAPDF_INCLUDE_DIR NAMES LHAPDF/LHAPDF.h)
-find_library(LIBLHAPDF_LIBRARY NAMES libLHAPDF.so)
+if (APPLE)
+   find_library(LIBLHAPDF_LIBRARY NAMES libLHAPDF.dylib)
+elseif (UNIX)
+   find_library(LIBLHAPDF_LIBRARY NAMES libLHAPDF.so)
+endif()
 
 find_path(LIBRK_INCLUDE_DIR NAMES rk/rk.hh)
 if(APPLE)
@@ -33,6 +48,11 @@ if(APPLE)
    find_library(LIBCOLORFULL_LIBRARY NAMES ColorFull/libColorFull.dylib)
 elseif(UNIX)
    find_library(LIBCOLORFULL_LIBRARY NAMES ColorFull/libColorFull.so)
+endif()
+
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
 endif()
 
 include_directories (
@@ -76,7 +96,7 @@ target_link_libraries(
    Eigen3::Eigen
    nlohmann_json::nlohmann_json
 )
-target_include_directories(RSymSQCDlib PUBLIC include)
+target_include_directories(RSymSQCDlib PUBLIC include "${PROJECT_BINARY_DIR}")
 
 add_executable(RSymSQCD src/main.cpp)
 target_link_libraries(RSymSQCD PUBLIC RSymSQCDlib)
