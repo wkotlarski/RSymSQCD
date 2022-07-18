@@ -1,13 +1,11 @@
 cmake_minimum_required (VERSION 3.13)
 
 project (RSymSQCD VERSION 0.9.0 LANGUAGES CXX)
-configure_file(include/RSymSQCDConfig.hpp.in include/RSymSQCDConfig.hpp)
+configure_file(include/version.hpp.in include/version.hpp)
 
 set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_CXX_STANDARD_REQUIRED True)
-
-# use -std=c++ instead of -std=gnu
-set (CMAKE_CXX_EXTENSIONS OFF)
+set (CMAKE_CXX_EXTENSIONS OFF)            # use -std=c++ instead of -std=gnu
 
 # build type
 set (default_build_type "Release")

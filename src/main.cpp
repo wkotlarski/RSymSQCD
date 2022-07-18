@@ -1,4 +1,4 @@
-#include "include/RSymSQCDConfig.hpp"
+#include "include/version.hpp"
 #include <chrono>
 using namespace std::chrono_literals;
 
