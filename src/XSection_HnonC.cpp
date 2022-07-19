@@ -7,6 +7,11 @@
 #include "rk/rk.hh"
 #include "rk/geom3.hh"
 
+// @todo this is absolutely necessary but I don't know why
+// without it the uu -> uLuRg gives for BMP1 57.1.. +/- 0.005
+// with it                                   57.8.. +/- 0.005
+using namespace std;
+
 std::array<double, 3> XSection_HnonC::integrate() {
 
    //  integral dimension, number of integrands
