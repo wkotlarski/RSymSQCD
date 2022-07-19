@@ -66,7 +66,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
     *        = S - 2 sqrtS * E2 + m2^2
     */
    const double s35_min = m1*m1;
-   const double s35_max = std::pow(shat_sqrt - m2, 2);
+   const double s35_max = Sqr(shat_sqrt - m2);
    const double s35 = s35_min + (s35_max - s35_min)*xx[0];
    const double E2 = -0.5*(s35 - shat - m1*m1)/shat_sqrt;
    assert(E2 >= m2);
@@ -84,8 +84,8 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    const double E1 = -0.5*(s45 - shat - m2*m2)/shat_sqrt;
    assert(E1 >= m1);
 
+   ff[0] = 0.;
    if (shat_sqrt - E1 - E2 < 0.5*dS*shat_sqrt) {
-      ff[0] = 0.;
       return 0;
    }
 
@@ -98,7 +98,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    // if yes but reasonable, return 0 and continue
    // assert(std::abs(cosx) - 1. < 1e-7);
    if (cosx > 1. || cosx < -1.)  {
-      ff[0] = 0;
+      // std::cout << "Warning! 1 - |cos(x)| = " << 1. - std::abs(cosx) << "  - Skipping the phase space point.\n";
       return 0;
    }
 
@@ -110,15 +110,19 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    p[1] = {0.5*shat_sqrt, 0., 0., -0.5*shat_sqrt};
 
    // 1st final state momenta
+   const double sinpix2 = std::sin(pi*xx[2]);
+   const double cospix2 = std::cos(pi*xx[2]);
+   const double sin2pix3 = std::sin(two_pi*xx[3]);
+   const double cos2pix3 = std::cos(two_pi*xx[3]);
    p[2][0] = E1;
-   p[2][1] = p1 * std::sin(pi*xx[2]) * std::cos(two_pi*xx[3]);
-   p[2][2] = p1 * std::sin(pi*xx[2]) * std::sin(two_pi*xx[3]);
-   p[2][3] = p1 * std::cos(pi*xx[2]);
+   p[2][1] = p1 * sinpix2 * cos2pix3;
+   p[2][2] = p1 * sinpix2 * sin2pix3;
+   p[2][3] = p1 * cospix2;
 
    geom3::UnitVector3 rotation_axis(
-      std::sin(pi*xx[2]) * std::cos(two_pi*xx[3]),
-      std::sin(pi*xx[2]) * std::sin(two_pi*xx[3]),
-      std::cos(pi*xx[2])
+      sinpix2 * cos2pix3,
+      sinpix2 * sin2pix3,
+      cospix2
    );
 
    // construct rotation by angle xx[4] * two_pi
@@ -142,9 +146,10 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
       parton_phi = two_pi*xx[3] + pi;
    }
 
+   const double sinparton_theta = std::sin(parton_theta);
    const geom3::Vector3 p_parton(
-      p2 * std::sin(parton_theta) * std::cos(parton_phi),
-      p2 * std::sin(parton_theta) * std::sin(parton_phi),
+      p2 * sinparton_theta * std::cos(parton_phi),
+      p2 * sinparton_theta * std::sin(parton_phi),
       p2 * std::cos(parton_theta)
    );
 
@@ -167,16 +172,14 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    // check if we are not in the collinear region
    // if yes, return
    if (-t15 < dC*shat_sqrt*p[4][0] || -t25 < dC*shat_sqrt*p[4][0]) {
-      ff[0] = 0.;
       return 0;
    }
 
    double ME2 = (processID->*processID->matrixelementReal_HnonC)(p);
-   assert(!std::isnan(ME2));
-   assert(ME2 >= 0);
+   assert(!std::isnan(ME2) && ME2 >= 0);
 
    // some final factors
-   const double fac = to_fb/(128.*shat*pi_sqr) * std::sin(xx[2]*pi);
+   const double fac = to_fb/(128.*shat*pi_sqr) * sinpix2;
 
    double pdf_flux = 0.0;
    for (const auto& f : processID->flav) {
@@ -187,7 +190,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    ME2 *=  pdf_flux;
 
    const double m {m1};
-   const double J = ((-std::pow(m,2) + s35)*(-2*m + shat_sqrt)*shat_sqrt*std::sqrt(std::pow(m,4) + std::pow(s35 - shat,2) - 2*std::pow(m,2)*(s35 + shat)))/s35;
+   const double J = ((-Sqr(m) + s35)*(-2*m + shat_sqrt)*shat_sqrt*std::sqrt(std::pow(m,4) + Sqr(s35 - shat) - 2*Sqr(m)*(s35 + shat)))/s35;
    ME2 *= std::abs(J);
 
    // Jakobian of (E2, E1) -> (s35, s45) change
@@ -195,10 +198,11 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
    // Jakobian of Bjorken vars. mapping xx0, xx1 -> x1, x2
    const double xx0 = xx[*ndim-2];
-   ME2 *= std::pow(-4.*std::pow(m,2) + S,2)*xx0/(S*(-4.*std::pow(m,2)*(-1. + xx0) + S*xx0));
+   ME2 *= Sqr(-4.*std::pow(m,2) + S)*xx0/(S*(-4.*Sqr(m)*(-1. + xx0) + S*xx0));
 
    ME2 *= fac;
 
    ff[0] = ME2;
+
    return 0;
 }
