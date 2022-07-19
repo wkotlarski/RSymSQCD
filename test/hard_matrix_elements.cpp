@@ -17,6 +17,7 @@ TEST(HardMatrixElementTest, MRSSM) {
    }};
 
    boost::property_tree::ptree pt;
+   pt.put("collider setup.sqrt_S", 13e+3);
    pt.put("masses.gluino", 1000.);
    pt.put("masses.top", 172.);
    pt.put("masses.pseudoscalar_sgluon", 5000.);
@@ -31,6 +32,10 @@ TEST(HardMatrixElementTest, MRSSM) {
 
    Process process1("MRSSM,uu_suLsuR", pt);
    EXPECT_EQ((process1.*process1.Process::matrixelementReal_HnonC)(p), 0.020376409677647898);
+
+   Process process2("MRSSM,gu_suLsuR", pt);
+   std::cout << std::setprecision(17) << (process2.*process2.Process::matrixelementReal_HnonC)(p) << std::endl;
+   EXPECT_EQ((process2.*process2.Process::matrixelementReal_HnonC)(p), 1.3897879902109231e-07);
 }
 
 }
