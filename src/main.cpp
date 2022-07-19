@@ -32,7 +32,6 @@ inline array<double,3> operator+(array<double,3> x, array<double,3> y) {
    };
 }
 
-
 void xsec_to_json(json& j, string str, array<double,3> tree, array<double,3> virt, array<double,3> soft, array<double,3> hard) {
    j["cross sections"][str] = {
       {"tree", {{"res", tree.at(0)}, {"err", tree.at(1)}, {"p-val", tree.at(2)}}},

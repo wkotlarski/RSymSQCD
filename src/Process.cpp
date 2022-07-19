@@ -36,7 +36,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_uu_suLsuRg;
       m1 = MassSquarks;
       m2 = MassSquarks;
-      flav.push_back( std::vector<int> {2, 2, 1} );
+      flav.push_back({2, 2, 1});
       k = 2.*2*3*3;
       h = 2.*2;
    }
@@ -46,7 +46,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       m1 = MassSquarks;
       m2 = MassSquarks;
       // result doubled up, as there is ud and du initial state
-      flav.push_back( std::vector<int> {2, 1, 2} );
+      flav.push_back({2, 1, 2});
       k = 2.*2*3*3;
       h = 2.*2;
    }
@@ -56,7 +56,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       matrixelementVirt = &Process::matrixMSSMVirt_uu_suLsuR;
       //matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
       matrixelementReal_SC = &Process::matrix_soft_stub;
-      flav.push_back( std::vector<int> {2, 2, 1} );
+      flav.push_back({2, 2, 1});
       m1 = MassSquarks;
       m2 = MassSquarks;
       k = 2.*2*3*3;
@@ -102,7 +102,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_uubar_suLsuLdaggerg;
       m1 = MassSquarks;
       m2 = MassSquarks;
-      flav.push_back( std::vector<int> {2, -2, 2} );
+      flav.push_back({2, -2, 2});
       k = 2.*2*3*3;
       h = 2.*2;
    }
@@ -117,10 +117,10 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_ddbar_suLsuLdaggerg;
       m1 = MassSquarks;
       m2 = MassSquarks;
-      flav.push_back( std::vector<int> {1, -1, 2} );
-      flav.push_back( std::vector<int> {3, -3, 2} );
-      flav.push_back( std::vector<int> {4, -4, 2} );
-      flav.push_back( std::vector<int> {5, -5, 2} );
+      flav.push_back({1, -1, 2});
+      flav.push_back({3, -3, 2});
+      flav.push_back({4, -4, 2});
+      flav.push_back({5, -5, 2});
       k = 2.*2*3*3;
       h = 2.*2;
    }
@@ -142,7 +142,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_gg_suLsuLdaggerg;
       m1 = MassSquarks;
       m2 = MassSquarks;
-      flav.push_back( std::vector<int> {21, 21, 1} );
+      flav.push_back({21, 21, 1});
       k = 2.*2*8*8;
       h = 1.;
    }
@@ -158,8 +158,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 
       m1 = MassSquarks;
       m2 = MassSquarks;
-      std::array<int, 8> partons = { 1, -1, 3, -3, 4, -4, 5, -5 };
-      for( int el : partons) flav.push_back( std::vector<int> {21, el, 2} );
+      for( int el : { 1, -1, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2});
    }
    else if(processID == "MRSSM,gu_suLsuLdagger") {
       sigmaPartTree1 = &Process::sigmaMRSSMTree_uubar_suLsuLdagger;
@@ -190,8 +189,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
             matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DS;
          }
       }
-      std::array<int, 2> partons = { 2, -2 };
-      for( int el : partons) flav.push_back( std::vector<int> {21, el, 2} );
+      for( int el : { 2, -2 }) flav.push_back({21, el, 2});
    }
    else if(processID == "MRSSM,gu_suLsuR") {
       sigmaPartTree1 = &Process::sigmaMRSSMTree_uu_suLsuR;
@@ -224,12 +222,12 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
          }
       }
       std::array<int, 1> partons = {2};
-      for (int el : partons) flav.push_back(std::vector<int> {21, el, 2});
+      for (int el : partons) flav.push_back({21, el, 2});
    }
    else if(processID == "MSSM,uubar_suLsuLdagger") {
       matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR;  // matrix elements are identical
       //std::vector<int> row {2, -2};
-      flav.push_back( std::vector<int> {2, -2, 2} );
+      flav.push_back({2, -2, 2});
       m1 = MassSquarks;
       m2 = MassSquarks;
       k = 2.*2*3*3;
@@ -237,7 +235,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
    }
    else if(processID == "MSSM,uubar_suLsuRdagger") {
       matrixelementTree = &Process::matrixMSSMTree_uubar_suLsuRdagger;
-      flav.push_back( std::vector<int> {2, -2, 2} );
+      flav.push_back({2, -2, 2} );
       m1 = MassSquarks;
       m2 = MassSquarks;
       k = 2.*2*3*3;
@@ -287,11 +285,11 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       matrixelementReal_HnonC = &Process::matrixSimplifiedHard_uubar_OOg;
       m1 = MasssigmaO;
       m2 = MasssigmaO;
-      flav.push_back( std::vector<int> {1, -1, 2} );
-      flav.push_back( std::vector<int> {2, -2, 2} );
-      flav.push_back( std::vector<int> {3, -3, 2} );
-      flav.push_back( std::vector<int> {4, -4, 2} );
-      flav.push_back( std::vector<int> {5, -5, 2} );
+      flav.push_back({1, -1, 2});
+      flav.push_back({2, -2, 2});
+      flav.push_back({3, -3, 2});
+      flav.push_back({4, -4, 2});
+      flav.push_back({5, -5, 2});
    }
    else if(processID == "Simplified,gg_OO") {
       sigmaPartTree1 = &Process::matrix_xsec_stub;
@@ -301,7 +299,7 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
       matrixelementReal_HnonC = &Process::matrixSimplifiedHard_gg_OOg;
       m1 = MasssigmaO;
       m2 = MasssigmaO;
-      flav.push_back( std::vector<int> {21, 21, 0} );
+      flav.push_back({21, 21, 1});
    }
    else {
       std::cout << "Error! Subprocess " << processID << " not implemented.\n";
@@ -357,9 +355,9 @@ Process::Process(std::string processID, boost::property_tree::ptree pt) {
 #include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdagger_virt_matrix.cpp"
 
 /*
- 
+
    Real emissions
- 
+
  */
 #include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdaggerg_soft.cpp"
 #include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdaggerg_hard.cpp"
