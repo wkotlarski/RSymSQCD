@@ -1,21 +1,20 @@
 #ifndef PROCESS_H_
 #define PROCESS_H_
 
-#include <cmath>
-#include <complex>
-#include "clooptools.h"
-#include <string>
-#include <array>
-#include <iostream>
+#include "constants.hpp"
+#include "mathematica_wrapper.hpp"
+
 #include <boost/property_tree/ptree.hpp>
-#include <mathematica_wrapper.hpp>
-#include <constants.hpp>
 #include "LHAPDF/LHAPDF.h"
+
+#include <array>
+#include <string>
+#include <vector>
 
 class Process {
    private:
       // gauge vector for DR ME
-      std::array<double,4> eta;
+      std::array<double, 4> eta;
 
       // particle masses
       double MasssigmaO, MassphiO, MassGlu, MassTop, MassSq, MassSquarks,
@@ -31,17 +30,16 @@ class Process {
       inline double matrix_hard_stub( std::vector< double* >& )  { return 0.; };
       inline double matrix_xsec_stub( double )  { return 0.; };
 
-      std::array<double, 2> Pqq( double z) { return std::array<double, 2> {
-         CF * (1 + z * z)/(1 - z), - CF * (1 - z) }; 
+      std::array<double, 2> Pqq( double z) {
+         return {CF*(1+z*z)/(1-z), -CF*(1-z)};
       }
-      std::array<double, 2> Pgq( double z) { return Pqq(1 - z); }; 
+      std::array<double, 2> Pgq( double z) { return Pqq(1 - z); };
 
-      std::array<double, 2> Pgg( double z) { return std::array<double, 2> {
-         2 * CA * (z/(1 - z) + (1 - z)/z + z * (1 - z)), 0 }; 
+      std::array<double, 2> Pgg(double z) {
+         return {2*CA*(z/(1-z) + (1-z)/z + z*(1-z)), 0};
       }
-
       std::array<double, 2> Pqg( double z) {
-         return std::array<double, 2> { 1/2. * ( z*z + (1 - z)*(1 - z) ), -z * (1-z) };
+         return {1/2.*(Sqr(z) + Sqr(1-z)), -z*(1-z)};
       }
 
       // tree-level matrix elements
@@ -106,7 +104,7 @@ class Process {
       //double matrixMRSSMSoft_gg_OOg( double, double );
 
    public:
-      Process(std::string,  boost::property_tree::ptree);
+      Process(std::string const&, boost::property_tree::ptree const&);
 
       double (Process::* matrixelementTree)(double, double) const; // matrix element squared
       double (Process::* sigmaPartTree1)(double); // partonic cross section

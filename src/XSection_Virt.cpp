@@ -1,5 +1,7 @@
 #include "XSection_Virt.hpp"
 
+#include "clooptools.h"
+
 int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    const int *ncomp, cubareal ff[], void *userdata) {
 

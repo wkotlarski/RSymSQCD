@@ -1,24 +1,21 @@
 #include "include/version.hpp"
-#include <chrono>
-using namespace std::chrono_literals;
-
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/ini_parser.hpp>
-
-#include <boost/program_options.hpp>
-namespace po = boost::program_options;
-
 #include "XSection_Tree.hpp"
 #include "XSection_Virt.hpp"
 #include "XSection_SC.hpp"
 #include "XSection_HnonC.hpp"
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+#include <boost/program_options.hpp>
 #include "LHAPDF/Info.h"
 #include "LHAPDF/Config.h"
-
 #include <nlohmann/json.hpp>
 
+#include <chrono>
+
 using namespace std;
+using namespace std::chrono_literals;
+namespace po = boost::program_options;
 using json = nlohmann::json;
 
 /*
@@ -26,13 +23,11 @@ using json = nlohmann::json;
  *    overload + operator to add xsection and errors in quadrature
  *    pvalues are just added
  */
-inline array<double,3> operator+(array<double,3> x, array<double,3> y) {
-   return array<double,3> {
-      x.at(0) + y.at(0), sqrt(pow(x.at(1),2)+pow(y.at(1),2)), x.at(2) + y.at(2)
-   };
+inline array<double, 3> operator+(array<double, 3> const& x, array<double, 3> const& y) {
+   return {x.at(0) + y.at(0), std::hypot(x.at(1), y.at(1)), std::max(x.at(2), y.at(2))};
 }
 
-void xsec_to_json(json& j, string str, array<double,3> tree, array<double,3> virt, array<double,3> soft, array<double,3> hard) {
+void xsec_to_json(json& j, std::string const& str, array<double, 3> const& tree, array<double, 3> const& virt, array<double, 3> const& soft, array<double, 3> const& hard) {
    j["cross sections"][str] = {
       {"tree", {{"res", tree.at(0)}, {"err", tree.at(1)}, {"p-val", tree.at(2)}}},
       {"virtual", {{"res", virt.at(0)}, {"err", virt.at(1)}, {"p-val", virt.at(2)}}},

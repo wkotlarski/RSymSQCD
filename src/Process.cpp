@@ -1,7 +1,11 @@
-#include <Eigen/Dense>
 #include "Process.hpp"
 
-Process::Process(std::string processID, boost::property_tree::ptree pt) {
+#include <Eigen/Dense>
+#include "clooptools.h"
+
+#include <cmath>
+
+Process::Process(std::string const& processID, boost::property_tree::ptree const& pt) {
 
    MassTop = pt.get<double>("masses.top");
    MassGlu = pt.get<double>("masses.gluino");
