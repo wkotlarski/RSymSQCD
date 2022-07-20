@@ -21,7 +21,7 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
    pdf = LHAPDF::mkPDF( pt.get<std::string>("collider setup.pdf") , 0);
 
    // choose a gage vector \eta for DR matrix elements
-   eta = {sqrt(1.+delta*delta), 0., delta, eta_sign};
+   eta = {std::sqrt(1.+Sqr(delta)), 0., delta, eta_sign};
 
    // @todo remove
    MassSq = MassSquarks;

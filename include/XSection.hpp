@@ -1,14 +1,13 @@
 #ifndef XSECTION_H_
 #define XSECTION_H_
 
-#include <array>
+#include "Process.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/program_options/variables_map.hpp>
-
 #include "LHAPDF/LHAPDF.h"
 
-#include "Process.hpp"
+#include <array>
 
 // every class with at least one pure virtual function
 // is an abstract base class
@@ -18,7 +17,7 @@ class XSection {
       // pure virtual function (abstract function)
       virtual std::array<double, 3> integrate() = 0;
 
-      static void init (Process*, boost::property_tree::ptree, boost::program_options::variables_map);
+      static void init (Process*, boost::property_tree::ptree const&, boost::program_options::variables_map const&);
       static Process* processID;
 
    protected:

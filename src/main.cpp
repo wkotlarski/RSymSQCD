@@ -152,7 +152,7 @@ int main(int argc, char* argv[]) {
    string subprocess = vm["subprocess"].as<string>();
 
    boost::property_tree::ptree pt;
-   boost::property_tree::ini_parser::read_ini( card, pt );
+   boost::property_tree::ini_parser::read_ini(card, pt);
 
    cout << "INFO: Using phase space slicing parameters dS = " << pt.get<double>("technical parameters.dS")
         << ", dC = " <<  pt.get<double>("technical parameters.dC") << '\n';
@@ -182,7 +182,7 @@ int main(int argc, char* argv[]) {
       model = Model::MSSM;
    }
    else if (pt.get<string>("process.model") == "Simplified") {
-      model = Model::Simplified;
+       model = Model::Simplified;
    }
    else {
       std::cout << "\nModel not implemented!\n\n";

@@ -51,8 +51,9 @@ std::array<double, 3> XSection_HnonC::integrate() {
 int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    const int *ncomp, cubareal ff[], void *userdata) {
 
-   double m_sqr = m1 * m1;
-  
+   double m_sqr = Sqr(m1);
+
+   ff[0] = 0;
    /*
    *  3-body phase space parametrization based on
    *  http://www.t39.ph.tum.de/T39_files/T39_people_files/duell_files/Dipl-MultiPion.pdf
@@ -60,7 +61,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
    // failsafe (this should never happen)
    // but sometimes does for suave
-   if (
+   assert(
         xx[0] < 0 || xx[0] > 1        // gluon energy
         || xx[1] < 0 || xx[1] > 1     // sgluon energy
         || xx[2] < 0 || xx[2] > 1     // angle
@@ -68,38 +69,31 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
         || xx[4] < 0 || xx[4] > 1     // angle
         || xx[5] < 0 || xx[5] > 1   // Bjorken x
         || xx[6] < 0 || xx[6] > 1   // Bjorken x
-        ) {
-      ff[0] = 0;
-      return 0;
-   }
+        );
 
-	double x1 = 4. * m_sqr/S + (1. - 4. * m_sqr/S ) * xx[5];
-	double x2 = 4. * m_sqr /(S * x1) + (1. - 4. * m_sqr/(S * x1)) * xx[6];
-	double shat = x1 * x2 * S;
-	double shat_sqrt = sqrt( shat );
+	double x1 = 4.*m_sqr/S      + (1.-4.*m_sqr/S)      * xx[5];
+	double x2 = 4.*m_sqr/(S*x1) + (1.-4.*m_sqr/(S*x1)) * xx[6];
+	double shat = x1*x2*S;
+	double shat_sqrt = std::sqrt(shat);
 
-	double Ej_max = shat_sqrt/2. - 2. * m_sqr/shat_sqrt;
-   
-	if ( Ej_max < dS * shat_sqrt/2. ) {
-	  ff[0] = 0;
+	double Ej_max = 0.5*shat_sqrt - 2.*m_sqr/shat_sqrt;
+
+	if (Ej_max < 0.5*dS*shat_sqrt) {
 	  return 0;
 	}
-   
-	double Ej = dS * shat_sqrt/2. + ( Ej_max - dS * shat_sqrt/2.) * xx[0];  
-   
-	double c = shat - 2. * shat_sqrt * Ej;
+
+	const double Ej = dS*shat_sqrt/2. + (Ej_max - dS*shat_sqrt/2.)*xx[0];
+
+	const double c = shat - 2. * shat_sqrt * Ej;
 	// Eq. 4.5
-	double E1_max = ( shat_sqrt - Ej) * c + Ej * sqrt( (c - 2. * m_sqr) 
-    * (c - 2 * m_sqr) - 4. * m_sqr * m_sqr );
-	E1_max /= 2 * c;
-   double E1_min = ( shat_sqrt - Ej) * c - Ej * sqrt( (c - 2 * m_sqr) 
-      * (c - 2. * m_sqr) - 4. * m_sqr * m_sqr );
-   E1_min /= 2. * c;
-	double E1 = E1_min + (E1_max - E1_min) * xx[1];
+	const double E1_max = ((shat_sqrt - Ej)*c + Ej*std::sqrt(Sqr(c-2.*m_sqr) - Sqr(2.*m_sqr)))/(2.*c);
+   const double E1_min = ((shat_sqrt - Ej)*c - Ej*std::sqrt(Sqr(c-2.*m_sqr) - Sqr(2.*m_sqr)))/(2.*c);
+   const double E1 = E1_min + (E1_max - E1_min)*xx[1];
+   assert(E1 >= m1);
 
 	// Eq. 4.2 with E2 = Ej
-   double cosx = (shat - 2 * shat_sqrt * ( E1 + Ej ) + 2. * Ej * E1 )/
-      (2. * Ej * sqrt( ( E1 - m1 ) * ( E1 + m1 ) ) );
+   const double p1 = std::sqrt((E1-m1)*(E1+m1));
+   double cosx = (shat - 2*shat_sqrt*(E1+Ej) + 2.*Ej*E1)/(2.*Ej*p1);
 
    // check if due to numerics |cos(x)| is not > 1
    // if yes, return 0 and continue
@@ -112,34 +106,29 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    // initialize matrix of particles momenta
    std::array<std::array<double, 4>, 5> p;
 
-   // incoming parton 1 momenta
-   p[0][0] = shat_sqrt/2;
-   p[0][1] = 0;
-   p[0][2] = 0;
-   p[0][3] = shat_sqrt/2;
+   // incoming partons momenta
+   p[0] = {0.5*shat_sqrt, 0., 0.,  0.5*shat_sqrt};
+   p[1] = {0.5*shat_sqrt, 0., 0., -0.5*shat_sqrt};
 
-   // incoming parton 2 momenta
-   p[1][0] = shat_sqrt/2;
-   p[1][1] = 0;
-   p[1][2] = 0;
-   p[1][3] = - shat_sqrt/2;
-
-   // 1st sgluons momenta
+   // 1st final state momenta
+   const double sinpix2 = std::sin(pi*xx[2]);
+   const double cospix2 = std::cos(pi*xx[2]);
+   const double sin2pix3 = std::sin(two_pi*xx[3]);
+   const double cos2pix3 = std::cos(two_pi*xx[3]);
    p[2][0] = E1;
-   double p1 = sqrt( ( E1 - m1 ) * ( E1 + m1 ) );
-   p[2][1] = p1 * sin( pi * xx[2] ) * cos( two_pi * xx[3] );
-   p[2][2] = p1 * sin( pi * xx[2] ) * sin( two_pi * xx[3] );
-   p[2][3] = p1 * cos( pi * xx[2] );
+   p[2][1] = p1 * sinpix2 * cos2pix3;
+   p[2][2] = p1 * sinpix2 * sin2pix3;
+   p[2][3] = p1 * cospix2;
 
-   geom3::UnitVector3 rotation_axis(
-      sin( pi * xx[2] ) * cos( two_pi * xx[3] ),
-      sin( pi * xx[2] ) * sin( two_pi * xx[3] ),
-      cos( pi * xx[2] )
+   const geom3::UnitVector3 rotation_axis(
+      sinpix2 * cos2pix3,
+      sinpix2 * sin2pix3,
+      cospix2
    );
 
    // construct rotation by angle xx[4] * two_pi
    // around final state momentum
-   geom3::Rotation3 rot(rotation_axis, xx[4]*two_pi);
+   const geom3::Rotation3 rot(rotation_axis, xx[4]*two_pi);
 
    /*
     *  kinematics was solved for the cosx of angle
@@ -149,19 +138,20 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
     *  periodicity of sin and cos would solve the thing
     */
    double parton_theta, parton_phi;
-   if( pi * xx[2] + acos(cosx) < pi ) {
-      parton_theta = pi * xx[2] + acos(cosx);
-      parton_phi = two_pi * xx[3];
+   if( pi*xx[2] + std::acos(cosx) < pi ) {
+      parton_theta = pi*xx[2] + std::acos(cosx);
+      parton_phi = two_pi*xx[3];
    }
    else {
-      parton_theta = two_pi - pi * xx[2] - acos(cosx);
-      parton_phi = two_pi * xx[3] + pi;
+      parton_theta = two_pi - pi*xx[2] - std::acos(cosx);
+      parton_phi = two_pi*xx[3] + pi;
    }
 
-   geom3::Vector3 p_parton(
-      Ej * sin( parton_theta ) * cos( parton_phi ),
-      Ej * sin( parton_theta ) * sin( parton_phi ),
-      Ej * cos( parton_theta )
+   const double sinparton_theta = std::sin(parton_theta);
+   const geom3::Vector3 p_parton(
+      Ej * sinparton_theta * std::cos(parton_phi),
+      Ej * sinparton_theta * std::sin(parton_phi),
+      Ej * std::cos(parton_theta)
    );
 
    // rotate parton momentum
@@ -172,36 +162,46 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
 
    // 2nd sgluon momenta
    p[3][0] = shat_sqrt - E1 - Ej;
-   for( int i = 1; i < 4; ++i) p[3][i] = - p[2][i] - p_temp_2[i];
-  
+   for (int i = 1; i < 4; ++i) p[3][i] = - p[2][i] - p_temp_2[i];
+
    assert( abs(
-      (pow(p[2][0], 2) - pow(p[2][1], 2) - pow(p[2][2], 2) - pow(p[2][3], 2))/(m1 * m1) - 1) < 1e-10 
+      (pow(p[2][0], 2) - pow(p[2][1], 2) - pow(p[2][2], 2) - pow(p[2][3], 2))/(m1 * m1) - 1) < 1e-10
          && p[2][0] >= m1
    );
    if( abs(
-      (pow(p[3][0], 2) - pow(p[3][1], 2) - pow(p[3][2], 2) - pow(p[3][3], 2))/(m2 * m2) - 1) > 1e-10 
+      (pow(p[3][0], 2) - pow(p[3][1], 2) - pow(p[3][2], 2) - pow(p[3][3], 2))/(m2 * m2) - 1) > 1e-10
       || p[3][0] < m2 ) {
       std::cout << "Error in kinematics. " <<
               abs(
       (pow(p[3][0], 2) - pow(p[3][1], 2) - pow(p[3][2], 2) - pow(p[3][3], 2))/(m2 * m2) - 1) << " " << p[3][0] << '\n';
    }
-  
+
    // write parton momentum to momentum matrix p
    for(int i = 0; i < 4; ++i) p[4][i] = p_temp_2[i];
-      
-   double t15 = p[0][0] * p[4][0] - p[0][3] * p[4][3];
-   t15 = - 2. * t15;
-   double t25 = p[1][0] * p[4][0] - p[1][3] * p[4][3];
-   t25 = - 2. * t25;
+
+   const double t15 = -2.*(p[0][0]*p[4][0] - p[0][3]*p[4][3]);
+   const double t25 = -2.*(p[1][0]*p[4][0] - p[1][3]*p[4][3]);
 
    // check if we are not in the collinear region
    // if yes, return
-   if( -t15 < dC * shat_sqrt * Ej || -t25 < dC * shat_sqrt * Ej ) {
-      ff[0] = 0;
+   if (-t15 < dC*shat_sqrt*Ej || -t25 < dC*shat_sqrt*Ej) {
       return 0;
 	}
-        
+
    double ME2 = (processID->*processID->matrixelementReal_HnonC)(p);
+   assert(!std::isnan(ME2) && ME2 >= 0);
+   /*
+   std::cout << setprecision(17);
+   for (const auto& row : p) {
+      for (const double& col : row) {
+         std::cout << col << ' ';
+      }
+      std::cout << '\n';
+   }
+   std::cout << ME2 << '\n';
+   std::cout << "================================================\n";
+   */
+
    //assert( ME2 >= 0 );
    if( ME2 < 0 || std::isnan(ME2) ) {
 //      std::cout << "Warning, negative ME2 " << ME2 << '\n';
@@ -227,18 +227,18 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    double xx1 = xx[6];
    double xx2 = xx[0];
 
-   double jacobian =  (xx0*(-4*dS*pow(m1,2) + (-1 + dS)*xx0*xx1*(-S + 4*pow(m1,2)))*
-     (xx0*xx1*xx2*(S - 4*pow(m1,2)) + 
-       dS*(-1 + xx2)*(-(S*xx0*xx1) + 4*(-1 + xx0*xx1)*pow(m1,2)))*pow(S,-1)*
-     pow(S - 4*pow(m1,2),2)*pow(S*xx0 - 4*(-1 + xx0)*pow(m1,2),-1)*
-     pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*pow(m1,2),-1)*
+   double jacobian =  (xx0*(-4*dS*Sqr(m1) + (-1 + dS)*xx0*xx1*(-S + 4*Sqr(m1)))*
+     (xx0*xx1*xx2*(S - 4*Sqr(m1)) + 
+       dS*(-1 + xx2)*(-(S*xx0*xx1) + 4*(-1 + xx0*xx1)*Sqr(m1)))*pow(S,-1)*
+     Sqr(S - 4*Sqr(m1))*pow(S*xx0 - 4*(-1 + xx0)*Sqr(m1),-1)*
+     pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*Sqr(m1),-1)*
      pow((-1 + dS)*S*xx0*xx1*(-1 + xx2) + 
-       4*(1 + xx0*xx1*(-1 + xx2) - dS*(-1 + xx0*xx1)*(-1 + xx2))*pow(m1,2),-1)*
+       4*(1 + xx0*xx1*(-1 + xx2) - dS*(-1 + xx0*xx1)*(-1 + xx2))*Sqr(m1),-1)*
      pow((-1 + xx2)*(S*xx0*xx1*(-1 + dS + xx2 - dS*xx2) + 
-         4*(-1 + xx0*xx1 + dS*(-1 + xx0*xx1)*(-1 + xx2) - xx0*xx1*xx2)*pow(m1,2))*
-       (-4*dS*pow(m1,2) + (-1 + dS)*xx0*xx1*(-S + 4*pow(m1,2))),0.5))/4.;
+         4*(-1 + xx0*xx1 + dS*(-1 + xx0*xx1)*(-1 + xx2) - xx0*xx1*xx2)*Sqr(m1))*
+       (-4*dS*Sqr(m1) + (-1 + dS)*xx0*xx1*(-S + 4*Sqr(m1))),0.5))/4.;
    
-   ff[0] = ME2 * abs(jacobian);
+   ff[0] = ME2 * std::abs(jacobian);
 
 	return 0;
 }

@@ -7,15 +7,13 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
 
     const double x1min = 4. * pow( m1, 2 )/S;
     static constexpr double xmax = 1.;
-    const double x1 = x1min + (xmax - x1min) * xx[1];
-    const double x2min = 4. * pow( m1, 2 )/(S*x1);
-    const double x2 = x2min + (xmax - x2min) * xx[2];
-    const double s = S * x1 * x2;     //partonic
-    const double Tmin = pow( m1, 2 ) - s/2. - sqrt( pow(s, 2)/4 -
-                  pow( m1, 2 )*s);
-    const double Tmax = pow( m1, 2 ) - s/2. + sqrt( pow(s, 2)/4. -
-                  pow( m1, 2 )*s);
-    const double T = xx[0]*(Tmax-Tmin) + Tmin;
+    const double x1 = x1min + (xmax-x1min)*xx[1];
+    const double x2min = 4.*Sqr(m1)/(S*x1);
+    const double x2 = x2min + (xmax-x2min)*xx[2];
+    const double s = S*x1*x2;     //partonic
+    const double Tmin = Sqr(m1) - s/2. - std::sqrt(Sqr(s)/4. - Sqr(m1)*s);
+    const double Tmax = Sqr(m1) - s/2. + std::sqrt(Sqr(s)/4. - Sqr(m1)*s);
+    const double T = Tmin + (Tmax-Tmin)*xx[0];
     const double jacobian = (Tmax-Tmin)*(1.-x1min)*(1.-x2min);
 
     int FiniteGs = 1;
@@ -28,8 +26,8 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
     double squaredMReal = (processID->*processID->matrixelementVirt)(
       s, T, FiniteGs, Dminus4, Divergence);
 
-    double dSigmaPart1 = 2.*squaredMReal*(processID->h)*pi/(pow(4.*pi,2))/
-                         (processID->k)/(pow(s,2));
+    double dSigmaPart1 = 2.*squaredMReal*(processID->h)*pi/Sqr(4.*pi)/
+                         (processID->k)/Sqr(s);
 
     // contraction with O(eps) from Dminus4
     Divergence = -1;           // O(eps)
@@ -38,34 +36,34 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
       s, T, FiniteGs, Dminus4, Divergence);
 
     Dminus4 = -2.;
-    double squaredMRealMinus2 = (processID->*processID->matrixelementVirt)(
+    const double squaredMRealMinus2 = (processID->*processID->matrixelementVirt)(
                          s, T, FiniteGs, Dminus4, Divergence);
 
-    double dSigmaPart3 = 2.*(squaredMRealMinus2 - squaredMReal)*
-                         (processID->h)*pi/(pow(4.*pi,2))/
-                         (processID->k)/(pow(s,2));
+    const double dSigmaPart3 = 2.*(squaredMRealMinus2 - squaredMReal)*
+                         (processID->h)*pi/Sqr(4.*pi)/
+                         (processID->k)/Sqr(s);
 
     // contraction with O(eps^2) prefactor of loop integral
     // and with product of O(eps) prefactors of phase space and loop integral
     Divergence = -2;
     Dminus4 = 0;
-   squaredMReal = (processID->*processID->matrixelementVirt)(
+    squaredMReal = (processID->*processID->matrixelementVirt)(
       s, T, FiniteGs, Dminus4, Divergence);
 
-    double dSigmaPart4 = 2.*squaredMReal*(processID->h)*pi/(pow(4.*pi,2))/
-                         (processID->k)/(pow(s,2))
-                         *(pow(pi,2.)/6.);
+   double dSigmaPart4 = 2.*squaredMReal*(processID->h)*pi/Sqr(4.*pi)/
+                         (processID->k)/Sqr(s)
+                         *(Sqr(pi)/6.);
 
-    double dSigmaHad = (dSigmaPart1 + dSigmaPart3 + dSigmaPart4);
+   const double dSigmaHad = (dSigmaPart1 + dSigmaPart3 + dSigmaPart4);
 
    double pdf_flux = 0.0;
    for (const auto& flav : processID->flav) {
-      pdf_flux += flav.at(2) * pdf->xfxQ( flav.at(0), x1, mu_f ) * pdf->xfxQ( flav.at(1), x2, mu_f );
+      pdf_flux += flav.at(2) * pdf->xfxQ(flav.at(0), x1, mu_f) * pdf->xfxQ(flav.at(1), x2, mu_f);
    }
    pdf_flux /= (x1 * x2);
 
-    ff[0] = dSigmaHad*jacobian*to_fb * pdf_flux;   // in femto barn
-    return 0;
+   ff[0] = dSigmaHad*jacobian*to_fb * pdf_flux;   // in femto barn
+   return 0;
 }
 
 
@@ -115,7 +113,7 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
         NULL, NULL,
         &nregions, &neval, &fail, integral, error, prob);
 
-   std::array <double, 3> result {integral[0], error[0], prob[0]};
+   std::array<double, 3> result {integral[0], error[0], prob[0]};
 
    return result;
 }
