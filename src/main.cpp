@@ -105,6 +105,7 @@ int main(int argc, char* argv[]) {
    desc.add_options()
       ("help,h",    "produce help message")
       ("version,v", "display the version number")
+      ("json-outputfile-name", po::value<string>(), "name of output file in JSON format")
       ("precision-virt", po::value<int>() -> default_value(3), "")
       // gu_suLsuLdaggeru with SC precision 5 for BMP2 gives p-value 1
       ("precision-sc",   po::value<int>() -> default_value(6), "")
@@ -450,24 +451,26 @@ int main(int argc, char* argv[]) {
    }
 
    auto end = chrono::steady_clock::now();
-   cout << '\n';
-   cout << "INFO: Calculation ended after ";
+   cout << "\nINFO: Calculation ended after ";
    if (end - start > 1h)
       cout << chrono::duration_cast<chrono::hours>(end-start).count() << " hour(s), ";
    if (end - start > 1min)
       cout << chrono::duration_cast<chrono::minutes>(end-start).count() %  60 << " minute(s) and ";
    cout << chrono::duration_cast<chrono::seconds>(end-start).count() % 60 << " second(s)\n";
 
-   std::ofstream o(
-      pt.get<string>("process.process") + "_" +
-      to_string(pt.get<double>("masses.squarks")) + "_" +
-      to_string(pt.get<double>("masses.gluino")) + "_" +
-      to_string(pt.get<double>("masses.pseudoscalar_sgluon")) + "_" +
-      to_string(pt.get<double>("collider setup.sqrt_S")) + "_" +
-      to_string(pt.get<double>("collider setup.mu_r")) + "_" +
-      to_string(pt.get<double>("collider setup.mu_f")) + "_" +
-      pt.get<string>("collider setup.pdf") +
-      ".json");
+   const string json_outputfile_name =
+      vm.count("json-outputfile-name")
+         ? vm["json-outputfile-name"].as<string>()
+         : pt.get<string>("process.process") + "_"
+           + to_string(pt.get<double>("masses.squarks")) + "_"
+           + to_string(pt.get<double>("masses.gluino")) + "_"
+           + to_string(pt.get<double>("masses.pseudoscalar_sgluon")) + "_"
+           + to_string(pt.get<double>("collider setup.sqrt_S")) + "_"
+           + to_string(pt.get<double>("collider setup.mu_r")) + "_"
+           + to_string(pt.get<double>("collider setup.mu_f")) + "_"
+           + pt.get<string>("collider setup.pdf")
+           + ".json";
+   std::ofstream o(json_outputfile_name);
    o << std::setw(3) << j << std::endl;
 
    return 0;
