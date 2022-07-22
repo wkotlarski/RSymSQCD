@@ -1,16 +1,16 @@
 cmake_minimum_required (VERSION 3.13)
 
-# user should build from his own directory, e.g. ./build
-if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-   message(SEND_ERROR "In-source builds are not allowed.")
-endif()
-
 project (RSymSQCD VERSION 0.9.0 LANGUAGES CXX)
 configure_file(include/version.hpp.in include/version.hpp)
 
 set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_CXX_STANDARD_REQUIRED True)
 set (CMAKE_CXX_EXTENSIONS OFF)            # use -std=c++ instead of -std=gnu
+
+# user should build from his own directory, e.g. ./build
+if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
+   message(SEND_ERROR "In-source builds are not allowed.")
+endif()
 
 # build type
 set (default_build_type "Release")
