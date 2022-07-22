@@ -31,11 +31,10 @@ TEST(HardMatrixElementTest, MRSSM) {
    pt.put("technical parameters.WidthOverMass", 1.5e+3);
 
    Process process1("MRSSM,uu_suLsuR", pt);
-   EXPECT_EQ((process1.*process1.Process::matrixelementReal_HnonC)(p), 0.020376409677647898);
+   EXPECT_NEAR((process1.*process1.Process::matrixelementReal_HnonC)(p), 0.020376409677647898, 3e-17);
 
    Process process2("MRSSM,gu_suLsuR", pt);
-   std::cout << std::setprecision(17) << (process2.*process2.Process::matrixelementReal_HnonC)(p) << std::endl;
-   EXPECT_EQ((process2.*process2.Process::matrixelementReal_HnonC)(p), 1.3897879902109231e-07);
+   EXPECT_NEAR((process2.*process2.Process::matrixelementReal_HnonC)(p), 1.3897879902109231e-07, 2e-22);
 }
 
 }
