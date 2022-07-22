@@ -317,25 +317,25 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
 
 
 /* -------------------- Squark-squark production: q+q > sq+sq ---------------------------------*/
-#include "matrix_elements_and_xsections/mssm_uu_suLsuR_tree_matrix.cpp"
-#include "matrix_elements_and_xsections/mssm_uu_suLsuL_tree_matrix.cpp"
-#include "matrix_elements_and_xsections/mssm_ud_suLsdR_tree_matrix.cpp"
-#include "matrix_elements_and_xsections/mssm_ud_suLsdL_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/MSSM/mssm_uu_suLsuR_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/MSSM/mssm_uu_suLsuL_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/MSSM/mssm_ud_suLsdR_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/MSSM/mssm_ud_suLsdL_tree_matrix.cpp"
 
 /* -------------------- Squark-antisquark production: q+q^bar > sq+sq^dagger ---------------------*/
-#include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdagger_tree_matrix.cpp"
-#include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdagger_tree_matrix.cpp"
-#include "matrix_elements_and_xsections/mrssm_udbar_suLsdLdagger_tree_matrix.cpp"
-#include "matrix_elements_and_xsections/mssm_uubar_suLsuRdagger_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_uubar_suLsuLdagger_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_ddbar_suLsuLdagger_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_udbar_suLsdLdagger_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/MSSM/mssm_uubar_suLsuRdagger_tree_matrix.cpp"
 
 /* -------------------- Squark-antisquark production: G+G > sq+sq^dagger ---------------------*/
-#include "matrix_elements_and_xsections/mrssm_gg_suLsuLdagger_tree_matrix.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_gg_suLsuLdagger_tree_matrix.cpp"
 
 
 
 /* /////////////////////////////////// partonic xsections /////////////////////////////////////// */
 //#include "matrix_elements_and_xsections/mrssm_uu_suLsuR_tree_xsec.cpp"
-#include "matrix_elements_and_xsections/mrssm_partonic_xsections.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_partonic_xsections.cpp"
 
 /* -----------------------------------------------------------------------------------------------*/
 /* ------------------------------------------ Virtual --------------------------------------------*/
@@ -343,49 +343,49 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
 
 /* ----------------------- Squark-squark production: q+q > sq+sq ---------------------------------*/
 // mssm
-#include "matrix_elements_and_xsections/mssm_uu_suLsuR_virt_matrix.cpp"
-#include "matrix_elements_and_xsections/mssm_ud_suLsdR_virt_matrix.cpp"
+#include "matrix_elements_and_xsections/MSSM/mssm_uu_suLsuR_virt_matrix.cpp"
+#include "matrix_elements_and_xsections/MSSM/mssm_ud_suLsdR_virt_matrix.cpp"
 
 //mrssm
-#include "matrix_elements_and_xsections/mrssm_uu_suLsuR_virt_matrix.cpp"
-#include "matrix_elements_and_xsections/mrssm_ud_suLsdR_virt_matrix.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_uu_suLsuR_virt_matrix.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_ud_suLsdR_virt_matrix.cpp"
 
 /* --------------------- Squark-antisquark production: G+G > sq+sq^dagger ------------------------*/
 //mrssm
-#include "matrix_elements_and_xsections/mrssm_gg_suLsuLdagger_virt_matrix.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_gg_suLsuLdagger_virt_matrix.cpp"
 
 /* --------------------- Squark-antisquark production: q+qbar > sq+sq^dagger ------------------------*/
 //mrssm
-#include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdagger_virt_matrix.cpp"
-#include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdagger_virt_matrix.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_ddbar_suLsuLdagger_virt_matrix.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_uubar_suLsuLdagger_virt_matrix.cpp"
 
 /*
 
    Real emissions
 
  */
-#include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdaggerg_soft.cpp"
-#include "matrix_elements_and_xsections/mrssm_uubar_suLsuLdaggerg_hard.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_uubar_suLsuLdaggerg_soft.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_uubar_suLsuLdaggerg_hard.cpp"
 
-#include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg_soft.cpp"
-#include "matrix_elements_and_xsections/mrssm_ddbar_suLsuLdaggerg_hard.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_ddbar_suLsuLdaggerg_soft.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_ddbar_suLsuLdaggerg_hard.cpp"
 
-#include "matrix_elements_and_xsections/mrssm_gd_suLsuLdaggerd_hard.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_gd_suLsuLdaggerd_hard.cpp"
 // wEta_noSimplify is faster than wEta
-#include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DS.cpp"
-#include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DR.cpp"
-#include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard-DR_wEta_noSimplify.cpp"
-#include "matrix_elements_and_xsections/mrssm_gu_suLsuLdaggeru_hard.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuLdaggeru_hard-DS.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuLdaggeru_hard-DR.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuLdaggeru_hard-DR_wEta_noSimplify.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuLdaggeru_hard.cpp"
 
-#include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_hard.cpp"
-#include "matrix_elements_and_xsections/mrssm_gg_suLsuLdaggerg_soft.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_gg_suLsuLdaggerg_hard.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_gg_suLsuLdaggerg_soft.cpp"
 
-#include "matrix_elements_and_xsections/mrssm_uu_suLsuRg_soft.cpp"
-#include "matrix_elements_and_xsections/mrssm_uu_suLsuRg_hard.cpp"
-#include "matrix_elements_and_xsections/mrssm_gu_suLsuRubar_hard.cpp"
-#include "matrix_elements_and_xsections/mrssm_gu_suLsuRubar_hard-DR.cpp"
-#include "matrix_elements_and_xsections/mrssm_gu_suLsuRubar_hard-DR_wEtaDep.cpp"
-#include "matrix_elements_and_xsections/mrssm_gu_suLsuRubar_hard-DS.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_uu_suLsuRg_soft.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_uu_suLsuRg_hard.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuRubar_hard.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuRubar_hard-DR.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuRubar_hard-DR_wEtaDep.cpp"
+#include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuRubar_hard-DS.cpp"
 
 #include "matrix_elements_and_xsections/simplified_uubar_OOg_soft.cpp"
 #include "matrix_elements_and_xsections/simplified_uubar_OOg_hard.cpp"
