@@ -30,18 +30,6 @@ class Process {
       inline double matrix_hard_stub( std::vector< double* >& )  { return 0.; };
       inline double matrix_xsec_stub( double )  { return 0.; };
 
-      std::array<double, 2> Pqq( double z) {
-         return {CF*(1+z*z)/(1-z), -CF*(1-z)};
-      }
-      std::array<double, 2> Pgq( double z) { return Pqq(1 - z); };
-
-      std::array<double, 2> Pgg(double z) {
-         return {2*CA*(z/(1-z) + (1-z)/z + z*(1-z)), 0};
-      }
-      std::array<double, 2> Pqg( double z) {
-         return {1/2.*(Sqr(z) + Sqr(1-z)), -z*(1-z)};
-      }
-
       // tree-level matrix elements
       double sigmaMSSMTree_uu_suLsuR( double );
       double sigmaMRSSMTree_uubar_suLsuLdagger( double );
@@ -109,8 +97,8 @@ class Process {
       double (Process::* matrixelementTree)(double, double) const; // matrix element squared
       double (Process::* sigmaPartTree1)(double); // partonic cross section
       double (Process::* sigmaPartTree2)(double);
-      std::array<double, 2> (Process::* splitting_kernel1)(double);
-      std::array<double, 2> (Process::* splitting_kernel2)(double);
+      std::array<double, 2> (*splitting_kernel1)(double);
+      std::array<double, 2> (*splitting_kernel2)(double);
       double (Process::* matrixelementVirt)(double, double, double,
          double, int); // Re[M^1L M^(B star)]
 

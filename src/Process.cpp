@@ -1,4 +1,5 @@
 #include "Process.hpp"
+#include "splitting_kernels.hpp"
 
 #include <Eigen/Dense>
 #include "clooptools.h"
@@ -34,9 +35,9 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       matrixelementVirt = &Process::matrixMRSSMVirt_uu_suLsuR;
       matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
       sigmaPartTree1 = &Process::sigmaMRSSMTree_uu_suLsuR;
-      splitting_kernel1 = &Process::Pqq;
+      splitting_kernel1 = &Pqq;
       sigmaPartTree2 = &Process::sigmaMRSSMTree_uu_suLsuR;
-      splitting_kernel2 = &Process::Pqq;
+      splitting_kernel2 = &Pqq;
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_uu_suLsuRg;
       m1 = MassSquarks;
       m2 = MassSquarks;
@@ -101,8 +102,8 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       matrixelementTree = &Process::matrixMRSSMTree_uubar_suLsuLdagger;
       matrixelementVirt = &Process::matrixMRSSMVirt_uubar_suLsuLdagger;
       matrixelementReal_SC = &Process::matrixMRSSMSoft_uubar_suLsuLdaggerg;
-      splitting_kernel1 = &Process::Pqq;
-      splitting_kernel2 = &Process::Pqq;
+      splitting_kernel1 = &Pqq;
+      splitting_kernel2 = &Pqq;
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_uubar_suLsuLdaggerg;
       m1 = MassSquarks;
       m2 = MassSquarks;
@@ -116,8 +117,8 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       matrixelementTree = &Process::matrixMRSSMTree_ddbar_suLsuLdagger;
       matrixelementVirt = &Process::matrixMRSSMVirt_ddbar_suLsuLdagger;
       matrixelementReal_SC = &Process::matrixMRSSMSoft_ddbar_suLsuLdaggerg;
-      splitting_kernel1 = &Process::Pqq;
-      splitting_kernel2 = &Process::Pqq;
+      splitting_kernel1 = &Pqq;
+      splitting_kernel2 = &Pqq;
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_ddbar_suLsuLdaggerg;
       m1 = MassSquarks;
       m2 = MassSquarks;
@@ -141,8 +142,8 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       matrixelementTree = &Process::matrixMRSSMTree_GG_suLsuLdagger; 
       matrixelementVirt = &Process::matrixMRSSMVirt_GG_suLsuLdagger;
       matrixelementReal_SC = &Process::matrixMRSSMSoft_gg_suLsuLdaggerg;
-      splitting_kernel1 = &Process::Pgg;
-      splitting_kernel2 = &Process::Pgg;
+      splitting_kernel1 = &Pgg;
+      splitting_kernel2 = &Pgg;
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_gg_suLsuLdaggerg;
       m1 = MassSquarks;
       m2 = MassSquarks;
@@ -152,10 +153,10 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
    }
    else if(processID == "MRSSM,gq_suLsuLdagger") {
       sigmaPartTree1 = &Process::sigmaMRSSMTree_ddbar_suLsuLdagger;
-      splitting_kernel1 = &Process::Pqg;
+      splitting_kernel1 = &Pqg;
 
       sigmaPartTree2 = &Process::sigmaMRSSMTree_gg_suLsuLdagger;
-      splitting_kernel2 = &Process::Pgq;
+      splitting_kernel2 = &Pgq;
 
       matrixelementReal_SC = &Process::matrix_soft_stub;
       matrixelementReal_HnonC = &Process::matrixMRSSMHard_gd_suLsuLdaggerd;
@@ -166,10 +167,10 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
    }
    else if(processID == "MRSSM,gu_suLsuLdagger") {
       sigmaPartTree1 = &Process::sigmaMRSSMTree_uubar_suLsuLdagger;
-      splitting_kernel1 = &Process::Pqg;
+      splitting_kernel1 = &Pqg;
 
       sigmaPartTree2 = &Process::sigmaMRSSMTree_gg_suLsuLdagger;
-      splitting_kernel2 = &Process::Pgq;
+      splitting_kernel2 = &Pgq;
 
       matrixelementReal_SC = &Process::matrix_soft_stub;
       m1 = MassSquarks;
@@ -197,10 +198,10 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
    }
    else if(processID == "MRSSM,gu_suLsuR") {
       sigmaPartTree1 = &Process::sigmaMRSSMTree_uu_suLsuR;
-      splitting_kernel1 = &Process::Pqg;
+      splitting_kernel1 = &Pqg;
 
       sigmaPartTree2 = &Process::matrix_xsec_stub;
-      splitting_kernel2 = &Process::Pgq;
+      splitting_kernel2 = &Pgq;
 
       matrixelementReal_SC = &Process::matrix_soft_stub;
 
@@ -283,9 +284,9 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       matrixelementVirt = &Process::matrix_virt_stub;
       matrixelementReal_SC = &Process::matrixSimplifiedSoft_uubar_OOg;
       sigmaPartTree1 = &Process::sigmaMRSSMTree_uubar_OO;
-      splitting_kernel1 = &Process::Pgg;
+      splitting_kernel1 = &Pgg;
       sigmaPartTree2 = &Process::sigmaMRSSMTree_uubar_OO;
-      splitting_kernel2 = &Process::Pgg;
+      splitting_kernel2 = &Pgg;
       matrixelementReal_HnonC = &Process::matrixSimplifiedHard_uubar_OOg;
       m1 = MasssigmaO;
       m2 = MasssigmaO;
