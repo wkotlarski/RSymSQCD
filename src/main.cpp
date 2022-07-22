@@ -240,6 +240,13 @@ int main(int argc, char* argv[]) {
       {"top", pt.get<double>("masses.top")},
       {"squarks", pt.get<double>("masses.squarks")}
    };
+   j["technical parameters"] = {
+      {"dS", pt.get<double>("technical parameters.dS")},
+      {"dC", pt.get<double>("technical parameters.dC")},
+      {"WidthOverMass", pt.get<double>("technical parameters.WidthOverMass")},
+      {"eta_sign", pt.get<double>("technical parameters.eta_sign")},
+      {"delta", pt.get<double>("technical parameters.delta")}
+   };
 
    auto start = chrono::steady_clock::now();
 
