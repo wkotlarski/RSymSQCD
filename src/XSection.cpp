@@ -2,12 +2,12 @@
 
 #include <string>
 
-void XSection::init(Process&& processID_, boost::property_tree::ptree const& pt_in, boost::program_options::variables_map const& vm_in) {
+void XSection::init(Process&& process_, boost::property_tree::ptree const& pt_in, boost::program_options::variables_map const& vm_in) {
 
    pt = pt_in;
    vm = vm_in;
 
-   processID = processID_;
+   processID = process_;
    m1 = processID.m1;
    m2 = processID.m2;
 
