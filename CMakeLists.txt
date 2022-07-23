@@ -46,12 +46,12 @@ elseif(UNIX)
    find_library(LIBRK_LIBRARY NAMES librk.so)
 endif()
 
-find_path(LIBCOLORFULL_INCLUDE_DIRS NAMES ColorFull/Core/Tree_level_gluon_basis.h)
-if(APPLE)
-   find_library(LIBCOLORFULL_LIBRARY NAMES ColorFull/libColorFull.dylib)
-elseif(UNIX)
-   find_library(LIBCOLORFULL_LIBRARY NAMES ColorFull/libColorFull.so)
-endif()
+# find_path(LIBCOLORFULL_INCLUDE_DIRS NAMES ColorFull/Core/Tree_level_gluon_basis.h)
+# if(APPLE)
+#    find_library(LIBCOLORFULL_LIBRARY NAMES ColorFull/libColorFull.dylib)
+# elseif(UNIX)
+#    find_library(LIBCOLORFULL_LIBRARY NAMES ColorFull/libColorFull.so)
+# endif()
 
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
@@ -65,7 +65,7 @@ include_directories (
    ${LIBLHAPDF_INCLUDE_DIR}
    ${LIBRK_INCLUDE_DIR}
    ${Boost_INCLUDE_DIRS}
-   ${LIBCOLORFULL_INCLUDE_DIRS}
+   # ${LIBCOLORFULL_INCLUDE_DIRS}
 )
 
 file (GLOB SOURCES
@@ -94,7 +94,7 @@ target_link_libraries(
    ${LIBLOOPTOOLS_LIBRARY}
    ${FORTRAN_LIBS}
    ${LIBLHAPDF_LIBRARY}
-   ${LIBCOLORFULL_LIBRARY}
+   # ${LIBCOLORFULL_LIBRARY}
    Eigen3::Eigen
    nlohmann_json::nlohmann_json
 )
