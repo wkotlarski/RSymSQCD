@@ -196,6 +196,7 @@ int main(int argc, char* argv[]) {
        pp_suLsuL,
        pp_suLsdR,
        pp_suLsdL,
+       pp_sqLsqR,
        pp_suLsuLdagger,
        pp_suLsuRdagger,
        pp_suLsdLdagger,
@@ -208,6 +209,8 @@ int main(int argc, char* argv[]) {
       channel = Channel::pp_OsOs;
    } else if ( pt.get<string>("process.process") == "pp_suLsuR" ) {
       channel = Channel::pp_suLsuR;
+   } else if ( pt.get<string>("process.process") == "pp_sqLsqR" ) {
+      channel = Channel::pp_sqLsqR;
    } else if ( pt.get<string>("process.process") == "pp_suLsuL" ) {
       channel = Channel::pp_suLsuL;
    } else if ( pt.get<string>("process.process") == "pp_suLsdR" ) {
@@ -369,6 +372,57 @@ int main(int argc, char* argv[]) {
                   xsection_SC_total = xsection_SC1 + xsection_SC2;
                   xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
                   print( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
+                  break;
+			      }
+               case Channel::pp_sqLsqR:
+               {
+                  XSection_Tree tree;
+                  XSection_Virt virt;
+                  XSection_SC sc;
+                  XSection_HnonC hc;
+
+                  // qq > sqL sqR (+g) process
+		            if( subprocess == "" ) {
+                     Process process("MRSSM,qq_sqLsqR", pt);
+	                  XSection::init(std::move(process), pt, vm );
+                     if(enable_born) xsection_tree1 = tree.integrate();
+                     if(enable_virt) xsection_virt1 = virt.integrate();
+                     if(enable_sc) xsection_SC1 = sc.integrate();
+                     if(enable_hard) xsection_HnonC1 = hc.integrate();
+                     print( "qq > sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     xsec_to_json(j, "qq->sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+		            }
+                  // qq' > sqL sq'R (+g) process
+		            if( subprocess == "" ) {
+                     Process process("MRSSM,qq'_sqLsqR'", pt);
+	                  XSection::init(std::move(process), pt, vm );
+                     if(enable_born) xsection_tree2 = tree.integrate();
+                     if(enable_virt) xsection_virt2 = virt.integrate();
+                     if(enable_sc) xsection_SC2 = sc.integrate();
+                     if(enable_hard) xsection_HnonC2 = hc.integrate();
+                     print( "qq' > sqLsqR'(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+                     xsec_to_json(j, "qq->sqLsqR'(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+		            }
+
+                  // the matrix element is regular in the limit dS -> 0 but the phase space parametrization
+                  // fails if we are exactly on the threshold
+                  pt.put( "technical parameters.dS", 1e-10 );
+
+                  // gu > suL suR ubar process
+		            if( subprocess == "gq_sqLsqRqbar" || subprocess == "" ) {
+                     Process process( "MRSSM,gd_sdLsdR", pt);
+                     XSection::init(std::move(process), pt, vm );
+                     if(enable_sc) xsection_SC3 = sc.integrate();
+                     if(enable_hard) xsection_HnonC3 = hc.integrate();
+                     print( "gq > sqLsqR(+X)", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3 );
+                     xsec_to_json(j, "gq->sqLsqR(+X)", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
+		            }
+
+                  xsection_tree_total = xsection_tree1 + xsection_tree2;
+                  xsection_virt_total = xsection_virt1 + xsection_virt2;
+                  xsection_SC_total = xsection_SC1 + xsection_SC2 + xsection_SC3;
+                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2 + xsection_HnonC3;
+                  print( "sum", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total );
                   break;
 			      }
                case Channel::pp_suLsuLdagger:

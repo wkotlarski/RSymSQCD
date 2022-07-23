@@ -55,6 +55,46 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       k = 2.*2*3*3;
       h = 2.*2;
    }
+   else if (processID == "MRSSM,qq_sqLsqR") {
+      matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM
+      matrixelementVirt = &Process::matrixMRSSMVirt_uu_suLsuR;
+      matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
+      sigmaPartTree1 = &Process::sigmaMRSSMTree_uu_suLsuR;
+      splitting_kernel1 = &Pqq;
+      sigmaPartTree2 = &Process::sigmaMRSSMTree_uu_suLsuR;
+      splitting_kernel2 = &Pqq;
+      matrixelementReal_HnonC = &Process::matrixMRSSMHard_uu_suLsuRg;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
+      for (int i : {1, 2, 3, 4, 5}) {
+         flav.push_back({ i,  i, 1});
+         flav.push_back({-i, -i, 1});
+      }
+      k = 2.*2*3*3;
+      h = 2.*2;
+   }
+   else if(processID == "MRSSM,qq'_sqLsqR'") {
+      matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR;
+      matrixelementVirt = &Process::matrixMRSSMVirt_ud_suLsdR;
+      matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
+      sigmaPartTree1 = &Process::sigmaMRSSMTree_uu_suLsuR;
+      splitting_kernel1 = &Pqq;
+      sigmaPartTree2 = &Process::sigmaMRSSMTree_uu_suLsuR;
+      splitting_kernel2 = &Pqq;
+      matrixelementReal_HnonC = &Process::matrixMRSSMHard_uu_suLsuRg;
+      m1 = MassSquarks;
+      m2 = MassSquarks;
+      // result doubled up, as there is ud and du initial state
+      for (int i : {1, 2, 3, 4, 5}) {
+         for (int j : {1, 2, 3, 4, 5}) {
+            if (j <= i) continue;
+            flav.push_back({ i,  j, 2});
+            flav.push_back({-i, -j, 2});
+         }
+      }
+      k = 2.*2*3*3;
+      h = 2.*2;
+   }
     /* squark production, MSSM */
    else if(processID == "MSSM,uu_suLsuR") {
       matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR;
@@ -226,8 +266,41 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
             matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DS;
          }
       }
-      std::array<int, 1> partons = {2};
-      for (int el : partons) flav.push_back({21, el, 2});
+      flav.push_back({21, 2, 2});
+   }
+   else if(processID == "MRSSM,gd_sdLsdR") {
+      sigmaPartTree1 = &Process::sigmaMRSSMTree_uu_suLsuR;
+      splitting_kernel1 = &Pqg;
+
+      sigmaPartTree2 = &Process::matrix_xsec_stub;
+      splitting_kernel2 = &Pgq;
+
+      matrixelementReal_SC = &Process::matrix_soft_stub;
+
+      m1 = MassSquarks;
+      m2 = MassSquarks;
+      // if gluino cannot be on-shell use full real ME
+      if( pt.get<double>("collider setup.sqrt_S") < std::min(m1,m2) +  MassGlu ||
+          MassGlu < m2 ) {
+         matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar;
+         std::cout << "\nINFO: Not using any subtraction for the gu_suLsuRubar channel.\n";
+      }
+      else {
+         // otherwise, if WidthGlu < 0 use DR
+         if( WidthGlu < 0) {
+            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep;
+            std::cout << "\nINFO: Using diagram removal for the gu_suLsuRubar channel.\n";
+         }
+         // else use DS
+         else {
+            std::cout << "\nINFO: Using diagram subtraction for the gu_suLsuRubar channel with Γ/M = "
+                      << pt.get<double>("technical parameters.WidthOverMass") << ".\n";
+            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DS;
+         }
+      }
+      for (int el : {1, 2, 3, 4, 5}) {
+         flav.push_back({21, el, 20});
+      }
    }
    else if(processID == "MSSM,uubar_suLsuLdagger") {
       matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR;  // matrix elements are identical
