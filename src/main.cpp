@@ -1,4 +1,4 @@
-#include "include/version.hpp"
+#include "version.hpp"
 #include "XSection_Tree.hpp"
 #include "XSection_Virt.hpp"
 #include "XSection_SC.hpp"

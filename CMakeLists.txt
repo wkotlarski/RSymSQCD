@@ -58,22 +58,6 @@ if(CCACHE_PROGRAM)
     set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
 endif()
 
-include_directories (
-   include
-   ${LIBCUBA_INCLUDE_DIR}
-   ${LIBLOOPTOOLS_INCLUDE_DIR}
-   ${LIBLHAPDF_INCLUDE_DIR}
-   ${LIBRK_INCLUDE_DIR}
-   ${Boost_INCLUDE_DIRS}
-   # ${LIBCOLORFULL_INCLUDE_DIRS}
-)
-
-file (GLOB SOURCES
-   "src/*.cpp"
-   "src/matrix_elements/*.cpp"
-   "src/matrix_elements/*/*.cpp"
-)
-
 # we link against LoopTools which requires a fortran library
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
    # assume that if we're using GCC or Clang then LoopTools was compiled with GCC
@@ -86,7 +70,21 @@ elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
    set(FORTRAN_LIBS "ifcore;ifport")
 endif()
 
-add_library(RSymSQCDlib STATIC ${SOURCES})
+file (GLOB SOURCES
+   "src/Li2.cpp"  "src/Process.cpp"  "src/splitting_kernels.cpp"  "XSection*.cpp"
+)
+add_library(RSymSQCDlib SHARED ${SOURCES})
+target_include_directories (
+      RSymSQCDlib
+   PUBLIC
+      include
+      ${LIBCUBA_INCLUDE_DIR}
+      ${LIBLOOPTOOLS_INCLUDE_DIR}
+      ${LIBLHAPDF_INCLUDE_DIR}
+      ${LIBRK_INCLUDE_DIR}
+      ${Boost_INCLUDE_DIRS}
+      # ${LIBCOLORFULL_INCLUDE_DIRS}
+)
 target_link_libraries(
    RSymSQCDlib
    Boost::program_options
@@ -96,12 +94,34 @@ target_link_libraries(
    ${LIBLHAPDF_LIBRARY}
    # ${LIBCOLORFULL_LIBRARY}
    Eigen3::Eigen
-   nlohmann_json::nlohmann_json
 )
-target_include_directories(RSymSQCDlib PUBLIC include "${PROJECT_BINARY_DIR}")
 
-add_executable(RSymSQCD src/main.cpp)
-target_link_libraries(RSymSQCD PUBLIC RSymSQCDlib)
+add_executable(RSymSQCD "src/main.cpp" "src/XSection.cpp" "src/XSection_Tree.cpp" "src/XSection_Virt.cpp" "src/XSection_SC.cpp" "src/XSection_HnonC.cpp" "src/Process.cpp")
+target_include_directories(
+      RSymSQCD
+   PRIVATE
+      include
+      ${CMAKE_CURRENT_BINARY_DIR}/include # location of version.hpp
+      ${LIBCUBA_INCLUDE_DIR}
+      ${LIBLOOPTOOLS_INCLUDE_DIR}
+      ${LIBLHAPDF_INCLUDE_DIR}
+      ${LIBRK_INCLUDE_DIR}
+      ${Boost_INCLUDE_DIRS}
+      # ${LIBCOLORFULL_INCLUDE_DIRS}
+)
+target_link_libraries(
+      RSymSQCD
+   PRIVATE
+      RSymSQCDlib
+      nlohmann_json::nlohmann_json
+      Boost::program_options
+      ${LIBCUBA_LIBRARY}
+      ${LIBLOOPTOOLS_LIBRARY}
+      ${FORTRAN_LIBS}
+      ${LIBLHAPDF_LIBRARY}
+      # ${LIBCOLORFULL_LIBRARY}
+      Eigen3::Eigen
+)
 
 if(ENABLE_TESTS)
    enable_testing()
