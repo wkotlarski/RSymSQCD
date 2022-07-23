@@ -38,7 +38,7 @@ void xsec_to_json(json& j, std::string const& str, array<double, 3> const& tree,
 
 // why do I have to write this?
 // why isn't init() enough?
-Process *XSection::processID;
+Process XSection::processID;
 double XSection::mu_r;
 double XSection::mu_f;
 double XSection::m1;
@@ -257,19 +257,19 @@ int main(int argc, char* argv[]) {
                case Channel::pp_OsOs:
                {
                   Process process1("sgluons-gg_OO", pt);
-                  XSection::init( &process1, pt, vm );
+                  XSection::init(std::move(process1), pt, vm );
                   XSection_Tree tree;
                   temp = tree.integrate();
                   Process process2("sgluons-qqbar_OO", pt);
-                  XSection::init( &process2, pt, vm );
+                  XSection::init(std::move(process2), pt, vm );
                   xsection_tree = tree.integrate() + temp;
                   print("pp > OO", xsection_tree);
                   break;
 			      }
                case Channel::pp_suLsuR:
                {                                                     // checked with MadGraph and Philip
-                  Process process1("MRSSM,uu_suLsuR", pt);
-                  XSection::init( &process1, pt, vm );
+                  Process process("MRSSM,uu_suLsuR", pt);
+                  XSection::init(std::move(process), pt, vm );
                   XSection_Tree tree;
                   xsection_tree = tree.integrate();
                   print("uu > suLsuR", xsection_tree);
@@ -277,8 +277,8 @@ int main(int argc, char* argv[]) {
 			      }
                case Channel::pp_suLsdR:
                {                                                     // checked with MadGraph and Philip
-                  Process process1("MRSSM,ud_suLsdR", pt);
-                  XSection::init( &process1, pt, vm );
+                  Process process("MRSSM,ud_suLsdR", pt);
+                  XSection::init(std::move(process), pt, vm );
                   XSection_Tree tree;
                   xsection_tree = tree.integrate();
                   print("uu > suLsdR", xsection_tree);
@@ -287,18 +287,18 @@ int main(int argc, char* argv[]) {
                case Channel::pp_suLsuLdagger:
                {
                   Process process1("MRSSM,GG_suLsuLdagger", pt);
-                  XSection::init( &process1, pt, vm );
+                  XSection::init(std::move(process1), pt, vm );
                   XSection_Tree tree;
                   xsection_tree1 = tree.integrate();
                   print("GG > suLsdLdagger", xsection_tree1);
 
                   Process process2("MRSSM,uubar_suLsuLdagger", pt);
-                  XSection::init( &process2, pt, vm );
+                  XSection::init(std::move(process2), pt, vm );
                   xsection_tree2 = tree.integrate();
                   print("uubar > suLsdLdagger", xsection_tree2);
 
                   Process process3("MRSSM,ddbar_suLsuLdagger", pt);
-                  XSection::init( &process3, pt, vm );
+                  XSection::init(std::move(process3), pt, vm );
                   xsection_tree3 = tree.integrate();
                   print("qqbar > suLsuLdagger", xsection_tree3);
 
@@ -340,8 +340,8 @@ int main(int argc, char* argv[]) {
 
                   // uu > suL suR (+g) process
 		            if( subprocess == "" ) {
-                     Process process1("MRSSM,uu_suLsuR", pt);
-	                  XSection::init( &process1, pt, vm );
+                     Process process("MRSSM,uu_suLsuR", pt);
+	                  XSection::init(std::move(process), pt, vm );
                      if(enable_born) xsection_tree1 = tree.integrate();
                      if(enable_virt) xsection_virt1 = virt.integrate();
                      if(enable_sc) xsection_SC1 = sc.integrate();
@@ -356,8 +356,8 @@ int main(int argc, char* argv[]) {
 
                   // gu > suL suR ubar process
 		            if( subprocess == "gu_suLsuRubar" || subprocess == "" ) {
-                     Process process2( "MRSSM,gu_suLsuR", pt);
-                     XSection::init( &process2, pt, vm );
+                     Process process( "MRSSM,gu_suLsuR", pt);
+                     XSection::init(std::move(process), pt, vm );
                      if(enable_sc) xsection_SC2 = sc.integrate();
                      if(enable_hard) xsection_HnonC2 = hc.integrate();
                      print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
@@ -379,8 +379,8 @@ int main(int argc, char* argv[]) {
                   XSection_HnonC hc;
 
 		            if( subprocess == "" || subprocess == "uubar_suLsuLdagger" ) {
-                     Process process1("MRSSM,uubar_suLsuLdagger", pt);
-                     XSection::init( &process1, pt, vm );
+                     Process process("MRSSM,uubar_suLsuLdagger", pt);
+                     XSection::init(std::move(process), pt, vm );
                      if(enable_born) xsection_tree1 = tree.integrate();
                      if(enable_virt) xsection_virt1 = virt.integrate();
                      if(enable_sc) xsection_SC1 = sc.integrate();
@@ -390,8 +390,8 @@ int main(int argc, char* argv[]) {
 	    	         }
 
                   if( subprocess == "") {
-                     Process process2("MRSSM,ddbar_suLsuLdagger", pt);
-                     XSection::init( &process2, pt, vm );
+                     Process process("MRSSM,ddbar_suLsuLdagger", pt);
+                     XSection::init(std::move(process), pt, vm );
                      if(enable_born) xsection_tree2 = tree.integrate();
                      if(enable_virt) xsection_virt2 = virt.integrate();
                      if(enable_sc) xsection_SC2 = sc.integrate();
@@ -401,8 +401,8 @@ int main(int argc, char* argv[]) {
                   }
 
                   if( subprocess == "") {
-                     Process process3("MRSSM,GG_suLsuLdagger", pt);
-                     XSection::init( &process3, pt, vm );
+                     Process process("MRSSM,GG_suLsuLdagger", pt);
+                     XSection::init(std::move(process), pt, vm );
                      if(enable_born) xsection_tree3 = tree.integrate();
                      if(enable_virt) xsection_virt3 = virt.integrate();
                      if(enable_sc) xsection_SC3 = sc.integrate();
@@ -416,8 +416,8 @@ int main(int argc, char* argv[]) {
                   pt.put( "technical parameters.dS", 1e-10 );
 
                   if( subprocess == "") {
-                     Process process4("MRSSM,gq_suLsuLdagger", pt);
-                     XSection::init( &process4, pt, vm );
+                     Process process("MRSSM,gq_suLsuLdagger", pt);
+                     XSection::init(std::move(process), pt, vm );
                      if(enable_sc) xsection_SC4 = sc.integrate();
                      if(enable_hard) xsection_HnonC4 = hc.integrate();
                      print( "gq > suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
@@ -427,8 +427,8 @@ int main(int argc, char* argv[]) {
                   // g u > suL suLdagger
                   pt.put( "technical parameters.dS", 1e-9 );
                   if( subprocess == "gu_suLsuLdaggeru" || subprocess == "" ) {
-                     Process process5("MRSSM,gu_suLsuLdagger", pt);
-                     XSection::init( &process5, pt, vm );
+                     Process process("MRSSM,gu_suLsuLdagger", pt);
+                     XSection::init(std::move(process), pt, vm );
                      if(enable_sc) xsection_SC5 = sc.integrate();
                      if(enable_hard) xsection_HnonC5 = hc.integrate();
                      print( "gu > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5 );

@@ -20,44 +20,41 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
     double Dminus4 = 0;
     int Divergence = 0;     // O(eps)
 
-    //using Func = double (Process::* double)(double, double, int, double, int);
-    //Func* f_ptr = processID->*processID->matrixelementVirt;
-
-    double squaredMReal = (processID->*processID->matrixelementVirt)(
+    double squaredMReal = (processID.*processID.matrixelementVirt)(
       s, T, FiniteGs, Dminus4, Divergence);
 
-    double dSigmaPart1 = 2.*squaredMReal*(processID->h)*pi/Sqr(4.*pi)/
-                         (processID->k)/Sqr(s);
+    double dSigmaPart1 = 2.*squaredMReal*(processID.h)*pi/Sqr(4.*pi)/
+                         (processID.k)/Sqr(s);
 
     // contraction with O(eps) from Dminus4
     Divergence = -1;           // O(eps)
     FiniteGs = 0;
-    squaredMReal = (processID->*processID->matrixelementVirt)(
+    squaredMReal = (processID.*processID.matrixelementVirt)(
       s, T, FiniteGs, Dminus4, Divergence);
 
     Dminus4 = -2.;
-    const double squaredMRealMinus2 = (processID->*processID->matrixelementVirt)(
+    const double squaredMRealMinus2 = (processID.*processID.matrixelementVirt)(
                          s, T, FiniteGs, Dminus4, Divergence);
 
     const double dSigmaPart3 = 2.*(squaredMRealMinus2 - squaredMReal)*
-                         (processID->h)*pi/Sqr(4.*pi)/
-                         (processID->k)/Sqr(s);
+                         (processID.h)*pi/Sqr(4.*pi)/
+                         (processID.k)/Sqr(s);
 
     // contraction with O(eps^2) prefactor of loop integral
     // and with product of O(eps) prefactors of phase space and loop integral
     Divergence = -2;
     Dminus4 = 0;
-    squaredMReal = (processID->*processID->matrixelementVirt)(
+    squaredMReal = (processID.*processID.matrixelementVirt)(
       s, T, FiniteGs, Dminus4, Divergence);
 
-   double dSigmaPart4 = 2.*squaredMReal*(processID->h)*pi/Sqr(4.*pi)/
-                         (processID->k)/Sqr(s)
+   double dSigmaPart4 = 2.*squaredMReal*(processID.h)*pi/Sqr(4.*pi)/
+                         (processID.k)/Sqr(s)
                          *(Sqr(pi)/6.);
 
    const double dSigmaHad = (dSigmaPart1 + dSigmaPart3 + dSigmaPart4);
 
    double pdf_flux = 0.0;
-   for (const auto& flav : processID->flav) {
+   for (const auto& flav : processID.flav) {
       pdf_flux += flav.at(2) * pdf->xfxQ(flav.at(0), x1, mu_f) * pdf->xfxQ(flav.at(1), x2, mu_f);
    }
    pdf_flux /= (x1 * x2);

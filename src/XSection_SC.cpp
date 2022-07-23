@@ -52,14 +52,14 @@ int XSection_SC::integrand_sc(const int *ndim, const cubareal xx[],
    const double x2 = 4.*Sqr(m1)/(S*x1) + (1-4.*Sqr(m1)/(S*x1)) * xx[1];
 
    double pdf_flux = 0.0;
-   for (const auto& f : processID->flav) {
+   for (const auto& f : processID.flav) {
       pdf_flux += f.at(2) * pdf->xfxQ(f.at(0), x1, mu_f) * pdf->xfxQ(f.at(1), x2, mu_f);
    }
    pdf_flux /= x1 * x2;
 
    const double s12 = x1 * x2 * S;
    const double th = xx[2] * pi;
-   ff[0] = pdf_flux * (processID->*processID->matrixelementReal_SC)(s12, th);
+   ff[0] = pdf_flux * (processID.*processID.matrixelementReal_SC)(s12, th);
    ff[0] *= to_fb;
 
    // jakobian
@@ -84,7 +84,7 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
    double Alfas2 = Sqr(Alfas);
 
    double pdf_flux = 0.0;
-   for (const auto& inner : processID->flav) {
+   for (const auto& inner : processID.flav) {
       pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f ) * pdf->xfxQ( inner.at(1), x2, mu_f );
    }
    pdf_flux /= x1 * x2;
@@ -113,13 +113,13 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
    }
 
    const double s12 = x1 * x2 * S;
-   for (const auto& f : processID->flav) {
+   for (const auto& f : processID.flav) {
       ff[0] += f.at(2) * pdf->xfxQ(f.at(0), x1/z, mu_f)/(x1/z) * pdf->xfxQ(f.at(1), x2, mu_f)/x2
-            * ( (processID->splitting_kernel1)(z).at(0) * std::log( dC/2. * s12/Sqr(mu_f) * Sqr(1 - z)/z ) -
-           (processID->splitting_kernel1)(z).at(1)) * (processID->*processID->sigmaPartTree1)(s12);
+            * ( (processID.splitting_kernel1)(z).at(0) * std::log( dC/2. * s12/Sqr(mu_f) * Sqr(1 - z)/z ) -
+           (processID.splitting_kernel1)(z).at(1)) * (processID.*processID.sigmaPartTree1)(s12);
       ff[0] += f.at(2) * pdf->xfxQ(f.at(0), x2, mu_f)/x2 * pdf->xfxQ(f.at(1), x1/z, mu_f)/(x1/z)
-           * ( (processID->splitting_kernel2)(z).at(0) * std::log( dC/2. * s12/Sqr(mu_f) * Sqr(1 - z)/z ) -
-           (processID->splitting_kernel2)(z).at(1)) * (processID->*processID->sigmaPartTree2)(s12);
+           * ( (processID.splitting_kernel2)(z).at(0) * std::log( dC/2. * s12/Sqr(mu_f) * Sqr(1 - z)/z ) -
+           (processID.splitting_kernel2)(z).at(1)) * (processID.*processID.sigmaPartTree2)(s12);
    }
 
    const double Alfas = pdf->alphasQ(mu_r);

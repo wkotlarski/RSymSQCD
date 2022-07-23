@@ -2,14 +2,14 @@
 
 #include <string>
 
-void XSection::init(Process *processID_init, boost::property_tree::ptree const& pt_in, boost::program_options::variables_map const& vm_in) {
+void XSection::init(Process&& processID_, boost::property_tree::ptree const& pt_in, boost::program_options::variables_map const& vm_in) {
 
    pt = pt_in;
    vm = vm_in;
 
-   processID = processID_init;
-   m1 = processID->m1;
-   m2 = processID->m2;
+   processID = processID_;
+   m1 = processID.m1;
+   m2 = processID.m2;
 
    S_sqrt = pt.get<double>("collider setup.sqrt_S");
    S = Sqr(S_sqrt);

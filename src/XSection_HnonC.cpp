@@ -188,7 +188,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
       return 0;
 	}
 
-   double ME2 = (processID->*processID->matrixelementReal_HnonC)(p);
+   double ME2 = (processID.*processID.matrixelementReal_HnonC)(p);
    assert(!std::isnan(ME2) && ME2 >= 0);
    /*
    std::cout << setprecision(17);
@@ -202,13 +202,6 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    std::cout << "================================================\n";
    */
 
-   //assert( ME2 >= 0 );
-   if( ME2 < 0 || std::isnan(ME2) ) {
-//      std::cout << "Warning, negative ME2 " << ME2 << '\n';
-//      ff[0] = 0;
-//      return 0;      
-   }
-  
    // some final factors
    ME2 *= to_fb;
    ME2 /=  2 * shat;
@@ -217,7 +210,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    ME2 /= 256 * pi_sqr;
 
    double pdf_flux = 0.0;
-   for (const auto& f : processID->flav) {
+   for (const auto& f : processID.flav) {
       pdf_flux += f.at(2) * pdf->xfxQ(f.at(0), x1, mu_f) * pdf->xfxQ(f.at(1), x2, mu_f);
    }
    pdf_flux /= x1 * x2;

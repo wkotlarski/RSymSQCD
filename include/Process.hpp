@@ -92,6 +92,7 @@ class Process {
       //double matrixMRSSMSoft_gg_OOg( double, double );
 
    public:
+      Process() = default;
       Process(std::string const&, boost::property_tree::ptree const&);
 
       double (Process::* matrixelementTree)(double, double) const; // matrix element squared

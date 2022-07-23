@@ -17,8 +17,8 @@ class XSection {
       // pure virtual function (abstract function)
       virtual std::array<double, 3> integrate() = 0;
 
-      static void init (Process*, boost::property_tree::ptree const&, boost::program_options::variables_map const&);
-      static Process* processID;
+      static void init (Process&&, boost::property_tree::ptree const&, boost::program_options::variables_map const&);
+      static Process processID;
 
    protected:
       static double dS;
