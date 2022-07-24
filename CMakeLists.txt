@@ -80,6 +80,7 @@ target_include_directories(
       include
       ${EIGEN3_INCLUDE_DIR}
       ${LIBLOOPTOOLS_INCLUDE_DIR}
+      ${LIBLHAPDF_INCLUDE_DIR}
 )
 
 file (GLOB SOURCES
@@ -91,7 +92,6 @@ target_include_directories (
    PUBLIC
       include
       ${LIBCUBA_INCLUDE_DIR}
-      ${LIBLHAPDF_INCLUDE_DIR}
       ${LIBRK_INCLUDE_DIR}
       ${Boost_INCLUDE_DIRS}
       ${LIBCOLORFULL_INCLUDE_DIRS}
@@ -115,8 +115,6 @@ target_include_directories(
       include
       ${CMAKE_CURRENT_BINARY_DIR}/include # location of version.hpp
       ${LIBCUBA_INCLUDE_DIR}
-      ${LIBLOOPTOOLS_INCLUDE_DIR}
-      ${LIBLHAPDF_INCLUDE_DIR}
       ${LIBRK_INCLUDE_DIR}
       ${Boost_INCLUDE_DIRS}
       # ${LIBCOLORFULL_INCLUDE_DIRS}
