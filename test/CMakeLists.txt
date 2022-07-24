@@ -39,3 +39,28 @@ add_test(
       RSymSQCD --card ${CMAKE_SOURCE_DIR}/run_cards/pp_suLsuR/pp_suLsuR_BMP3_DR.ini --json-outputfile-name "pp_suLsuR_BMP3_DR.out" --precision-hard=4 --precision-virt=4
 )
 add_test(NAME "compare outputs for pp_suLsuR in BMP3 with DR" COMMAND ${RUBY_EXECUTABLE} "${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb" "${CMAKE_SOURCE_DIR}/test/ref_outputs/pp_suLsuR_BMP3_DR.ref" "pp_suLsuR_BMP3_DR.out")
+
+add_test(
+   NAME
+      "pp_suLsuLdagger total xsec in BMP1"
+   COMMAND
+      RSymSQCD --card ${CMAKE_SOURCE_DIR}/run_cards/pp_suLsuLdagger/pp_suLsuLdagger_BMP1.ini --json-outputfile-name "pp_suLsuLdagger_BMP1.out" --precision-hard=4 --precision-virt=4
+)
+add_test(NAME "compare outputs for pp_suLsuL* in BMP1" COMMAND ${RUBY_EXECUTABLE} "${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb" "${CMAKE_SOURCE_DIR}/test/ref_outputs/pp_suLsuLdagger_BMP1.ref" "pp_suLsuLdagger_BMP1.out")
+
+add_test(
+   NAME
+      "pp_suLsuLdagger total xsec in BMP2 with DR"
+   COMMAND
+      RSymSQCD --card ${CMAKE_SOURCE_DIR}/run_cards/pp_suLsuLdagger/pp_suLsuLdagger_BMP2_DR.ini --json-outputfile-name "pp_suLsuLdagger_BMP2_DR.out" --precision-hard=4 --precision-virt=4
+)
+add_test(NAME "compare outputs for pp_suLsuL* in BMP2 with DR" COMMAND ${RUBY_EXECUTABLE} "${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb" "${CMAKE_SOURCE_DIR}/test/ref_outputs/pp_suLsuLdagger_BMP2_DR.ref" "pp_suLsuLdagger_BMP2_DR.out")
+
+add_test(
+   NAME
+      "pp_suLsuLdagger total xsec in BMP3 with DR"
+   COMMAND
+      RSymSQCD --card ${CMAKE_SOURCE_DIR}/run_cards/pp_suLsuLdagger/pp_suLsuLdagger_BMP3_DR.ini --json-outputfile-name "pp_suLsuLdagger_BMP3_DR.out" --precision-hard=4 --precision-virt=4
+)
+add_test(NAME "compare outputs for pp_suLsuL* in BMP3 with DR" COMMAND ${RUBY_EXECUTABLE} "${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb" "${CMAKE_SOURCE_DIR}/test/ref_outputs/pp_suLsuLdagger_BMP3_DR.ref" "pp_suLsuLdagger_BMP3_DR.out")
+
