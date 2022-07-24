@@ -70,8 +70,20 @@ elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
    set(FORTRAN_LIBS "ifcore;ifport")
 endif()
 
+find_package(Eigen3 REQUIRED)
+
+add_library(process OBJECT "src/Process.cpp")
+target_compile_options(process PRIVATE -fPIC)
+target_include_directories(
+      process
+   PUBLIC
+      include
+      ${EIGEN3_INCLUDE_DIR}
+      ${LIBLOOPTOOLS_INCLUDE_DIR}
+)
+
 file (GLOB SOURCES
-   "src/Li2.cpp"  "src/Process.cpp"  "src/splitting_kernels.cpp"  "XSection*.cpp"
+   "src/Li2.cpp"  "src/splitting_kernels.cpp"  "XSection*.cpp" "colour_me.cpp"
 )
 add_library(RSymSQCDlib SHARED ${SOURCES})
 target_include_directories (
@@ -79,27 +91,27 @@ target_include_directories (
    PUBLIC
       include
       ${LIBCUBA_INCLUDE_DIR}
-      ${LIBLOOPTOOLS_INCLUDE_DIR}
       ${LIBLHAPDF_INCLUDE_DIR}
       ${LIBRK_INCLUDE_DIR}
       ${Boost_INCLUDE_DIRS}
-      # ${LIBCOLORFULL_INCLUDE_DIRS}
+      ${LIBCOLORFULL_INCLUDE_DIRS}
 )
 target_link_libraries(
-   RSymSQCDlib
-   Boost::program_options
-   ${LIBCUBA_LIBRARY}
-   ${LIBLOOPTOOLS_LIBRARY}
-   ${FORTRAN_LIBS}
-   ${LIBLHAPDF_LIBRARY}
-   # ${LIBCOLORFULL_LIBRARY}
-   Eigen3::Eigen
+      RSymSQCDlib
+   PUBLIC
+      process
+      Boost::program_options
+      ${LIBCUBA_LIBRARY}
+      ${LIBLOOPTOOLS_LIBRARY}
+      ${FORTRAN_LIBS}
+      ${LIBLHAPDF_LIBRARY}
+      ${LIBCOLORFULL_LIBRARY}
 )
 
-add_executable(RSymSQCD "src/main.cpp" "src/XSection.cpp" "src/XSection_Tree.cpp" "src/XSection_Virt.cpp" "src/XSection_SC.cpp" "src/XSection_HnonC.cpp" "src/Process.cpp")
+add_executable(RSymSQCD "src/main.cpp" "src/XSection.cpp" "src/XSection_Tree.cpp" "src/XSection_Virt.cpp" "src/XSection_SC.cpp" "src/XSection_HnonC.cpp")
 target_include_directories(
       RSymSQCD
-   PRIVATE
+   PUBLIC
       include
       ${CMAKE_CURRENT_BINARY_DIR}/include # location of version.hpp
       ${LIBCUBA_INCLUDE_DIR}
@@ -111,16 +123,10 @@ target_include_directories(
 )
 target_link_libraries(
       RSymSQCD
-   PRIVATE
+   PUBLIC
+      process
       RSymSQCDlib
       nlohmann_json::nlohmann_json
-      Boost::program_options
-      ${LIBCUBA_LIBRARY}
-      ${LIBLOOPTOOLS_LIBRARY}
-      ${FORTRAN_LIBS}
-      ${LIBLHAPDF_LIBRARY}
-      # ${LIBCOLORFULL_LIBRARY}
-      Eigen3::Eigen
 )
 
 if(ENABLE_TESTS)
