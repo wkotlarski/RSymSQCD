@@ -363,11 +363,9 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       matrixelementReal_HnonC = &Process::matrixSimplifiedHard_uubar_OOg;
       m1 = MasssigmaO;
       m2 = MasssigmaO;
-      flav.push_back({1, -1, 2});
-      flav.push_back({2, -2, 2});
-      flav.push_back({3, -3, 2});
-      flav.push_back({4, -4, 2});
-      flav.push_back({5, -5, 2});
+      for (int i : {1, 2, 3, 4, 5}) {
+         flav.push_back({i, -i, 2});
+      }
    }
    else if(processID == "Simplified,gg_OO") {
       sigmaPartTree1 = &Process::matrix_xsec_stub;
