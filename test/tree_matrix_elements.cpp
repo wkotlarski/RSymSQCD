@@ -35,7 +35,7 @@ TEST(TreeMatrixElementTest, MRSSM) {
    const double ME2_5 = (p3.*p3.Process::matrixelementTree)(1.14422471782008708e+07, -6.02139997033274081e+06);
    EXPECT_NEAR(ME2_5, 2.52442229108592073e+01, 2e-14);
    const double ME2_6 = (p3.*p3.Process::matrixelementTree)(9.31249764834811352e+06, -1.55330597453783639e+06);
-   EXPECT_NEAR(ME2_6, 2.17602531175420566e+01, 2e-14);
+   EXPECT_NEAR(ME2_6, 2.17602531175420566e+01, 3e-14);
 
    Process p4 = Process("MRSSM,ddbar_suLsuLdagger", pt);
    const double ME2_7 = (p4.*p4.Process::matrixelementTree)(4.12440390444746092e+07, -2.64010504270515181e+07);
