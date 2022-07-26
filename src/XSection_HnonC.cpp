@@ -1,16 +1,23 @@
-#include <cassert>
-#include <iostream>
-
 #include "XSection_HnonC.hpp"
 #include "constants.hpp"
-// needed to do Euler rotation
+
+#include "cuba.h"
 #include "rk/rk.hh"
 #include "rk/geom3.hh"
+
+#include <cassert>
+#include <iostream>
 
 // @todo this is absolutely necessary but I don't know why
 // without it the uu -> uLuRg gives for BMP1 57.1.. +/- 0.005
 // with it                                   57.8.. +/- 0.005
-using namespace std;
+
+namespace {
+int forwarder(const int *ndim, const double xx[],
+   const int *ncomp, double ff[], void *userdata) {
+    return static_cast<XSection_HnonC*>(userdata)->integrand(ndim, xx, ncomp, ff, nullptr);
+}
+}
 
 std::array<double, 3> XSection_HnonC::integrate() {
 
@@ -35,8 +42,8 @@ std::array<double, 3> XSection_HnonC::integrate() {
    const char* state_file = "";
    int nregions, fail;
 
-   cubareal integral[ncomp], error[ncomp], prob[ncomp];
-   llVegas( ndim, ncomp, integrand, NULL, 1,
+   double integral[ncomp], error[ncomp], prob[ncomp];
+   llVegas( ndim, ncomp, forwarder, this, 1,
       accuracy_rel, accuracy_abs, flags, seed,
       neval_min, neval_max, nstart, nincrease, nbatch,
       gridno, state_file, NULL,
@@ -48,8 +55,8 @@ std::array<double, 3> XSection_HnonC::integrate() {
    return result_finite;
 }
 
-int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
-   const int *ncomp, cubareal ff[], void *userdata) {
+int XSection_HnonC::integrand(const int *ndim, const double xx[],
+   const int *ncomp, double ff[], void *userdata) {
 
    double m_sqr = Sqr(m1);
 
@@ -168,13 +175,6 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
       (pow(p[2][0], 2) - pow(p[2][1], 2) - pow(p[2][2], 2) - pow(p[2][3], 2))/(m1 * m1) - 1) < 1e-10
          && p[2][0] >= m1
    );
-   if( abs(
-      (pow(p[3][0], 2) - pow(p[3][1], 2) - pow(p[3][2], 2) - pow(p[3][3], 2))/(m2 * m2) - 1) > 1e-10
-      || p[3][0] < m2 ) {
-      std::cout << "Error in kinematics. " <<
-              abs(
-      (pow(p[3][0], 2) - pow(p[3][1], 2) - pow(p[3][2], 2) - pow(p[3][3], 2))/(m2 * m2) - 1) << " " << p[3][0] << '\n';
-   }
 
    // write parton momentum to momentum matrix p
    for(int i = 0; i < 4; ++i) p[4][i] = p_temp_2[i];
@@ -188,7 +188,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
       return 0;
 	}
 
-   double ME2 = (processID.*processID.matrixelementReal_HnonC)(p);
+   double ME2 = f(pdf->alphasQ(mu_r), p);
    assert(!std::isnan(ME2) && ME2 >= 0);
    /*
    std::cout << setprecision(17);
@@ -206,11 +206,11 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
    ME2 *= to_fb;
    ME2 /=  2 * shat;
 
-   ME2 *= sin( xx[2] * pi ) * 4;
+   ME2 *= 4.*sinpix2;
    ME2 /= 256 * pi_sqr;
 
    double pdf_flux = 0.0;
-   for (const auto& f : processID.flav) {
+   for (const auto& f : flav_) {
       pdf_flux += f.at(2) * pdf->xfxQ(f.at(0), x1, mu_f) * pdf->xfxQ(f.at(1), x2, mu_f);
    }
    pdf_flux /= x1 * x2;
@@ -230,7 +230,7 @@ int XSection_HnonC::integrand(const int *ndim, const cubareal xx[],
      pow((-1 + xx2)*(S*xx0*xx1*(-1 + dS + xx2 - dS*xx2) + 
          4*(-1 + xx0*xx1 + dS*(-1 + xx0*xx1)*(-1 + xx2) - xx0*xx1*xx2)*Sqr(m1))*
        (-4*dS*Sqr(m1) + (-1 + dS)*xx0*xx1*(-S + 4*Sqr(m1))),0.5))/4.;
-   
+
    ff[0] = ME2 * std::abs(jacobian);
 
 	return 0;

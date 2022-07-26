@@ -1,5 +1,15 @@
 #include "XSection_Tree.hpp"
 
+#include "cuba.h"
+
+#include <functional>
+
+namespace {
+int forwarder(const int *ndim, const double xx[],
+   const int *ncomp, double ff[], void *userdata) {
+    return static_cast<XSection_Tree*>(userdata)->integrand(ndim, xx, ncomp, ff, nullptr);
+}
+}
 /*
  * E1 = sqrtS/2 (1 + (m1^2 - m2^2)/s)
  * E2 = sqrtS/2 (1 + (m2^2 - m1^2)/s)
@@ -7,44 +17,42 @@
  * p  = sqrtS/2 b
  *
  */
-int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
-    const int *ncomp, cubareal ff[], void *userdata) {
+int XSection_Tree::integrand(const int *ndim, const double xx[],
+    const int *ncomp, double ff[], void *userdata) {
 
-   double x1min = 4. * pow(processID.m1,2)/S;
-   double xmax = 1.;
-   double x1 = x1min + (xmax - x1min ) * xx[0];
-   double x2min = 4. * pow(processID.m1,2)/(S*x1);
-   double x2 = x2min + (xmax - x2min) * xx[1];
-   double s = S * x1 * x2;     //partonic 
+   const double x1min = 4.*Sqr(m1)/S;
+   static constexpr double xmax = 1.;
+   const double x1 = x1min + (xmax - x1min ) * xx[0];
+   const double x2min = 4.*Sqr(m1)/(S*x1);
+   const double x2 = x2min + (xmax - x2min) * xx[1];
+   const double s = S * x1 * x2;     //partonic
 
    double pdf_flux = 0.0;
-   for (const auto& inner : processID.flav) {
-      pdf_flux += inner.at(2) * pdf->xfxQ( inner.at(0), x1, mu_f ) * pdf->xfxQ( inner.at(1), x2, mu_f );
+   for (const auto& inner : flav_) {
+      pdf_flux += inner.at(2) * pdf->xfxQ(inner.at(0), x1, mu_f) * pdf->xfxQ(inner.at(1), x2, mu_f);
    }
    pdf_flux /= (x1 * x2);
-    
+
+   
+   const double alphas = pdf->alphasQ(muR);
    /* integration of |M^B|^2 */
-   if( processID.partonic == false ) {		
-      double Tmin = pow( processID.m1, 2 ) - s/2. - sqrt( pow(s, 2)/4 -
-                      pow( processID.m1, 2 )*s);
-      double Tmax = pow( processID.m1, 2 ) - s/2. + sqrt( pow(s, 2)/4. -
-                      pow( processID.m1, 2 )*s);
-      double T = xx[2]*(Tmax-Tmin) + Tmin;
-      double jacobian = (Tmax-Tmin)*(xmax-x1min)*(xmax-x2min);
-      double squaredM = (processID.*processID.matrixelementTree)(
-                           s, T);
-      double dSigmaPart = squaredM*(processID.h)*M_PI/(pow(4.*pi,2))/
-                         (processID.k)/(pow(s,2));
-           
-      ff[0] = dSigmaPart * pdf_flux * jacobian * to_fb; 
+   if (!processID.partonic) {
+      const double Tmin = Sqr(m1) - 0.5*s - std::sqrt(0.25*Sqr(s) - Sqr(m1)*s);
+      const double Tmax = Sqr(m1) - 0.5*s + std::sqrt(0.25*Sqr(s) - Sqr(m1)*s);
+      const double T = Tmin + (Tmax-Tmin)*xx[2];
+      const double jacobian = (Tmax-Tmin)*(xmax-x1min)*(xmax-x2min);
+      const double squaredM = f(alphas, s, T);
+      double dSigmaPart = squaredM/(16.*pi*Sqr(s));
+
+      ff[0] = dSigmaPart * pdf_flux * jacobian * to_fb;
    }
    /* integration of partonic cross section */
-   else {    
-      ff[0] = (processID.*processID.sigmaPartTree1)(s) * to_fb * pdf_flux *
-         pow(-4.*pow(m1, 2) + S, 2)*xx[0] / 
+   else {
+      ff[0] = (processID.*processID.sigmaPartTree1)(alphas, s) * to_fb * pdf_flux *
+         pow(-4.*pow(m1, 2) + S, 2)*xx[0] /
          (S*(-4*pow(m1, 2)*(-1 + xx[0]) + S*xx[0]));
-   }   
-     
+   }
+
    return 0;
 }
 
@@ -60,9 +68,9 @@ int XSection_Tree::integrand(const int *ndim, const cubareal xx[],
    constexpr int last = 4;
    constexpr int key = 0;
    int nregions, neval, fail;
-   cubareal integral[ncomp], error[ncomp], prob[ncomp];
+   double integral[ncomp], error[ncomp], prob[ncomp];
 
-   Cuhre( ndim, ncomp, integrand, NULL, nvec,
+   Cuhre( ndim, ncomp, forwarder, this, nvec,
       accuracy_rel, accuracy_abs, verbose | last,
       eval_min, eval_max, key, NULL, NULL,
       &nregions, &neval, &fail, integral, error, prob );

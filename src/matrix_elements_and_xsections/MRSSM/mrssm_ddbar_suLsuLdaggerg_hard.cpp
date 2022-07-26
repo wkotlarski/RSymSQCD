@@ -1,5 +1,4 @@
-double Process::matrixMRSSMHard_ddbar_suLsuLdaggerg(std::array<std::array<double, 4>, 5> const& p) const {
-   double Alfas = pdf->alphasQ(mu_r);
+double Process::matrixMRSSMHard_ddbar_suLsuLdaggerg(double Alfas, std::array<std::array<double, 4>, 5> const& p) const {
    double Alfas2 = Sqr(Alfas);
    double k12 = p[0][0]*p[1][0]-p[0][1]*p[1][1]-p[0][2]*p[1][2]-p[0][3]*p[1][3];
    double k35 = p[2][0]*p[4][0]-p[2][1]*p[4][1]-p[2][2]*p[4][2]-p[2][3]*p[4][3];

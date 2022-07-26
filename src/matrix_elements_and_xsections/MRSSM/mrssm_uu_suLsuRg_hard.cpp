@@ -1,5 +1,4 @@
-double Process::matrixMRSSMHard_uu_suLsuRg(std::array<std::array<double, 4>, 5> const& p) const {
-   const double Alfas = pdf->alphasQ( mu_r );
+double Process::matrixMRSSMHard_uu_suLsuRg(double Alfas, std::array<std::array<double, 4>, 5> const& p) const {
    const double Alfas2 = pow(Alfas, 2);
    const double k12 = p[0][0]*p[1][0]-p[0][1]*p[1][1]-p[0][2]*p[1][2]-p[0][3]*p[1][3];
    const double k35 = p[2][0]*p[4][0]-p[2][1]*p[4][1]-p[2][2]*p[4][2]-p[2][3]*p[4][3];
@@ -7,8 +6,8 @@ double Process::matrixMRSSMHard_uu_suLsuRg(std::array<std::array<double, 4>, 5> 
    const double k13 = p[0][0]*p[2][0]-p[0][1]*p[2][1]-p[0][2]*p[2][2]-p[0][3]*p[2][3];
    const double k14 = p[0][0]*p[3][0]-p[0][1]*p[3][1]-p[0][2]*p[3][2]-p[0][3]*p[3][3];
    const double S12 = 2.*k12;
-   const double sqrm1 = Sqr(m1);
-   const double sqrm2 = Sqr(m2);
+   const double sqrm1 = Sqr(MassSq);
+   const double sqrm2 = Sqr(MassSq);
    const double S35 = sqrm1 + 2*k35;
    const double S45 = sqrm2 + 2*k45;
    const double T = sqrm1 - 2.*k13;

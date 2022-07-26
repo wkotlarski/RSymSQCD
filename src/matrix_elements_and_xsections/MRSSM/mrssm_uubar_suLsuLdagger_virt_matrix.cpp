@@ -1,7 +1,5 @@
-double Process::matrixMRSSMVirt_uubar_suLsuLdagger(double S, double T, 
-   const double FiniteGs, const double Dminus4, int divergence) { // agrees with Philip    
-	const double alphaS = pdf->alphasQ(mu_r);
-   const double mu = mu_r;
+double Process::matrixMRSSMVirt_uubar_suLsuLdagger(double alphaS, double S, double T, 
+   const double FiniteGs, const double Dminus4, int divergence, double mu) { // agrees with Philip    
    const double U = Sqr(m1) + Sqr(m2) - S - T;  
 	setmudim(Sqr(mu));
 	setlambda(divergence);      

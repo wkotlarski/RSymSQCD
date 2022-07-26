@@ -1,11 +1,9 @@
-double Process::matrixMSSMVirt_uu_suLsuR(double S, double T, 
-   const double FiniteGs, const double Dminus4, int divergence) {   
-	ltini(); // for LoopTools
-	setmudim(pow(mu_r,2));
+double Process::matrixMSSMVirt_uu_suLsuR(double alphaS, double S, double T, 
+   const double FiniteGs, const double Dminus4, int divergence, double mu) {   
+	//ltini(); // for LoopTools
+	setmudim(pow(mu,2));
 	setlambda(divergence);   
-    double alphaS = pdf->alphasQ( mu_r );
-    double mu = mu_r;
-    double U = pow(m1, 2) + pow(m2, 2) - S - T;  
+    double U = pow(MassSq, 2) + pow(MassSq, 2) - S - T;  
 	int Divergence;    // UV divergence from gauge coupling
 	if(divergence == 0 || divergence == -2) {		    
 	    Divergence = 0;     

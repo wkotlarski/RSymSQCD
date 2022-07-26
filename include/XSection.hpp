@@ -12,27 +12,21 @@
 // every class with at least one pure virtual function
 // is an abstract base class
 class XSection {
+public:
+   void init (Process const&, boost::property_tree::ptree const&, boost::program_options::variables_map const&);
+   Process processID;
 
-   public:
-      // pure virtual function (abstract function)
-      virtual std::array<double, 3> integrate() = 0;
+protected:
+   double dS;
+   double dC;
+   boost::property_tree::ptree pt;
+   boost::program_options::variables_map vm;
+   double S_sqrt;
+   double S;
+   double mu_r;
+   double mu_f;
 
-      static void init (Process&&, boost::property_tree::ptree const&, boost::program_options::variables_map const&);
-      static Process processID;
-
-   protected:
-      static double dS;
-      static double dC;
-      static boost::property_tree::ptree pt;
-      static boost::program_options::variables_map vm;
-      static double S_sqrt;
-      static double S;
-      static double mu_r;
-      static double mu_f;
-      static double m1;
-      static double m2;
-
-      static const LHAPDF::PDF* pdf;
+   const LHAPDF::PDF* pdf;
 };
 
 #endif /* XSECTION_H_ */

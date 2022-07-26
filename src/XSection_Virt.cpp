@@ -1,61 +1,61 @@
 #include "XSection_Virt.hpp"
 
 #include "clooptools.h"
+#include "cuba.h"
 
-int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
-   const int *ncomp, cubareal ff[], void *userdata) {
+namespace {
+int forwarder(const int *ndim, const double xx[],
+   const int *ncomp, double ff[], void *userdata) {
+    return static_cast<XSection_Virt*>(userdata)->integrand(ndim, xx, ncomp, ff, nullptr);
+}
+}
 
-    const double x1min = 4. * pow( m1, 2 )/S;
+int XSection_Virt::integrand(const int *ndim, const double xx[],
+   const int *ncomp, double ff[], void *userdata) {
+
+    const double x1min = 4.*Sqr(m1)/S;
     static constexpr double xmax = 1.;
     const double x1 = x1min + (xmax-x1min)*xx[1];
     const double x2min = 4.*Sqr(m1)/(S*x1);
     const double x2 = x2min + (xmax-x2min)*xx[2];
     const double s = S*x1*x2;     //partonic
-    const double Tmin = Sqr(m1) - s/2. - std::sqrt(Sqr(s)/4. - Sqr(m1)*s);
-    const double Tmax = Sqr(m1) - s/2. + std::sqrt(Sqr(s)/4. - Sqr(m1)*s);
+    const double Tmin = Sqr(m1) - s/2. - std::sqrt(0.25*Sqr(s) - Sqr(m1)*s);
+    const double Tmax = Sqr(m1) - s/2. + std::sqrt(0.25*Sqr(s) - Sqr(m1)*s);
     const double T = Tmin + (Tmax-Tmin)*xx[0];
     const double jacobian = (Tmax-Tmin)*(1.-x1min)*(1.-x2min);
 
     int FiniteGs = 1;
     double Dminus4 = 0;
     int Divergence = 0;     // O(eps)
+    const double alphas = pdf->alphasQ(muR);
 
-    double squaredMReal = (processID.*processID.matrixelementVirt)(
-      s, T, FiniteGs, Dminus4, Divergence);
+    double squaredMReal = f(alphas, s, T, FiniteGs, Dminus4, Divergence, muR);
 
-    double dSigmaPart1 = 2.*squaredMReal*(processID.h)*pi/Sqr(4.*pi)/
-                         (processID.k)/Sqr(s);
+    double dSigmaPart1 = squaredMReal/(8.*pi*Sqr(s));
 
     // contraction with O(eps) from Dminus4
     Divergence = -1;           // O(eps)
     FiniteGs = 0;
-    squaredMReal = (processID.*processID.matrixelementVirt)(
-      s, T, FiniteGs, Dminus4, Divergence);
+    squaredMReal = f(alphas, s, T, FiniteGs, Dminus4, Divergence, muR);
 
     Dminus4 = -2.;
-    const double squaredMRealMinus2 = (processID.*processID.matrixelementVirt)(
-                         s, T, FiniteGs, Dminus4, Divergence);
+    const double squaredMRealMinus2 = f(alphas, s, T, FiniteGs, Dminus4, Divergence, muR);
 
-    const double dSigmaPart3 = 2.*(squaredMRealMinus2 - squaredMReal)*
-                         (processID.h)*pi/Sqr(4.*pi)/
-                         (processID.k)/Sqr(s);
+    const double dSigmaPart3 = (squaredMRealMinus2 - squaredMReal)/(8.*pi*Sqr(s));
 
     // contraction with O(eps^2) prefactor of loop integral
     // and with product of O(eps) prefactors of phase space and loop integral
     Divergence = -2;
     Dminus4 = 0;
-    squaredMReal = (processID.*processID.matrixelementVirt)(
-      s, T, FiniteGs, Dminus4, Divergence);
+    squaredMReal = f(alphas, s, T, FiniteGs, Dminus4, Divergence, muR);
 
-   double dSigmaPart4 = 2.*squaredMReal*(processID.h)*pi/Sqr(4.*pi)/
-                         (processID.k)/Sqr(s)
-                         *(Sqr(pi)/6.);
+   double dSigmaPart4 = squaredMReal*pi/(48.*Sqr(s));
 
    const double dSigmaHad = (dSigmaPart1 + dSigmaPart3 + dSigmaPart4);
 
    double pdf_flux = 0.0;
-   for (const auto& flav : processID.flav) {
-      pdf_flux += flav.at(2) * pdf->xfxQ(flav.at(0), x1, mu_f) * pdf->xfxQ(flav.at(1), x2, mu_f);
+   for (const auto& fv : flav_) {
+      pdf_flux += fv.at(2) * pdf->xfxQ(fv.at(0), x1, mu_f) * pdf->xfxQ(fv.at(1), x2, mu_f);
    }
    pdf_flux /= (x1 * x2);
 
@@ -73,7 +73,7 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
    constexpr int eval_max = 1000000;
    const int verbose = vm["verbosity-virt"].as<int>();        // adjust output 0 ... 3
    int nregions, neval, fail;
-   cubareal integral[ncomp], error[ncomp], prob[ncomp];
+   double integral[ncomp], error[ncomp], prob[ncomp];
    constexpr int last = 4;
    constexpr int key = 0;
    // Divonne specific
@@ -102,7 +102,7 @@ int XSection_Virt::integrand(const int *ndim, const cubareal xx[],
     *    It's not clear if this is just a sign of numerical instability
     *    of LoopTools or something more serious.
     */
-   Divonne(ndim, ncomp, integrand, NULL, nvec,
+   Divonne(ndim, ncomp, forwarder, this, nvec,
         prec_virt, accuracy_abs, verbose, seed,
         eval_min, eval_max, key1, key2, key3, maxpass,
         border, maxchisq, mindeviation,

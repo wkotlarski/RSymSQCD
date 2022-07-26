@@ -5,6 +5,7 @@
 #include "clooptools.h"
 
 #include <cmath>
+#include <iostream>
 
 Process::Process(std::string const& processID, boost::property_tree::ptree const& pt) {
 
@@ -13,13 +14,9 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
    MasssigmaO = pt.get<double>("masses.pseudoscalar_sgluon");
    MassphiO  = sqrt( pow(MasssigmaO,2) + 4.0 * pow(MassGlu, 2) );
    MassSquarks = pt.get<double>("masses.squarks");
-   mu_r = pt.get<double>("collider setup.mu_r");
-   mu_f = pt.get<double>("collider setup.mu_f");
-   dS = pt.get<double>("technical parameters.dS");
    double eta_sign = pt.get<double>("technical parameters.eta_sign");
    double delta = pt.get<double>("technical parameters.delta");
    WidthGlu = pt.get<double>("technical parameters.WidthOverMass") * MassGlu;
-   pdf = LHAPDF::mkPDF( pt.get<std::string>("collider setup.pdf") , 0);
 
    // choose a gage vector \eta for DR matrix elements
    eta = {std::sqrt(1.+Sqr(delta)), 0., delta, eta_sign};
@@ -31,19 +28,18 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
 /* -------------------- Squark-squark production---------------------------------*/
 
    if(processID == "MRSSM,uu_suLsuR") {
-      matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM
-      matrixelementVirt = &Process::matrixMRSSMVirt_uu_suLsuR;
-      matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
+      //matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR; // same as in MSSM
+      //matrixelementVirt = &Process::matrixMRSSMVirt_uu_suLsuR;
+      //matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
       sigmaPartTree1 = &Process::sigmaMRSSMTree_uu_suLsuR;
       splitting_kernel1 = &Pqq;
       sigmaPartTree2 = &Process::sigmaMRSSMTree_uu_suLsuR;
       splitting_kernel2 = &Pqq;
-      matrixelementReal_HnonC = &Process::matrixMRSSMHard_uu_suLsuRg;
-      m1 = MassSquarks;
-      m2 = MassSquarks;
-      flav.push_back({2, 2, 1});
-      k = 2.*2*3*3;
-      h = 2.*2;
+      //m1 = MassSquarks;
+      //m2 = MassSquarks;
+      //flav.push_back({2, 2, 1});
+      //k = 2.*2*3*3;
+      //h = 2.*2;
    }
    else if(processID == "MRSSM,ud_suLsdR") { // same as in MSSM
       matrixelementTree = &Process::matrixMSSMTree_ud_suLsdR;
@@ -51,7 +47,7 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       m1 = MassSquarks;
       m2 = MassSquarks;
       // result doubled up, as there is ud and du initial state
-      flav.push_back({2, 1, 2});
+      // flav.push_back({2, 1, 2});
       k = 2.*2*3*3;
       h = 2.*2;
    }
@@ -63,12 +59,12 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       splitting_kernel1 = &Pqq;
       sigmaPartTree2 = &Process::sigmaMRSSMTree_uu_suLsuR;
       splitting_kernel2 = &Pqq;
-      matrixelementReal_HnonC = &Process::matrixMRSSMHard_uu_suLsuRg;
+      // matrixelementReal_HnonC = &Process::matrixMRSSMHard_uu_suLsuRg;
       m1 = MassSquarks;
       m2 = MassSquarks;
       for (int i : {1, 2, 3, 4, 5}) {
-         flav.push_back({ i,  i, 1});
-         flav.push_back({-i, -i, 1});
+         // flav.push_back({ i,  i, 1});
+         // flav.push_back({-i, -i, 1});
       }
       k = 2.*2*3*3;
       h = 2.*2;
@@ -81,15 +77,15 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       splitting_kernel1 = &Pqq;
       sigmaPartTree2 = &Process::sigmaMRSSMTree_uu_suLsuR;
       splitting_kernel2 = &Pqq;
-      matrixelementReal_HnonC = &Process::matrixMRSSMHard_uu_suLsuRg;
+      // matrixelementReal_HnonC = &Process::matrixMRSSMHard_uu_suLsuRg;
       m1 = MassSquarks;
       m2 = MassSquarks;
       // result doubled up, as there is ud and du initial state
       for (int i : {1, 2, 3, 4, 5}) {
          for (int j : {1, 2, 3, 4, 5}) {
             if (j <= i) continue;
-            flav.push_back({ i,  j, 2});
-            flav.push_back({-i, -j, 2});
+            // flav.push_back({ i,  j, 2});
+            // flav.push_back({-i, -j, 2});
          }
       }
       k = 2.*2*3*3;
@@ -101,7 +97,7 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       matrixelementVirt = &Process::matrixMSSMVirt_uu_suLsuR;
       //matrixelementReal_SC = &Process::matrixMRSSMSoft_uu_suLsuRg;
       matrixelementReal_SC = &Process::matrix_soft_stub;
-      flav.push_back({2, 2, 1});
+      // flav.push_back({2, 2, 1});
       m1 = MassSquarks;
       m2 = MassSquarks;
       k = 2.*2*3*3;
@@ -144,10 +140,10 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       matrixelementReal_SC = &Process::matrixMRSSMSoft_uubar_suLsuLdaggerg;
       splitting_kernel1 = &Pqq;
       splitting_kernel2 = &Pqq;
-      matrixelementReal_HnonC = &Process::matrixMRSSMHard_uubar_suLsuLdaggerg;
+      // matrixelementReal_HnonC = &Process::matrixMRSSMHard_uubar_suLsuLdaggerg;
       m1 = MassSquarks;
       m2 = MassSquarks;
-      flav.push_back({2, -2, 2});
+      // flav.push_back({2, -2, 2});
       k = 2.*2*3*3;
       h = 2.*2;
    }
@@ -159,13 +155,13 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       matrixelementReal_SC = &Process::matrixMRSSMSoft_ddbar_suLsuLdaggerg;
       splitting_kernel1 = &Pqq;
       splitting_kernel2 = &Pqq;
-      matrixelementReal_HnonC = &Process::matrixMRSSMHard_ddbar_suLsuLdaggerg;
+      // matrixelementReal_HnonC = &Process::matrixMRSSMHard_ddbar_suLsuLdaggerg;
       m1 = MassSquarks;
       m2 = MassSquarks;
-      flav.push_back({1, -1, 2});
-      flav.push_back({3, -3, 2});
-      flav.push_back({4, -4, 2});
-      flav.push_back({5, -5, 2});
+      // flav.push_back({1, -1, 2});
+      // flav.push_back({3, -3, 2});
+      // flav.push_back({4, -4, 2});
+      // flav.push_back({5, -5, 2});
       k = 2.*2*3*3;
       h = 2.*2;
    }
@@ -184,10 +180,10 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       matrixelementReal_SC = &Process::matrixMRSSMSoft_gg_suLsuLdaggerg;
       splitting_kernel1 = &Pgg;
       splitting_kernel2 = &Pgg;
-      matrixelementReal_HnonC = &Process::matrixMRSSMHard_gg_suLsuLdaggerg;
+      // matrixelementReal_HnonC = &Process::matrixMRSSMHard_gg_suLsuLdaggerg;
       m1 = MassSquarks;
       m2 = MassSquarks;
-      flav.push_back({21, 21, 1});
+      // flav.push_back({21, 21, 1});
       k = 2.*2*8*8;
       h = 1.;
    }
@@ -199,11 +195,11 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       splitting_kernel2 = &Pgq;
 
       matrixelementReal_SC = &Process::matrix_soft_stub;
-      matrixelementReal_HnonC = &Process::matrixMRSSMHard_gd_suLsuLdaggerd;
+      // matrixelementReal_HnonC = &Process::matrixMRSSMHard_gd_suLsuLdaggerd;
 
       m1 = MassSquarks;
       m2 = MassSquarks;
-      for( int el : { 1, -1, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2});
+      // for( int el : { 1, -1, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2});
    }
    else if(processID == "MRSSM,gu_suLsuLdagger") {
       sigmaPartTree1 = &Process::sigmaMRSSMTree_uubar_suLsuLdagger;
@@ -218,23 +214,23 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       // if gluino cannot be on-shell use full real ME
       if( pt.get<double>("collider setup.sqrt_S") < m1 +  MassGlu ||
           MassGlu < m2 ) {
-         matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru;
+         // matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru;
          std::cout << "\nINFO: Not using any subtraction for the gu_suLsuLdagger channel.\n";
       }
       else {
          // otherwise, if WidthGlu < 0 use DR
          if (WidthGlu < 0) {
-            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DR;//_wEta;
+            // matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DR;//_wEta;
             std::cout << "\nINFO: Using diagram removal for the gu_suLsuLdagger channel.\n";
          }
          // else use DS
          else {
             std::cout << "\nINFO: Using diagram subtraction for the gu_suLsuLdagger channel with Γ/M = "
                       << pt.get<double>("technical parameters.WidthOverMass") << ".\n";
-            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DS;
+            // matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuLdaggeru_DS;
          }
       }
-      for( int el : { 2, -2 }) flav.push_back({21, el, 2});
+      // for( int el : { 2, -2 }) flav.push_back({21, el, 2});
    }
    else if(processID == "MRSSM,gu_suLsuR") {
       sigmaPartTree1 = &Process::sigmaMRSSMTree_uu_suLsuR;
@@ -243,30 +239,30 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       sigmaPartTree2 = &Process::matrix_xsec_stub;
       splitting_kernel2 = &Pgq;
 
-      matrixelementReal_SC = &Process::matrix_soft_stub;
+      // matrixelementReal_SC = &Process::matrix_soft_stub;
 
       m1 = MassSquarks;
       m2 = MassSquarks;
       // if gluino cannot be on-shell use full real ME
       if( pt.get<double>("collider setup.sqrt_S") < std::min(m1,m2) +  MassGlu ||
           MassGlu < m2 ) {
-         matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar;
+         // matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar;
          std::cout << "\nINFO: Not using any subtraction for the gu_suLsuRubar channel.\n";
       }
       else {
          // otherwise, if WidthGlu < 0 use DR
          if( WidthGlu < 0) {
-            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep;
+            // matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep;
             std::cout << "\nINFO: Using diagram removal for the gu_suLsuRubar channel.\n";
          }
          // else use DS
          else {
             std::cout << "\nINFO: Using diagram subtraction for the gu_suLsuRubar channel with Γ/M = "
                       << pt.get<double>("technical parameters.WidthOverMass") << ".\n";
-            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DS;
+            // matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DS;
          }
       }
-      flav.push_back({21, 2, 2});
+      //flav.push_back({21, 2, 2});
    }
    else if(processID == "MRSSM,gd_sdLsdR") {
       sigmaPartTree1 = &Process::sigmaMRSSMTree_uu_suLsuR;
@@ -282,30 +278,30 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
       // if gluino cannot be on-shell use full real ME
       if( pt.get<double>("collider setup.sqrt_S") < std::min(m1,m2) +  MassGlu ||
           MassGlu < m2 ) {
-         matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar;
+         // matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar;
          std::cout << "\nINFO: Not using any subtraction for the gu_suLsuRubar channel.\n";
       }
       else {
          // otherwise, if WidthGlu < 0 use DR
          if( WidthGlu < 0) {
-            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep;
+            // matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep;
             std::cout << "\nINFO: Using diagram removal for the gu_suLsuRubar channel.\n";
          }
          // else use DS
          else {
             std::cout << "\nINFO: Using diagram subtraction for the gu_suLsuRubar channel with Γ/M = "
                       << pt.get<double>("technical parameters.WidthOverMass") << ".\n";
-            matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DS;
+            // matrixelementReal_HnonC = &Process::matrixMRSSMHard_gu_suLsuRubar_DS;
          }
       }
       for (int el : {1, 2, 3, 4, 5}) {
-         flav.push_back({21, el, 20});
+         // flav.push_back({21, el, 20});
       }
    }
    else if(processID == "MSSM,uubar_suLsuLdagger") {
       matrixelementTree = &Process::matrixMSSMTree_uu_suLsuR;  // matrix elements are identical
       //std::vector<int> row {2, -2};
-      flav.push_back({2, -2, 2});
+      // flav.push_back({2, -2, 2});
       m1 = MassSquarks;
       m2 = MassSquarks;
       k = 2.*2*3*3;
@@ -313,7 +309,7 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
    }
    else if(processID == "MSSM,uubar_suLsuRdagger") {
       matrixelementTree = &Process::matrixMSSMTree_uubar_suLsuRdagger;
-      flav.push_back({2, -2, 2} );
+      // flav.push_back({2, -2, 2} );
       m1 = MassSquarks;
       m2 = MassSquarks;
       k = 2.*2*3*3;
@@ -355,27 +351,27 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
    else if(processID == "Simplified,uubar_OO") {
       matrixelementTree = &Process::matrix_tree_stub;
       matrixelementVirt = &Process::matrix_virt_stub;
-      matrixelementReal_SC = &Process::matrixSimplifiedSoft_uubar_OOg;
+      // matrixelementReal_SC = &Process::matrixSimplifiedSoft_uubar_OOg;
       sigmaPartTree1 = &Process::sigmaMRSSMTree_uubar_OO;
       splitting_kernel1 = &Pgg;
       sigmaPartTree2 = &Process::sigmaMRSSMTree_uubar_OO;
       splitting_kernel2 = &Pgg;
-      matrixelementReal_HnonC = &Process::matrixSimplifiedHard_uubar_OOg;
+      // matrixelementReal_HnonC = &Process::matrixSimplifiedHard_uubar_OOg;
       m1 = MasssigmaO;
       m2 = MasssigmaO;
       for (int i : {1, 2, 3, 4, 5}) {
-         flav.push_back({i, -i, 2});
+         // flav.push_back({i, -i, 2});
       }
    }
    else if(processID == "Simplified,gg_OO") {
       sigmaPartTree1 = &Process::matrix_xsec_stub;
       matrixelementTree = &Process::matrix_tree_stub;
       matrixelementVirt = &Process::matrix_virt_stub;
-      matrixelementReal_SC = &Process::matrixSimplifiedSoft_gg_OOg;
-      matrixelementReal_HnonC = &Process::matrixSimplifiedHard_gg_OOg;
+      // matrixelementReal_SC = &Process::matrixSimplifiedSoft_gg_OOg;
+      // matrixelementReal_HnonC = &Process::matrixSimplifiedHard_gg_OOg;
       m1 = MasssigmaO;
       m2 = MasssigmaO;
-      flav.push_back({21, 21, 1});
+      // flav.push_back({21, 21, 1});
    }
    else {
       std::cout << "Error! Subprocess " << processID << " not implemented.\n";
@@ -458,8 +454,8 @@ Process::Process(std::string const& processID, boost::property_tree::ptree const
 #include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuRubar_hard-DR_wEtaDep.cpp"
 #include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuRubar_hard-DS.cpp"
 
-#include "matrix_elements_and_xsections/simplified_uubar_OOg_soft.cpp"
-#include "matrix_elements_and_xsections/simplified_uubar_OOg_hard.cpp"
+// #include "matrix_elements_and_xsections/simplified_uubar_OOg_soft.cpp"
+// #include "matrix_elements_and_xsections/simplified_uubar_OOg_hard.cpp"
 
-#include "matrix_elements_and_xsections/simplified_gg_OOg_soft.cpp"
-#include "matrix_elements_and_xsections/simplified_gg_OOg_hard.cpp"
+// #include "matrix_elements_and_xsections/simplified_gg_OOg_soft.cpp"
+// #include "matrix_elements_and_xsections/simplified_gg_OOg_hard.cpp"

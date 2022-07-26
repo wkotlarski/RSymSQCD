@@ -7,16 +7,16 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/program_options.hpp>
-#include "LHAPDF/Info.h"
-#include "LHAPDF/Config.h"
 #include <nlohmann/json.hpp>
 
 #include <chrono>
+#include <functional>
 
 using namespace std;
 using namespace std::chrono_literals;
 namespace po = boost::program_options;
 using json = nlohmann::json;
+using namespace std::placeholders;
 
 /*
  *    XSection_* return results in the form xsection, its error, erros's pvalue
@@ -36,20 +36,6 @@ void xsec_to_json(json& j, std::string const& str, array<double, 3> const& tree,
    };
 }
 
-// why do I have to write this?
-// why isn't init() enough?
-Process XSection::processID;
-double XSection::mu_r;
-double XSection::mu_f;
-double XSection::m1;
-double XSection::m2;
-double XSection::S;
-double XSection::S_sqrt;
-double XSection::dC;
-double XSection::dS;
-boost::property_tree::ptree XSection::pt;
-boost::program_options::variables_map XSection::vm;
-const LHAPDF::PDF* XSection::pdf;
 void print( string str, array<double,3> tree, array<double,3> virt, array<double,3> soft, array<double,3> hard) {
    cout << "\nResults for subprocess " << str << '\n';
    cout << scientific;
@@ -92,11 +78,6 @@ void print( string str, array<double,3> tree) {
 
 int main(int argc, char* argv[]) {
 
-   // disable printint LHAPDF header since it gets printed twice
-   LHAPDF::Info& cfg = LHAPDF::getConfig();
-   cfg.set_entry("Verbosity", 0);
-
-   //
    boost::program_options::positional_options_description p;
    p.add("card", -1);
 
@@ -254,6 +235,7 @@ int main(int argc, char* argv[]) {
    auto start = chrono::steady_clock::now();
 
    if( pt.get<string>("process.order") == "LO" ) {
+      /*
       switch(model) {
          case Model::MRSSM:
             switch(channel) {
@@ -324,10 +306,12 @@ int main(int argc, char* argv[]) {
             }
          break;
       }
+      */
    }
    else if( pt.get<string>("process.order") == "NLO" ) {
 	   switch(model) {
-         case Model::MRSSM:
+         case Model::MRSSM: {
+            Process mrssm("MRSSM,uu_suLsuR", pt);
             switch(channel) {
                case Channel::pp_OsOs:
                {
@@ -336,15 +320,42 @@ int main(int argc, char* argv[]) {
 			      }
                case Channel::pp_suLsuR:
                {
-                  XSection_Tree tree;
-                  XSection_Virt virt;
-                  XSection_SC sc;
-                  XSection_HnonC hc;
-
                   // uu > suL suR (+g) process
 		            if( subprocess == "" ) {
+                     std::vector<std::array<int, 3>> flav {{2,2,1}};
+                     XSection_Tree tree(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        // same ME as in the MSSM
+                        std::bind(&Process::matrixMSSMTree_uu_suLsuR, mrssm, _1, _2, _3),
+                        flav,
+                        pt.get<double>("collider setup.mu_r"),
+                        pt.get<double>("collider setup.mu_f")
+                     );
+                     XSection_Virt virt(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        std::bind(&Process::matrixMRSSMVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        flav,
+                        pt.get<double>("collider setup.mu_r"),
+                        pt.get<double>("collider setup.mu_f")
+
+                     );
+                     XSection_SC sc(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        std::bind(&Process::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
+                        pt.get<double>("technical parameters.dS"),
+                        pt.get<double>("collider setup.mu_r"),
+                        flav
+                     );
+                     XSection_HnonC hc(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        std::bind(&Process::matrixMRSSMHard_uu_suLsuRg, mrssm, _1, _2),
+                        flav
+                     );
                      Process process("MRSSM,uu_suLsuR", pt);
-	                  XSection::init(std::move(process), pt, vm );
+	                  tree.init(process, pt, vm );
+	                  virt.init(process, pt, vm );
+	                  sc.init(process, pt, vm );
+	                  hc.init(process, pt, vm );
                      if(enable_born) xsection_tree1 = tree.integrate();
                      if(enable_virt) xsection_virt1 = virt.integrate();
                      if(enable_sc) xsection_SC1 = sc.integrate();
@@ -358,9 +369,24 @@ int main(int argc, char* argv[]) {
                   pt.put( "technical parameters.dS", 1e-10 );
 
                   // gu > suL suR ubar process
-		            if( subprocess == "gu_suLsuRubar" || subprocess == "" ) {
-                     Process process( "MRSSM,gu_suLsuR", pt);
-                     XSection::init(std::move(process), pt, vm );
+		            if (subprocess == "gu_suLsuRubar" || subprocess == "" ) {
+                     Process process("MRSSM,gu_suLsuR", pt);
+                     std::vector<std::array<int, 3>> flav {};
+                     for(int el : {2, -2}) flav.push_back({21, el, 2});
+                     XSection_SC sc(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        std::bind(&Process::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
+                        pt.get<double>("technical parameters.dS"),
+                        pt.get<double>("collider setup.mu_r"),
+                        flav
+                     );
+                     XSection_HnonC hc(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        std::bind(&Process::matrixMRSSMHard_gu_suLsuRubar, mrssm, _1, _2),
+                        flav
+                     );
+	                  sc.init(process, pt, vm );
+	                  hc.init(process, pt, vm );
                      if(enable_sc) xsection_SC2 = sc.integrate();
                      if(enable_hard) xsection_HnonC2 = hc.integrate();
                      print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
@@ -376,15 +402,39 @@ int main(int argc, char* argv[]) {
 			      }
                case Channel::pp_sqLsqR:
                {
-                  XSection_Tree tree;
-                  XSection_Virt virt;
-                  XSection_SC sc;
-                  XSection_HnonC hc;
-
                   // qq > sqL sqR (+g) process
 		            if( subprocess == "" ) {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {1, 2, 3, 4, 5}) {
+                        flav.push_back({ i,  i, 1});
+                        flav.push_back({-i, -i, 1});
+                     }
                      Process process("MRSSM,qq_sqLsqR", pt);
-	                  XSection::init(std::move(process), pt, vm );
+                     XSection_Tree tree(pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"), std::bind(&Process::matrixMSSMTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        pt.get<double>("collider setup.mu_r"),
+                        pt.get<double>("collider setup.mu_f")
+);
+                     XSection_Virt virt(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        std::bind(&Process::matrixMRSSMVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        flav,
+                        pt.get<double>("collider setup.mu_r"),
+                        pt.get<double>("collider setup.mu_f")
+
+                     );
+                     XSection_SC sc(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        std::bind(&Process::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
+                        pt.get<double>("technical parameters.dS"),
+                        pt.get<double>("collider setup.mu_r"),
+                        flav
+                     );
+
+                     XSection_HnonC hc(pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"), std::bind(&Process::matrixMRSSMHard_uu_suLsuRg, mrssm, _1, _2), flav);
+	                  tree.init(process, pt, vm );
+	                  virt.init(process, pt, vm );
+	                  sc.init(process, pt, vm );
+	                  hc.init(process, pt, vm );
                      if(enable_born) xsection_tree1 = tree.integrate();
                      if(enable_virt) xsection_virt1 = virt.integrate();
                      if(enable_sc) xsection_SC1 = sc.integrate();
@@ -395,11 +445,27 @@ int main(int argc, char* argv[]) {
                   // qq' > sqL sq'R (+g) process
 		            if( subprocess == "" ) {
                      Process process("MRSSM,qq'_sqLsqR'", pt);
-	                  XSection::init(std::move(process), pt, vm );
-                     if(enable_born) xsection_tree2 = tree.integrate();
+                     XSection_Tree tree(pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"), std::bind(&Process::matrixMSSMTree_uu_suLsuR, process, _1, _2, _3), {},
+                        pt.get<double>("collider setup.mu_r"),
+                        pt.get<double>("collider setup.mu_f")
+);
+                     XSection_Virt virt(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        std::bind(&Process::matrixMRSSMVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        {},
+                        pt.get<double>("collider setup.mu_r"),
+                        pt.get<double>("collider setup.mu_f")
+
+                     );
+                     //XSection_HnonC hc;
+	                  tree.init(process, pt, vm );
+	                  virt.init(process, pt, vm );
+	                  //sc.init(process, pt, vm );
+	                  //hc.init(process, pt, vm );
+                     //if(enable_born) xsection_tree2 = tree.integrate();
                      if(enable_virt) xsection_virt2 = virt.integrate();
-                     if(enable_sc) xsection_SC2 = sc.integrate();
-                     if(enable_hard) xsection_HnonC2 = hc.integrate();
+                     //if(enable_sc) xsection_SC2 = sc.integrate();
+                     //if(enable_hard) xsection_HnonC2 = hc.integrate();
                      print( "qq' > sqLsqR'(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
                      xsec_to_json(j, "qq->sqLsqR'(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
 		            }
@@ -410,12 +476,14 @@ int main(int argc, char* argv[]) {
 
                   // gu > suL suR ubar process
 		            if( subprocess == "gq_sqLsqRqbar" || subprocess == "" ) {
+                     /*
                      Process process( "MRSSM,gd_sdLsdR", pt);
                      XSection::init(std::move(process), pt, vm );
                      if(enable_sc) xsection_SC3 = sc.integrate();
                      if(enable_hard) xsection_HnonC3 = hc.integrate();
                      print( "gq > sqLsqR(+X)", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3 );
                      xsec_to_json(j, "gq->sqLsqR(+X)", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
+                     */
 		            }
 
                   xsection_tree_total = xsection_tree1 + xsection_tree2;
@@ -427,14 +495,33 @@ int main(int argc, char* argv[]) {
 			      }
                case Channel::pp_suLsuLdagger:
                   {
-                  XSection_Tree tree;
-                  XSection_Virt virt;
-                  XSection_SC sc;
-                  XSection_HnonC hc;
-
 		            if( subprocess == "" || subprocess == "uubar_suLsuLdagger" ) {
                      Process process("MRSSM,uubar_suLsuLdagger", pt);
-                     XSection::init(std::move(process), pt, vm );
+                     std::vector<std::array<int, 3>> flav {};
+                     XSection_Tree tree(pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"), std::bind(&Process::matrixMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        pt.get<double>("collider setup.mu_r"),
+                        pt.get<double>("collider setup.mu_f")
+);
+                     XSection_Virt virt(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        std::bind(&Process::matrixMRSSMVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        flav,
+                        pt.get<double>("collider setup.mu_r"),
+                        pt.get<double>("collider setup.mu_f")
+
+                     );
+                     XSection_SC sc(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        std::bind(&Process::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
+                        pt.get<double>("technical parameters.dS"),
+                        pt.get<double>("collider setup.mu_r"),
+                        flav
+                     );
+                     XSection_HnonC hc(pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"), std::bind(&Process::matrixMRSSMHard_uubar_suLsuLdaggerg, mrssm, _1, _2), flav);
+	                  tree.init(process, pt, vm );
+	                  virt.init(process, pt, vm );
+	                  sc.init(process, pt, vm );
+	                  hc.init(process, pt, vm );
                      if(enable_born) xsection_tree1 = tree.integrate();
                      if(enable_virt) xsection_virt1 = virt.integrate();
                      if(enable_sc) xsection_SC1 = sc.integrate();
@@ -445,7 +532,31 @@ int main(int argc, char* argv[]) {
 
                   if( subprocess == "") {
                      Process process("MRSSM,ddbar_suLsuLdagger", pt);
-                     XSection::init(std::move(process), pt, vm );
+                     std::vector<std::array<int, 3>> flav {};
+                     XSection_Tree tree(pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"), std::bind(&Process::matrixMRSSMTree_ddbar_suLsuLdagger, process, _1, _2, _3), flav,
+                        pt.get<double>("collider setup.mu_r"),
+                        pt.get<double>("collider setup.mu_f")
+);
+                     XSection_Virt virt(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        std::bind(&Process::matrixMRSSMVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        flav,
+                        pt.get<double>("collider setup.mu_r"),
+                        pt.get<double>("collider setup.mu_f")
+
+                     );
+                     XSection_SC sc(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        std::bind(&Process::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
+                        pt.get<double>("technical parameters.dS"),
+                        pt.get<double>("collider setup.mu_r"),
+                        flav
+                     );
+                     XSection_HnonC hc(pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"), std::bind(&Process::matrixMRSSMHard_ddbar_suLsuLdaggerg, mrssm, _1, _2), flav);
+	                  tree.init(process, pt, vm );
+	                  virt.init(process, pt, vm );
+	                  sc.init(process, pt, vm );
+	                  hc.init(process, pt, vm );
                      if(enable_born) xsection_tree2 = tree.integrate();
                      if(enable_virt) xsection_virt2 = virt.integrate();
                      if(enable_sc) xsection_SC2 = sc.integrate();
@@ -456,10 +567,27 @@ int main(int argc, char* argv[]) {
 
                   if( subprocess == "") {
                      Process process("MRSSM,GG_suLsuLdagger", pt);
-                     XSection::init(std::move(process), pt, vm );
+                     std::vector<std::array<int, 3>> flav {};
+                     XSection_Tree tree(pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"), std::bind(&Process::matrixMRSSMTree_GG_suLsuLdagger, process, _1, _2, _3), flav,
+                        pt.get<double>("collider setup.mu_r"),
+                        pt.get<double>("collider setup.mu_f")
+);
+                     XSection_Virt virt(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        std::bind(&Process::matrixMRSSMVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        flav,
+                        pt.get<double>("collider setup.mu_r"),
+                        pt.get<double>("collider setup.mu_f")
+
+                     );
+                     XSection_HnonC hc(pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"), std::bind(&Process::matrixMRSSMHard_gg_suLsuLdaggerg, mrssm, _1, _2), flav);
+	                  tree.init(process, pt, vm );
+	                  virt.init(process, pt, vm );
+	                  //sc.init(process, pt, vm );
+	                  hc.init(process, pt, vm );
                      if(enable_born) xsection_tree3 = tree.integrate();
                      if(enable_virt) xsection_virt3 = virt.integrate();
-                     if(enable_sc) xsection_SC3 = sc.integrate();
+                     //if(enable_sc) xsection_SC3 = sc.integrate();
                      if(enable_hard) xsection_HnonC3 = hc.integrate();
                      print( "gg > suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
                      xsec_to_json(j, "gg->suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
@@ -471,7 +599,17 @@ int main(int argc, char* argv[]) {
 
                   if( subprocess == "") {
                      Process process("MRSSM,gq_suLsuLdagger", pt);
-                     XSection::init(std::move(process), pt, vm );
+                     std::vector<std::array<int, 3>> flav {};
+                     XSection_SC sc(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        std::bind(&Process::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
+                        pt.get<double>("technical parameters.dS"),
+                        pt.get<double>("collider setup.mu_r"),
+                        flav
+                     );
+                     XSection_HnonC hc(pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"), std::bind(&Process::matrixMRSSMHard_gd_suLsuLdaggerd, mrssm, _1, _2), flav);
+	                  sc.init(process, pt, vm );
+	                  hc.init(process, pt, vm );
                      if(enable_sc) xsection_SC4 = sc.integrate();
                      if(enable_hard) xsection_HnonC4 = hc.integrate();
                      print( "gq > suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
@@ -482,7 +620,17 @@ int main(int argc, char* argv[]) {
                   pt.put( "technical parameters.dS", 1e-9 );
                   if( subprocess == "gu_suLsuLdaggeru" || subprocess == "" ) {
                      Process process("MRSSM,gu_suLsuLdagger", pt);
-                     XSection::init(std::move(process), pt, vm );
+                     std::vector<std::array<int, 3>> flav {};
+                     XSection_SC sc(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        std::bind(&Process::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
+                        pt.get<double>("technical parameters.dS"),
+                        pt.get<double>("collider setup.mu_r"),
+                        flav
+                     );
+                     XSection_HnonC hc(pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"), std::bind(&Process::matrixMRSSMHard_gu_suLsuLdaggeru, mrssm, _1, _2), flav);
+	                  sc.init(process, pt, vm );
+	                  hc.init(process, pt, vm );
                      if(enable_sc) xsection_SC5 = sc.integrate();
                      if(enable_hard) xsection_HnonC5 = hc.integrate();
                      print( "gu > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5 );
@@ -500,6 +648,7 @@ int main(int argc, char* argv[]) {
                default:
                   cout << "NLO process not implemented\n";
             }
+                            }
          case Model::Simplified:
             switch(channel) {
                case Channel::pp_OO:
