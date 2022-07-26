@@ -27,9 +27,11 @@ double Process::sigmaMRSSMTree_uu_suLsuR(double alphas, double s ) {
       (4.*MGl2 + Sqr(-1. + sqrt(1. - (4.*Sqr(MassSq))/s))*s))))/(9.*Sqr(s));
 }
 
+/*
 double Process::sigmaMRSSMTree_uubar_OO(double alphas, double s ) {
    double a2 = Sqr(alphas);
    double m1 = 1000;
    double b = sqrt( 1. - 4. * m1*m1/s );
    return 2 * a2 * pi * pow(b, 3)/(9. * s);
 }
+*/

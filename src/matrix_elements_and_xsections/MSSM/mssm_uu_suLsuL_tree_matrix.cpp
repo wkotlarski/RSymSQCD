@@ -2,7 +2,7 @@
  *    checked with MadGraph    
  */
 
-inline double Process::matrixMSSMTree_uu_suLsuL(double alphas, double S, double T) const {
+double Process::matrixMSSMTree_uu_suLsuL(double alphas, double S, double T) const {
    double U = 2*Sqr(MassSq) - S - T;
    /* factor of 0.5 introduced by hand, as mathematica output for left-left is actually twice as real left-left */
    /* because of double counting of final state particles */

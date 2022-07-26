@@ -10,6 +10,8 @@ double Process::matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep(double Alfas, std::arra
    double E1k3 = eta[0]*p[2][0]-eta[1]*p[2][1]-eta[2]*p[2][2]-eta[3]*p[2][3];
    double E1k4 = eta[0]*p[3][0]-eta[1]*p[3][1]-eta[2]*p[3][2]-eta[3]*p[3][3];
    double S12 = 2.*k12;
+   const double m1 = MassSq;
+   const double m2 = MassSq;
    double S35 = m1*m1 + 2*k35;
    double S45 = m2*m2 + 2*k45;
    double T = m1*m1 - 2.*k13;

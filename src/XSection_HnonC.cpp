@@ -1,7 +1,9 @@
 #include "XSection_HnonC.hpp"
 #include "constants.hpp"
+#include "mathematica_wrapper.hpp"
 
 #include "cuba.h"
+#include "LHAPDF/LHAPDF.h"
 #include "rk/rk.hh"
 #include "rk/geom3.hh"
 
@@ -58,7 +60,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
 int XSection_HnonC::integrand(const int *ndim, const double xx[],
    const int *ncomp, double ff[], void *userdata) {
 
-   double m_sqr = Sqr(m1);
+   double m_sqr = Sqr(m1_);
 
    ff[0] = 0;
    /*
@@ -78,34 +80,34 @@ int XSection_HnonC::integrand(const int *ndim, const double xx[],
         || xx[6] < 0 || xx[6] > 1   // Bjorken x
         );
 
-	double x1 = 4.*m_sqr/S      + (1.-4.*m_sqr/S)      * xx[5];
-	double x2 = 4.*m_sqr/(S*x1) + (1.-4.*m_sqr/(S*x1)) * xx[6];
-	double shat = x1*x2*S;
+	double x1 = 4.*m_sqr/Sqr(sqrtS_)      + (1.-4.*m_sqr/Sqr(sqrtS_))      * xx[5];
+	double x2 = 4.*m_sqr/(Sqr(sqrtS_)*x1) + (1.-4.*m_sqr/(Sqr(sqrtS_)*x1)) * xx[6];
+	double shat = x1*x2*Sqr(sqrtS_);
 	double shat_sqrt = std::sqrt(shat);
 
 	double Ej_max = 0.5*shat_sqrt - 2.*m_sqr/shat_sqrt;
 
-	if (Ej_max < 0.5*dS*shat_sqrt) {
+	if (Ej_max < 0.5*dS_*shat_sqrt) {
 	  return 0;
 	}
 
-	const double Ej = dS*shat_sqrt/2. + (Ej_max - dS*shat_sqrt/2.)*xx[0];
+	const double Ej = dS_*shat_sqrt/2. + (Ej_max - dS_*shat_sqrt/2.)*xx[0];
 
 	const double c = shat - 2. * shat_sqrt * Ej;
 	// Eq. 4.5
 	const double E1_max = ((shat_sqrt - Ej)*c + Ej*std::sqrt(Sqr(c-2.*m_sqr) - Sqr(2.*m_sqr)))/(2.*c);
    const double E1_min = ((shat_sqrt - Ej)*c - Ej*std::sqrt(Sqr(c-2.*m_sqr) - Sqr(2.*m_sqr)))/(2.*c);
    const double E1 = E1_min + (E1_max - E1_min)*xx[1];
-   assert(E1 >= m1);
+   assert(E1 >= m1_);
 
 	// Eq. 4.2 with E2 = Ej
-   const double p1 = std::sqrt((E1-m1)*(E1+m1));
+   const double p1 = std::sqrt((E1-m1_)*(E1+m1_));
    double cosx = (shat - 2*shat_sqrt*(E1+Ej) + 2.*Ej*E1)/(2.*Ej*p1);
 
    // check if due to numerics |cos(x)| is not > 1
    // if yes, return 0 and continue
    if ( cosx > 1 || cosx < -1)  {
-      std::cout << "Warning! 1 - |cos(x)| = " << 1 - abs(cosx) << "  - Skipping the phase space point.\n";
+      std::cout << "Warning! 1 - |cos(x)| = " << 1 - std::abs(cosx) << "  - Skipping the phase space point.\n";
       ff[0] = 0;
       return 0;
    }
@@ -171,9 +173,9 @@ int XSection_HnonC::integrand(const int *ndim, const double xx[],
    p[3][0] = shat_sqrt - E1 - Ej;
    for (int i = 1; i < 4; ++i) p[3][i] = - p[2][i] - p_temp_2[i];
 
-   assert( abs(
-      (pow(p[2][0], 2) - pow(p[2][1], 2) - pow(p[2][2], 2) - pow(p[2][3], 2))/(m1 * m1) - 1) < 1e-10
-         && p[2][0] >= m1
+   assert( std::abs(
+      (pow(p[2][0], 2) - pow(p[2][1], 2) - pow(p[2][2], 2) - pow(p[2][3], 2))/(m1_ * m1_) - 1) < 1e-10
+         && p[2][0] >= m1_
    );
 
    // write parton momentum to momentum matrix p
@@ -184,11 +186,11 @@ int XSection_HnonC::integrand(const int *ndim, const double xx[],
 
    // check if we are not in the collinear region
    // if yes, return
-   if (-t15 < dC*shat_sqrt*Ej || -t25 < dC*shat_sqrt*Ej) {
+   if (-t15 < dC_*shat_sqrt*Ej || -t25 < dC_*shat_sqrt*Ej) {
       return 0;
 	}
 
-   double ME2 = f(pdf->alphasQ(mu_r), p);
+   double ME2 = f(pdf_->alphasQ(muR_), p);
    assert(!std::isnan(ME2) && ME2 >= 0);
    /*
    std::cout << setprecision(17);
@@ -211,7 +213,7 @@ int XSection_HnonC::integrand(const int *ndim, const double xx[],
 
    double pdf_flux = 0.0;
    for (const auto& f : flav_) {
-      pdf_flux += f.at(2) * pdf->xfxQ(f.at(0), x1, mu_f) * pdf->xfxQ(f.at(1), x2, mu_f);
+      pdf_flux += f.at(2) * pdf_->xfxQ(f.at(0), x1, muF_) * pdf_->xfxQ(f.at(1), x2, muF_);
    }
    pdf_flux /= x1 * x2;
 
@@ -220,16 +222,16 @@ int XSection_HnonC::integrand(const int *ndim, const double xx[],
    double xx1 = xx[6];
    double xx2 = xx[0];
 
-   double jacobian =  (xx0*(-4*dS*Sqr(m1) + (-1 + dS)*xx0*xx1*(-S + 4*Sqr(m1)))*
-     (xx0*xx1*xx2*(S - 4*Sqr(m1)) + 
-       dS*(-1 + xx2)*(-(S*xx0*xx1) + 4*(-1 + xx0*xx1)*Sqr(m1)))*pow(S,-1)*
-     Sqr(S - 4*Sqr(m1))*pow(S*xx0 - 4*(-1 + xx0)*Sqr(m1),-1)*
-     pow(S*xx0*xx1 + (4 - 4*xx0*xx1)*Sqr(m1),-1)*
-     pow((-1 + dS)*S*xx0*xx1*(-1 + xx2) + 
-       4*(1 + xx0*xx1*(-1 + xx2) - dS*(-1 + xx0*xx1)*(-1 + xx2))*Sqr(m1),-1)*
-     pow((-1 + xx2)*(S*xx0*xx1*(-1 + dS + xx2 - dS*xx2) + 
-         4*(-1 + xx0*xx1 + dS*(-1 + xx0*xx1)*(-1 + xx2) - xx0*xx1*xx2)*Sqr(m1))*
-       (-4*dS*Sqr(m1) + (-1 + dS)*xx0*xx1*(-S + 4*Sqr(m1))),0.5))/4.;
+   double jacobian =  (xx0*(-4*dS_*Sqr(m1_) + (-1 + dS_)*xx0*xx1*(-Sqr(sqrtS_) + 4*Sqr(m1_)))*
+     (xx0*xx1*xx2*(Sqr(sqrtS_) - 4*Sqr(m1_)) + 
+       dS_*(-1 + xx2)*(-(Sqr(sqrtS_)*xx0*xx1) + 4*(-1 + xx0*xx1)*Sqr(m1_)))*pow(Sqr(sqrtS_),-1)*
+     Sqr(Sqr(sqrtS_) - 4*Sqr(m1_))*pow(Sqr(sqrtS_)*xx0 - 4*(-1 + xx0)*Sqr(m1_),-1)*
+     pow(Sqr(sqrtS_)*xx0*xx1 + (4 - 4*xx0*xx1)*Sqr(m1_),-1)*
+     pow((-1 + dS_)*Sqr(sqrtS_)*xx0*xx1*(-1 + xx2) + 
+       4*(1 + xx0*xx1*(-1 + xx2) - dS_*(-1 + xx0*xx1)*(-1 + xx2))*Sqr(m1_),-1)*
+     pow((-1 + xx2)*(Sqr(sqrtS_)*xx0*xx1*(-1 + dS_ + xx2 - dS_*xx2) + 
+         4*(-1 + xx0*xx1 + dS_*(-1 + xx0*xx1)*(-1 + xx2) - xx0*xx1*xx2)*Sqr(m1_))*
+       (-4*dS_*Sqr(m1_) + (-1 + dS_)*xx0*xx1*(-Sqr(sqrtS_) + 4*Sqr(m1_))),0.5))/4.;
 
    ff[0] = ME2 * std::abs(jacobian);
 

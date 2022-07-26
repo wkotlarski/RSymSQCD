@@ -6,6 +6,8 @@ double Process::matrixMRSSMHard_ddbar_suLsuLdaggerg(double Alfas, std::array<std
    double k13 = p[0][0]*p[2][0]-p[0][1]*p[2][1]-p[0][2]*p[2][2]-p[0][3]*p[2][3];
    double k14 = p[0][0]*p[3][0]-p[0][1]*p[3][1]-p[0][2]*p[3][2]-p[0][3]*p[3][3];
    double S12 = 2.*k12;
+   const double m1 = MassSq;
+   const double m2 = MassSq;
    double S35 = m1*m1 + 2*k35;
    double S45 = m2*m2 + 2*k45;
    double T = m1*m1 - 2.*k13;

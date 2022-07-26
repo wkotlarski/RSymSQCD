@@ -1,7 +1,10 @@
 #include "XSection_Virt.hpp"
+#include "constants.hpp"
+#include "mathematica_wrapper.hpp"
 
 #include "clooptools.h"
 #include "cuba.h"
+#include "LHAPDF/LHAPDF.h"
 
 namespace {
 int forwarder(const int *ndim, const double xx[],
@@ -13,33 +16,33 @@ int forwarder(const int *ndim, const double xx[],
 int XSection_Virt::integrand(const int *ndim, const double xx[],
    const int *ncomp, double ff[], void *userdata) {
 
-    const double x1min = 4.*Sqr(m1)/S;
+    const double x1min = 4.*Sqr(m1_/sqrtS_);
     static constexpr double xmax = 1.;
     const double x1 = x1min + (xmax-x1min)*xx[1];
-    const double x2min = 4.*Sqr(m1)/(S*x1);
+    const double x2min = 4.*Sqr(m1_/sqrtS_)/x1;
     const double x2 = x2min + (xmax-x2min)*xx[2];
-    const double s = S*x1*x2;     //partonic
-    const double Tmin = Sqr(m1) - s/2. - std::sqrt(0.25*Sqr(s) - Sqr(m1)*s);
-    const double Tmax = Sqr(m1) - s/2. + std::sqrt(0.25*Sqr(s) - Sqr(m1)*s);
+    const double s = Sqr(sqrtS_)*x1*x2;     //partonic
+    const double Tmin = Sqr(m1_) - 0.5*s - std::sqrt(0.25*Sqr(s) - Sqr(m1_)*s);
+    const double Tmax = Sqr(m1_) - 0.5*s + std::sqrt(0.25*Sqr(s) - Sqr(m1_)*s);
     const double T = Tmin + (Tmax-Tmin)*xx[0];
     const double jacobian = (Tmax-Tmin)*(1.-x1min)*(1.-x2min);
 
     int FiniteGs = 1;
     double Dminus4 = 0;
     int Divergence = 0;     // O(eps)
-    const double alphas = pdf->alphasQ(muR);
+    const double alphas = pdf_->alphasQ(muR_);
 
-    double squaredMReal = f(alphas, s, T, FiniteGs, Dminus4, Divergence, muR);
+    double squaredMReal = f(alphas, s, T, FiniteGs, Dminus4, Divergence, muR_);
 
     double dSigmaPart1 = squaredMReal/(8.*pi*Sqr(s));
 
     // contraction with O(eps) from Dminus4
     Divergence = -1;           // O(eps)
     FiniteGs = 0;
-    squaredMReal = f(alphas, s, T, FiniteGs, Dminus4, Divergence, muR);
+    squaredMReal = f(alphas, s, T, FiniteGs, Dminus4, Divergence, muR_);
 
     Dminus4 = -2.;
-    const double squaredMRealMinus2 = f(alphas, s, T, FiniteGs, Dminus4, Divergence, muR);
+    const double squaredMRealMinus2 = f(alphas, s, T, FiniteGs, Dminus4, Divergence, muR_);
 
     const double dSigmaPart3 = (squaredMRealMinus2 - squaredMReal)/(8.*pi*Sqr(s));
 
@@ -47,7 +50,7 @@ int XSection_Virt::integrand(const int *ndim, const double xx[],
     // and with product of O(eps) prefactors of phase space and loop integral
     Divergence = -2;
     Dminus4 = 0;
-    squaredMReal = f(alphas, s, T, FiniteGs, Dminus4, Divergence, muR);
+    squaredMReal = f(alphas, s, T, FiniteGs, Dminus4, Divergence, muR_);
 
    double dSigmaPart4 = squaredMReal*pi/(48.*Sqr(s));
 
@@ -55,7 +58,7 @@ int XSection_Virt::integrand(const int *ndim, const double xx[],
 
    double pdf_flux = 0.0;
    for (const auto& fv : flav_) {
-      pdf_flux += fv.at(2) * pdf->xfxQ(fv.at(0), x1, mu_f) * pdf->xfxQ(fv.at(1), x2, mu_f);
+      pdf_flux += fv.at(2) * pdf_->xfxQ(fv.at(0), x1, muF_) * pdf_->xfxQ(fv.at(1), x2, muF_);
    }
    pdf_flux /= (x1 * x2);
 
