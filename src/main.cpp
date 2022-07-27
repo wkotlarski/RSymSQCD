@@ -137,9 +137,6 @@ int main(int argc, char* argv[]) {
    boost::property_tree::ptree pt;
    boost::property_tree::ini_parser::read_ini(card, pt);
 
-   cout << "\nINFO: Using phase space slicing parameters dS = " << pt.get<double>("technical parameters.dS")
-        << ", dC = " <<  pt.get<double>("technical parameters.dC") << '\n';
-
    // local arrays are not aumatically initialized to 0
    // need to use {}
    array<double,3> temp {}, xsection_tree {}, xsection_virt {}, xsection_SC {}, xsection_HnonC {},
@@ -234,21 +231,18 @@ int main(int argc, char* argv[]) {
       {"delta", pt.get<double>("technical parameters.delta")}
    };
 
-   auto start = chrono::steady_clock::now();
+   // set PDFs
+   std::cout << '\n';
+   std::unique_ptr<LHAPDF::PDF> pdf(LHAPDF::mkPDF(pt.get<std::string>("collider setup.pdf")));
+   LHAPDF::setVerbosity(0);
 
-   const double dS = pt.get<double>("technical parameters.dS");
-   const double dC = pt.get<double>("technical parameters.dC");
+   // parameters used by both LO and NLO calculations
    const double muR = pt.get<double>("collider setup.mu_r");
    const double muF = pt.get<double>("collider setup.mu_f");
 
-   // set PDFs
-   std::cout << '\n';
-   std::unique_ptr<LHAPDF::PDF> pdf(LHAPDF::mkPDF(pt.get<std::string>("collider setup.pdf"), 0));
-   LHAPDF::Info& cfg = LHAPDF::getConfig();
-   cfg.set_entry("Verbosity", 0);
-   LHAPDF::setVerbosity(0);
+   auto start = chrono::steady_clock::now();
 
-   if( pt.get<string>("process.order") == "LO" ) {
+   if (pt.get<string>("process.order") == "LO") {
       /*
       switch(model) {
          case Model::MRSSM:
@@ -323,6 +317,10 @@ int main(int argc, char* argv[]) {
       */
    }
    else if (pt.get<string>("process.order") == "NLO") {
+      const double dS = pt.get<double>("technical parameters.dS");
+      const double dC = pt.get<double>("technical parameters.dC");
+      cout << "\nINFO: Using phase space slicing parameters dS = " << δS
+           << ", dC = " << δC << '\n';
 	   switch(model) {
          case Model::MRSSM:
          {
@@ -374,9 +372,6 @@ int main(int argc, char* argv[]) {
                      xsec_to_json(j, "uu->suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
 		            }
 
-                  // the matrix element is regular in the limit dS -> 0 but the phase space parametrization
-                  // fails if we are exactly on the threshold
-
                   // gu > suL suR ubar process
 		            if (subprocess == "gu_suLsuRubar" || subprocess == "" ) {
                      std::vector<std::array<int, 3>> flav {};
@@ -421,6 +416,11 @@ int main(int argc, char* argv[]) {
                      for (int i : {1, 2, 3, 4, 5}) {
                         flav.push_back({ i,  i, 1});
                         flav.push_back({-i, -i, 1});
+                        for (int j : {1, 2, 3, 4, 5}) {
+                           if (j>=i) continue;
+                           flav.push_back({ i,  j, 2});
+                           flav.push_back({-i, -j, 2});
+                        }
                      }
                      XSection_Tree tree(pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"), std::bind(&Process::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
                         pt.get<double>("collider setup.mu_r"),
@@ -466,56 +466,40 @@ int main(int argc, char* argv[]) {
                      print( "qq > sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      xsec_to_json(j, "qq->sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
 		            }
-                  // qq' > sqL sq'R (+g) process
-		            if( subprocess == "" ) {
-                     XSection_Tree tree(pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"), std::bind(&Process::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3), {},
-                        pt.get<double>("collider setup.mu_r"),
-                        pt.get<double>("collider setup.mu_f"),
-                        pdf.get()
-);
-                     XSection_Virt virt(
+                  // gu > suL suR ubar process
+		            if (subprocess == "gu_suLsuRubar" || subprocess == "" ) {
+                     std::vector<std::array<int, 3>> flav {};
+                     for(int el : {1, -1, 2, -2, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2*5});
+                     XSection_SC sc(
                         pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
-                        std::bind(&Process::matrixMRSSMVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
-                        {},
-                        pt.get<double>("collider setup.mu_r"),
-                        pt.get<double>("collider setup.mu_f"),
-                        pdf.get()
+                        std::bind(&Process::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
+                        0. /*dS*/, dC, muR, muF,
+                        flav, pdf.get(),
+                        {
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&Process::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&Process::matrix_xsec_stub, mrssm, _1, _2)}
+                        }
 
                      );
-                     //XSection_HnonC hc;
-	                  tree.init(pt, vm );
-	                  virt.init(pt, vm );
-	                  //sc.init(pt, vm );
-	                  //hc.init(pt, vm );
-                     //if(enable_born) xsection_tree2 = tree.integrate();
-                     if(enable_virt) xsection_virt2 = virt.integrate();
-                     //if(enable_sc) xsection_SC2 = sc.integrate();
-                     //if(enable_hard) xsection_HnonC2 = hc.integrate();
-                     print( "qq' > sqLsqR'(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
-                     xsec_to_json(j, "qq->sqLsqR'(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+                     XSection_HnonC hc(
+                        pt.get<double>("masses.squarks"), pt.get<double>("masses.squarks"),
+                        std::bind(&Process::matrixMRSSMHard_gu_suLsuRubar, mrssm, _1, _2),
+                        0. /*dS*/, dC, muR, muF,
+                        flav, pdf.get()
+                     );
+	                  sc.init(pt, vm );
+	                  hc.init(pt, vm );
+                     if(enable_sc) xsection_SC2 = sc.integrate();
+                     if(enable_hard) xsection_HnonC2 = hc.integrate();
+                     print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
+                     xsec_to_json(j, "gu->suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
 		            }
 
-                  // the matrix element is regular in the limit dS -> 0 but the phase space parametrization
-                  // fails if we are exactly on the threshold
-                  pt.put( "technical parameters.dS", 1e-10 );
-
-                  // gu > suL suR ubar process
-		            if( subprocess == "gq_sqLsqRqbar" || subprocess == "" ) {
-                     /*
-                     Process process( "MRSSM,gd_sdLsdR", pt);
-                     XSection::init(std::move(process), pt, vm );
-                     if(enable_sc) xsection_SC3 = sc.integrate();
-                     if(enable_hard) xsection_HnonC3 = hc.integrate();
-                     print( "gq > sqLsqR(+X)", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3 );
-                     xsec_to_json(j, "gq->sqLsqR(+X)", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
-                     */
-		            }
-
-                  xsection_tree_total = xsection_tree1 + xsection_tree2;
-                  xsection_virt_total = xsection_virt1 + xsection_virt2;
-                  xsection_SC_total = xsection_SC1 + xsection_SC2 + xsection_SC3;
-                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2 + xsection_HnonC3;
-                  print( "sum", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total );
+                  xsection_tree_total = xsection_tree1;
+                  xsection_virt_total = xsection_virt1;
+                  xsection_SC_total = xsection_SC1 + xsection_SC2;
+                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
+                  print( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
                   break;
 			      }
                case Channel::pp_suLsuLdagger:
