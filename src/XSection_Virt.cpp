@@ -74,7 +74,6 @@ int XSection_Virt::integrand(const int *ndim, const double xx[],
    constexpr double accuracy_abs = 1e-12;
    constexpr int eval_min = 1000;
    constexpr int eval_max = 1000000;
-   const int verbose = vm["verbosity-virt"].as<int>();        // adjust output 0 ... 3
    int nregions, neval, fail;
    double integral[ncomp], error[ncomp], prob[ncomp];
    constexpr int last = 4;
@@ -91,7 +90,7 @@ int XSection_Virt::integrand(const int *ndim, const double xx[],
    constexpr int ngiven = 0;
    constexpr int ldxgiven = ndim;
    constexpr int nextra = 0;
-   const double prec_virt = pow( 10., -vm["precision-virt"].as<int>());
+   const double prec_virt = std::pow(10., -integration_precision_);
 
    static bool looptools_initialized = false;
    if(!looptools_initialized) {
@@ -106,7 +105,7 @@ int XSection_Virt::integrand(const int *ndim, const double xx[],
     *    of LoopTools or something more serious.
     */
    Divonne(ndim, ncomp, forwarder, this, nvec,
-        prec_virt, accuracy_abs, verbose, seed,
+        prec_virt, accuracy_abs, integration_verbosity_, seed,
         eval_min, eval_max, key1, key2, key3, maxpass,
         border, maxchisq, mindeviation,
         ngiven, ldxgiven, NULL, nextra, NULL,

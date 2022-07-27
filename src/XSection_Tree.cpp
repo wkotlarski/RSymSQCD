@@ -36,7 +36,6 @@ int XSection_Tree::integrand(const int *ndim, const double xx[],
    }
    pdf_flux /= (x1 * x2);
 
-   
    const double alphas = pdf_->alphasQ(muR_);
    /* integration of |M^B|^2 */
       const double Tmin = Sqr(m1_) - 0.5*s - std::sqrt(0.25*Sqr(s) - Sqr(m1_)*s);
@@ -59,22 +58,21 @@ int XSection_Tree::integrand(const int *ndim, const double xx[],
    constexpr int ndim = 3;
    constexpr int ncomp = 1;
    constexpr int nvec = 1;
-   constexpr double accuracy_rel = 1e-6;
+   const double accuracy_rel = std::pow(10., -integration_precision_);
    constexpr double accuracy_abs = 1e-12;
    constexpr int eval_min = 1000;
    constexpr int eval_max = 1000000000;
-   const int verbose = vm["verbosity-born"].as<int>();        // adjust shown output 0 ... 3
    constexpr int last = 4;
    constexpr int key = 0;
    int nregions, neval, fail;
    double integral[ncomp], error[ncomp], prob[ncomp];
 
    Cuhre( ndim, ncomp, forwarder, this, nvec,
-      accuracy_rel, accuracy_abs, verbose | last,
+      accuracy_rel, accuracy_abs, integration_verbosity_ | last,
       eval_min, eval_max, key, NULL, NULL,
       &nregions, &neval, &fail, integral, error, prob );
 
-   std::array <double, 3> result{ integral[0], error[0], prob[0] }; 
+   std::array<double, 3> result {integral[0], error[0], prob[0]};
 
    return result;
 }

@@ -12,8 +12,9 @@ public:
       double m1, double m2,
       std::function<double(double, std::array<std::array<double, 4>, 5>)> f_,
       double dS, double dC,
-      std::vector<std::array<int, 3>> const& flav
-   ) : XSection(parameters, m1, m2, flav), f(f_), dS_(dS), dC_(dC) {};
+      std::vector<std::array<int, 3>> const& flav,
+      int integration_precision, int integration_verbosity
+   ) : XSection(parameters, m1, m2, flav, integration_precision, integration_verbosity), f(f_), dS_(dS), dC_(dC) {};
 
    std::array<double, 3> integrate();
    int integrand(const int *ndim, const double xx[],

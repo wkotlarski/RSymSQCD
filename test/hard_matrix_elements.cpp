@@ -16,6 +16,7 @@ TEST(HardMatrixElementTest, MRSSM) {
          {{104.73931202517923, -12.035749757710732, -2.1013738546919383, 104.02426851076837}}
    }};
 
+   /*
    boost::property_tree::ptree pt;
    pt.put("collider setup.sqrt_S", 13e+3);
    pt.put("masses.gluino", 1000.);
@@ -29,8 +30,10 @@ TEST(HardMatrixElementTest, MRSSM) {
    pt.put("technical parameters.eta_sign", 1.5e+3);
    pt.put("technical parameters.delta", 1.5e+3);
    pt.put("technical parameters.WidthOverMass", 1.5e+3);
+   */
 
-   MRSSM MRSSM(pt);
+   MRSSMParameters params;
+   MRSSM MRSSM(params);
    // EXPECT_NEAR((process1.*process1.Process::matrixelementReal_HnonC)(p), 0.020376409677647898, 5e-17);
 
    // EXPECT_NEAR((process2.*process2.Process::matrixelementReal_HnonC)(p), 1.3897879902109231e-07, 7e-21);

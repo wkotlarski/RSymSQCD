@@ -27,7 +27,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
    static constexpr int ndim = 7;
    static constexpr int ncomp = 1;
    //  accuraccy
-   const double accuracy_rel {std::pow(10., -vm["precision-hard"].as<int>())};
+   const double accuracy_rel {std::pow(10., -integration_precision_)};
    static constexpr double accuracy_abs {1e-12};
 
    static constexpr int neval_min = 10'000;
@@ -39,14 +39,13 @@ std::array<double, 3> XSection_HnonC::integrate() {
    static constexpr int nincrease = 10000;
    static constexpr int nbatch = 1000;
    static constexpr int gridno = 0;
-   const int flags = vm["verbosity-hard"].as<int>();
    static constexpr int seed = 0;
    const char* state_file = "";
    int nregions, fail;
 
    double integral[ncomp], error[ncomp], prob[ncomp];
    llVegas( ndim, ncomp, forwarder, this, 1,
-      accuracy_rel, accuracy_abs, flags, seed,
+      accuracy_rel, accuracy_abs, integration_verbosity_, seed,
       neval_min, neval_max, nstart, nincrease, nbatch,
       gridno, state_file, NULL,
       &neval, &fail, integral, error, prob );

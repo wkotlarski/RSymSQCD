@@ -6,22 +6,16 @@
 #include "clooptools.h"
 
 #include <cmath>
-#include <iostream>
 
-MRSSM::MRSSM(boost::property_tree::ptree const& pt) {
-
-   MassTop = pt.get<double>("masses.top");
-   MassGlu = pt.get<double>("masses.gluino");
-   MasssigmaO = pt.get<double>("masses.pseudoscalar_sgluon");
-   MassphiO  = sqrt( pow(MasssigmaO,2) + 4.0 * pow(MassGlu, 2) );
-   MassSq = pt.get<double>("masses.squarks");
-   double eta_sign = pt.get<double>("technical parameters.eta_sign");
-   double delta = pt.get<double>("technical parameters.delta");
-   WidthGlu = pt.get<double>("technical parameters.WidthOverMass") * MassGlu;
-
-   // choose a gage vector \eta for DR matrix elements
-   eta = {std::sqrt(1.+Sqr(delta)), 0., delta, eta_sign};
-}
+MRSSM::MRSSM(MRSSMParameters const& params)
+   : MassTop(params.MassTop),
+     MassGlu(params.MassGlu),
+     MasssigmaO(params.MasssigmaO),
+     MassphiO(std::sqrt(Sqr(params.MasssigmaO) + 4.*Sqr(params.MassGlu))),
+     MassSq(params.MassSq),
+     eta({std::sqrt(1.+Sqr(params.delta)), 0., params.delta, params.eta_sign}),
+     WidthGlu(params.WidthGlu)
+   {};
 
 #include "mrssm_born_mes.cpp"
 #include "mrssm_born_xsecs.cpp"

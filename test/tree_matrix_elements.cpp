@@ -5,6 +5,7 @@
 namespace {
 
 TEST(TreeMatrixElementTest, MRSSM) {
+   /*
    boost::property_tree::ptree pt;
    pt.put("masses.gluino", 2000.);
    pt.put("masses.top", 172.);
@@ -17,8 +18,10 @@ TEST(TreeMatrixElementTest, MRSSM) {
    pt.put("technical parameters.eta_sign", 1.5e+3);
    pt.put("technical parameters.delta", 1.5e+3);
    pt.put("technical parameters.WidthOverMass", 1.5e+3);
+   */
 
-   MRSSM p1 = MRSSM(pt);
+   MRSSMParameters params;
+   MRSSM p1 = MRSSM(params);
 
    /*
    const double ME2_1 = (p1.*p1.Process::matrixelementTree)(0.1, 76858666.754357532, -35567448.864206761);

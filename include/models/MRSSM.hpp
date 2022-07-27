@@ -1,14 +1,23 @@
 #ifndef PROCESS_H_
 #define PROCESS_H_
 
-#include <boost/property_tree/ptree.hpp>
-
 #include <array>
+
+struct MRSSMParameters {
+   double MassTop;
+   double MassGlu;
+   double MasssigmaO;
+   double MassSq;
+   double eta_sign;
+   double delta;
+   double WidthGlu;
+};
 
 class MRSSM {
 
 public:
-   MRSSM(boost::property_tree::ptree const&);
+   MRSSM() = delete;
+   MRSSM(MRSSMParameters const& params);
 
    inline double matrix_soft_stub(double, double, double, double, double)  { return 0.; };
    inline double matrix_xsec_stub(double, double )  { return 0.; };
@@ -58,6 +67,11 @@ private:
       std::array<double, 4> eta;
 
       // particle masses
-      double MasssigmaO, MassphiO, MassGlu, MassTop, MassSq, MassSquarks, WidthGlu;
+      const double MasssigmaO;
+      const double MassphiO;
+      const double MassGlu;
+      const double MassTop;
+      const double MassSq;
+      const double WidthGlu;
 };
 #endif /* PROCESS_H_ */

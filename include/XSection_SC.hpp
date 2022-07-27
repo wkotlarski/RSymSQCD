@@ -14,8 +14,9 @@ public:
       std::function<double(double, double, double, double, double)> f_soft,
       double dS, double dC,
       std::vector<std::array<int, 3>> flav,
-      std::array<std::pair<SplittingKernel, std::function<double(double, double)>>, 2> sp
-   ) : XSection(parameters, m1, m2, flav), f_soft_(f_soft), dS_(dS), dC_(dC), sp_(sp) {};
+      std::array<std::pair<SplittingKernel, std::function<double(double, double)>>, 2> sp,
+      int integration_precision, int integration_verbosity
+   ) : XSection(parameters, m1, m2, flav, integration_precision, integration_verbosity), f_soft_(f_soft), dS_(dS), dC_(dC), sp_(sp) {};
 
    std::array<double, 3> integrate();
    int integrand_sc(const int*, const cubareal[],

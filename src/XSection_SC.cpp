@@ -25,32 +25,31 @@ std::array<double, 3> XSection_SC::integrate() {
    static constexpr int ndim  = 3;
    static constexpr int ncomp = 1;
    // accuraccy
-   const double accuracy_rel_sc {std::pow(10., -vm["precision-sc"].as<int>())};
-   const double accuracy_rel_c  {std::pow(10., -vm["precision-sc"].as<int>())};
+   const double accuracy_rel_sc {std::pow(10., -integration_precision_)};
+   const double accuracy_rel_c  {std::pow(10., -integration_precision_)};
    static constexpr double accuracy_abs {1e-12};
 
    static constexpr int neval_min = 10'000;
    long long int neval;
    static constexpr long long int neval_max {1'000'000'000};
-   const int verbose = vm["verbosity-sc"].as<int>();
 
    int nregions, fail;
 
    cubareal integral_sc[ncomp], error_sc[ncomp], prob_sc[ncomp];
    llCuhre(ndim, ncomp, forwarder_sc, this, 1,
-      accuracy_rel_sc, accuracy_abs, verbose,
+      accuracy_rel_sc, accuracy_abs, integration_verbosity_,
       neval_min, neval_max, 1, NULL, NULL,
       &nregions, &neval, &fail, integral_sc, error_sc, prob_sc);
 
    cubareal integral_c1[ncomp], error_c1[ncomp], prob_c1[ncomp];
    llCuhre(ndim, ncomp, forwarder_c1, this, 1,
-      accuracy_rel_c, accuracy_abs, verbose,
+      accuracy_rel_c, accuracy_abs, integration_verbosity_,
       neval_min, neval_max, 1, NULL, NULL,
       &nregions, &neval, &fail, integral_c1, error_c1, prob_c1);
 
    cubareal integral_c2[ncomp], error_c2[ncomp], prob_c2[ncomp];
    llCuhre(ndim, ncomp, forwarder_c2, this, 1,
-      accuracy_rel_c, accuracy_abs, verbose,
+      accuracy_rel_c, accuracy_abs, integration_verbosity_,
       neval_min, neval_max, 1, NULL, NULL,
       &nregions, &neval, &fail, integral_c2, error_c2, prob_c2);
 
