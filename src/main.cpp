@@ -326,7 +326,10 @@ int main(int argc, char* argv[]) {
       const double dS = pt.get<double>("technical parameters.dS");
       const double dC = pt.get<double>("technical parameters.dC");
       cout << "\nINFO: Using phase space slicing parameters δS=" << dS
-           << ", δC=" << dC << '\n';
+           << "and δC=" << dC << '\n';
+      if (dC > dS) {
+         cout << "Warning: δC should be always << than δS\n";
+      }
 	   switch(model) {
          case Model::MRSSM:
          {
