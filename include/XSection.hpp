@@ -13,20 +13,24 @@ namespace LHAPDF {
    class PDF;
 }
 
-// every class with at least one pure virtual function
-// is an abstract base class
+struct XSectionParameters {
+   double sqrtS;
+   double muR;
+   double muF;
+   LHAPDF::PDF* pdf;
+};
+
 class XSection {
 public:
-   XSection(double m1, double m2, double muR, double muF, std::vector<std::array<int, 3>> const& flav, const LHAPDF::PDF* const pdf)
-      : m1_(m1), m2_(m2), muR_(muR), muF_(muF), flav_(flav), pdf_(pdf) {};
+   XSection(XSectionParameters const& parameters, double m1, double m2, std::vector<std::array<int, 3>> const& flav)
+      : m1_(m1), m2_(m2), sqrtS_(parameters.sqrtS), muR_(parameters.muR), muF_(parameters.muF), flav_(flav), pdf_(parameters.pdf) {};
 
-   void init (boost::property_tree::ptree const&, boost::program_options::variables_map const&);
+   void init (boost::program_options::variables_map const&);
 
 protected:
-   boost::property_tree::ptree pt;
    boost::program_options::variables_map vm;
 
-   double sqrtS_;
+   const double sqrtS_;
    const double m1_;
    const double m2_;
    const double muR_;

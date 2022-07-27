@@ -8,12 +8,11 @@
 class XSection_Tree : public XSection {
 public:
    XSection_Tree(
+      XSectionParameters const& parameters,
       double m1, double m2,
       std::function<double(double, double, double)> f_,
-      std::vector<std::array<int, 3>> flav,
-      double muR, double muF,
-      const LHAPDF::PDF* const pdf
-   ) : XSection(m1, m2, muR, muF, flav, pdf), f(f_) {};
+      std::vector<std::array<int, 3>> flav
+   ) : XSection(parameters, m1, m2, flav), f(f_) {};
 
    std::array<double, 3> integrate();
    void show_settings();
