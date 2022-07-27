@@ -719,7 +719,7 @@ int main(int argc, char* argv[]) {
 		            if (subprocess == "" || subprocess == "uubar_suLsuLdagger") {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
-                        flav.push_back({i,-i,2});
+                        flav.push_back({i, -i, 4});
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
@@ -807,7 +807,8 @@ int main(int argc, char* argv[]) {
                   if( subprocess == "") {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
-                        flav.push_back({i,-i, 2*4});
+                        // 4 (squark flavours) * 2 (pp symmetry) * 2 (L and R squarks)
+                        flav.push_back({i,-i, 2*4*2});
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
@@ -846,7 +847,8 @@ int main(int argc, char* argv[]) {
                   }
 
                   if( subprocess == "") {
-                     std::vector<std::array<int, 3>> flav {{21, 21, 5}};
+                     // 5 squark flavours * L and R
+                     std::vector<std::array<int, 3>> flav {{21, 21, 2*5}};
                      XSection_Tree tree(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrixMRSSMTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav
