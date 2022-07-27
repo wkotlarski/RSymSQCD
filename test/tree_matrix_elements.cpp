@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "Process.hpp"
+#include "models/MRSSM.hpp"
 
 namespace {
 
@@ -18,7 +18,7 @@ TEST(TreeMatrixElementTest, MRSSM) {
    pt.put("technical parameters.delta", 1.5e+3);
    pt.put("technical parameters.WidthOverMass", 1.5e+3);
 
-   Process p1 = Process(pt);
+   MRSSM p1 = MRSSM(pt);
 
    /*
    const double ME2_1 = (p1.*p1.Process::matrixelementTree)(0.1, 76858666.754357532, -35567448.864206761);

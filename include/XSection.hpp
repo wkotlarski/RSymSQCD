@@ -1,8 +1,6 @@
 #ifndef XSECTION_H_
 #define XSECTION_H_
 
-#include "Process.hpp"
-
 #include <boost/property_tree/ptree.hpp>
 #include <boost/program_options/variables_map.hpp>
 

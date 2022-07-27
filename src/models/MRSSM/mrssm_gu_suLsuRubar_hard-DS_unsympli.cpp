@@ -1,4 +1,4 @@
-double Process::matrixMRSSMHard_gu_suLsuRubar_DS(double Alfas, std::vector<double*> const& p) const {
+double MRSSM::matrixMRSSMHard_gu_suLsuRubar_DS(double Alfas, std::vector<double*> const& p) const {
    double Alfas2 = Sqr(Alfas);
    double Theta = MassGlu > m2 ? 1 : 0;
    double k12 = p[0][0]*p[1][0]-p[0][1]*p[1][1]-p[0][2]*p[1][2]-p[0][3]*p[1][3];

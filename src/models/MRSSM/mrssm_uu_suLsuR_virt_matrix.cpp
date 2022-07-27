@@ -1,4 +1,4 @@
-double Process::matrixMRSSMVirt_uu_suLsuR(double alphaS, double S, double T,
+double MRSSM::matrixMRSSMVirt_uu_suLsuR(double alphaS, double S, double T,
    const double FiniteGs, const double Dminus4, int divergence, double mu) { // agrees with Philip
    setmudim(Sqr(mu));
    setlambda(divergence);

@@ -1,4 +1,4 @@
-double Process::matrixMRSSMHard_gu_suLsuLdaggeru_DR(double Alfas, std::array<std::array<double, 4>, 5> const& p) const {
+double MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru_DR(double Alfas, std::array<std::array<double, 4>, 5> const& p) const {
    double Alfas2 = Sqr(Alfas);
    const double m1 = MassSq;
    const double m2 = MassSq;

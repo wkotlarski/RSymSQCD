@@ -4,6 +4,10 @@
 #include "XSection_SC.hpp"
 #include "XSection_HnonC.hpp"
 #include "splitting_kernels.hpp"
+// models
+#include "models/MSSM.hpp"
+#include "models/MRSSM.hpp"
+#include "models/Sgluons.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
@@ -145,12 +149,13 @@ int main(int argc, char* argv[]) {
            xsection_tree3 {}, xsection_virt3 {}, xsection_SC3 {}, xsection_HnonC3 {},
            xsection_tree4 {}, xsection_virt4 {}, xsection_SC4 {}, xsection_HnonC4 {},
            xsection_tree5 {}, xsection_virt5 {}, xsection_SC5 {}, xsection_HnonC5 {},
+           xsection_tree6 {}, xsection_virt6 {}, xsection_SC6 {}, xsection_HnonC6 {},
            xsection_tree_total {}, xsection_virt_total {}, xsection_SC_total {}, xsection_HnonC_total {};
 
    enum class Model {
        MRSSM,
        MSSM,
-       Simplified,
+       Sgluons,
        no_model
    };
 
@@ -161,8 +166,8 @@ int main(int argc, char* argv[]) {
    else if (pt.get<string>("process.model") == "MSSM") {
       model = Model::MSSM;
    }
-   else if (pt.get<string>("process.model") == "Simplified") {
-       model = Model::Simplified;
+   else if (pt.get<string>("process.model") == "Sgluons") {
+       model = Model::Sgluons;
    }
    else {
       std::cout << "\nModel not implemented!\n\n";
@@ -181,34 +186,50 @@ int main(int argc, char* argv[]) {
        pp_suLsuRdagger,
        pp_suLsdLdagger,
        pp_suLsdRdagger,
+       pp_sqsqdagger,
        no_channel
    };
 
    Channel channel = Channel::no_channel;
-   if ( pt.get<string>("process.process") == "pp_OsOs" ) {
+   if (pt.get<string>("process.process") == "pp_OsOs") {
       channel = Channel::pp_OsOs;
-   } else if ( pt.get<string>("process.process") == "pp_suLsuR" ) {
+   }
+   else if (pt.get<string>("process.process") == "pp_suLsuR") {
       channel = Channel::pp_suLsuR;
-   } else if ( pt.get<string>("process.process") == "pp_sqLsqR" ) {
+   }
+   else if (pt.get<string>("process.process") == "pp_sqLsqR") {
       channel = Channel::pp_sqLsqR;
-   } else if ( pt.get<string>("process.process") == "pp_suLsuL" ) {
+   }
+   else if (pt.get<string>("process.process") == "pp_suLsuL") {
       channel = Channel::pp_suLsuL;
-   } else if ( pt.get<string>("process.process") == "pp_suLsdR" ) {
+   }
+   else if (pt.get<string>("process.process") == "pp_suLsdR") {
       channel = Channel::pp_suLsdR;
-   } else if ( pt.get<string>("process.process") == "pp_suLsdL" ) {
+   }
+   else if (pt.get<string>("process.process") == "pp_suLsdL") {
       channel = Channel::pp_suLsdL;
-   } else if ( pt.get<string>("process.process") == "pp_suLsuLdagger" ) {
+   }
+   else if (pt.get<string>("process.process") == "pp_suLsuLdagger") {
       channel = Channel::pp_suLsuLdagger;
-   } else if ( pt.get<string>("process.process") == "pp_suLsuRdagger" ) {
+   }
+   else if (pt.get<string>("process.process") == "pp_sqsqdagger") {
+      channel = Channel::pp_sqsqdagger;
+   }
+   else if (pt.get<string>("process.process") == "pp_suLsuRdagger") {
       channel = Channel::pp_suLsuRdagger;
-   } else if ( pt.get<string>("process.process") == "pp_suLsdLdagger" ) {
+   }
+   else if (pt.get<string>("process.process") == "pp_suLsdLdagger") {
       channel = Channel::pp_suLsdLdagger;
-   } else if ( pt.get<string>("process.process") == "pp_suLsdRdagger" ) {
+   }
+   else if (pt.get<string>("process.process") == "pp_suLsdRdagger") {
       channel = Channel::pp_suLsdRdagger;
-         } else if ( pt.get<string>("process.process") == "pp_OO" ) {
+   }
+   else if (pt.get<string>("process.process") == "pp_OO") {
       channel = Channel::pp_OO;
-   } else {
+   }
+   else {
 	   cout << "\n Process not implemented! \n\n";
+      return 1.;
    }
 
    json j;
@@ -326,14 +347,14 @@ int main(int argc, char* argv[]) {
       const double dS = pt.get<double>("technical parameters.dS");
       const double dC = pt.get<double>("technical parameters.dC");
       cout << "\nINFO: Using phase space slicing parameters δS=" << dS
-           << "and δC=" << dC << '\n';
+           << " and δC=" << dC << '\n';
       if (dC > dS) {
          cout << "Warning: δC should be always << than δS\n";
       }
 	   switch(model) {
          case Model::MRSSM:
          {
-            Process mrssm(pt);
+            MRSSM mrssm(pt);
             switch(channel) {
                case Channel::pp_suLsuR:
                {
@@ -345,27 +366,27 @@ int main(int argc, char* argv[]) {
                      XSection_Tree tree(
                         parameters, m1, m2,
                         // same ME as in the MSSM
-                        std::bind(&Process::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3),
-                        flav 
+                        std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3),
+                        flav
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixMRSSMVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&Process::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&Process::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)}
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)}
                         }
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMHard_uu_suLsuRg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixMRSSMHard_uu_suLsuRg, mrssm, _1, _2),
                         dS, dC,
                         flav
                      );
@@ -387,18 +408,18 @@ int main(int argc, char* argv[]) {
                      for(int el : {2, -2}) flav.push_back({21, el, 2});
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
                         0. /*dS*/, dC,
                         flav,
                         {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&Process::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&Process::matrix_xsec_stub, mrssm, _1, _2)}
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::matrix_xsec_stub, mrssm, _1, _2)}
                         }
 
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMHard_gu_suLsuRubar, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixMRSSMHard_gu_suLsuRubar, mrssm, _1, _2),
                         0. /*dS*/, dC,
                         flav
                      );
@@ -435,27 +456,27 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3), flav
+                        std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3), flav
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixMRSSMVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&Process::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&Process::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)}
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)}
                         }
                      );
 
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMHard_uu_suLsuRg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixMRSSMHard_uu_suLsuRg, mrssm, _1, _2),
                         dS, dC, flav
                      );
 	                  tree.init(vm );
@@ -475,18 +496,18 @@ int main(int argc, char* argv[]) {
                      for(int el : {1, -1, 2, -2, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2*5});
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
                         0. /*dS*/, dC,
                         flav,
                         {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&Process::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&Process::matrix_xsec_stub, mrssm, _1, _2)}
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::matrix_xsec_stub, mrssm, _1, _2)}
                         }
 
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMHard_gu_suLsuRubar, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixMRSSMHard_gu_suLsuRubar, mrssm, _1, _2),
                         0. /*dS*/, dC,
                         flav
                      );
@@ -513,27 +534,27 @@ int main(int argc, char* argv[]) {
                      std::vector<std::array<int, 3>> flav {{2, -2, 2}};
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav
+                        std::bind(&MRSSM::matrixMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixMRSSMVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixMRSSMSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&Process::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&Process::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)}
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)}
                         }
 
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMHard_uubar_suLsuLdaggerg, mrssm, _1, _2), 
+                        std::bind(&MRSSM::matrixMRSSMHard_uubar_suLsuLdaggerg, mrssm, _1, _2), 
                         dS, dC, 
                         flav
                      );
@@ -556,26 +577,26 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2, _3), flav
+                        std::bind(&MRSSM::matrixMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2, _3), flav
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMVirt_ddbar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixMRSSMVirt_ddbar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMSoft_ddbar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixMRSSMSoft_ddbar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&Process::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&Process::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)}
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)}
                         }
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMHard_ddbar_suLsuLdaggerg, mrssm, _1, _2), 
+                        std::bind(&MRSSM::matrixMRSSMHard_ddbar_suLsuLdaggerg, mrssm, _1, _2), 
                         dS, dC, flav
                      );
 	                  tree.init(vm );
@@ -594,26 +615,26 @@ int main(int argc, char* argv[]) {
                      std::vector<std::array<int, 3>> flav {{21, 21, 1}};
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav
+                        std::bind(&MRSSM::matrixMRSSMTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMVirt_GG_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixMRSSMVirt_GG_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMSoft_gg_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixMRSSMSoft_gg_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgg, std::bind(&Process::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgg, std::bind(&Process::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgg, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgg, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
                         }
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMHard_gg_suLsuLdaggerg, mrssm, _1, _2), 
+                        std::bind(&MRSSM::matrixMRSSMHard_gg_suLsuLdaggerg, mrssm, _1, _2), 
                         dS, dC, flav
                      );
 	                  tree.init(vm );
@@ -637,16 +658,16 @@ int main(int argc, char* argv[]) {
                      for( int el : { 1, -1, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2});
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
                         dS, dC, flav,
                         {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&Process::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&Process::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
                         }
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMHard_gd_suLsuLdaggerd, mrssm, _1, _2), 
+                        std::bind(&MRSSM::matrixMRSSMHard_gd_suLsuLdaggerd, mrssm, _1, _2), 
                         dS, dC, flav
                      );
 	                  sc.init(vm );
@@ -663,16 +684,16 @@ int main(int argc, char* argv[]) {
                      for( int el : { 2, -2 }) flav.push_back({21, el, 2});
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
                         0. /*dS*/, dC, flav,
                         {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&Process::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&Process::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
                         }
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&Process::matrixMRSSMHard_gu_suLsuLdaggeru, mrssm, _1, _2), 
+                        std::bind(&MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru, mrssm, _1, _2), 
                         dS, dC, flav
                      );
 	                  sc.init(vm );
@@ -690,19 +711,294 @@ int main(int argc, char* argv[]) {
                           + xsection_HnonC4 + xsection_HnonC5;
                   print( "total", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total);
                   break;
+               }
+               case Channel::pp_sqsqdagger:
+               {
+                  const double m1 = pt.get<double>("masses.squarks");
+                  const double m2 = pt.get<double>("masses.squarks");
+		            if (subprocess == "" || subprocess == "uubar_suLsuLdagger") {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {1, 2, 3, 4, 5}) {
+                        flav.push_back({i,-i,2});
+                     }
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav
+                     );
+                     XSection_Virt virt(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        flav
+                     );
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        dS, dC,
+                        flav,
+                        {
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)}
+                        }
+
+                     );
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMHard_uubar_suLsuLdaggerg, mrssm, _1, _2), 
+                        dS, dC, 
+                        flav
+                     );
+	                  tree.init(vm );
+	                  virt.init(vm );
+	                  sc.init(vm );
+	                  hc.init(vm );
+                     if(enable_born) xsection_tree1 = tree.integrate();
+                     if(enable_virt) xsection_virt1 = virt.integrate();
+                     if(enable_sc) xsection_SC1 = sc.integrate();
+                     if(enable_hard) xsection_HnonC1 = hc.integrate();
+                     print( "qqbar > sqsq*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     xsec_to_json(j, "qqbar->sqsq*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+	    	         }
+		            if (subprocess == "" || subprocess == "uubar_suLsuLdagger") {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {1, 2, 3, 4, 5}) {
+                        for (int j : {1, 2, 3, 4, 5}) {
+                           if (j==i) continue;
+                           flav.push_back({i,-j,2});
+                        }
+                     }
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3), flav
+                     );
+                     XSection_Virt virt(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        flav
+                     );
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        dS, dC,
+                        flav,
+                        {
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)}
+                        }
+
+                     );
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMHard_uubar_suLsuLdaggerg, mrssm, _1, _2), 
+                        dS, dC, 
+                        flav
+                     );
+	                  tree.init(vm );
+	                  virt.init(vm );
+	                  sc.init(vm );
+	                  hc.init(vm );
+                     if(enable_born) xsection_tree2 = tree.integrate();
+                     if(enable_virt) xsection_virt2 = virt.integrate();
+                     if(enable_sc) xsection_SC2 = sc.integrate();
+                     if(enable_hard) xsection_HnonC2 = hc.integrate();
+                     print( "qqbar > sqsq*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+                     xsec_to_json(j, "qqbar->sqsq*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+	    	         }
+
+                  if( subprocess == "") {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {1, 2, 3, 4, 5}) {
+                        flav.push_back({i,-i, 2*4});
+                     }
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2, _3), flav
+                     );
+                     XSection_Virt virt(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMVirt_ddbar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        flav
+                     );
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMSoft_ddbar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        dS, dC,
+                        flav,
+                        {
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)}
+                        }
+                     );
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMHard_ddbar_suLsuLdaggerg, mrssm, _1, _2), 
+                        dS, dC, flav
+                     );
+	                  tree.init(vm );
+	                  virt.init(vm );
+	                  sc.init(vm );
+	                  hc.init(vm );
+                     if(enable_born) xsection_tree3 = tree.integrate();
+                     if(enable_virt) xsection_virt3 = virt.integrate();
+                     if(enable_sc) xsection_SC3 = sc.integrate();
+                     if(enable_hard) xsection_HnonC3 = hc.integrate();
+                     print( "ddbar->suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
+                     xsec_to_json(j, "ddbar->suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
                   }
+
+                  if( subprocess == "") {
+                     std::vector<std::array<int, 3>> flav {{21, 21, 5}};
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav
+                     );
+                     XSection_Virt virt(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMVirt_GG_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        flav
+                     );
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMSoft_gg_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        dS, dC,
+                        flav,
+                        {
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgg, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgg, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                        }
+                     );
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMHard_gg_suLsuLdaggerg, mrssm, _1, _2), 
+                        dS, dC, flav
+                     );
+	                  tree.init(vm );
+	                  virt.init(vm );
+	                  sc.init(vm );
+	                  hc.init(vm );
+                     if(enable_born) xsection_tree4 = tree.integrate();
+                     if(enable_virt) xsection_virt4 = virt.integrate();
+                     if(enable_sc) xsection_SC4 = sc.integrate();
+                     if(enable_hard) xsection_HnonC4 = hc.integrate();
+                     print( "gg > suLsuL*", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
+                     xsec_to_json(j, "gg->suLsuL*", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
+                  }
+
+                  // the matrix element is regular in the limit dS -> 0 but the phase space parametrization
+                  // fails if we are exactly on the threshold
+                  pt.put( "technical parameters.dS", 1e-10 );
+
+                  if( subprocess == "") {
+                     std::vector<std::array<int, 3>> flav {};
+                     for( int el : { 1, -1, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2});
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
+                        dS, dC, flav,
+                        {
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                        }
+                     );
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMHard_gd_suLsuLdaggerd, mrssm, _1, _2), 
+                        dS, dC, flav
+                     );
+	                  sc.init(vm );
+	                  hc.init(vm );
+                     if(enable_sc) xsection_SC5 = sc.integrate();
+                     if(enable_hard) xsection_HnonC5 = hc.integrate();
+                     print( "gq > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5);
+                     xsec_to_json(j, "gq->suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5);
+                  }
+
+                  // g u > suL suLdagger
+                  if( subprocess == "gu_suLsuLdaggeru" || subprocess == "" ) {
+                     std::vector<std::array<int, 3>> flav {};
+                     for( int el : { 2, -2 }) flav.push_back({21, el, 2});
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
+                        0. /*dS*/, dC, flav,
+                        {
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                        }
+                     );
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru, mrssm, _1, _2), 
+                        dS, dC, flav
+                     );
+	                  sc.init(vm );
+	                  hc.init(vm );
+                     if(enable_sc) xsection_SC6 = sc.integrate();
+                     if(enable_hard) xsection_HnonC6 = hc.integrate();
+                     print( "gu > suLsuL*(+X)", xsection_tree6, xsection_virt6, xsection_SC6, xsection_HnonC6 );
+                     xsec_to_json(j, "gu->suLsuL*(+X)", xsection_tree6, xsection_virt6, xsection_SC6, xsection_HnonC6);
+                  }
+
+                  xsection_tree_total = xsection_tree1 + xsection_tree2 + xsection_tree3 + xsection_tree4;
+                  xsection_virt_total = xsection_virt1 + xsection_virt2 + xsection_virt3;
+                  xsection_SC_total = xsection_SC1 + xsection_SC2 + xsection_SC3 + xsection_SC4 + xsection_SC5;
+                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2 + xsection_HnonC3
+                          + xsection_HnonC4 + xsection_HnonC5;
+                  print( "total", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total);
+                  break;
+               }
                default:
                   cout << "NLO process not implemented\n";
             }
-                            }
-         case Model::Simplified:
+         }
+         case Model::Sgluons:
+            Sgluons sgluons(pt);
             switch(channel) {
                case Channel::pp_OO:
                {
-                  {
-                  }
-               }
+                  const double m1 = pt.get<double>("masses.sgluon");
+		            if (subprocess == "") {
+                     std::vector<std::array<int, 3>> flav {{2, -2, 2}};
+                     XSection_Tree tree(
+                        parameters, m1, m1,
+                        std::bind(&Sgluons::matrixSgluonsTree_qqbar_OO, sgluons, _1, _2, _3), flav
+                     );
+                     /*
+                     XSection_Virt virt(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        flav
+                     );
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        dS, dC,
+                        flav,
+                        {
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)}
+                        }
+
+                     );
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMHard_uubar_suLsuLdaggerg, mrssm, _1, _2), 
+                        dS, dC, 
+                        flav
+                     );
+	                  tree.init(vm );
+	                  virt.init(vm );
+	                  sc.init(vm );
+	                  hc.init(vm );
+                     if(enable_born) xsection_tree1 = tree.integrate();
+                     if(enable_virt) xsection_virt1 = virt.integrate();
+                     if(enable_sc) xsection_SC1 = sc.integrate();
+                     if(enable_hard) xsection_HnonC1 = hc.integrate();
+                     print( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     xsec_to_json(j, "uubar->suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     */
+	    	      }
             }
+         }
       }
    }
 

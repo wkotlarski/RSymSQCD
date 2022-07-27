@@ -72,7 +72,7 @@ endif()
 
 find_package(Eigen3 REQUIRED)
 
-add_library(process OBJECT "src/Process.cpp")
+add_library(process OBJECT "src/models/MRSSM/MRSSM.cpp" "src/models/Sgluons/Sgluons.cpp")
 target_compile_options(process PRIVATE -fPIC)
 target_include_directories(
       process
