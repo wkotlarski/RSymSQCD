@@ -15,6 +15,17 @@ find_package(Ruby)
 # allow whitespaces in test names
 cmake_policy(SET CMP0110 NEW)
 
+list(APPEND BORN_RUN_CARDS pp_sqLsqR/pp_sqLsqR_BMP1_LO.ini pp_sqLsqR/pp_sqLsqR_BMP2_LO.ini pp_sqLsqR/pp_sqLsqR_BMP3_LO.ini)
+# σLO(LO PDF) column from Tab. 3 of 1707.04557
+list(APPEND BORN_RESULTS 13.065515658699582 4.608168157871303 159.82254549998856)
+foreach(el IN ZIP_LISTS BORN_RUN_CARDS BORN_RESULTS)
+add_test(
+   NAME
+      "σLO for ${el_0}"
+   COMMAND ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/check_born_xsec.rb ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${el_1} ${CMAKE_BINARY_DIR}
+)
+endforeach()
+
 add_test(
    NAME
       "pp_suLsuR total xsec in BMP1"
