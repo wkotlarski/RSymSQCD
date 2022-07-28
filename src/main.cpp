@@ -245,7 +245,7 @@ int main(int argc, char* argv[]) {
       channel = Channel::pp_OO;
    }
    else {
-	   cout << "\n Process not implemented! \n\n";
+      cout << "\n Process not implemented! \n\n";
       return 1.;
    }
 
@@ -297,7 +297,7 @@ int main(int argc, char* argv[]) {
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
-		            {
+                  {
                      std::vector<std::array<int, 3>> flav {{2,2,1}};
                      XSection_Tree tree(
                         parameters, m1, m2,
@@ -310,7 +310,7 @@ int main(int argc, char* argv[]) {
                      print("uu > suLsuR", xsection_tree);
                   }
                   break;
-			      }
+               }
                case Channel::pp_suLsuLdagger:
                {
                   break;
@@ -319,7 +319,7 @@ int main(int argc, char* argv[]) {
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
-		            {
+                  {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
                         flav.push_back({ i,  i, 1});
@@ -340,12 +340,12 @@ int main(int argc, char* argv[]) {
                      xsec_to_json(j, "qq->sqLsqR+cc", result);
                   }
                   break;
-			      }
+               }
                case Channel::pp_sqLsqR:
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
-		            {
+                  {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
                         flav.push_back({ i,  i, 1});
@@ -364,13 +364,13 @@ int main(int argc, char* argv[]) {
                      xsec_to_json(j, "qq->sqLsqR", result);
                   }
                   break;
-			      }
+               }
                case Channel::pp_sqsqdagger:
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
                   std::array<double, 3> result {0., 0., 0.};
-		            {
+                  {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
                         flav.push_back({i, -i, 4});
@@ -384,8 +384,8 @@ int main(int argc, char* argv[]) {
                      print("qqbar > sqsq*", chan_res);
                      xsec_to_json(j, "qqbar->sqsq*", chan_res);
                      result = result + chan_res;
-	    	         }
-		            {
+                  }
+                  {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
                         for (int j : {1, 2, 3, 4, 5}) {
@@ -402,7 +402,7 @@ int main(int argc, char* argv[]) {
                      print("qqbar > sqsq*", chan_res);
                      xsec_to_json(j, "qqbar->sqsq*", chan_res);
                      result = result + chan_res;
-	    	         }
+                  }
                   {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
@@ -435,8 +435,8 @@ int main(int argc, char* argv[]) {
                   print("total", result);
                   break;
                }
-			      default:
-   			      break;
+               default:
+                  break;
             } // end of process block
          break;
       } // end of model block
@@ -449,7 +449,7 @@ int main(int argc, char* argv[]) {
       if (dC > dS) {
          cout << "Warning: δC should be always << than δS\n";
       }
-	   switch(model) {
+      switch(model) {
          case Model::MRSSM:
          {
             MRSSM mrssm(mrssm_params);
@@ -459,7 +459,7 @@ int main(int argc, char* argv[]) {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
                   // uu > suL suR (+g) process
-		            if( subprocess == "" ) {
+                  if( subprocess == "" ) {
                      std::vector<std::array<int, 3>> flav {{2,2,1}};
                      XSection_Tree tree(
                         parameters, m1, m2,
@@ -498,10 +498,10 @@ int main(int argc, char* argv[]) {
                      if(enable_hard) xsection_HnonC1 = hc.integrate();
                      print( "uu > suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      xsec_to_json(j, "uu->suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
-		            }
+                  }
 
                   // gu > suL suR ubar process
-		            if (subprocess == "gu_suLsuRubar" || subprocess == "" ) {
+                  if (subprocess == "gu_suLsuRubar" || subprocess == "" ) {
                      std::vector<std::array<int, 3>> flav {};
                      for(int el : {2, -2}) flav.push_back({21, el, 2});
                      XSection_SC sc(
@@ -530,7 +530,7 @@ int main(int argc, char* argv[]) {
                      if(enable_hard) xsection_HnonC2 = hc.integrate();
                      print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
                      xsec_to_json(j, "gu->suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
-		            }
+                  }
 
                   xsection_tree_total = xsection_tree1;
                   xsection_virt_total = xsection_virt1;
@@ -538,13 +538,13 @@ int main(int argc, char* argv[]) {
                   xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
                   print( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
                   break;
-			      }
+               }
                case Channel::pp_sqLsqR:
                {
                   // qq > sqL sqR (+g) process
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
-		            if( subprocess == "" ) {
+                  if( subprocess == "" ) {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
                         flav.push_back({ i,  i, 1});
@@ -590,9 +590,9 @@ int main(int argc, char* argv[]) {
                      if(enable_hard) xsection_HnonC1 = hc.integrate();
                      print( "qq > sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      xsec_to_json(j, "qq->sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
-		            }
+                  }
                   // gu > suL suR ubar process
-		            if (subprocess == "gu_suLsuRubar" || subprocess == "" ) {
+                  if (subprocess == "gu_suLsuRubar" || subprocess == "" ) {
                      std::vector<std::array<int, 3>> flav {};
                      for(int el : {1, 2, 3, 4, 5}) flav.push_back({21, el, 5});
                      XSection_SC sc(
@@ -621,7 +621,7 @@ int main(int argc, char* argv[]) {
                      if(enable_hard) xsection_HnonC2 = hc.integrate();
                      print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
                      xsec_to_json(j, "gu->suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
-		            }
+                  }
 
                   xsection_tree_total = xsection_tree1;
                   xsection_virt_total = xsection_virt1;
@@ -629,13 +629,13 @@ int main(int argc, char* argv[]) {
                   xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
                   print( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
                   break;
-			      }
+               }
                case Channel::pp_sqLsqR_w_cc:
                {
                   // qq > sqL sqR (+g) process
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
-		            if( subprocess == "" ) {
+                  if( subprocess == "" ) {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
                         flav.push_back({ i,  i, 1});
@@ -685,9 +685,9 @@ int main(int argc, char* argv[]) {
                      if(enable_hard) xsection_HnonC1 = hc.integrate();
                      print( "qq > sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      xsec_to_json(j, "qq->sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
-		            }
+                  }
                   // gu > suL suR ubar process
-		            if (subprocess == "gu_suLsuRubar" || subprocess == "" ) {
+                  if (subprocess == "gu_suLsuRubar" || subprocess == "" ) {
                      std::vector<std::array<int, 3>> flav {};
                      // for(int el : {1, -1, 2, -2, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2*5});
                      for(int el : {1, 2, 3, 4, 5}) flav.push_back({21, el, 5});
@@ -713,7 +713,7 @@ int main(int argc, char* argv[]) {
                      if(enable_hard) xsection_HnonC2 = hc.integrate();
                      print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
                      xsec_to_json(j, "gu->suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
-		            }
+                  }
 
                   xsection_tree_total = xsection_tree1;
                   xsection_virt_total = xsection_virt1;
@@ -721,12 +721,12 @@ int main(int argc, char* argv[]) {
                   xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
                   print( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
                   break;
-			      }
+               }
                case Channel::pp_suLsuLdagger:
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
-		            if (subprocess == "" || subprocess == "uubar_suLsuLdagger") {
+                  if (subprocess == "" || subprocess == "uubar_suLsuLdagger") {
                      std::vector<std::array<int, 3>> flav {{2, -2, 2}};
                      XSection_Tree tree(
                         parameters, m1, m2,
@@ -763,7 +763,7 @@ int main(int argc, char* argv[]) {
                      if(enable_hard) xsection_HnonC1 = hc.integrate();
                      print( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      xsec_to_json(j, "uubar->suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
-	    	         }
+                  }
 
                   if( subprocess == "") {
                      std::vector<std::array<int, 3>> flav {};
@@ -911,7 +911,7 @@ int main(int argc, char* argv[]) {
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
-		            if (subprocess == "" || subprocess == "uubar_suLsuLdagger") {
+                  if (subprocess == "" || subprocess == "uubar_suLsuLdagger") {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
                         flav.push_back({i, -i, 4});
@@ -951,8 +951,8 @@ int main(int argc, char* argv[]) {
                      if(enable_hard) xsection_HnonC1 = hc.integrate();
                      print( "qqbar > sqsq*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      xsec_to_json(j, "qqbar->sqsq*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
-	    	         }
-		            if (subprocess == "" || subprocess == "uubar_suLsuLdagger") {
+                  }
+                  if (subprocess == "" || subprocess == "uubar_suLsuLdagger") {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
                         for (int j : {1, 2, 3, 4, 5}) {
@@ -995,7 +995,7 @@ int main(int argc, char* argv[]) {
                      if(enable_hard) xsection_HnonC2 = hc.integrate();
                      print( "qqbar > sqsq*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
                      xsec_to_json(j, "qqbar->sqsq*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
-	    	         }
+                  }
 
                   if( subprocess == "") {
                      std::vector<std::array<int, 3>> flav {};
@@ -1152,7 +1152,7 @@ int main(int argc, char* argv[]) {
                case Channel::pp_OO:
                {
                   const double m1 = pt.get<double>("masses.sgluon");
-		            if (subprocess == "") {
+                  if (subprocess == "") {
                      std::vector<std::array<int, 3>> flav {{2, -2, 2}};
                      XSection_Tree tree(
                         parameters, m1, m1,
@@ -1189,7 +1189,7 @@ int main(int argc, char* argv[]) {
                      print( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      xsec_to_json(j, "uubar->suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      */
-	    	      }
+               }
             }
          }
       }
