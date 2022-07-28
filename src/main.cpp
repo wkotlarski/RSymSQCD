@@ -1047,7 +1047,6 @@ int main(int argc, char* argv[]) {
          }
          break;
          case Model::Sgluons:
-            std::cout << "why" << std::endl;
             Sgluons sgluons(pt);
             switch(channel) {
                case Channel::pp_OO:
