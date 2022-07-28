@@ -357,7 +357,6 @@ int main(int argc, char* argv[]) {
                }
                case Channel::pp_sqLsqR:
                {
-                  // qq > sqL sqR (+g) process
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
 		            {
@@ -377,9 +376,9 @@ int main(int argc, char* argv[]) {
                         born_precision, born_verbosity
                      );
                      auto result = tree.integrate();
-                     print("qq > sqLsqR(+X)", result);
-                     xsec_to_json(j, "qq->sqLsqR(+X)", result);
-		            }
+                     print("qq > sqLsqR", result);
+                     xsec_to_json(j, "qq->sqLsqR", result);
+                  }
                   break;
 			      }
                case Channel::pp_sqsqdagger:
