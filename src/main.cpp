@@ -33,13 +33,20 @@ inline array<double, 3> operator+(array<double, 3> const& x, array<double, 3> co
    return {x.at(0) + y.at(0), std::hypot(x.at(1), y.at(1)), std::max(x.at(2), y.at(2))};
 }
 
-void xsec_to_json(json& j, std::string const& str, array<double, 3> const& tree, array<double, 3> const& virt, array<double, 3> const& soft, array<double, 3> const& hard) {
-   j["cross sections"][str] = {
-      {"tree", {{"res", tree.at(0)}, {"err", tree.at(1)}, {"p-val", tree.at(2)}}},
-      {"virtual", {{"res", virt.at(0)}, {"err", virt.at(1)}, {"p-val", virt.at(2)}}},
-      {"SC", {{"res", soft.at(0)}, {"err", soft.at(1)}, {"p-val", soft.at(2)}}},
-      {"HnonC", {{"res", hard.at(0)}, {"err", hard.at(1)}, {"p-val", hard.at(2)}}}
-   };
+void xsec_to_json(json& j, std::string const& str, array<double, 3> const& tree, array<double, 3> const& virt = {}, array<double, 3> const& soft = {}, array<double, 3> const& hard = {}) {
+   if (virt.empty()==0 && soft.empty()==0 && hard.empty() == 0) {
+      j["cross sections"][str] = {
+         {"tree", {{"res", tree.at(0)}, {"err", tree.at(1)}, {"p-val", tree.at(2)}}}
+      };
+   }
+   else {
+      j["cross sections"][str] = {
+         {"tree", {{"res", tree.at(0)}, {"err", tree.at(1)}, {"p-val", tree.at(2)}}},
+         {"virtual", {{"res", virt.at(0)}, {"err", virt.at(1)}, {"p-val", virt.at(2)}}},
+         {"SC", {{"res", soft.at(0)}, {"err", soft.at(1)}, {"p-val", soft.at(2)}}},
+         {"HnonC", {{"res", hard.at(0)}, {"err", hard.at(1)}, {"p-val", hard.at(2)}}}
+      };
+   }
 }
 
 void print( string str, array<double,3> tree, array<double,3> virt, array<double,3> soft, array<double,3> hard) {
@@ -253,13 +260,6 @@ int main(int argc, char* argv[]) {
       {"top", pt.get<double>("masses.top")},
       {"squarks", pt.get<double>("masses.squarks")}
    };
-   j["technical parameters"] = {
-      {"dS", pt.get<double>("technical parameters.dS")},
-      {"dC", pt.get<double>("technical parameters.dC")},
-      {"WidthOverMass", pt.get<double>("technical parameters.WidthOverMass")},
-      {"eta_sign", pt.get<double>("technical parameters.eta_sign")},
-      {"delta", pt.get<double>("technical parameters.delta")}
-   };
 
    // set PDFs
    std::cout << '\n';
@@ -288,38 +288,55 @@ int main(int argc, char* argv[]) {
    auto start = chrono::steady_clock::now();
 
    if (pt.get<string>("process.order") == "LO") {
-      /*
       switch(model) {
          case Model::MRSSM:
+            MRSSM mrssm(mrssm_params);
             switch(channel) {
                case Channel::pp_OsOs:
                {
+                  /*
                   Process process1("sgluons-gg_OO", pt);
                   XSection_Tree tree;
                   temp = tree.integrate();
                   Process process2("sgluons-qqbar_OO", pt);
                   xsection_tree = tree.integrate() + temp;
                   print("pp > OO", xsection_tree);
+                  */
                   break;
 			      }
                case Channel::pp_suLsuR:
                {                                                     // checked with MadGraph and Philip
-                  Process process("MRSSM,uu_suLsuR", pt);
-                  XSection_Tree tree;
-                  xsection_tree = tree.integrate();
-                  print("uu > suLsuR", xsection_tree);
+                  const double m1 = pt.get<double>("masses.squarks");
+                  const double m2 = pt.get<double>("masses.squarks");
+                  // uu > suL suR (+g) process
+		            {
+                     std::vector<std::array<int, 3>> flav {{2,2,1}};
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        // same ME as in the MSSM
+                        std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3),
+                        flav,
+                        born_precision, born_verbosity
+                     );
+                     xsection_tree = tree.integrate();
+                     xsec_to_json(j, "uu->suLsuR", xsection_tree);
+                     print("uu > suLsuR", xsection_tree);
+                  }
                   break;
 			      }
                case Channel::pp_suLsdR:
                {                                                     // checked with MadGraph and Philip
+                  /*
                   Process process("MRSSM,ud_suLsdR", pt);
                   XSection_Tree tree;
                   xsection_tree = tree.integrate();
                   print("uu > suLsdR", xsection_tree);
+                  */
                   break;
 			      }
                case Channel::pp_suLsuLdagger:
                {
+                  /*
                   Process process1("MRSSM,GG_suLsuLdagger", pt);
                   XSection_Tree tree;
                   xsection_tree1 = tree.integrate();
@@ -335,24 +352,112 @@ int main(int argc, char* argv[]) {
 
                   xsection_tree_total = xsection_tree1 + xsection_tree2 + xsection_tree3;
                   print("pp > suLsdLdagger", xsection_tree_total);
+                  */
+                  break;
+               }
+               case Channel::pp_sqLsqR:
+               {
+                  // qq > sqL sqR (+g) process
+                  const double m1 = pt.get<double>("masses.squarks");
+                  const double m2 = pt.get<double>("masses.squarks");
+		            {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {1, 2, 3, 4, 5}) {
+                        flav.push_back({ i,  i, 1});
+                        flav.push_back({-i, -i, 1});
+                        for (int j : {1, 2, 3, 4, 5}) {
+                           if (j>=i) continue;
+                           flav.push_back({ i,  j, 2});
+                           flav.push_back({-i, -j, 2});
+                        }
+                     }
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        born_precision, born_verbosity
+                     );
+                     auto result = tree.integrate();
+                     print("qq > sqLsqR(+X)", result);
+                     xsec_to_json(j, "qq->sqLsqR(+X)", result);
+		            }
+                  break;
+			      }
+               case Channel::pp_sqsqdagger:
+               {
+                  const double m1 = pt.get<double>("masses.squarks");
+                  const double m2 = pt.get<double>("masses.squarks");
+                  std::array<double, 3> result {0., 0., 0.};
+		            {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {1, 2, 3, 4, 5}) {
+                        flav.push_back({i, -i, 4});
+                     }
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        born_precision, born_verbosity
+                     );
+                     auto chan_res = tree.integrate();
+                     print("qqbar > sqsq*", chan_res);
+                     xsec_to_json(j, "qqbar->sqsq*", chan_res);
+                     result = result + chan_res;
+	    	         }
+		            {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {1, 2, 3, 4, 5}) {
+                        for (int j : {1, 2, 3, 4, 5}) {
+                           if (j==i) continue;
+                           flav.push_back({i,-j,2});
+                        }
+                     }
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        born_precision, born_verbosity
+                     );
+                     auto chan_res = tree.integrate();
+                     print("qqbar > sqsq*", chan_res);
+                     xsec_to_json(j, "qqbar->sqsq*", chan_res);
+                     result = result + chan_res;
+	    	         }
+                  {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {1, 2, 3, 4, 5}) {
+                        // 4 (squark flavours) * 2 (pp symmetry) * 2 (L and R squarks)
+                        flav.push_back({i,-i, 2*4*2});
+                     }
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        born_precision, born_verbosity
+                     );
+                     auto chan_res = tree.integrate();
+                     print( "ddbar->suLsuL*", chan_res);
+                     xsec_to_json(j, "ddbar->suLsuL*", chan_res);
+                     result = result + chan_res;
+                  }
+                  {
+                     // 5 squark flavours * L and R
+                     std::vector<std::array<int, 3>> flav {{21, 21, 2*5}};
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        born_precision, born_verbosity
+                     );
+                     auto chan_res = tree.integrate();
+                     print( "gg > suLsuL*", chan_res);
+                     xsec_to_json(j, "gg->suLsuL*", chan_res);
+                  }
+                  print("total", result);
                   break;
                }
 			      default:
 			      {
-			         xsection_tree = {0,0,0};
    			      break;
 			      }
             }
             break;
-         case Model::MSSM:
-            switch(channel) {
-               //case pp_suLsuR:
-               //case pp_suLsuLdagger:
-               //default:
-            }
-         break;
       }
-      */
    }
    else if (pt.get<string>("process.order") == "NLO") {
       const double dS = pt.get<double>("technical parameters.dS");
@@ -1007,6 +1112,13 @@ int main(int argc, char* argv[]) {
             }
          }
       }
+      j["technical parameters"] = {
+         {"dS", pt.get<double>("technical parameters.dS")},
+         {"dC", pt.get<double>("technical parameters.dC")},
+         {"WidthOverMass", pt.get<double>("technical parameters.WidthOverMass")},
+         {"eta_sign", pt.get<double>("technical parameters.eta_sign")},
+         {"delta", pt.get<double>("technical parameters.delta")}
+      };
    }
 
    // print out time statistics
