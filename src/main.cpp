@@ -103,9 +103,7 @@ int main(int argc, char* argv[]) {
       ("precision-virt", po::value<int>() -> default_value(3), "")
       // gu_suLsuLdaggeru with SC precision 5 for BMP2 gives p-value 1
       ("precision-sc",   po::value<int>() -> default_value(6), "")
-      // hard precision 3 gives p-valus of ~0.3 but on a home PC precision of 4
-      // takes to long for a 'normal' run
-      ("precision-hard", po::value<int>() -> default_value(3), "")
+      ("precision-hard", po::value<int>() -> default_value(4), "")
       ("enable-born", po::value<bool>() -> default_value(true), "")
       ("enable-virt", po::value<bool>() -> default_value(true), "")
       ("enable-sc",   po::value<bool>() -> default_value(true), "")
