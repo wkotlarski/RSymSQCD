@@ -590,7 +590,7 @@ int main(int argc, char* argv[]) {
                   // gu > suL suR ubar process
 		            if (subprocess == "gu_suLsuRubar" || subprocess == "" ) {
                      std::vector<std::array<int, 3>> flav {};
-                     for(int el : {1, -1, 2, -2, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2*5});
+                     for(int el : {1, 2, 3, 4, 5}) flav.push_back({21, el, 5});
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
@@ -605,6 +605,94 @@ int main(int argc, char* argv[]) {
                      XSection_HnonC hc(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrixMRSSMHard_gu_suLsuRubar, mrssm, _1, _2),
+                        0. /*dS*/, dC,
+                        flav,
+                        hard_precision, hard_verbosity
+                     );
+                     if(enable_sc) xsection_SC2 = sc.integrate();
+                     if(enable_hard) xsection_HnonC2 = hc.integrate();
+                     print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
+                     xsec_to_json(j, "gu->suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+		            }
+
+                  xsection_tree_total = xsection_tree1;
+                  xsection_virt_total = xsection_virt1;
+                  xsection_SC_total = xsection_SC1 + xsection_SC2;
+                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
+                  print( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
+                  break;
+			      }
+               case Channel::pp_sqLsqR_w_cc:
+               {
+                  // qq > sqL sqR (+g) process
+                  const double m1 = pt.get<double>("masses.squarks");
+                  const double m2 = pt.get<double>("masses.squarks");
+		            if( subprocess == "" ) {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {1, 2, 3, 4, 5}) {
+                        flav.push_back({ i,  i, 1});
+                        flav.push_back({-i, -i, 1});
+                        for (int j : {1, 2, 3, 4, 5}) {
+                           if (j>=i) continue;
+                           flav.push_back({ i,  j, 2});
+                           flav.push_back({-i, -j, 2});
+                        }
+                     }
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        born_precision, born_verbosity
+                     );
+                     XSection_Virt virt(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        flav,
+                        virt_precision, virt_verbosity
+                     );
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
+                        dS, dC,
+                        flav,
+                        {
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)}
+                        },
+                        sc_precision, sc_verbosity
+                     );
+
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMHard_uu_suLsuRg, mrssm, _1, _2),
+                        dS, dC, flav,
+                        hard_precision, hard_verbosity
+                     );
+                     if(enable_born) xsection_tree1 = tree.integrate();
+                     if(enable_virt) xsection_virt1 = virt.integrate();
+                     if(enable_sc) xsection_SC1 = sc.integrate();
+                     if(enable_hard) xsection_HnonC1 = hc.integrate();
+                     print( "qq > sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     xsec_to_json(j, "qq->sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+		            }
+                  // gu > suL suR ubar process
+		            if (subprocess == "gu_suLsuRubar" || subprocess == "" ) {
+                     std::vector<std::array<int, 3>> flav {};
+                     // for(int el : {1, -1, 2, -2, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2*5});
+                     for(int el : {1, 2, 3, 4, 5}) flav.push_back({21, el, 5});
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
+                        0. /*dS*/, dC,
+                        flav,
+                        {
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::matrix_xsec_stub, mrssm, _1, _2)}
+                        },
+                        sc_precision, sc_verbosity
+                     );
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMHard_gu_suLsuRubar_DR, mrssm, _1, _2),
                         0. /*dS*/, dC,
                         flav,
                         hard_precision, hard_verbosity
