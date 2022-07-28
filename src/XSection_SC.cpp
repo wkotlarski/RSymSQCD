@@ -121,7 +121,7 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
          result += (2.*CA*std::log(dS_) + (11.*CA + 2.*Nf)/6)*el.second(alphas, s12);
       }
    };
-   result *= std::log(Sqr(muR_/muF_));
+   result *= alphas/two_pi*std::log(Sqr(muR_/muF_));
 
    ff[0] = result*(pi*Power(-4*Sqr(m1_) + Sqr(sqrtS_),2)*xx[0])/(Sqr(sqrtS_)*(-4*Sqr(m1_)*(-1 + xx[0]) + Sqr(sqrtS_)*xx[0]));
 
