@@ -293,28 +293,14 @@ int main(int argc, char* argv[]) {
          case Model::MRSSM:
             MRSSM mrssm(mrssm_params);
             switch(channel) {
-               case Channel::pp_OsOs:
-               {
-                  /*
-                  Process process1("sgluons-gg_OO", pt);
-                  XSection_Tree tree;
-                  temp = tree.integrate();
-                  Process process2("sgluons-qqbar_OO", pt);
-                  xsection_tree = tree.integrate() + temp;
-                  print("pp > OO", xsection_tree);
-                  */
-                  break;
-			      }
                case Channel::pp_suLsuR:
-               {                                                     // checked with MadGraph and Philip
+               {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
-                  // uu > suL suR (+g) process
 		            {
                      std::vector<std::array<int, 3>> flav {{2,2,1}};
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        // same ME as in the MSSM
                         std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3),
                         flav,
                         born_precision, born_verbosity
@@ -325,35 +311,8 @@ int main(int argc, char* argv[]) {
                   }
                   break;
 			      }
-               case Channel::pp_suLsdR:
-               {                                                     // checked with MadGraph and Philip
-                  /*
-                  Process process("MRSSM,ud_suLsdR", pt);
-                  XSection_Tree tree;
-                  xsection_tree = tree.integrate();
-                  print("uu > suLsdR", xsection_tree);
-                  */
-                  break;
-			      }
                case Channel::pp_suLsuLdagger:
                {
-                  /*
-                  Process process1("MRSSM,GG_suLsuLdagger", pt);
-                  XSection_Tree tree;
-                  xsection_tree1 = tree.integrate();
-                  print("GG > suLsdLdagger", xsection_tree1);
-
-                  Process process2("MRSSM,uubar_suLsuLdagger", pt);
-                  xsection_tree2 = tree.integrate();
-                  print("uubar > suLsdLdagger", xsection_tree2);
-
-                  Process process3("MRSSM,ddbar_suLsuLdagger", pt);
-                  xsection_tree3 = tree.integrate();
-                  print("qqbar > suLsuLdagger", xsection_tree3);
-
-                  xsection_tree_total = xsection_tree1 + xsection_tree2 + xsection_tree3;
-                  print("pp > suLsdLdagger", xsection_tree_total);
-                  */
                   break;
                }
                case Channel::pp_sqLsqR_w_cc:
@@ -477,13 +436,11 @@ int main(int argc, char* argv[]) {
                   break;
                }
 			      default:
-			      {
    			      break;
-			      }
-            }
-            break;
-      }
-   }
+            } // end of process block
+         break;
+      } // end of model block
+   } // end of LO block
    else if (pt.get<string>("process.order") == "NLO") {
       const double dS = pt.get<double>("technical parameters.dS");
       const double dC = pt.get<double>("technical parameters.dC");
