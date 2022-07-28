@@ -15,9 +15,17 @@ find_package(Ruby)
 # allow whitespaces in test names
 cmake_policy(SET CMP0110 NEW)
 
-list(APPEND LO_RUN_CARDS pp_sqLsqR/pp_sqLsqR_BMP1_LO.ini pp_sqLsqR/pp_sqLsqR_BMP2_LO.ini pp_sqLsqR/pp_sqLsqR_BMP3_LO.ini)
+list(
+   APPEND LO_RUN_CARDS
+   pp_sqLsqR/pp_sqLsqR_BMP1_LO.ini pp_sqLsqR/pp_sqLsqR_BMP2_LO.ini pp_sqLsqR/pp_sqLsqR_BMP3_LO.ini
+   pp_sqsqdagger/pp_sqsqdagger_BMP1_LO.ini pp_sqsqdagger/pp_sqsqdagger_BMP2_LO.ini pp_sqsqdagger/pp_sqsqdagger_BMP3_LO.ini
+)
 # σLO(LO PDF) column from Tab. 3 of 1707.04557
-list(APPEND LO_RESULTS pp_sqLsqR_BMP1_LO.json pp_sqLsqR_BMP2_LO.json pp_sqLsqR_BMP3_LO.json)
+list(
+   APPEND LO_RESULTS
+   pp_sqLsqR_BMP1_LO.json pp_sqLsqR_BMP2_LO.json pp_sqLsqR_BMP3_LO.json
+   pp_sqsqdagger_BMP1_LO.json pp_sqsqdagger_BMP2_LO.json pp_sqsqdagger_BMP3_LO.json
+)
 foreach(el IN ZIP_LISTS LO_RUN_CARDS LO_RESULTS)
 add_test(
    NAME
