@@ -515,9 +515,13 @@ int main(int argc, char* argv[]) {
                         },
                         sc_precision, sc_verbosity
                      );
+                     auto f =
+                        mrssm_params.MassGlu < mrssm_params.MassSq
+                           ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar
+                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep : &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DR);
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_gu_suLsuRubar, mrssm, _1, _2),
+                        std::bind(f, mrssm, _1, _2),
                         0. /*dS*/, dC,
                         flav,
                         hard_precision, hard_verbosity
@@ -602,9 +606,13 @@ int main(int argc, char* argv[]) {
                         },
                         sc_precision, sc_verbosity
                      );
+                     auto f =
+                        mrssm_params.MassGlu < mrssm_params.MassSq
+                           ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar
+                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep : &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DR);
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_gu_suLsuRubar, mrssm, _1, _2),
+                        std::bind(f, mrssm, _1, _2),
                         0. /*dS*/, dC,
                         flav,
                         hard_precision, hard_verbosity
@@ -661,9 +669,13 @@ int main(int argc, char* argv[]) {
                         sc_precision, sc_verbosity
                      );
 
+                     auto f =
+                        mrssm_params.MassGlu < mrssm_params.MassSq
+                           ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar
+                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep : &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DR);
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_uu_suLsuRg, mrssm, _1, _2),
+                        std::bind(f, mrssm, _1, _2),
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
