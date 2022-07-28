@@ -41,11 +41,16 @@ std::array<double, 3> XSection_SC::integrate() {
       neval_min, neval_max, 1, NULL, NULL,
       &nregions, &neval, &fail, integral_sc, error_sc, prob_sc);
 
-   cubareal integral_c1[ncomp], error_c1[ncomp], prob_c1[ncomp];
-   llCuhre(ndim, ncomp, forwarder_c1, this, 1,
-      accuracy_rel_c, accuracy_abs, integration_verbosity_,
-      neval_min, neval_max, 1, NULL, NULL,
-      &nregions, &neval, &fail, integral_c1, error_c1, prob_c1);
+   double integral_c1[ncomp] = {0.};
+   double error_c1[ncomp]    = {0.};
+   double prob_c1[ncomp]     = {0.};
+   if (sp_.at(0).first == SplittingKernel::Pqq || sp_.at(0).first == SplittingKernel::Pgg ||
+       sp_.at(1).first == SplittingKernel::Pgg || sp_.at(1).first == SplittingKernel::Pgg) {
+      llCuhre(ndim, ncomp, forwarder_c1, this, 1,
+         accuracy_rel_c, accuracy_abs, integration_verbosity_,
+         neval_min, neval_max, 1, NULL, NULL,
+         &nregions, &neval, &fail, integral_c1, error_c1, prob_c1);
+   }
 
    cubareal integral_c2[ncomp], error_c2[ncomp], prob_c2[ncomp];
    llCuhre(ndim, ncomp, forwarder_c2, this, 1,
@@ -98,21 +103,27 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
    const double x2 = 4.*Sqr(m1_)/(Sqr(sqrtS_)*x1) + (1-4.*Sqr(m1_)/(Sqr(sqrtS_)*x1)) * xx[1];
    const double th = pi * xx[2];
 
-   const double s12 = x1 * x2 * Sqr(sqrtS_);
-   double Alfas = pdf_->alphasQ( muR_ );
-   double Alfas2 = Sqr(Alfas);
-
    double pdf_flux = 0.0;
    for (const auto& inner : flav_) {
       pdf_flux += inner.at(2) * pdf_->xfxQ(inner.at(0), x1, muF_) * pdf_->xfxQ(inner.at(1), x2, muF_);
    }
    pdf_flux /= x1 * x2;
 
-   //ff[0] = to_fb * pdf_flux * CF * (2.*std::log(dS) + 1.5);
-   // 2.*N*std::log(dS) + (11.*N + 2.*Nf)/6
-   // std::log(Sqr(mu_r/mu_f))
+   const double s12 = x1 * x2 * Sqr(sqrtS_);
+   const double alphas = pdf_->alphasQ(muR_);
+   double result = 0.;
+   for (const auto& el : sp_) {
+      if (el.first == SplittingKernel::Pqq) {
+         result += CF*(2.*std::log(dS_) + 1.5)*el.second(alphas, s12);
+      }
+      else if (el.first == SplittingKernel::Pgg) {
+         static constexpr int Nf = 5;
+         result += (2.*CA*std::log(dS_) + (11.*CA + 2.*Nf)/6)*el.second(alphas, s12);
+      }
+   };
+   result *= std::log(Sqr(muR_/muF_));
 
-   ff[0] *= 0*(pi*Power(-4*Sqr(m1_) + Sqr(sqrtS_),2)*xx[0])/(Sqr(sqrtS_)*(-4*Sqr(m1_)*(-1 + xx[0]) + Sqr(sqrtS_)*xx[0]));
+   ff[0] = result*(pi*Power(-4*Sqr(m1_) + Sqr(sqrtS_),2)*xx[0])/(Sqr(sqrtS_)*(-4*Sqr(m1_)*(-1 + xx[0]) + Sqr(sqrtS_)*xx[0]));
 
    return 0;
 }
