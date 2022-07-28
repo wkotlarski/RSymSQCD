@@ -433,7 +433,7 @@ int main(int argc, char* argv[]) {
                      for (int i : {1, 2, 3, 4, 5}) {
                         for (int j : {1, 2, 3, 4, 5}) {
                            if (j==i) continue;
-                           flav.push_back({i,-j,2});
+                           flav.push_back({i, -j, 2});
                         }
                      }
                      XSection_Tree tree(
@@ -473,6 +473,7 @@ int main(int argc, char* argv[]) {
                      auto chan_res = tree.integrate();
                      print( "gg > suLsuL*", chan_res);
                      xsec_to_json(j, "gg->suLsuL*", chan_res);
+                     result = result + chan_res;
                   }
                   print("total", result);
                   break;
