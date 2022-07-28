@@ -198,6 +198,7 @@ int main(int argc, char* argv[]) {
        pp_suLsdR,
        pp_suLsdL,
        pp_sqLsqR,
+       pp_sqLsqR_w_cc,
        pp_suLsuLdagger,
        pp_suLsuRdagger,
        pp_suLsdLdagger,
@@ -215,6 +216,9 @@ int main(int argc, char* argv[]) {
    }
    else if (pt.get<string>("process.process") == "pp_sqLsqR") {
       channel = Channel::pp_sqLsqR;
+   }
+   else if (pt.get<string>("process.process") == "pp_sqLsqR+cc") {
+      channel = Channel::pp_sqLsqR_w_cc;
    }
    else if (pt.get<string>("process.process") == "pp_suLsuL") {
       channel = Channel::pp_suLsuL;
@@ -355,7 +359,7 @@ int main(int argc, char* argv[]) {
                   */
                   break;
                }
-               case Channel::pp_sqLsqR:
+               case Channel::pp_sqLsqR_w_cc:
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
@@ -368,6 +372,30 @@ int main(int argc, char* argv[]) {
                            if (j>=i) continue;
                            flav.push_back({ i,  j, 2});
                            flav.push_back({-i, -j, 2});
+                        }
+                     }
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        born_precision, born_verbosity
+                     );
+                     auto result = tree.integrate();
+                     print("qq > sqLsqR + cc", result);
+                     xsec_to_json(j, "qq->sqLsqR+cc", result);
+                  }
+                  break;
+			      }
+               case Channel::pp_sqLsqR:
+               {
+                  const double m1 = pt.get<double>("masses.squarks");
+                  const double m2 = pt.get<double>("masses.squarks");
+		            {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {1, 2, 3, 4, 5}) {
+                        flav.push_back({ i,  i, 1});
+                        for (int j : {1, 2, 3, 4, 5}) {
+                           if (j>=i) continue;
+                           flav.push_back({ i,  j, 2});
                         }
                      }
                      XSection_Tree tree(
