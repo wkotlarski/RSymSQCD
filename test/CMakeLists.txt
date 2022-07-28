@@ -30,16 +30,26 @@ foreach(el IN ZIP_LISTS LO_RUN_CARDS LO_RESULTS)
 add_test(
    NAME
       "LO cross-section for ${el_0}"
-   COMMAND ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/${el_1}
+   COMMAND ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/LO/${el_1}
 )
 endforeach()
 
-list(APPEND NLO_RUN_CARDS pp_suLsuR/pp_suLsuR_BMP1.ini)
-list(APPEND NLO_RESULTS pp_suLsuR_BMP1.json)
+list(
+   APPEND NLO_RUN_CARDS
+   pp_suLsuR/pp_suLsuR_BMP1.ini pp_suLsuR/pp_suLsuR_BMP2_DR.ini pp_suLsuR/pp_suLsuR_BMP3_DR.ini
+   # pp_suLsuLdagger/pp_suLsuLdagger_BMP1.ini
+   # pp_sqLsqR/pp_sqLsqR_BMP1.ini
+)
+list(
+   APPEND NLO_RESULTS
+   pp_suLsuR_BMP1.json pp_suLsuR_BMP2_DR.json pp_suLsuR_BMP3_DR.json
+   # pp_suLsuLdagger_BMP1.json
+   # pp_sqLsqR_BMP1.json
+)
 foreach(el IN ZIP_LISTS NLO_RUN_CARDS NLO_RESULTS)
 add_test(
    NAME
       "NLO cross-section for ${el_0}"
-   COMMAND ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/${el_1}
+      COMMAND ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/NLO/${el_1}
 )
 endforeach()
