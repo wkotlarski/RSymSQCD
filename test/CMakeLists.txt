@@ -15,62 +15,23 @@ find_package(Ruby)
 # allow whitespaces in test names
 cmake_policy(SET CMP0110 NEW)
 
-list(APPEND BORN_RUN_CARDS pp_sqLsqR/pp_sqLsqR_BMP1_LO.ini pp_sqLsqR/pp_sqLsqR_BMP2_LO.ini pp_sqLsqR/pp_sqLsqR_BMP3_LO.ini)
+list(APPEND LO_RUN_CARDS pp_sqLsqR/pp_sqLsqR_BMP1_LO.ini pp_sqLsqR/pp_sqLsqR_BMP2_LO.ini pp_sqLsqR/pp_sqLsqR_BMP3_LO.ini)
 # σLO(LO PDF) column from Tab. 3 of 1707.04557
-list(APPEND BORN_RESULTS test/ref_outputs/pp_sqLsqR_BMP1_LO.json test/ref_outputs/pp_sqLsqR_BMP2_LO.json test/ref_outputs/pp_sqLsqR_BMP3_LO.json)
-foreach(el IN ZIP_LISTS BORN_RUN_CARDS BORN_RESULTS)
+list(APPEND LO_RESULTS pp_sqLsqR_BMP1_LO.json pp_sqLsqR_BMP2_LO.json pp_sqLsqR_BMP3_LO.json)
+foreach(el IN ZIP_LISTS LO_RUN_CARDS LO_RESULTS)
 add_test(
    NAME
-      "σLO for ${el_0}"
-   COMMAND ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/${el_1}
+      "LO cross-section for ${el_0}"
+   COMMAND ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/${el_1}
 )
 endforeach()
 
+list(APPEND NLO_RUN_CARDS pp_suLsuR/pp_suLsuR_BMP1.ini)
+list(APPEND NLO_RESULTS pp_suLsuR_BMP1.json)
+foreach(el IN ZIP_LISTS NLO_RUN_CARDS NLO_RESULTS)
 add_test(
    NAME
-      "pp_suLsuR total xsec in BMP1"
-   COMMAND
-      RSymSQCD --card ${CMAKE_SOURCE_DIR}/run_cards/pp_suLsuR/pp_suLsuR_BMP1.ini --json-outputfile-name "pp_suLsuR_BMP1.out" --precision-hard=4 --precision-virt=4
+      "NLO cross-section for ${el_0}"
+   COMMAND ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/${el_1}
 )
-add_test(NAME "compare outputs for pp_suLsuR in BMP1" COMMAND ${RUBY_EXECUTABLE} "${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb" "${CMAKE_SOURCE_DIR}/test/ref_outputs/pp_suLsuR_BMP1.ref" "pp_suLsuR_BMP1.out")
-
-add_test(
-   NAME
-      "pp_suLsuR total xsec in BMP2 with DR"
-   COMMAND
-      RSymSQCD --card ${CMAKE_SOURCE_DIR}/run_cards/pp_suLsuR/pp_suLsuR_BMP2_DR.ini --json-outputfile-name "pp_suLsuR_BMP2_DR.out" --precision-hard=4 --precision-virt=4
-)
-add_test(NAME "compare outputs for pp_suLsuR in BMP2 with DR" COMMAND ${RUBY_EXECUTABLE} "${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb" "${CMAKE_SOURCE_DIR}/test/ref_outputs/pp_suLsuR_BMP2_DR.ref" "pp_suLsuR_BMP2_DR.out")
-
-add_test(
-   NAME
-      "pp_suLsuR total xsec in BMP3 with DR"
-   COMMAND
-      RSymSQCD --card ${CMAKE_SOURCE_DIR}/run_cards/pp_suLsuR/pp_suLsuR_BMP3_DR.ini --json-outputfile-name "pp_suLsuR_BMP3_DR.out" --precision-hard=4 --precision-virt=4
-)
-add_test(NAME "compare outputs for pp_suLsuR in BMP3 with DR" COMMAND ${RUBY_EXECUTABLE} "${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb" "${CMAKE_SOURCE_DIR}/test/ref_outputs/pp_suLsuR_BMP3_DR.ref" "pp_suLsuR_BMP3_DR.out")
-
-add_test(
-   NAME
-      "pp_suLsuLdagger total xsec in BMP1"
-   COMMAND
-      RSymSQCD --card ${CMAKE_SOURCE_DIR}/run_cards/pp_suLsuLdagger/pp_suLsuLdagger_BMP1.ini --json-outputfile-name "pp_suLsuLdagger_BMP1.out" --precision-hard=4 --precision-virt=4
-)
-add_test(NAME "compare outputs for pp_suLsuL* in BMP1" COMMAND ${RUBY_EXECUTABLE} "${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb" "${CMAKE_SOURCE_DIR}/test/ref_outputs/pp_suLsuLdagger_BMP1.ref" "pp_suLsuLdagger_BMP1.out")
-
-add_test(
-   NAME
-      "pp_suLsuLdagger total xsec in BMP2 with DR"
-   COMMAND
-      RSymSQCD --card ${CMAKE_SOURCE_DIR}/run_cards/pp_suLsuLdagger/pp_suLsuLdagger_BMP2_DR.ini --json-outputfile-name "pp_suLsuLdagger_BMP2_DR.out" --precision-hard=4 --precision-virt=4
-)
-add_test(NAME "compare outputs for pp_suLsuL* in BMP2 with DR" COMMAND ${RUBY_EXECUTABLE} "${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb" "${CMAKE_SOURCE_DIR}/test/ref_outputs/pp_suLsuLdagger_BMP2_DR.ref" "pp_suLsuLdagger_BMP2_DR.out")
-
-add_test(
-   NAME
-      "pp_suLsuLdagger total xsec in BMP3 with DR"
-   COMMAND
-      RSymSQCD --card ${CMAKE_SOURCE_DIR}/run_cards/pp_suLsuLdagger/pp_suLsuLdagger_BMP3_DR.ini --json-outputfile-name "pp_suLsuLdagger_BMP3_DR.out" --precision-hard=4 --precision-virt=4
-)
-add_test(NAME "compare outputs for pp_suLsuL* in BMP3 with DR" COMMAND ${RUBY_EXECUTABLE} "${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb" "${CMAKE_SOURCE_DIR}/test/ref_outputs/pp_suLsuLdagger_BMP3_DR.ref" "pp_suLsuLdagger_BMP3_DR.out")
-
+endforeach()

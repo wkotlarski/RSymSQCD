@@ -4,7 +4,7 @@ require 'json'
 require 'securerandom'
 
 uuid = SecureRandom.uuid
-system("#{ARGV[0]}/RSymSQCD --card #{ARGV[1]} --json-outputfile-name=#{uuid}")
+system("CUBACORES=3 #{ARGV[0]}/RSymSQCD --card #{ARGV[1]} --json-outputfile-name=#{uuid}")
 
 file_ref     = File.read(ARGV[2])
 file_to_test = File.read(uuid)
