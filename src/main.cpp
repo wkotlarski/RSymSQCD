@@ -172,9 +172,9 @@ int main(int argc, char* argv[]) {
       mrssm_params.MassGlu = pt.get<double>("masses.gluino");
       mrssm_params.MasssigmaO = pt.get<double>("masses.pseudoscalar_sgluon");
       mrssm_params.MassSq = pt.get<double>("masses.squarks");
-      mrssm_params.eta_sign = pt.get<double>("technical parameters.eta_sign");
-      mrssm_params.delta = pt.get<double>("technical parameters.delta");
-      mrssm_params.WidthGlu = pt.get<double>("technical parameters.WidthOverMass") * mrssm_params.MassGlu;
+      mrssm_params.eta_sign = pt.get<int>("technical parameters.eta_sign", -1);
+      mrssm_params.delta = pt.get<double>("technical parameters.delta", 0.);
+      mrssm_params.WidthGlu = pt.get<double>("technical parameters.WidthOverMass", -1.) * mrssm_params.MassGlu;
    }
    else if (pt.get<string>("process.model") == "MSSM") {
       model = Model::MSSM;
@@ -442,13 +442,15 @@ int main(int argc, char* argv[]) {
       } // end of model block
    } // end of LO block
    else if (pt.get<string>("process.order") == "NLO") {
-      const double dS = pt.get<double>("technical parameters.dS");
-      const double dC = pt.get<double>("technical parameters.dC");
+      const double dS = pt.get<double>("technical parameters.dS", 1e-5);
+      const double dC = pt.get<double>("technical parameters.dC", 1e-6);
       cout << "\nINFO: Using phase space slicing parameters δS=" << dS
            << " and δC=" << dC << '\n';
       if (dC > dS) {
          cout << "Warning: δC should be always << than δS\n";
       }
+      const double delta = pt.get<double>("technical parameters.delta", 0.);
+      const int eta_sign = pt.get<double>("technical parameters.eta_sign", -1);
       switch(model) {
          case Model::MRSSM:
          {
@@ -1194,11 +1196,11 @@ int main(int argc, char* argv[]) {
          }
       }
       j["technical parameters"] = {
-         {"dS", pt.get<double>("technical parameters.dS")},
-         {"dC", pt.get<double>("technical parameters.dC")},
+         {"dS", dS},
+         {"dC", dC},
          {"WidthOverMass", pt.get<double>("technical parameters.WidthOverMass")},
-         {"eta_sign", pt.get<double>("technical parameters.eta_sign")},
-         {"delta", pt.get<double>("technical parameters.delta")}
+         {"eta_sign", eta_sign},
+         {"delta", delta}
       };
    }
 
