@@ -123,7 +123,8 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
    };
    result *= alphas/two_pi*std::log(Sqr(muR_/muF_));
 
-   ff[0] = result*(pi*Power(-4*Sqr(m1_) + Sqr(sqrtS_),2)*xx[0])/(Sqr(sqrtS_)*(-4*Sqr(m1_)*(-1 + xx[0]) + Sqr(sqrtS_)*xx[0]));
+   ff[0] = result*(pow(-4.*pow(m1_, 2) + Sqr(sqrtS_), 2)*xx[0] /
+          (Sqr(sqrtS_)*(-4*pow(m1_, 2)*(-1 + xx[0]) + Sqr(sqrtS_)*xx[0])))*pdf_flux*to_fb;
 
    return 0;
 }
