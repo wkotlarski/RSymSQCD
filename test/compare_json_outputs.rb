@@ -20,8 +20,9 @@ content_ref["cross sections"].each do |key, _|
 
     exit 1 if err_ref < 0 || err_new < 0
 
-    puts "#{key} #{key2}: #{xsec_ref} v. #{xsec_new} (1-ratio: #{1-xsec_ref/xsec_new}, max_error: #{[err_ref, err_new].max}"
+    sigma = (xsec_ref-xsec_new).abs/Math.sqrt(err_ref**2 + err_new**2)
+    puts "#{key} #{key2}: differ by #{sprintf('%.1f', sigma)}σ (#{xsec_ref} +/- #{err_ref} vs. #{xsec_new} +/- #{err_new})"
 
-    exit 1 if (xsec_ref-xsec_new).abs > 3.0*Math.sqrt(err_ref**2 + err_new**2)
+    exit 1 if sigma > 1.0
   end
 end
