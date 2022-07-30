@@ -19,6 +19,10 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set (CMAKE_BUILD_TYPE "${default_build_type}")
 endif()
 
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+   set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
+
 option(OPTIMIZE_FOR_NATIVE "Build with -march=native" OFF)
 if (OPTIMIZE_FOR_NATIVE)
    include(CheckCXXCompilerFlag)
