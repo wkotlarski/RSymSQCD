@@ -650,7 +650,7 @@ int main(int argc, char* argv[]) {
                      auto f =
                         mrssm_params.MassGlu < mrssm_params.MassSq
                            ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar
-                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep : &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DR);
+                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep : &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DS);
                      XSection_HnonC hc(
                         parameters, m1, m2,
                         std::bind(f, mrssm, _1, _2),
@@ -672,7 +672,7 @@ int main(int argc, char* argv[]) {
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
-                        0. /*dS*/, dC,
+                        dS0, dC,
                         flav,
                         {
                            std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
@@ -683,7 +683,7 @@ int main(int argc, char* argv[]) {
                      XSection_HnonC hc(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrixMRSSMHard_gu_suLsuRubar_DR, mrssm, _1, _2),
-                        0. /*dS*/, dC,
+                        dS0, dC,
                         flav,
                         hard_precision, hard_verbosity
                      );
@@ -861,6 +861,10 @@ int main(int argc, char* argv[]) {
                         },
                         sc_precision, sc_verbosity
                      );
+                     auto f =
+                        mrssm_params.MassGlu < mrssm_params.MassSq
+                           ? &MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru
+                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru_DR_wEta : &MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru_DS);
                      XSection_HnonC hc(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru, mrssm, _1, _2),
