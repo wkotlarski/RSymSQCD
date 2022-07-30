@@ -849,17 +849,13 @@ int main(int argc, char* argv[]) {
                      xsec_to_json(j, "gg->suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
                   }
 
-                  // the matrix element is regular in the limit dS -> 0 but the phase space parametrization
-                  // fails if we are exactly on the threshold
-                  pt.put( "technical parameters.dS", 1e-10 );
-
                   if( subprocess == "") {
                      std::vector<std::array<int, 3>> flav {};
                      for( int el : { 1, -1, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2});
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
-                        dS, dC, flav,
+                        dS0, dC, flav,
                         {
                            std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
                            std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
@@ -869,7 +865,7 @@ int main(int argc, char* argv[]) {
                      XSection_HnonC hc(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrixMRSSMHard_gd_suLsuLdaggerd, mrssm, _1, _2),
-                        dS, dC, flav,
+                        dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
                      if(enable_sc) xsection_SC4 = sc.integrate();
@@ -1083,17 +1079,13 @@ int main(int argc, char* argv[]) {
                      xsec_to_json(j, "gg->suLsuL*", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
                   }
 
-                  // the matrix element is regular in the limit dS -> 0 but the phase space parametrization
-                  // fails if we are exactly on the threshold
-                  pt.put( "technical parameters.dS", 1e-10 );
-
                   if( subprocess == "") {
                      std::vector<std::array<int, 3>> flav {};
                      for( int el : { 1, -1, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2});
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
-                        dS, dC, flav,
+                        dS0, dC, flav,
                         {
                            std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
                            std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
@@ -1103,7 +1095,7 @@ int main(int argc, char* argv[]) {
                      XSection_HnonC hc(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrixMRSSMHard_gd_suLsuLdaggerd, mrssm, _1, _2),
-                        dS, dC, flav,
+                        dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
                      if(enable_sc) xsection_SC5 = sc.integrate();
@@ -1119,7 +1111,7 @@ int main(int argc, char* argv[]) {
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
-                        0. /*dS*/, dC, flav,
+                        dS0, dC, flav,
                         {
                            std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
                            std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
@@ -1129,7 +1121,7 @@ int main(int argc, char* argv[]) {
                      XSection_HnonC hc(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru, mrssm, _1, _2),
-                        dS, dC, flav,
+                        dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
                      if(enable_sc) xsection_SC6 = sc.integrate();
