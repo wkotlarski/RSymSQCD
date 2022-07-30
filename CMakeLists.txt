@@ -108,7 +108,7 @@ target_link_libraries(
       ${LIBCOLORFULL_LIBRARY}
 )
 
-add_executable(RSymSQCD "src/main.cpp" "src/XSection_Tree.cpp" "src/XSection_Virt.cpp" "src/XSection_SC.cpp" "src/XSection_HnonC.cpp")
+add_executable(RSymSQCD "src/main.cpp" "src/XSection_Tree.cpp" "src/XSection_Virt.cpp" "src/XSection_SC.cpp" "src/XSection_HnonC.cpp" "src/utils.cpp")
 target_include_directories(
       RSymSQCD
    PUBLIC

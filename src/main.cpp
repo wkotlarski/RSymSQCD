@@ -4,6 +4,8 @@
 #include "XSection_SC.hpp"
 #include "XSection_HnonC.hpp"
 #include "splitting_kernels.hpp"
+#include "utils.hpp"
+
 // models
 #include "models/MSSM.hpp"
 #include "models/MRSSM.hpp"
@@ -46,46 +48,6 @@ void xsec_to_json(json& j, std::string const& str, array<double, 3> const& tree,
       {"SC", {{"res", soft.at(0)}, {"err", soft.at(1)}, {"p-val", soft.at(2)}}},
       {"HnonC", {{"res", hard.at(0)}, {"err", hard.at(1)}, {"p-val", hard.at(2)}}}
    };
-}
-
-void print( string str, array<double,3> tree, array<double,3> virt, array<double,3> soft, array<double,3> hard) {
-   cout << "\nResults for subprocess " << str << '\n';
-   cout << scientific;
-   // print out LO run statistics
-   cout << "---------------------------------------------------------------" << endl;
-   cout << setprecision(5);
-   cout << setw(12) << "tree:" << setw(13) << tree.at(0)
-         << " +/- " << setprecision(1) << tree.at(1)
-         << " fb ( p-value = " << setw(8) << tree.at(2) << " )\n";
-   cout << setprecision(5);
-   cout << setw(12) << "virtual:" << setw(13) << virt.at(0) << " +/- "
-           << setprecision(1) << virt.at(1) << " fb ( p-value = "
-           << setw(8) << virt.at(2) << " )\n";
-
-      cout << setprecision(5);
-      cout << setw(12) << "real (soft):" << setw(13) << soft.at(0) << " +/- " << setprecision(1) << soft.at(1)
-           << " fb ( p-value = " << setw(8) << soft.at(2) << " )\n";
-      cout << setprecision(5);
-      cout << setw(12) << "real (hard):" << setw(13) << hard.at(0) << " +/- " << setprecision(1) << hard.at(1)
-           << " fb ( p-value = " << setw(8) << hard.at(2) << " )\n";
-      cout << "---------------------------------------------------------------" << endl;
-      cout << setprecision(5);
-      cout << setw(12) << "sum:" << setw(13)
-           << tree.at(0) + virt.at(0) + hard.at(0) + soft.at(0)
-           << " +/- " << setprecision(1) << sqrt(pow(tree.at(1),2) +
-           pow(virt.at(1),2) + pow(hard.at(1),2) +
-           pow(soft.at(1),2)) << " fb" << endl;
-}
-
-void print( string str, array<double,3> tree) {
-   cout << "\nResults for subprocess " << str << '\n';
-      cout << scientific;
-   //print out LO run statistics
-   cout << "---------------------------------------------------------------" << endl;
-   cout << setprecision(5);
-   cout << setw(12) << "tree:" << setw(13) << tree.at(0)
-         << " +/- " << setprecision(1) << tree.at(1)
-         << " fb ( p-value = " << setw(8) << tree.at(2) << " )\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -307,7 +269,7 @@ int main(int argc, char* argv[]) {
                      );
                      xsection_tree = tree.integrate();
                      xsec_to_json(j, "uu->suLsuR", xsection_tree);
-                     print("uu > suLsuR", xsection_tree);
+                     print_to_terminal("uu > suLsuR", xsection_tree);
                   }
                   break;
                }
@@ -336,7 +298,7 @@ int main(int argc, char* argv[]) {
                         born_precision, born_verbosity
                      );
                      auto result = tree.integrate();
-                     print("qq > sqLsqR + cc", result);
+                     print_to_terminal("qq > sqLsqR + cc", result);
                      xsec_to_json(j, "qq->sqLsqR+cc", result);
                   }
                   break;
@@ -360,7 +322,7 @@ int main(int argc, char* argv[]) {
                         born_precision, born_verbosity
                      );
                      auto result = tree.integrate();
-                     print("qq > sqLsqR", result);
+                     print_to_terminal("qq > sqLsqR", result);
                      xsec_to_json(j, "qq->sqLsqR", result);
                   }
                   break;
@@ -381,7 +343,7 @@ int main(int argc, char* argv[]) {
                         born_precision, born_verbosity
                      );
                      auto chan_res = tree.integrate();
-                     print("qqbar > sqsq*", chan_res);
+                     print_to_terminal("qqbar > sqsq*", chan_res);
                      xsec_to_json(j, "qqbar->sqsq*", chan_res);
                      result = result + chan_res;
                   }
@@ -399,7 +361,7 @@ int main(int argc, char* argv[]) {
                         born_precision, born_verbosity
                      );
                      auto chan_res = tree.integrate();
-                     print("qqbar > sqsq*", chan_res);
+                     print_to_terminal("qqbar > sqsq*", chan_res);
                      xsec_to_json(j, "qqbar->sqsq*", chan_res);
                      result = result + chan_res;
                   }
@@ -415,7 +377,7 @@ int main(int argc, char* argv[]) {
                         born_precision, born_verbosity
                      );
                      auto chan_res = tree.integrate();
-                     print( "ddbar->suLsuL*", chan_res);
+                     print_to_terminal( "ddbar->suLsuL*", chan_res);
                      xsec_to_json(j, "ddbar->suLsuL*", chan_res);
                      result = result + chan_res;
                   }
@@ -428,11 +390,11 @@ int main(int argc, char* argv[]) {
                         born_precision, born_verbosity
                      );
                      auto chan_res = tree.integrate();
-                     print( "gg > suLsuL*", chan_res);
+                     print_to_terminal( "gg > suLsuL*", chan_res);
                      xsec_to_json(j, "gg->suLsuL*", chan_res);
                      result = result + chan_res;
                   }
-                  print("total", result);
+                  print_to_terminal("total", result);
                   break;
                }
                default:
@@ -498,7 +460,7 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) xsection_virt1 = virt.integrate();
                      if(enable_sc) xsection_SC1 = sc.integrate();
                      if(enable_hard) xsection_HnonC1 = hc.integrate();
-                     print( "uu > suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     print_to_terminal( "uu > suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      xsec_to_json(j, "uu->suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                   }
 
@@ -530,7 +492,7 @@ int main(int argc, char* argv[]) {
                      );
                      if(enable_sc) xsection_SC2 = sc.integrate();
                      if(enable_hard) xsection_HnonC2 = hc.integrate();
-                     print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
+                     print_to_terminal( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
                      xsec_to_json(j, "gu->suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
                   }
 
@@ -538,7 +500,7 @@ int main(int argc, char* argv[]) {
                   xsection_virt_total = xsection_virt1;
                   xsection_SC_total = xsection_SC1 + xsection_SC2;
                   xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
-                  print( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
+                  print_to_terminal( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
                   break;
                }
                case Channel::pp_sqLsqR:
@@ -590,7 +552,7 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) xsection_virt1 = virt.integrate();
                      if(enable_sc) xsection_SC1 = sc.integrate();
                      if(enable_hard) xsection_HnonC1 = hc.integrate();
-                     print( "qq > sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     print_to_terminal( "qq > sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      xsec_to_json(j, "qq->sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                   }
                   // gu > suL suR ubar process
@@ -621,7 +583,7 @@ int main(int argc, char* argv[]) {
                      );
                      if(enable_sc) xsection_SC2 = sc.integrate();
                      if(enable_hard) xsection_HnonC2 = hc.integrate();
-                     print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
+                     print_to_terminal( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
                      xsec_to_json(j, "gu->suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
                   }
 
@@ -629,7 +591,7 @@ int main(int argc, char* argv[]) {
                   xsection_virt_total = xsection_virt1;
                   xsection_SC_total = xsection_SC1 + xsection_SC2;
                   xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
-                  print( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
+                  print_to_terminal( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
                   break;
                }
                case Channel::pp_sqLsqR_w_cc:
@@ -685,7 +647,7 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) xsection_virt1 = virt.integrate();
                      if(enable_sc) xsection_SC1 = sc.integrate();
                      if(enable_hard) xsection_HnonC1 = hc.integrate();
-                     print( "qq > sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     print_to_terminal( "qq > sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      xsec_to_json(j, "qq->sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                   }
                   // gu > suL suR ubar process
@@ -713,7 +675,7 @@ int main(int argc, char* argv[]) {
                      );
                      if(enable_sc) xsection_SC2 = sc.integrate();
                      if(enable_hard) xsection_HnonC2 = hc.integrate();
-                     print( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
+                     print_to_terminal( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
                      xsec_to_json(j, "gu->suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
                   }
 
@@ -721,7 +683,7 @@ int main(int argc, char* argv[]) {
                   xsection_virt_total = xsection_virt1;
                   xsection_SC_total = xsection_SC1 + xsection_SC2;
                   xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
-                  print( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
+                  print_to_terminal( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
                   break;
                }
                case Channel::pp_suLsuLdagger:
@@ -763,7 +725,7 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) xsection_virt1 = virt.integrate();
                      if(enable_sc) xsection_SC1 = sc.integrate();
                      if(enable_hard) xsection_HnonC1 = hc.integrate();
-                     print( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     print_to_terminal( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      xsec_to_json(j, "uubar->suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                   }
 
@@ -804,7 +766,7 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) xsection_virt2 = virt.integrate();
                      if(enable_sc) xsection_SC2 = sc.integrate();
                      if(enable_hard) xsection_HnonC2 = hc.integrate();
-                     print( "ddbar->suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+                     print_to_terminal( "ddbar->suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
                      xsec_to_json(j, "ddbar->suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
                   }
 
@@ -842,7 +804,7 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) xsection_virt3 = virt.integrate();
                      if(enable_sc) xsection_SC3 = sc.integrate();
                      if(enable_hard) xsection_HnonC3 = hc.integrate();
-                     print( "gg > suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
+                     print_to_terminal( "gg > suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
                      xsec_to_json(j, "gg->suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
                   }
 
@@ -871,7 +833,7 @@ int main(int argc, char* argv[]) {
                      );
                      if(enable_sc) xsection_SC4 = sc.integrate();
                      if(enable_hard) xsection_HnonC4 = hc.integrate();
-                     print( "gq > suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
+                     print_to_terminal( "gq > suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
                      xsec_to_json(j, "gq->suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
                   }
 
@@ -897,7 +859,7 @@ int main(int argc, char* argv[]) {
                      );
                      if(enable_sc) xsection_SC5 = sc.integrate();
                      if(enable_hard) xsection_HnonC5 = hc.integrate();
-                     print( "gu > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5 );
+                     print_to_terminal( "gu > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5 );
                      xsec_to_json(j, "gu->suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5);
                   }
 
@@ -906,7 +868,7 @@ int main(int argc, char* argv[]) {
                   xsection_SC_total = xsection_SC1 + xsection_SC2 + xsection_SC3 + xsection_SC4 + xsection_SC5;
                   xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2 + xsection_HnonC3
                           + xsection_HnonC4 + xsection_HnonC5;
-                  print( "total", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total);
+                  print_to_terminal( "total", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total);
                   break;
                }
                case Channel::pp_sqsqdagger:
@@ -951,7 +913,7 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) xsection_virt1 = virt.integrate();
                      if(enable_sc) xsection_SC1 = sc.integrate();
                      if(enable_hard) xsection_HnonC1 = hc.integrate();
-                     print( "qqbar > sqsq*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     print_to_terminal( "qqbar > sqsq*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      xsec_to_json(j, "qqbar->sqsq*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                   }
                   if (subprocess == "" || subprocess == "uubar_suLsuLdagger") {
@@ -995,7 +957,7 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) xsection_virt2 = virt.integrate();
                      if(enable_sc) xsection_SC2 = sc.integrate();
                      if(enable_hard) xsection_HnonC2 = hc.integrate();
-                     print( "qqbar > sqsq*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+                     print_to_terminal( "qqbar > sqsq*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
                      xsec_to_json(j, "qqbar->sqsq*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
                   }
 
@@ -1037,7 +999,7 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) xsection_virt3 = virt.integrate();
                      if(enable_sc) xsection_SC3 = sc.integrate();
                      if(enable_hard) xsection_HnonC3 = hc.integrate();
-                     print( "ddbar->suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
+                     print_to_terminal( "ddbar->suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
                      xsec_to_json(j, "ddbar->suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
                   }
 
@@ -1076,7 +1038,7 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) xsection_virt4 = virt.integrate();
                      if(enable_sc) xsection_SC4 = sc.integrate();
                      if(enable_hard) xsection_HnonC4 = hc.integrate();
-                     print( "gg > suLsuL*", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
+                     print_to_terminal( "gg > suLsuL*", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
                      xsec_to_json(j, "gg->suLsuL*", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
                   }
 
@@ -1105,7 +1067,7 @@ int main(int argc, char* argv[]) {
                      );
                      if(enable_sc) xsection_SC5 = sc.integrate();
                      if(enable_hard) xsection_HnonC5 = hc.integrate();
-                     print( "gq > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5);
+                     print_to_terminal( "gq > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5);
                      xsec_to_json(j, "gq->suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5);
                   }
 
@@ -1131,7 +1093,7 @@ int main(int argc, char* argv[]) {
                      );
                      if(enable_sc) xsection_SC6 = sc.integrate();
                      if(enable_hard) xsection_HnonC6 = hc.integrate();
-                     print( "gu > suLsuL*(+X)", xsection_tree6, xsection_virt6, xsection_SC6, xsection_HnonC6 );
+                     print_to_terminal( "gu > suLsuL*(+X)", xsection_tree6, xsection_virt6, xsection_SC6, xsection_HnonC6 );
                      xsec_to_json(j, "gu->suLsuL*(+X)", xsection_tree6, xsection_virt6, xsection_SC6, xsection_HnonC6);
                   }
 
@@ -1140,7 +1102,7 @@ int main(int argc, char* argv[]) {
                   xsection_SC_total = xsection_SC1 + xsection_SC2 + xsection_SC3 + xsection_SC4 + xsection_SC5;
                   xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2 + xsection_HnonC3
                           + xsection_HnonC4 + xsection_HnonC5;
-                  print( "total", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total);
+                  print_to_terminal( "total", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total);
                   break;
                }
                default:
@@ -1188,7 +1150,7 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) xsection_virt1 = virt.integrate();
                      if(enable_sc) xsection_SC1 = sc.integrate();
                      if(enable_hard) xsection_HnonC1 = hc.integrate();
-                     print( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     print_to_terminal( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      xsec_to_json(j, "uubar->suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      */
                }
