@@ -19,10 +19,10 @@ struct XSectionParameters {
 class XSection {
 public:
    XSection(XSectionParameters const& parameters, double m1, double m2, std::vector<std::array<int, 3>> const& flav, int integration_precision, int integration_verbosity)
-      : m1_(m1), m2_(m2),
-        sqrtS_(parameters.sqrtS), muR_(parameters.muR), muF_(parameters.muF),
-        flav_(flav), pdf_(parameters.pdf),
-        integration_precision_(integration_precision), integration_verbosity_(integration_verbosity)
+      : m1_{m1}, m2_{m2},
+        sqrtS_{parameters.sqrtS}, muR_{parameters.muR}, muF_{parameters.muF},
+        flav_{flav}, pdf_{parameters.pdf},
+        integration_precision_{integration_precision}, integration_verbosity_{integration_verbosity}
    {};
 
 protected:

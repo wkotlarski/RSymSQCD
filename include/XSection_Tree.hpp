@@ -13,7 +13,8 @@ public:
       std::function<double(double, double, double)> f_,
       std::vector<std::array<int, 3>> flav,
       int integration_precision, int integration_verbosity
-   ) : XSection(parameters, m1, m2, flav, integration_precision, integration_verbosity), f(f_) {};
+   ) : XSection{parameters, m1, m2, flav, integration_precision, integration_verbosity}, f{f_}
+   {};
 
    std::array<double, 3> integrate();
    void show_settings();
