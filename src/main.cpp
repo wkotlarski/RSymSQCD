@@ -153,27 +153,18 @@ int main(int argc, char* argv[]) {
 
    enum class Channel {
        pp_OO,
-       pp_OsOs,
        pp_suLsuR,
        pp_suLsuL,
        pp_suLsdR,
-       pp_suLsdL,
        pp_sqLsqR,
        pp_sqLsqR_w_cc,
        pp_suLsuLdagger,
-       pp_suLsuRdagger,
-       pp_suLsdLdagger,
-       pp_suLsdRdagger,
        pp_sqsqdagger,
-       pp_glglbar,
-       no_channel
+       pp_glglbar
    };
 
-   Channel channel = Channel::no_channel;
-   if (pt.get<string>("process.process") == "pp_OsOs") {
-      channel = Channel::pp_OsOs;
-   }
-   else if (pt.get<string>("process.process") == "pp_suLsuR") {
+   Channel channel;
+   if (pt.get<string>("process.process") == "pp_suLsuR") {
       channel = Channel::pp_suLsuR;
    }
    else if (pt.get<string>("process.process") == "pp_sqLsqR") {
@@ -182,29 +173,11 @@ int main(int argc, char* argv[]) {
    else if (pt.get<string>("process.process") == "pp_sqLsqR+cc") {
       channel = Channel::pp_sqLsqR_w_cc;
    }
-   else if (pt.get<string>("process.process") == "pp_suLsuL") {
-      channel = Channel::pp_suLsuL;
-   }
-   else if (pt.get<string>("process.process") == "pp_suLsdR") {
-      channel = Channel::pp_suLsdR;
-   }
-   else if (pt.get<string>("process.process") == "pp_suLsdL") {
-      channel = Channel::pp_suLsdL;
-   }
    else if (pt.get<string>("process.process") == "pp_suLsuLdagger") {
       channel = Channel::pp_suLsuLdagger;
    }
    else if (pt.get<string>("process.process") == "pp_sqsqdagger") {
       channel = Channel::pp_sqsqdagger;
-   }
-   else if (pt.get<string>("process.process") == "pp_suLsuRdagger") {
-      channel = Channel::pp_suLsuRdagger;
-   }
-   else if (pt.get<string>("process.process") == "pp_suLsdLdagger") {
-      channel = Channel::pp_suLsdLdagger;
-   }
-   else if (pt.get<string>("process.process") == "pp_suLsdRdagger") {
-      channel = Channel::pp_suLsdRdagger;
    }
    else if (pt.get<string>("process.process") == "pp_OO") {
       channel = Channel::pp_OO;
