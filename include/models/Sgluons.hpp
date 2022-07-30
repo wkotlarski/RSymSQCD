@@ -1,21 +1,24 @@
 #ifndef SGLUONS_H_
 #define SGLUONS_H_
 
-#include <boost/property_tree/ptree.hpp>
+#include <array>
+
+struct SgluonParameters {
+   double mt;
+   double mO;
+};
 
 class Sgluons {
 public:
-   Sgluons(boost::property_tree::ptree const&);
-      // double matrixSimplifiedSoft_uubar_OOg( double, double );
-      // double matrixSimplifiedHard_uubar_OOg(std::array<std::array<double, 4>, 5> const&) const;
-      // double matrixSimplifiedSoft_gg_OOg( double, double );
-      // double matrixSimplifiedHard_gg_OOg(std::array<std::array<double, 4>, 5> const&) const;
-      // pp > OO
-      //double matrixMRSSMSoft_qqbar_OOg( double, double );
-      //double matrixMRSSMSoft_gg_OOg( double, double );
-      // double sigmaMRSSMTree_uubar_OO(double, double );
+   Sgluons(SgluonParameters const&);
       double matrixSgluonsTree_qqbar_OO(double, double, double) {return 0.;}
       double matrixSgluonsTree_gg_OO(double, double, double);
+      double sigmaSgluonsTree_qqbar_OO(double, double);
+
+      double sgluons_qqbar_OOg_soft(double, double, double, double, double) const;
+      double sgluons_qqbar_OOg_hard(double, std::array<std::array<double, 4>, 5> const&) const;
+      double sgluons_gg_OOg_soft(double, double, double, double, double) const;
+      double sgluons_gg_OOg_hard(double, std::array<std::array<double, 4>, 5> const&) const;
 
 private:
    double mO;

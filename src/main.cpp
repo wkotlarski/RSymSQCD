@@ -128,6 +128,7 @@ int main(int argc, char* argv[]) {
 
    MRSSMParameters mrssm_params;
    Model model = Model::no_model;
+   SgluonParameters sgluon_params;
    if (pt.get<string>("process.model") == "MRSSM") {
       model = Model::MRSSM;
       mrssm_params.MassTop = pt.get<double>("masses.top");
@@ -142,7 +143,8 @@ int main(int argc, char* argv[]) {
       model = Model::MSSM;
    }
    else if (pt.get<string>("process.model") == "Sgluons") {
-       model = Model::Sgluons;
+      sgluon_params.mO = pt.get<double>("masses.sgluons");
+      model = Model::Sgluons;
    }
    else {
       std::cout << "\nModel not implemented!\n\n";
@@ -1150,7 +1152,7 @@ int main(int argc, char* argv[]) {
          }
          break;
          case Model::Sgluons:
-            Sgluons sgluons(pt);
+            Sgluons sgluons(sgluon_params);
             switch(channel) {
                case Channel::pp_OO:
                {
