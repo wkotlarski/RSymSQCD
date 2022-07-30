@@ -854,9 +854,9 @@ int main(int argc, char* argv[]) {
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
-                        0. /*dS*/, dC, flav,
+                        dS0, dC, flav,
                         {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
                            std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
                         },
                         sc_precision, sc_verbosity
@@ -864,7 +864,7 @@ int main(int argc, char* argv[]) {
                      XSection_HnonC hc(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru, mrssm, _1, _2),
-                        dS, dC, flav,
+                        dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
                      if(enable_sc) xsection_SC5 = sc.integrate();
