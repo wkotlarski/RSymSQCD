@@ -12,11 +12,11 @@ find_package(Ruby)
 
 add_executable(tree_matrix_elements tree_matrix_elements.cpp)
 target_link_libraries(tree_matrix_elements GTest::gtest GTest::gtest_main RSymSQCDlib)
-add_test("test tree-level matrix elements" tree_matrix_elements)
+add_test("tree-level matrix elements" tree_matrix_elements)
 
 add_executable(hard_matrix_elements hard_matrix_elements.cpp)
 target_link_libraries(hard_matrix_elements GTest::gtest GTest::gtest_main RSymSQCDlib)
-add_test("test hard and non-colinear matrix elements" hard_matrix_elements)
+add_test("hard and non-colinear matrix elements" hard_matrix_elements)
 
 # test LO cross sections
 # ------------------------------------------------------------------------------------------------------
