@@ -2,6 +2,14 @@ message(STATUS "Enabling tests")
 
 find_package(GTest REQUIRED)
 
+# allow whitespaces in test names
+cmake_policy(SET CMP0110 NEW)
+
+find_package(Ruby)
+
+# test matrix elements
+# ------------------------------------------------------------------------------------------------------
+
 add_executable(tree_matrix_elements tree_matrix_elements.cpp)
 target_link_libraries(tree_matrix_elements GTest::gtest GTest::gtest_main RSymSQCDlib)
 add_test("test tree-level matrix elements" tree_matrix_elements)
@@ -10,10 +18,8 @@ add_executable(hard_matrix_elements hard_matrix_elements.cpp)
 target_link_libraries(hard_matrix_elements GTest::gtest GTest::gtest_main RSymSQCDlib)
 add_test("test hard and non-colinear matrix elements" hard_matrix_elements)
 
-find_package(Ruby)
-
-# allow whitespaces in test names
-cmake_policy(SET CMP0110 NEW)
+# test LO cross sections
+# ------------------------------------------------------------------------------------------------------
 
 list(
    APPEND LO_RUN_CARDS
@@ -35,26 +41,33 @@ foreach(el IN ZIP_LISTS LO_RUN_CARDS LO_RESULTS)
 add_test(
    NAME
       "LO cross-section for ${el_0}"
-   COMMAND ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/LO/${el_1}
+   COMMAND
+      ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb
+         ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/LO/${el_1}
 )
 endforeach()
+
+# test NLO cross sections
+# ------------------------------------------------------------------------------------------------------
 
 list(
    APPEND NLO_RUN_CARDS
    pp_suLsuR/pp_suLsuR_BMP1.ini pp_suLsuR/pp_suLsuR_BMP2_DR.ini pp_suLsuR/pp_suLsuR_BMP3_DR.ini
    pp_suLsuLdagger/pp_suLsuLdagger_BMP1.ini pp_suLsuLdagger/pp_suLsuLdagger_BMP2_DR.ini
-   pp_sqLsqR/pp_sqLsqR_BMP2_DR.ini
+   pp_sqLsqR/pp_sqLsqR_BMP1.ini pp_sqLsqR/pp_sqLsqR_BMP2_DR.ini
 )
 list(
    APPEND NLO_RESULTS
    pp_suLsuR_BMP1.json pp_suLsuR_BMP2_DR.json pp_suLsuR_BMP3_DR.json
    pp_suLsuLdagger_BMP1.json pp_suLsuLdagger_BMP2_DR.json
-   pp_sqLsqR_BMP2_DR.json
+   pp_sqLsqR_BMP1.json pp_sqLsqR_BMP2_DR.json
 )
 foreach(el IN ZIP_LISTS NLO_RUN_CARDS NLO_RESULTS)
 add_test(
    NAME
       "NLO cross-section for ${el_0}"
-      COMMAND ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/NLO/${el_1}
+      COMMAND
+         ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb
+            ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/NLO/${el_1}
 )
 endforeach()
