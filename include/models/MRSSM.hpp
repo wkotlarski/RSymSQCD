@@ -62,6 +62,8 @@ public:
    double matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep(double, std::array<std::array<double, 4>, 5> const&) const;
    double matrixMRSSMHard_gu_suLsuRubar_DS(double, std::array<std::array<double, 4>, 5> const&) const;
 
+   double matrixMRSSMTree_uubar_glglbar(double, double, double) const;
+   double matrixMRSSMTree_gg_glglbar(double, double, double) const;
 private:
       // gauge vector for DR ME
       std::array<double, 4> eta;

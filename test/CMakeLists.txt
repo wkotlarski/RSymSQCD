@@ -20,6 +20,7 @@ list(
    pp_sqLsqR/pp_sqLsqR_BMP1_LO.ini pp_sqLsqR/pp_sqLsqR_BMP2_LO.ini pp_sqLsqR/pp_sqLsqR_BMP3_LO.ini
    pp_sqLsqR+cc/pp_sqLsqR+cc_BMP1_LO.ini pp_sqLsqR+cc/pp_sqLsqR+cc_BMP2_LO.ini pp_sqLsqR+cc/pp_sqLsqR+cc_BMP3_LO.ini
    pp_sqsqdagger/pp_sqsqdagger_BMP1_LO.ini pp_sqsqdagger/pp_sqsqdagger_BMP2_LO.ini pp_sqsqdagger/pp_sqsqdagger_BMP3_LO.ini
+   pp_glglbar/pp_glglbar_BMP1_LO.ini pp_glglbar/pp_glglbar_BMP2_LO.ini pp_glglbar/pp_glglbar_BMP3_LO.ini
 )
 # checked against σLO(LO PDF) column from Tab. 3 of 1707.04557 (pp_sqLsqR and pp_sqsqdagger)
 # and against Sebastian Liebschner's private code (pp_sqLsqR+cc)
@@ -28,6 +29,7 @@ list(
    pp_sqLsqR_BMP1_LO.json pp_sqLsqR_BMP2_LO.json pp_sqLsqR_BMP3_LO.json
    pp_sqLsqR+cc_BMP1_LO.json pp_sqLsqR+cc_BMP2_LO.json pp_sqLsqR+cc_BMP3_LO.json
    pp_sqsqdagger_BMP1_LO.json pp_sqsqdagger_BMP2_LO.json pp_sqsqdagger_BMP3_LO.json
+   pp_glglbar_BMP1_LO.json pp_glglbar_BMP2_LO.json pp_glglbar_BMP3_LO.json
 )
 foreach(el IN ZIP_LISTS LO_RUN_CARDS LO_RESULTS)
 add_test(

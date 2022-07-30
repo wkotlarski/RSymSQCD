@@ -31,3 +31,19 @@ double MRSSM::matrixMRSSMTree_uu_suLsuR(double alphas, double S, double T) const
    return h/k*((315.82734083485946*Sqr(alphas)*(-1.*pow(MassSq,4) + T*U))/pow(-1.*(MassGlu*MassGlu) + T,2) +
            (315.82734083485946*Sqr(alphas)*(-1.*pow(MassSq,4) + T*U))/pow(-1.*(MassGlu*MassGlu) + U,2));
 }
+
+double MRSSM::matrixMRSSMTree_uubar_glglbar(double alphaS, double S, double T) const
+{
+   const double U = 2*Sqr(MassGlu) - S - T;
+   const double MsquaredReal = 0.5*16.*52.63789013914324*(alphaS*alphaS)*((36.*(MassGlu*MassGlu))/S + (18.*pow(MassGlu*MassGlu - 1.*T,2))/(S*S) + (4.*pow(MassGlu*MassGlu - 1.*T,2))/pow(MassSq*MassSq - 1.*T,2) + (9.*(MassGlu*MassGlu))/(-1.*(MassSq*MassSq) + T) + (9.*pow(MassGlu*MassGlu - 1.*T,2))/(S*(-1.*(MassSq*MassSq) + T)) + (18.*pow(MassGlu*MassGlu - 1.*U,2))/(S*S) + (4.*pow(MassGlu*MassGlu - 1.*U,2))/pow(MassSq*MassSq - 1.*U,2) + (9.*(MassGlu*MassGlu))/(-1.*(MassSq*MassSq) + U) + (9.*pow(MassGlu*MassGlu - 1.*U,2))/(S*(-1.*(MassSq*MassSq) + U)))
+;
+   return MsquaredReal/18.;
+}
+
+double MRSSM::matrixMRSSMTree_gg_glglbar(double alphaS, double S, double T) const
+{
+   const double U = 2*Sqr(MassGlu) - S - T;
+   const double MsquaredReal = 8.*Sqr(4.*pi*alphaS)*3.*24.*(1.-(U - 1.*MassGlu*MassGlu)*(T - 1.*MassGlu*MassGlu)/(S*S))*(S*S/((T - 1.*MassGlu*MassGlu)*(U - 1.*MassGlu*MassGlu)) - 2. + 4.*MassGlu*MassGlu*S/((T - 1.*MassGlu*MassGlu)*(U - 1.*MassGlu*MassGlu))*(1. - 1.*MassGlu*MassGlu*S/((T - 1.*MassGlu*MassGlu)*(U - 1.*MassGlu*MassGlu))));
+
+return MsquaredReal/256.;
+}

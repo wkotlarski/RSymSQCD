@@ -163,6 +163,7 @@ int main(int argc, char* argv[]) {
        pp_suLsdLdagger,
        pp_suLsdRdagger,
        pp_sqsqdagger,
+       pp_glglbar,
        no_channel
    };
 
@@ -205,6 +206,9 @@ int main(int argc, char* argv[]) {
    }
    else if (pt.get<string>("process.process") == "pp_OO") {
       channel = Channel::pp_OO;
+   }
+   else if (pt.get<string>("process.process") == "pp_glglbar") {
+      channel = Channel::pp_glglbar;
    }
    else {
       cout << "\n Process not implemented! \n\n";
@@ -396,6 +400,39 @@ int main(int argc, char* argv[]) {
                   }
                   print_to_terminal("total", result);
                   break;
+               }
+               case Channel::pp_glglbar:
+               {
+                  const double m = pt.get<double>("masses.gluino");
+                  std::array<double, 3> result {0., 0., 0.};
+                  {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {1, 2, 3, 4, 5}) {
+                        flav.push_back({i, -i, 2});
+                     }
+                     XSection_Tree tree(
+                        parameters, m, m,
+                        std::bind(&MRSSM::matrixMRSSMTree_uubar_glglbar, mrssm, _1, _2, _3), flav,
+                        born_precision, born_verbosity
+                     );
+                     auto chan_res = tree.integrate();
+                     print_to_terminal("qqbar > gluglubar", chan_res);
+                     xsec_to_json(j, "qqbar->gluglubar", chan_res);
+                     result = result + chan_res;
+                  }
+                  {
+                     std::vector<std::array<int, 3>> flav {{21, 21, 1}};
+                     XSection_Tree tree(
+                        parameters, m, m,
+                        std::bind(&MRSSM::matrixMRSSMTree_gg_glglbar, mrssm, _1, _2, _3), flav,
+                        born_precision, born_verbosity
+                     );
+                     auto chan_res = tree.integrate();
+                     print_to_terminal("gg > gluglubar", chan_res);
+                     xsec_to_json(j, "gg->gluglubar", chan_res);
+                     result = result + chan_res;
+                  }
+                  print_to_terminal("total", result);
                }
                default:
                   break;
