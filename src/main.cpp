@@ -405,6 +405,9 @@ int main(int argc, char* argv[]) {
    } // end of LO block
    else if (pt.get<string>("process.order") == "NLO") {
       const double dS = pt.get<double>("technical parameters.dS", 1e-5);
+      // for the matrix elements that are regular in the limit dS -> 0 because the phase space parametrization
+      // fails if we are exactly on the threshold
+      constexpr double dS0 = 1e-10;
       const double dC = pt.get<double>("technical parameters.dC", 1e-6);
       cout << "\nINFO: Using phase space slicing parameters δS=" << dS
            << " and δC=" << dC << '\n';
@@ -424,7 +427,7 @@ int main(int argc, char* argv[]) {
                   const double m2 = pt.get<double>("masses.squarks");
                   // uu > suL suR (+g) process
                   if( subprocess == "" ) {
-                     std::vector<std::array<int, 3>> flav {{2,2,1}};
+                     const std::vector<std::array<int, 3>> flav {{2, 2, 1}};
                      XSection_Tree tree(
                         parameters, m1, m2,
                         // same ME as in the MSSM
@@ -466,12 +469,11 @@ int main(int argc, char* argv[]) {
 
                   // gu > suL suR ubar process
                   if (subprocess == "gu_suLsuRubar" || subprocess == "" ) {
-                     std::vector<std::array<int, 3>> flav {};
-                     for(int el : {2, -2}) flav.push_back({21, el, 2});
+                     const std::vector<std::array<int, 3>> flav {{21, 2, 2}};
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
-                        0. /*dS*/, dC,
+                        dS0, dC,
                         flav,
                         {
                            std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
@@ -486,7 +488,7 @@ int main(int argc, char* argv[]) {
                      XSection_HnonC hc(
                         parameters, m1, m2,
                         std::bind(f, mrssm, _1, _2),
-                        0. /*dS*/, dC,
+                        dS0, dC,
                         flav,
                         hard_precision, hard_verbosity
                      );
@@ -562,7 +564,7 @@ int main(int argc, char* argv[]) {
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
-                        0. /*dS*/, dC,
+                        dS0, dC,
                         flav,
                         {
                            std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
@@ -577,7 +579,7 @@ int main(int argc, char* argv[]) {
                      XSection_HnonC hc(
                         parameters, m1, m2,
                         std::bind(f, mrssm, _1, _2),
-                        0. /*dS*/, dC,
+                        dS0, dC,
                         flav,
                         hard_precision, hard_verbosity
                      );
