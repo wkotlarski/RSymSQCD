@@ -661,8 +661,7 @@ int main(int argc, char* argv[]) {
                   // gu > suL suR ubar process
                   if (subprocess == "gu_suLsuRubar" || subprocess == "" ) {
                      std::vector<std::array<int, 3>> flav {};
-                     // for(int el : {1, -1, 2, -2, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2*5});
-                     for(int el : {1, 2, 3, 4, 5}) flav.push_back({21, el, 5});
+                     for(int el : {1, -1, 2, -2, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2*5});
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
