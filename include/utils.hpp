@@ -1,8 +1,8 @@
 #include <array>
-#include <string>
+#include <string_view>
 
 void print_to_terminal(
-   std::string const&,
+   std::string_view,
    std::array<double, 3> const&, std::array<double, 3> const&, std::array<double, 3> const&, std::array<double, 3> const&);
 
-void print_to_terminal(std::string const&, std::array<double, 3> const&);
+void print_to_terminal(std::string_view, std::array<double, 3> const&);

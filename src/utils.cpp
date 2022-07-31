@@ -6,7 +6,7 @@
 #include <iomanip>
 
 void print_to_terminal(
-   std::string const& str,
+   std::string_view str,
    std::array<double, 3> const& tree, std::array<double, 3> const& virt, std::array<double, 3> const& soft, std:: array<double,3> const& hard)
 {
    std::cout << "\nResults for subprocess " << str << '\n';
@@ -37,7 +37,7 @@ void print_to_terminal(
            Sqr(soft.at(1))) << " fb\n";
 }
 
-void print_to_terminal(std::string const& str, std::array<double, 3> const& tree) {
+void print_to_terminal(std::string_view str, std::array<double, 3> const& tree) {
    std::cout << "\nResults for subprocess " << str << '\n';
    std::cout << std::scientific;
    //print out LO run statistics
