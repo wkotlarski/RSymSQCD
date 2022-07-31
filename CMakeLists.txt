@@ -33,6 +33,7 @@ if (OPTIMIZE_FOR_NATIVE)
 endif()
 
 include(FetchContent)
+set(JSON_MultipleHeaders ON)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.10.5/json.tar.xz)
 FetchContent_MakeAvailable(json)
 

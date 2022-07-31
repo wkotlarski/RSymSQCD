@@ -35,21 +35,6 @@ inline array<double, 3> operator+(array<double, 3> const& x, array<double, 3> co
    return {x.at(0) + y.at(0), std::hypot(x.at(1), y.at(1)), std::max(x.at(2), y.at(2))};
 }
 
-void xsec_to_json(json& j, std::string const& str, array<double, 3> const& tree) {
-   j["cross sections"][str] = {
-      {"tree", {{"res", tree.at(0)}, {"err", tree.at(1)}, {"p-val", tree.at(2)}}}
-   };
-}
-void xsec_to_json(json& j, std::string const& str, array<double, 3> const& tree, array<double, 3> const& virt, array<double, 3> const& soft, array<double, 3> const& hard) {
-   xsec_to_json(j, str, tree);
-   j["cross sections"][str] = {
-      {"tree", {{"res", tree.at(0)}, {"err", tree.at(1)}, {"p-val", tree.at(2)}}},
-      {"virtual", {{"res", virt.at(0)}, {"err", virt.at(1)}, {"p-val", virt.at(2)}}},
-      {"SC", {{"res", soft.at(0)}, {"err", soft.at(1)}, {"p-val", soft.at(2)}}},
-      {"HnonC", {{"res", hard.at(0)}, {"err", hard.at(1)}, {"p-val", hard.at(2)}}}
-   };
-}
-
 int main(int argc, char* argv[]) {
 
    boost::program_options::positional_options_description p;
