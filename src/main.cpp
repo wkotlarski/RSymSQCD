@@ -525,12 +525,10 @@ int main(int argc, char* argv[]) {
                   if( subprocess == "" ) {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
-                        flav.push_back({ i,  i, 1});
-                        flav.push_back({-i, -i, 1});
+                        flav.push_back({i,  i, 1});
                         for (int j : {1, 2, 3, 4, 5}) {
                            if (j>=i) continue;
-                           flav.push_back({ i,  j, 2});
-                           flav.push_back({-i, -j, 2});
+                           flav.push_back({i,  j, 2});
                         }
                      }
                      XSection_Tree tree(
@@ -647,13 +645,9 @@ int main(int argc, char* argv[]) {
                         sc_precision, sc_verbosity
                      );
 
-                     auto f =
-                        mrssm_params.MassGlu < mrssm_params.MassSq
-                           ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar
-                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DR : &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DS);
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(f, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixMRSSMHard_uu_suLsuRg, mrssm, _1, _2),
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
