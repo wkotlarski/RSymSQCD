@@ -14,7 +14,7 @@ endif()
 
 # build type
 set (default_build_type "Release")
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+if(NOT ${CMAKE_BUILD_TYPE} AND NOT ${CMAKE_CONFIGURATION_TYPES})
   message (STATUS "Setting build type to '${default_build_type}' as none was specified")
   set (CMAKE_BUILD_TYPE "${default_build_type}")
 endif()
@@ -24,7 +24,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT ${CMAKE_CXX_COMPILER_ID} STREQUA
 endif()
 
 option(OPTIMIZE_FOR_NATIVE "Build with -march=native" OFF)
-if (OPTIMIZE_FOR_NATIVE)
+if (${OPTIMIZE_FOR_NATIVE} AND ${CMAKE_BUILD_TYPE} STREQUAL "Release")
    include(CheckCXXCompilerFlag)
    CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
    if(COMPILER_SUPPORTS_MARCH_NATIVE)
@@ -141,7 +141,7 @@ target_link_libraries(
       nlohmann_json::nlohmann_json
 )
 
-if(ENABLE_TESTS)
+if(${ENABLE_TESTS})
    enable_testing()
    add_subdirectory(test)
 endif()

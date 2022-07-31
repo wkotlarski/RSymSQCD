@@ -199,8 +199,8 @@ int main(int argc, char* argv[]) {
 
    XSectionParameters parameters;
    parameters.sqrtS = pt.get<double>("collider setup.sqrt_S");
-   parameters.muR =  pt.get<double>("collider setup.mu_r");
-   parameters.muF =  pt.get<double>("collider setup.mu_f");
+   parameters.muR =  muR;
+   parameters.muF =  muF;
    parameters.pdf = pdf.get();
 
    const int born_verbosity = vm["verbosity-born"].as<int>();
@@ -849,7 +849,7 @@ int main(int argc, char* argv[]) {
                               : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru_DR : &MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru_DS);
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru, mrssm, _1, _2),
+                        std::bind(f, mrssm, _1, _2),
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );

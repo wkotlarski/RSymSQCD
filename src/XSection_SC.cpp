@@ -101,7 +101,6 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
    // integration variables
    const double x1 = 4.*Sqr(m1_)/Sqr(sqrtS_)      + (1-4.*Sqr(m1_)/Sqr(sqrtS_))      * xx[0];
    const double x2 = 4.*Sqr(m1_)/(Sqr(sqrtS_)*x1) + (1-4.*Sqr(m1_)/(Sqr(sqrtS_)*x1)) * xx[1];
-   const double th = pi * xx[2];
 
    double pdf_flux = 0.0;
    for (const auto& inner : flav_) {
