@@ -70,13 +70,13 @@ int XSection_HnonC::integrand(const int *ndim, const double xx[],
    // failsafe (this should never happen)
    // but sometimes does for suave
    assert(
-        xx[0] < 0 || xx[0] > 1        // gluon energy
-        || xx[1] < 0 || xx[1] > 1     // sgluon energy
-        || xx[2] < 0 || xx[2] > 1     // angle
-        || xx[3] < 0 || xx[3] > 1     // angle
-        || xx[4] < 0 || xx[4] > 1     // angle
-        || xx[5] < 0 || xx[5] > 1   // Bjorken x
-        || xx[6] < 0 || xx[6] > 1   // Bjorken x
+           xx[0] >= 0 && xx[0] <= 1        // gluon energy
+        && xx[1] >= 0 && xx[1] <= 1     // sgluon energy
+        && xx[2] >= 0 && xx[2] <= 1     // angle
+        && xx[3] >= 0 && xx[3] <= 1     // angle
+        && xx[4] >= 0 && xx[4] <= 1     // angle
+        && xx[5] >= 0 && xx[5] <= 1   // Bjorken x
+        && xx[6] >= 0 && xx[6] <= 1   // Bjorken x
         );
 
    double x1 = 4.*m_sqr/Sqr(sqrtS_)      + (1.-4.*m_sqr/Sqr(sqrtS_))      * xx[5];
