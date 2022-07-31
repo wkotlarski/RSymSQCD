@@ -133,7 +133,7 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
 
    // scale integration variables as Cuba works in a unit hipercube
    const double x1 = 4.*Sqr(m1_)/Sqr(sqrtS_)      + (1-4.*Sqr(m1_)/Sqr(sqrtS_))      * xx[0];
-	const double x2 = 4.*Sqr(m1_)/(Sqr(sqrtS_)*x1) + (1-4.*Sqr(m1_)/(Sqr(sqrtS_)*x1)) * xx[1];
+   const double x2 = 4.*Sqr(m1_)/(Sqr(sqrtS_)*x1) + (1-4.*Sqr(m1_)/(Sqr(sqrtS_)*x1)) * xx[1];
    const double z = x1 + (1-dS_-x1)*xx[2];
 
    ff[0] = 0.0;

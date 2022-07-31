@@ -1,5 +1,5 @@
 double MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger(double alphas, double s12) {
-	const double Alfas2 = Sqr(alphas);
+   const double Alfas2 = Sqr(alphas);
    return (Alfas2*pi*(8*(-3*Sqr(MassSq) + MassGlu*MassGlu - 2*s12)*Sqrt(s12*(-4*Sqr(MassSq) + s12)) +
        8*(2*Power4(MassSq) + 2*Power4(MassGlu) - 4*Sqr(MassGlu)*s12 - 3*(s12*s12) + Sqr(MassSq)*(-4*Sqr(MassGlu) + 6*s12))*
         atanh(Sqrt(s12*(-4*Sqr(MassSq) + s12))/(2*Sqr(MassSq) - 2*Sqr(MassGlu) - s12))))/(54.*Power3(s12));
@@ -7,12 +7,12 @@ double MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger(double alphas, double s12) {
 
 // checked against MG with SUSYQCD model
 double MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger(double alphas, double s12 ) {
-	const double Alfas2 = Sqr(alphas);
+   const double Alfas2 = Sqr(alphas);
    return (2*Alfas2*pi*pow(-4*Sqr(MassSq) + s12,1.5))/(27.*pow(s12,2.5));
 }
 
 double MRSSM::sigmaMRSSMTree_gg_suLsuLdagger(double alphas, double s12 ) {
-	const double Alfas2 = Sqr(alphas);
+   const double Alfas2 = Sqr(alphas);
    return (Alfas2*pi*(Sqrt(s12*(-4*Sqr(MassSq) + s12))*(62*Sqr(MassSq) + 5*s12) - 16*Sqr(MassSq)*(Sqr(MassSq) + 4*s12)*atanh(Sqrt(1 - (4*Sqr(MassSq))/s12))))/(48.*Power3(s12));
 }
 

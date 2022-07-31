@@ -79,27 +79,27 @@ int XSection_HnonC::integrand(const int *ndim, const double xx[],
         || xx[6] < 0 || xx[6] > 1   // Bjorken x
         );
 
-	double x1 = 4.*m_sqr/Sqr(sqrtS_)      + (1.-4.*m_sqr/Sqr(sqrtS_))      * xx[5];
-	double x2 = 4.*m_sqr/(Sqr(sqrtS_)*x1) + (1.-4.*m_sqr/(Sqr(sqrtS_)*x1)) * xx[6];
-	double shat = x1*x2*Sqr(sqrtS_);
-	double shat_sqrt = std::sqrt(shat);
+   double x1 = 4.*m_sqr/Sqr(sqrtS_)      + (1.-4.*m_sqr/Sqr(sqrtS_))      * xx[5];
+   double x2 = 4.*m_sqr/(Sqr(sqrtS_)*x1) + (1.-4.*m_sqr/(Sqr(sqrtS_)*x1)) * xx[6];
+   double shat = x1*x2*Sqr(sqrtS_);
+   double shat_sqrt = std::sqrt(shat);
 
-	double Ej_max = 0.5*shat_sqrt - 2.*m_sqr/shat_sqrt;
+   double Ej_max = 0.5*shat_sqrt - 2.*m_sqr/shat_sqrt;
 
-	if (Ej_max < 0.5*dS_*shat_sqrt) {
-	  return 0;
-	}
+   if (Ej_max < 0.5*dS_*shat_sqrt) {
+      return 0;
+   }
 
-	const double Ej = dS_*shat_sqrt/2. + (Ej_max - dS_*shat_sqrt/2.)*xx[0];
+   const double Ej = dS_*shat_sqrt/2. + (Ej_max - dS_*shat_sqrt/2.)*xx[0];
 
-	const double c = shat - 2. * shat_sqrt * Ej;
-	// Eq. 4.5
-	const double E1_max = ((shat_sqrt - Ej)*c + Ej*std::sqrt(Sqr(c-2.*m_sqr) - Sqr(2.*m_sqr)))/(2.*c);
+   const double c = shat - 2. * shat_sqrt * Ej;
+   // Eq. 4.5
+   const double E1_max = ((shat_sqrt - Ej)*c + Ej*std::sqrt(Sqr(c-2.*m_sqr) - Sqr(2.*m_sqr)))/(2.*c);
    const double E1_min = ((shat_sqrt - Ej)*c - Ej*std::sqrt(Sqr(c-2.*m_sqr) - Sqr(2.*m_sqr)))/(2.*c);
    const double E1 = E1_min + (E1_max - E1_min)*xx[1];
    assert(E1 >= m1_);
 
-	// Eq. 4.2 with E2 = Ej
+   // Eq. 4.2 with E2 = Ej
    const double p1 = std::sqrt((E1-m1_)*(E1+m1_));
    double cosx = (shat - 2*shat_sqrt*(E1+Ej) + 2.*Ej*E1)/(2.*Ej*p1);
 
@@ -187,7 +187,7 @@ int XSection_HnonC::integrand(const int *ndim, const double xx[],
    // if yes, return
    if (-t15 < dC_*shat_sqrt*Ej || -t25 < dC_*shat_sqrt*Ej) {
       return 0;
-	}
+   }
 
    double ME2 = f(pdf_->alphasQ(muR_), p);
    assert(!std::isnan(ME2) && ME2 >= 0);
@@ -234,5 +234,5 @@ int XSection_HnonC::integrand(const int *ndim, const double xx[],
 
    ff[0] = ME2 * std::abs(jacobian);
 
-	return 0;
+   return 0;
 }
