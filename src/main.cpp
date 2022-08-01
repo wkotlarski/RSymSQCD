@@ -91,7 +91,13 @@ int main(int argc, char* argv[]) {
    string subprocess = vm["subprocess"].as<string>();
 
    boost::property_tree::ptree pt;
-   boost::property_tree::ini_parser::read_ini(card, pt);
+   try {
+      boost::property_tree::ini_parser::read_ini(card, pt);
+   }
+   catch (const std::exception& e) {
+      std::cout << "Error while parsing trying to parse " << card << " (" << e.what() << ")\n";
+      return 1;
+   }
 
    // local arrays are not aumatically initialized to 0
    // need to use {}
