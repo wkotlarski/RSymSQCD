@@ -111,13 +111,13 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
    const double s12 = x1 * x2 * Sqr(sqrtS_);
    const double alphas = pdf_->alphasQ(muR_);
    double result = 0.;
-   for (const auto& el : sp_) {
-      if (el.first == SplittingKernel::Pqq) {
-         result += CF*(2.*std::log(dS_) + 1.5)*el.second(alphas, s12);
+   for (const auto& [ker, sigma] : sp_) {
+      if (ker == SplittingKernel::Pqq) {
+         result += CF*(2.*std::log(dS_) + 1.5)*sigma(alphas, s12);
       }
-      else if (el.first == SplittingKernel::Pgg) {
+      else if (ker == SplittingKernel::Pgg) {
          static constexpr int Nf = 5;
-         result += (2.*CA*std::log(dS_) + (11.*CA + 2.*Nf)/6)*el.second(alphas, s12);
+         result += (2.*CA*std::log(dS_) + (11.*CA + 2.*Nf)/6)*sigma(alphas, s12);
       }
    };
    result *= alphas/two_pi*std::log(Sqr(muR_/muF_));
