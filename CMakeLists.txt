@@ -32,6 +32,10 @@ if (${OPTIMIZE_FOR_NATIVE} AND "${CMAKE_BUILD_TYPE}" STREQUAL "Release")
    endif()
 endif()
 
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+   add_compile_options(-Wall -Wextra -pedantic)
+endif()
+
 include(FetchContent)
 set(JSON_MultipleHeaders ON)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.10.5/json.tar.xz)
