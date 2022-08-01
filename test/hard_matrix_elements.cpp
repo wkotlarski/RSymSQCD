@@ -26,7 +26,7 @@ TEST(HardMatrixElementTest, MRSSM) {
    static constexpr double alphas {8.41234775121963707e-02};
 
    // EXPECT_NEAR(mrssm.matrixMRSSMHard_uu_suLsuRg(alphas, p), 0.020376409677647898, 5e-17);
-   EXPECT_NEAR(mrssm.matrixMRSSMHard_gu_suLsuRubar(alphas, p), 1.3897879902109231e-07, 4e-22);
+   EXPECT_NEAR(mrssm.matrixMRSSMHard_gu_suLsuRubar(alphas, p), 1.3897879902109231e-07, 6.3e-21);
 }
 
 }
