@@ -14,7 +14,7 @@ endif()
 
 # build type
 set (default_build_type "Release")
-if (NOT (${CMAKE_BUILD_TYPE} OR ${CMAKE_CONFIGURATION_TYPES}))
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message (STATUS "Setting build type to '${default_build_type}' as none was specified")
   set (CMAKE_BUILD_TYPE "${default_build_type}")
 endif()
