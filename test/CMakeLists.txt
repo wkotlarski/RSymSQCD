@@ -55,12 +55,14 @@ list(
    pp_suLsuR/pp_suLsuR_BMP1.ini pp_suLsuR/pp_suLsuR_BMP2_DR.ini pp_suLsuR/pp_suLsuR_BMP3_DR.ini
    pp_suLsuLdagger/pp_suLsuLdagger_BMP1.ini pp_suLsuLdagger/pp_suLsuLdagger_BMP2_DR.ini
    pp_sqLsqR/pp_sqLsqR_BMP1.ini pp_sqLsqR/pp_sqLsqR_BMP2_DR.ini pp_sqLsqR/pp_sqLsqR_BMP3_DR.ini
+   pp_sqLsqR+cc/pp_sqLsqR+cc_BMP1.json pp_sqLsqR+cc/pp_sqLsqR+cc_BMP2_DR.json pp_sqLsqR+cc/pp_sqLsqR+cc_BMP3_DR.json
 )
 list(
    APPEND NLO_RESULTS
    pp_suLsuR_BMP1.json pp_suLsuR_BMP2_DR.json pp_suLsuR_BMP3_DR.json
    pp_suLsuLdagger_BMP1.json pp_suLsuLdagger_BMP2_DR.json
-   pp_sqLsqR_BMP1.json pp_sqLsqR_BMP2_DR.jso pp_sqLsqR_BMP3_DR.jsonn
+   pp_sqLsqR_BMP1.json pp_sqLsqR_BMP2_DR.jso pp_sqLsqR_BMP3_DR.json
+   pp_sqLsqR+cc_BMP1.json pp_sqLsqR+cc_BMP2_DR.json pp_sqLsqR+cc_BMP3_DR.json
 )
 foreach(el IN ZIP_LISTS NLO_RUN_CARDS NLO_RESULTS)
 add_test(
