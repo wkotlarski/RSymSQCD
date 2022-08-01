@@ -51,16 +51,16 @@ find_path(LIBLOOPTOOLS_INCLUDE_DIR NAMES clooptools.h)
 find_library(LIBLOOPTOOLS_LIBRARY NAMES libooptools.a)
 
 find_path(LIBLHAPDF_INCLUDE_DIR NAMES LHAPDF/LHAPDF.h)
-if (${APPLE})
+if (APPLE)
    find_library(LIBLHAPDF_LIBRARY NAMES libLHAPDF.dylib)
-elseif (${UNIX})
+elseif (UNIX)
    find_library(LIBLHAPDF_LIBRARY NAMES libLHAPDF.so)
 endif()
 
 find_path(LIBRK_INCLUDE_DIR NAMES rk/rk.hh)
-if(${APPLE})
+if(APPLE)
    find_library(LIBRK_LIBRARY NAMES librk.dylib)
-elseif(${UNIX})
+elseif(UNIX)
    find_library(LIBRK_LIBRARY NAMES librk.so)
 endif()
 
@@ -79,9 +79,9 @@ endif()
 # we link against LoopTools which requires a fortran library
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
    # assume that if we're using GCC or Clang then LoopTools was compiled with GCC
-   if(${APPLE})
+   if(APPLE)
       find_library(FORTRAN_LIBS NAMES "libgfortran.dylib")
-   elseif(${UNIX})
+   elseif(UNIX)
       find_library(FORTRAN_LIBS NAMES "libgfortran.so.5")
    endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
@@ -145,7 +145,7 @@ target_link_libraries(
       nlohmann_json::nlohmann_json
 )
 
-if(${ENABLE_TESTS})
+if(ENABLE_TESTS)
    enable_testing()
    add_subdirectory(test)
 endif()
