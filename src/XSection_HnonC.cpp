@@ -59,9 +59,9 @@ std::array<double, 3> XSection_HnonC::integrate() {
 int XSection_HnonC::integrand(const int *ndim, const double xx[],
    const int *ncomp, double ff[], void *userdata) {
 
-   double m_sqr = Sqr(m1_);
+   const double m_sqr = Sqr(m1_);
 
-   ff[0] = 0;
+   ff[0] = 0.;
    /*
    *  3-body phase space parametrization based on
    *  http://www.t39.ph.tum.de/T39_files/T39_people_files/duell_files/Dipl-MultiPion.pdf
@@ -69,45 +69,45 @@ int XSection_HnonC::integrand(const int *ndim, const double xx[],
 
    // failsafe (this should never happen)
    // but sometimes does for suave
-   assert(
-           xx[0] >= 0 && xx[0] <= 1        // gluon energy
-        && xx[1] >= 0 && xx[1] <= 1     // sgluon energy
-        && xx[2] >= 0 && xx[2] <= 1     // angle
-        && xx[3] >= 0 && xx[3] <= 1     // angle
-        && xx[4] >= 0 && xx[4] <= 1     // angle
-        && xx[5] >= 0 && xx[5] <= 1   // Bjorken x
-        && xx[6] >= 0 && xx[6] <= 1   // Bjorken x
-        );
+   assert(xx[0] >= 0 && xx[0] <= 1 // outgoing parton energy
+       && xx[1] >= 0 && xx[1] <= 1 // particle 1 energy
+       && xx[2] >= 0 && xx[2] <= 1 // angle
+       && xx[3] >= 0 && xx[3] <= 1 // angle
+       && xx[4] >= 0 && xx[4] <= 1 // angle
+       && xx[5] >= 0 && xx[5] <= 1 // Bjorken x
+       && xx[6] >= 0 && xx[6] <= 1 // Bjorken x
+   );
 
-   double x1 = 4.*m_sqr/Sqr(sqrtS_)      + (1.-4.*m_sqr/Sqr(sqrtS_))      * xx[5];
-   double x2 = 4.*m_sqr/(Sqr(sqrtS_)*x1) + (1.-4.*m_sqr/(Sqr(sqrtS_)*x1)) * xx[6];
-   double shat = x1*x2*Sqr(sqrtS_);
-   double shat_sqrt = std::sqrt(shat);
+   const double S = Sqr(sqrtS_);
+   const double x1 = 4.*m_sqr/S      + (1.-4.*m_sqr/S)      * xx[5];
+   const double x2 = 4.*m_sqr/(S*x1) + (1.-4.*m_sqr/(S*x1)) * xx[6];
+   const double shat = x1*x2*S;
+   const double shat_sqrt = std::sqrt(shat);
 
-   double Ej_max = 0.5*shat_sqrt - 2.*m_sqr/shat_sqrt;
+   const double Ej_max = 0.5*shat_sqrt - 2.*m_sqr/shat_sqrt;
 
    if (Ej_max < 0.5*dS_*shat_sqrt) {
       return 0;
    }
 
-   const double Ej = dS_*shat_sqrt/2. + (Ej_max - dS_*shat_sqrt/2.)*xx[0];
+   const double Ej = 0.5*dS_*shat_sqrt + (Ej_max - 0.5*dS_*shat_sqrt)*xx[0];
 
-   const double c = shat - 2. * shat_sqrt * Ej;
+   const double c = shat - 2.*shat_sqrt*Ej;
+   const double sqrtc = std::sqrt(Sqr(c) - 4.*c*m_sqr);
    // Eq. 4.5
-   const double E1_max = ((shat_sqrt - Ej)*c + Ej*std::sqrt(Sqr(c-2.*m_sqr) - Sqr(2.*m_sqr)))/(2.*c);
-   const double E1_min = ((shat_sqrt - Ej)*c - Ej*std::sqrt(Sqr(c-2.*m_sqr) - Sqr(2.*m_sqr)))/(2.*c);
+   const double E1_max = ((shat_sqrt - Ej)*c + Ej*sqrtc)/(2.*c);
+   const double E1_min = ((shat_sqrt - Ej)*c - Ej*sqrtc)/(2.*c);
    const double E1 = E1_min + (E1_max - E1_min)*xx[1];
    assert(E1 >= m1_);
 
    // Eq. 4.2 with E2 = Ej
    const double p1 = std::sqrt((E1-m1_)*(E1+m1_));
-   double cosx = (shat - 2*shat_sqrt*(E1+Ej) + 2.*Ej*E1)/(2.*Ej*p1);
+   const double cosx = (shat - 2*shat_sqrt*(E1+Ej) + 2.*Ej*E1)/(2.*Ej*p1);
 
    // check if due to numerics |cos(x)| is not > 1
    // if yes, return 0 and continue
    if ( cosx > 1 || cosx < -1)  {
       std::cout << "Warning! 1 - |cos(x)| = " << 1 - std::abs(cosx) << "  - Skipping the phase space point.\n";
-      ff[0] = 0;
       return 0;
    }
 
@@ -166,7 +166,7 @@ int XSection_HnonC::integrand(const int *ndim, const double xx[],
    const geom3::Vector3 p_temp = rot.rotate(p_parton);
 
    // set parton momenta
-   std::array<double, 4> p_temp_2 = {Ej, p_temp.x(), p_temp.y(), p_temp.z()};
+   const std::array<double, 4> p_temp_2 = {Ej, p_temp.x(), p_temp.y(), p_temp.z()};
 
    // 2nd sgluon momenta
    p[3][0] = shat_sqrt - E1 - Ej;
@@ -204,35 +204,27 @@ int XSection_HnonC::integrand(const int *ndim, const double xx[],
    */
 
    // some final factors
-   ME2 *= to_fb;
-   ME2 /=  2 * shat;
-
-   ME2 *= 4.*sinpix2;
-   ME2 /= 256 * pi_sqr;
+   ME2 *= to_fb/shat*sinpix2/(128.*pi_sqr);
 
    double pdf_flux = 0.0;
    for (const auto& f : flav_) {
       pdf_flux += f.at(2) * pdf_->xfxQ(f.at(0), x1, muF_) * pdf_->xfxQ(f.at(1), x2, muF_);
    }
-   pdf_flux /= x1 * x2;
+   ME2 *=  pdf_flux/(x1*x2);
 
-   ME2 *=  pdf_flux;
-   double xx0 = xx[5];
-   double xx1 = xx[6];
-   double xx2 = xx[0];
-
-   double jacobian =  (xx0*(-4*dS_*Sqr(m1_) + (-1 + dS_)*xx0*xx1*(-Sqr(sqrtS_) + 4*Sqr(m1_)))*
-     (xx0*xx1*xx2*(Sqr(sqrtS_) - 4*Sqr(m1_)) + 
-       dS_*(-1 + xx2)*(-(Sqr(sqrtS_)*xx0*xx1) + 4*(-1 + xx0*xx1)*Sqr(m1_)))*pow(Sqr(sqrtS_),-1)*
-     Sqr(Sqr(sqrtS_) - 4*Sqr(m1_))*pow(Sqr(sqrtS_)*xx0 - 4*(-1 + xx0)*Sqr(m1_),-1)*
-     pow(Sqr(sqrtS_)*xx0*xx1 + (4 - 4*xx0*xx1)*Sqr(m1_),-1)*
-     pow((-1 + dS_)*Sqr(sqrtS_)*xx0*xx1*(-1 + xx2) + 
-       4*(1 + xx0*xx1*(-1 + xx2) - dS_*(-1 + xx0*xx1)*(-1 + xx2))*Sqr(m1_),-1)*
-     pow((-1 + xx2)*(Sqr(sqrtS_)*xx0*xx1*(-1 + dS_ + xx2 - dS_*xx2) + 
-         4*(-1 + xx0*xx1 + dS_*(-1 + xx0*xx1)*(-1 + xx2) - xx0*xx1*xx2)*Sqr(m1_))*
-       (-4*dS_*Sqr(m1_) + (-1 + dS_)*xx0*xx1*(-Sqr(sqrtS_) + 4*Sqr(m1_))),0.5))/4.;
+   const double jacobian =  (xx[5]*(-4*dS_*Sqr(m1_) + (-1 + dS_)*xx[5]*xx[6]*(-S + 4*Sqr(m1_)))*
+     (xx[5]*xx[6]*xx[0]*(S - 4*Sqr(m1_)) +
+       dS_*(-1 + xx[0])*(-(S*xx[5]*xx[6]) + 4*(-1 + xx[5]*xx[6])*Sqr(m1_)))/S*
+     Sqr(S - 4*Sqr(m1_))*std::pow(S*xx[5] - 4*(-1 + xx[5])*Sqr(m1_),-1)*
+     std::pow(S*xx[5]*xx[6] + (4 - 4*xx[5]*xx[6])*Sqr(m1_),-1)*
+     std::pow((-1 + dS_)*S*xx[5]*xx[6]*(-1 + xx[0]) +
+       4*(1 + xx[5]*xx[6]*(-1 + xx[0]) - dS_*(-1 + xx[5]*xx[6])*(-1 + xx[0]))*Sqr(m1_),-1)*
+     std::sqrt((-1 + xx[0])*(S*xx[5]*xx[6]*(-1 + dS_ + xx[0] - dS_*xx[0]) +
+         4*(-1 + xx[5]*xx[6] + dS_*(-1 + xx[5]*xx[6])*(-1 + xx[0]) - xx[5]*xx[6]*xx[0])*Sqr(m1_))*
+       (-4*dS_*Sqr(m1_) + (-1 + dS_)*xx[5]*xx[6]*(-S + 4*Sqr(m1_)))))*0.25;
 
    ff[0] = ME2 * std::abs(jacobian);
+   assert(ff[0] >= 0);
 
    return 0;
 }

@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
            xsection_tree6 {}, xsection_virt6 {}, xsection_SC6 {}, xsection_HnonC6 {},
            xsection_tree_total {}, xsection_virt_total {}, xsection_SC_total {}, xsection_HnonC_total {};
 
-   enum class Order {LO, NLO};
+   enum class Order {LO, NLO/*, NLO+NLL*/};
    Order order;
    if (pt.get<string>("process.order") == "LO") {
       order = Order::LO;
@@ -125,20 +125,19 @@ int main(int argc, char* argv[]) {
       order = Order::NLO;
    }
    else {
-      std::cout << "Error: Unknown order \"" << pt.get<string>("process.order") << "\". Allowed values are LO and NLO. Please check the input card.\n";
+      std::cerr << "Error: Unknown order \"" << pt.get<string>("process.order") << "\". Allowed values are LO and NLO. Please check the input card.\n";
       return 1;
    }
 
    enum class Model {
        MRSSM,
        MSSM,
-       Sgluons,
-       no_model
+       Sgluons
    };
 
    MRSSMParameters mrssm_params;
-   Model model = Model::no_model;
    SgluonParameters sgluon_params;
+   Model model;
    if (pt.get<string>("process.model") == "MRSSM") {
       model = Model::MRSSM;
       mrssm_params.MassTop = pt.get<double>("masses.top");

@@ -28,6 +28,7 @@ MRSSM::MRSSM(MRSSMParameters const& params)
 #include "mrssm_gu_suLsuRubar_hard.cpp"
 #include "mrssm_gu_suLsuRubar_hard-DR.cpp"
 #include "mrssm_gu_suLsuRubar_hard-DS.cpp"
+#include "mrssm_gu_suLsuRubar_hard-DS_unsympli.cpp"
 
 #include "mrssm_gg_suLsuLdagger_virt_matrix.cpp"
 #include "mrssm_ddbar_suLsuLdagger_virt_matrix.cpp"
