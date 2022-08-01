@@ -27,7 +27,6 @@ MRSSM::MRSSM(MRSSMParameters const& params)
 #include "mrssm_uu_suLsuRg_hard.cpp"
 #include "mrssm_gu_suLsuRubar_hard.cpp"
 #include "mrssm_gu_suLsuRubar_hard-DR.cpp"
-//#include "mrssm_gu_suLsuRubar_hard-DR_wEtaDep.cpp"
 #include "mrssm_gu_suLsuRubar_hard-DS.cpp"
 
 #include "mrssm_gg_suLsuLdagger_virt_matrix.cpp"
@@ -38,11 +37,12 @@ MRSSM::MRSSM(MRSSMParameters const& params)
 #include "mrssm_ddbar_suLsuLdaggerg_soft.cpp"
 #include "mrssm_ddbar_suLsuLdaggerg_hard.cpp"
 #include "mrssm_gd_suLsuLdaggerd_hard.cpp"
-// wEta_noSimplify is faster than wEta
 #include "mrssm_gu_suLsuLdaggeru_hard-DS.cpp"
 #include "mrssm_gu_suLsuLdaggeru_hard-DR.cpp"
-// #include "mrssm_gu_suLsuLdaggeru_hard-DR_wEta_noSimplify.cpp"
 #include "mrssm_gu_suLsuLdaggeru_hard.cpp"
 #include "mrssm_gg_suLsuLdaggerg_hard.cpp"
 #include "mrssm_gg_suLsuLdaggerg_soft.cpp"
 
+//#include "mrssm_gu_suLsuRubar_hard-DR_wEtaDep.cpp"
+// #include "mrssm_gu_suLsuLdaggeru_hard-DR_wEta_noSimplify.cpp"
+// wEta_noSimplify is faster than wEta
