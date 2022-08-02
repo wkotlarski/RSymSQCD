@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
 
    // local arrays are not aumatically initialized to 0
    // need to use {}
-   array<double,3> temp {}, xsection_tree {}, xsection_virt {}, xsection_SC {}, xsection_HnonC {},
+   array<double,3> xsection_tree {}, xsection_virt {}, xsection_SC {}, xsection_HnonC {},
            xsection_tree1 {}, xsection_virt1 {}, xsection_SC1 {}, xsection_HnonC1 {},
            xsection_tree2 {}, xsection_virt2 {}, xsection_SC2 {}, xsection_HnonC2 {},
            xsection_tree3 {}, xsection_virt3 {}, xsection_SC3 {}, xsection_HnonC3 {},
@@ -163,8 +163,6 @@ int main(int argc, char* argv[]) {
    enum class Channel {
        pp_OO,
        pp_suLsuR,
-       pp_suLsuL,
-       pp_suLsdR,
        pp_sqLsqR,
        pp_sqLsqR_w_cc,
        pp_suLsuLdagger,
