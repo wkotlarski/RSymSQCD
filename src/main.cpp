@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
       boost::property_tree::ini_parser::read_ini(card, pt);
    }
    catch (const std::exception& e) {
-      std::cout << "Error while parsing trying to parse " << card << " (" << e.what() << ")\n";
+      std::cerr << "Error while trying to parse " << card << " (" << e.what() << ")\n";
       return 1;
    }
 
