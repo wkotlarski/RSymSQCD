@@ -331,7 +331,7 @@ int main(int argc, char* argv[]) {
                         born_precision, born_verbosity
                      );
                      auto chan_res = tree.integrate();
-                     print_to_terminal("qqbar > sqsq*", chan_res);
+                     print_to_terminal("qqbar -> sqsq*", chan_res);
                      xsec_to_json(j, "qqbar->sqsq*", chan_res);
                      result = result + chan_res;
                   }
@@ -349,15 +349,15 @@ int main(int argc, char* argv[]) {
                         born_precision, born_verbosity
                      );
                      auto chan_res = tree.integrate();
-                     print_to_terminal("qqbar > sqsq*", chan_res);
-                     xsec_to_json(j, "qqbar->sqsq*", chan_res);
+                     print_to_terminal("qq'bar -> sqsq'*", chan_res);
+                     xsec_to_json(j, "qq'bar->sqsq'*", chan_res);
                      result = result + chan_res;
                   }
                   {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
                         // 4 (squark flavours) * 2 (pp symmetry) * 2 (L and R squarks)
-                        flav.push_back({i,-i, 2*4*2});
+                        flav.push_back({i, -i, 2*4*2});
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
@@ -365,12 +365,12 @@ int main(int argc, char* argv[]) {
                         born_precision, born_verbosity
                      );
                      auto chan_res = tree.integrate();
-                     print_to_terminal( "ddbar->suLsuL*", chan_res);
-                     xsec_to_json(j, "ddbar->suLsuL*", chan_res);
+                     print_to_terminal("qqbar -> sq'sq'*", chan_res);
+                     xsec_to_json(j, "ddbar->sq'sq'*", chan_res);
                      result = result + chan_res;
                   }
                   {
-                     // 5 squark flavours * L and R
+                     // 5 squark flavours * (L + R)
                      std::vector<std::array<int, 3>> flav {{21, 21, 2*5}};
                      XSection_Tree tree(
                         parameters, m1, m2,
@@ -378,8 +378,8 @@ int main(int argc, char* argv[]) {
                         born_precision, born_verbosity
                      );
                      auto chan_res = tree.integrate();
-                     print_to_terminal( "gg > suLsuL*", chan_res);
-                     xsec_to_json(j, "gg->suLsuL*", chan_res);
+                     print_to_terminal( "gg -> suLsuL*", chan_res);
+                     xsec_to_json(j, "gg->sqsq*", chan_res);
                      result = result + chan_res;
                   }
                   print_to_terminal("total", result);
