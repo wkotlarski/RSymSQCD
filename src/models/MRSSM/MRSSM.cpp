@@ -2,10 +2,14 @@
 #include "constants.hpp"
 #include "mathematica_wrapper.hpp"
 
+#include <boost/math/special_functions/pow.hpp>
+
 #include <Eigen/Dense>
 #include "clooptools.h"
 
 #include <cmath>
+
+using boost::math::pow;
 
 MRSSM::MRSSM(MRSSMParameters const& params)
    : MassTop {params.MassTop},
