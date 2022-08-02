@@ -430,7 +430,7 @@ int main(int argc, char* argv[]) {
       // fails if we are exactly on the threshold
       constexpr double dS0 = 1e-10;
       const double dC = pt.get<double>("technical parameters.dC", 1e-6);
-      cout << "\nINFO: Using phase space slicing parameters δS=" << dS
+      cout << "\nINFO: Using phase space slicing parameters δS=" << std::scientific << std::setprecision(1) << dS
            << " and δC=" << dC << '\n';
       if (dC > dS) {
          cout << "Warning: δC should be always << than δS\n";
