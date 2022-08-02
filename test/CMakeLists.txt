@@ -52,9 +52,13 @@ endforeach()
 
 list(
    APPEND NLO_RUN_CARDS
+   # pp -> suL suR
    pp_suLsuR/pp_suLsuR_BMP1.ini pp_suLsuR/pp_suLsuR_BMP2_DR.ini pp_suLsuR/pp_suLsuR_BMP3_DR.ini
+   # pp -> suL suL*
    pp_suLsuLdagger/pp_suLsuLdagger_BMP1.ini pp_suLsuLdagger/pp_suLsuLdagger_BMP2_DR.ini
+   # pp -> sqL sqR
    pp_sqLsqR/pp_sqLsqR_BMP1.ini pp_sqLsqR/pp_sqLsqR_BMP2_DR.ini pp_sqLsqR/pp_sqLsqR_BMP3_DR.ini
+   # pp -> sqL sqR + sqL* sqR*
    pp_sqLsqR+cc/pp_sqLsqR+cc_BMP1.json pp_sqLsqR+cc/pp_sqLsqR+cc_BMP2_DR.json pp_sqLsqR+cc/pp_sqLsqR+cc_BMP3_DR.json
 )
 list(
