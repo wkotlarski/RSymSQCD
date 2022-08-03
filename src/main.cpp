@@ -1299,7 +1299,7 @@ int main(int argc, char* argv[]) {
                      */
                      XSection_SC sc(
                         parameters, m1, m1,
-                        std::bind(&Sgluons::sgluons_qqbar_OOg_soft, sgluons, _1, _2, _3, _4, _5),
+                        std::bind(&Sgluons::sgluons_gg_OOg_soft, sgluons, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {{
@@ -1325,6 +1325,10 @@ int main(int argc, char* argv[]) {
                      if(enable_hard) current_hard = hc.integrate();
                      print_to_terminal("gg -> OO", current_tree, current_virt, current_soft, current_hard);
                      xsec_to_json(j, "gg->OO", current_tree, current_virt, current_soft, current_hard);
+                     total_xsec_tree += current_tree;
+                     total_xsec_virt += current_virt;
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
                }
                print_to_terminal("sum", total_xsec_tree, total_xsec_virt, total_xsec_soft, total_xsec_hard);
             }
