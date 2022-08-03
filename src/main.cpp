@@ -23,7 +23,6 @@
 using namespace std;
 using namespace std::chrono_literals;
 namespace po = boost::program_options;
-using json = nlohmann::json;
 using namespace std::placeholders;
 
 int main(int argc, char* argv[]) {
@@ -171,7 +170,7 @@ int main(int argc, char* argv[]) {
       return 1.;
    }
 
-   json j;
+   nlohmann::json j;
    j["process"] = pt.get<string>("process.process");
    j["sqrt(S)"] = pt.get<double>("collider setup.sqrt_S");
    j["mu_r"] = pt.get<double>("collider setup.mu_r");
