@@ -105,17 +105,6 @@ int main(int argc, char* argv[]) {
       return 1;
    }
 
-   // local arrays are not aumatically initialized to 0
-   // need to use {}
-   array<double,3> xsection_tree {}, xsection_virt {}, xsection_SC {}, xsection_HnonC {},
-           xsection_tree1 {}, xsection_virt1 {}, xsection_SC1 {}, xsection_HnonC1 {},
-           xsection_tree2 {}, xsection_virt2 {}, xsection_SC2 {}, xsection_HnonC2 {},
-           xsection_tree3 {}, xsection_virt3 {}, xsection_SC3 {}, xsection_HnonC3 {},
-           xsection_tree4 {}, xsection_virt4 {}, xsection_SC4 {}, xsection_HnonC4 {},
-           xsection_tree5 {}, xsection_virt5 {}, xsection_SC5 {}, xsection_HnonC5 {},
-           xsection_tree6 {}, xsection_virt6 {}, xsection_SC6 {}, xsection_HnonC6 {},
-           xsection_tree_total {}, xsection_virt_total {}, xsection_SC_total {}, xsection_HnonC_total {};
-
    enum class Order {LO, NLO/*, NLO+NLL*/};
    Order order;
    if (pt.get<string>("process.order") == "LO") {
@@ -257,9 +246,9 @@ int main(int argc, char* argv[]) {
                         flav,
                         born_precision, born_verbosity
                      );
-                     xsection_tree = tree.integrate();
-                     xsec_to_json(j, "uu->suLsuR", xsection_tree);
-                     print_to_terminal("uu > suLsuR", xsection_tree);
+                     auto xsection_current = tree.integrate();
+                     xsec_to_json(j, "uu->suLsuR", xsection_current);
+                     print_to_terminal("uu > suLsuR", xsection_current);
                   }
                   break;
                }
@@ -321,7 +310,7 @@ int main(int argc, char* argv[]) {
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
-                  std::array<double, 3> result {0., 0., 0.};
+                  std::array<double, 3> result {};
                   {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
@@ -335,7 +324,7 @@ int main(int argc, char* argv[]) {
                      auto chan_res = tree.integrate();
                      print_to_terminal("qqbar -> sqsq*", chan_res);
                      xsec_to_json(j, "qqbar->sqsq*", chan_res);
-                     result = result + chan_res;
+                     result += chan_res;
                   }
                   {
                      std::vector<std::array<int, 3>> flav {};
@@ -353,7 +342,7 @@ int main(int argc, char* argv[]) {
                      auto chan_res = tree.integrate();
                      print_to_terminal("qq'bar -> sqsq'*", chan_res);
                      xsec_to_json(j, "qq'bar->sqsq'*", chan_res);
-                     result = result + chan_res;
+                     result += chan_res;
                   }
                   {
                      std::vector<std::array<int, 3>> flav {};
@@ -369,7 +358,7 @@ int main(int argc, char* argv[]) {
                      auto chan_res = tree.integrate();
                      print_to_terminal("qqbar -> sq'sq'*", chan_res);
                      xsec_to_json(j, "ddbar->sq'sq'*", chan_res);
-                     result = result + chan_res;
+                     result += chan_res;
                   }
                   {
                      // 5 squark flavours * (L + R)
@@ -382,7 +371,7 @@ int main(int argc, char* argv[]) {
                      auto chan_res = tree.integrate();
                      print_to_terminal( "gg -> suLsuL*", chan_res);
                      xsec_to_json(j, "gg->sqsq*", chan_res);
-                     result = result + chan_res;
+                     result += chan_res;
                   }
                   print_to_terminal("total", result);
                   break;
@@ -390,7 +379,7 @@ int main(int argc, char* argv[]) {
                case Channel::pp_glglbar:
                {
                   const double m = pt.get<double>("masses.gluino");
-                  std::array<double, 3> result {0., 0., 0.};
+                  std::array<double, 3> result {};
                   {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
@@ -404,7 +393,7 @@ int main(int argc, char* argv[]) {
                      auto chan_res = tree.integrate();
                      print_to_terminal("qqbar > gluglubar", chan_res);
                      xsec_to_json(j, "qqbar->gluglubar", chan_res);
-                     result = result + chan_res;
+                     result += chan_res;
                   }
                   {
                      std::vector<std::array<int, 3>> flav {{21, 21, 1}};
@@ -416,7 +405,7 @@ int main(int argc, char* argv[]) {
                      auto chan_res = tree.integrate();
                      print_to_terminal("gg > gluglubar", chan_res);
                      xsec_to_json(j, "gg->gluglubar", chan_res);
-                     result = result + chan_res;
+                     result += chan_res;
                   }
                   print_to_terminal("total", result);
                }
@@ -448,6 +437,10 @@ int main(int argc, char* argv[]) {
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
+                  array<double, 3> born_xsec_total {};
+                  array<double, 3> soft_xsec_total {};
+                  array<double, 3> virt_xsec_total {};
+                  array<double, 3> hard_xsec_total {};
                   // uu > suL suR (+g) process
                   if( subprocess == "" ) {
                      const std::vector<std::array<int, 3>> flav {{2, 2, 1}};
@@ -482,12 +475,20 @@ int main(int argc, char* argv[]) {
                         flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_born) xsection_tree1 = tree.integrate();
-                     if(enable_virt) xsection_virt1 = virt.integrate();
-                     if(enable_sc) xsection_SC1 = sc.integrate();
-                     if(enable_hard) xsection_HnonC1 = hc.integrate();
-                     print_to_terminal( "uu > suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
-                     xsec_to_json(j, "uu->suLsuR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     array<double, 3> born_xsec_current {};
+                     array<double, 3> soft_xsec_current {};
+                     array<double, 3> virt_xsec_current {};
+                     array<double, 3> hard_xsec_current {};
+                     if(enable_born) born_xsec_current = tree.integrate();
+                     if(enable_virt) virt_xsec_current = virt.integrate();
+                     if(enable_sc) soft_xsec_current = sc.integrate();
+                     if(enable_hard) hard_xsec_current = hc.integrate();
+                     print_to_terminal("uu > suLsuR(+X)", born_xsec_current, virt_xsec_current, soft_xsec_current, hard_xsec_current);
+                     xsec_to_json(j, "uu->suLsuR(+X)", born_xsec_current, virt_xsec_current, soft_xsec_current, hard_xsec_current);
+                     born_xsec_total += born_xsec_current;
+                     virt_xsec_total += virt_xsec_current;
+                     soft_xsec_total += soft_xsec_current;
+                     hard_xsec_total += hard_xsec_current;
                   }
 
                   // gu > suL suR ubar process
@@ -515,17 +516,17 @@ int main(int argc, char* argv[]) {
                         flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_sc) xsection_SC2 = sc.integrate();
-                     if(enable_hard) xsection_HnonC2 = hc.integrate();
-                     print_to_terminal( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
-                     xsec_to_json(j, "gu->suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+                     array<double, 3> soft_xsec_current {};
+                     array<double, 3> hard_xsec_current {};
+                     if(enable_sc) soft_xsec_current = sc.integrate();
+                     if(enable_hard) hard_xsec_current = hc.integrate();
+                     print_to_terminal("gu > suLsuR(+X)", {}, {}, soft_xsec_current, hard_xsec_current);
+                     xsec_to_json(j, "gu->suLsuR(+X)", {}, {}, soft_xsec_current, hard_xsec_current);
+                     soft_xsec_total += soft_xsec_current;
+                     hard_xsec_total += hard_xsec_current;
                   }
 
-                  xsection_tree_total = xsection_tree1;
-                  xsection_virt_total = xsection_virt1;
-                  xsection_SC_total = xsection_SC1 + xsection_SC2;
-                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
-                  print_to_terminal( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
+                  print_to_terminal("sum", born_xsec_total, virt_xsec_total, soft_xsec_total, hard_xsec_total);
                   break;
                }
                case Channel::pp_sqLsqR:
@@ -533,6 +534,10 @@ int main(int argc, char* argv[]) {
                   // qq > sqL sqR (+g) process
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
+                  std::array<double, 3> total_xsec_tree {};
+                  std::array<double, 3> total_xsec_virt {};
+                  std::array<double, 3> total_xsec_soft {};
+                  std::array<double, 3> total_xsec_hard {};
                   if( subprocess == "" ) {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
@@ -571,12 +576,20 @@ int main(int argc, char* argv[]) {
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_born) xsection_tree1 = tree.integrate();
-                     if(enable_virt) xsection_virt1 = virt.integrate();
-                     if(enable_sc) xsection_SC1 = sc.integrate();
-                     if(enable_hard) xsection_HnonC1 = hc.integrate();
-                     print_to_terminal( "qq > sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
-                     xsec_to_json(j, "qq->sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     std::array<double, 3> current_tree {};
+                     std::array<double, 3> current_virt {};
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_born) current_tree = tree.integrate();
+                     if(enable_virt) current_virt = virt.integrate();
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal("qq > sqLsqR(+X)", current_tree, current_virt, current_soft, current_hard);
+                     xsec_to_json(j, "qq->sqLsqR(+X)", current_tree, current_virt, current_soft, current_hard);
+                     total_xsec_tree += current_tree;
+                     total_xsec_virt += current_virt;
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
                   }
                   // gu > suL suR ubar process
                   if (subprocess == "gu_suLsuRubar" || subprocess == "" ) {
@@ -604,17 +617,17 @@ int main(int argc, char* argv[]) {
                         flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_sc) xsection_SC2 = sc.integrate();
-                     if(enable_hard) xsection_HnonC2 = hc.integrate();
-                     print_to_terminal( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
-                     xsec_to_json(j, "gu->suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal( "gu > suLsuR(+X)", {}, {}, current_soft, current_hard);
+                     xsec_to_json(j, "gu->suLsuR(+X)", {}, {}, current_soft, current_hard);
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
                   }
 
-                  xsection_tree_total = xsection_tree1;
-                  xsection_virt_total = xsection_virt1;
-                  xsection_SC_total = xsection_SC1 + xsection_SC2;
-                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
-                  print_to_terminal( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
+                  print_to_terminal("sum", total_xsec_tree, total_xsec_virt, total_xsec_soft, total_xsec_hard);
                   break;
                }
                case Channel::pp_sqLsqR_w_cc:
@@ -622,6 +635,10 @@ int main(int argc, char* argv[]) {
                   // qq > sqL sqR (+g) process
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
+                  std::array<double, 3> total_xsec_tree {};
+                  std::array<double, 3> total_xsec_virt {};
+                  std::array<double, 3> total_xsec_soft {};
+                  std::array<double, 3> total_xsec_hard {};
                   if( subprocess == "" ) {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
@@ -662,12 +679,20 @@ int main(int argc, char* argv[]) {
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_born) xsection_tree1 = tree.integrate();
-                     if(enable_virt) xsection_virt1 = virt.integrate();
-                     if(enable_sc) xsection_SC1 = sc.integrate();
-                     if(enable_hard) xsection_HnonC1 = hc.integrate();
-                     print_to_terminal( "qq > sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
-                     xsec_to_json(j, "qq->sqLsqR(+X)", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     std::array<double, 3> current_tree {};
+                     std::array<double, 3> current_virt {};
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_born) current_tree = tree.integrate();
+                     if(enable_virt) current_virt = virt.integrate();
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal( "qq > sqLsqR(+X)", current_tree, current_virt, current_soft, current_hard);
+                     xsec_to_json(j, "qq->sqLsqR(+X)", current_tree, current_virt, current_soft, current_hard);
+                     total_xsec_tree += current_tree;
+                     total_xsec_virt += current_virt;
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
                   }
                   // gu > suL suR ubar process
                   if (subprocess == "gu_suLsuRubar" || subprocess == "" ) {
@@ -695,23 +720,27 @@ int main(int argc, char* argv[]) {
                         flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_sc) xsection_SC2 = sc.integrate();
-                     if(enable_hard) xsection_HnonC2 = hc.integrate();
-                     print_to_terminal( "gu > suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2 );
-                     xsec_to_json(j, "gu->suLsuR(+X)", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal( "gu > suLsuR(+X)", {}, {}, current_soft, current_hard);
+                     xsec_to_json(j, "gu->suLsuR(+X)", {}, {}, current_soft, current_hard);
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
                   }
 
-                  xsection_tree_total = xsection_tree1;
-                  xsection_virt_total = xsection_virt1;
-                  xsection_SC_total = xsection_SC1 + xsection_SC2;
-                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2;
-                  print_to_terminal( "sum", xsection_tree1, xsection_virt1, xsection_SC_total, xsection_HnonC_total );
+                  print_to_terminal("sum", total_xsec_tree, total_xsec_virt, total_xsec_soft, total_xsec_hard);
                   break;
                }
                case Channel::pp_suLsuLdagger:
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
+                  std::array<double, 3> total_xsec_tree {};
+                  std::array<double, 3> total_xsec_virt {};
+                  std::array<double, 3> total_xsec_soft {};
+                  std::array<double, 3> total_xsec_hard {};
                   if (subprocess == "" || subprocess == "uubar_suLsuLdagger") {
                      std::vector<std::array<int, 3>> flav {{2, -2, 2}};
                      XSection_Tree tree(
@@ -743,12 +772,20 @@ int main(int argc, char* argv[]) {
                         flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_born) xsection_tree1 = tree.integrate();
-                     if(enable_virt) xsection_virt1 = virt.integrate();
-                     if(enable_sc) xsection_SC1 = sc.integrate();
-                     if(enable_hard) xsection_HnonC1 = hc.integrate();
-                     print_to_terminal( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
-                     xsec_to_json(j, "uubar->suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     std::array<double, 3> current_tree {};
+                     std::array<double, 3> current_virt {};
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_born) current_tree = tree.integrate();
+                     if(enable_virt) current_virt = virt.integrate();
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal( "uubar -> suLsuL*(+X)", current_tree, current_virt, current_soft, current_hard);
+                     xsec_to_json(j, "uubar->suLsuL*", current_tree, current_virt, current_soft, current_hard);
+                     total_xsec_tree += current_tree;
+                     total_xsec_virt += current_virt;
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
                   }
 
                   if( subprocess == "") {
@@ -784,12 +821,20 @@ int main(int argc, char* argv[]) {
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_born) xsection_tree2 = tree.integrate();
-                     if(enable_virt) xsection_virt2 = virt.integrate();
-                     if(enable_sc) xsection_SC2 = sc.integrate();
-                     if(enable_hard) xsection_HnonC2 = hc.integrate();
-                     print_to_terminal( "ddbar->suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
-                     xsec_to_json(j, "ddbar->suLsuL*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+                     std::array<double, 3> current_tree {};
+                     std::array<double, 3> current_virt {};
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_born) current_tree = tree.integrate();
+                     if(enable_virt) current_virt = virt.integrate();
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal("ddbar -> suLsuL*(+X)", current_tree, current_virt, current_soft, current_hard);
+                     xsec_to_json(j, "ddbar->suLsuL*", current_tree, current_virt, current_soft, current_hard);
+                     total_xsec_tree += current_tree;
+                     total_xsec_virt += current_virt;
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
                   }
 
                   if( subprocess == "") {
@@ -822,12 +867,20 @@ int main(int argc, char* argv[]) {
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_born) xsection_tree3 = tree.integrate();
-                     if(enable_virt) xsection_virt3 = virt.integrate();
-                     if(enable_sc) xsection_SC3 = sc.integrate();
-                     if(enable_hard) xsection_HnonC3 = hc.integrate();
-                     print_to_terminal( "gg > suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
-                     xsec_to_json(j, "gg->suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
+                     std::array<double, 3> current_tree {};
+                     std::array<double, 3> current_virt {};
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_born) current_tree = tree.integrate();
+                     if(enable_virt) current_virt = virt.integrate();
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal( "gg -> suLsuL*(+X)", current_tree, current_virt, current_soft, current_hard);
+                     xsec_to_json(j, "gg->suLsuL*", current_tree, current_virt, current_soft, current_hard);
+                     total_xsec_tree += current_tree;
+                     total_xsec_virt += current_virt;
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
                   }
 
                   if( subprocess == "") {
@@ -849,10 +902,14 @@ int main(int argc, char* argv[]) {
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_sc) xsection_SC4 = sc.integrate();
-                     if(enable_hard) xsection_HnonC4 = hc.integrate();
-                     print_to_terminal( "gq > suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
-                     xsec_to_json(j, "gq->suLsuL*(+X)", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal( "gq -> suLsuL*(+X)", {}, {}, current_soft, current_hard);
+                     xsec_to_json(j, "gq->suLsuL*(+X)", {}, {}, current_soft, current_hard);
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
                   }
 
                   // g u > suL suLdagger
@@ -879,24 +936,27 @@ int main(int argc, char* argv[]) {
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_sc) xsection_SC5 = sc.integrate();
-                     if(enable_hard) xsection_HnonC5 = hc.integrate();
-                     print_to_terminal( "gu > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5 );
-                     xsec_to_json(j, "gu->suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5);
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal( "gu -> suLsuL*(+X)", {}, {}, current_soft, current_hard);
+                     xsec_to_json(j, "gu->suLsuL*(+X)", {}, {}, current_soft, current_hard);
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
                   }
 
-                  xsection_tree_total = xsection_tree1 + xsection_tree2 + xsection_tree3;
-                  xsection_virt_total = xsection_virt1 + xsection_virt2 + xsection_virt3;
-                  xsection_SC_total = xsection_SC1 + xsection_SC2 + xsection_SC3 + xsection_SC4 + xsection_SC5;
-                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2 + xsection_HnonC3
-                          + xsection_HnonC4 + xsection_HnonC5;
-                  print_to_terminal( "total", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total);
+                  print_to_terminal("sum", total_xsec_tree, total_xsec_virt, total_xsec_soft, total_xsec_hard);
                   break;
                }
                case Channel::pp_sqsqdagger:
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
+                  std::array<double, 3> total_xsec_tree {};
+                  std::array<double, 3> total_xsec_virt {};
+                  std::array<double, 3> total_xsec_soft {};
+                  std::array<double, 3> total_xsec_hard {};
                   if (subprocess == "" || subprocess == "uubar_suLsuLdagger") {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
@@ -931,12 +991,20 @@ int main(int argc, char* argv[]) {
                         flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_born) xsection_tree1 = tree.integrate();
-                     if(enable_virt) xsection_virt1 = virt.integrate();
-                     if(enable_sc) xsection_SC1 = sc.integrate();
-                     if(enable_hard) xsection_HnonC1 = hc.integrate();
-                     print_to_terminal( "qqbar > sqsq*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
-                     xsec_to_json(j, "qqbar->sqsq*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
+                     std::array<double, 3> current_tree {};
+                     std::array<double, 3> current_virt {};
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_born) current_tree = tree.integrate();
+                     if(enable_virt) current_virt = virt.integrate();
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal("qqbar > sqsq*", current_tree, current_virt, current_soft, current_hard);
+                     xsec_to_json(j, "qqbar->sqsq*", current_tree, current_virt, current_soft, current_hard);
+                     total_xsec_tree += current_tree;
+                     total_xsec_virt += current_virt;
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
                   }
                   if (subprocess == "" || subprocess == "uubar_suLsuLdagger") {
                      std::vector<std::array<int, 3>> flav {};
@@ -975,12 +1043,20 @@ int main(int argc, char* argv[]) {
                         flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_born) xsection_tree2 = tree.integrate();
-                     if(enable_virt) xsection_virt2 = virt.integrate();
-                     if(enable_sc) xsection_SC2 = sc.integrate();
-                     if(enable_hard) xsection_HnonC2 = hc.integrate();
-                     print_to_terminal( "qqbar > sqsq*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
-                     xsec_to_json(j, "qqbar->sqsq*", xsection_tree2, xsection_virt2, xsection_SC2, xsection_HnonC2);
+                     std::array<double, 3> current_tree {};
+                     std::array<double, 3> current_virt {};
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_born) current_tree = tree.integrate();
+                     if(enable_virt) current_virt = virt.integrate();
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal("qqbar > sqsq*", current_tree, current_virt, current_soft, current_hard);
+                     xsec_to_json(j, "qqbar->sqsq*", current_tree, current_virt, current_soft, current_hard);
+                     total_xsec_tree += current_tree;
+                     total_xsec_virt += current_virt;
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
                   }
 
                   if( subprocess == "") {
@@ -1017,12 +1093,20 @@ int main(int argc, char* argv[]) {
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_born) xsection_tree3 = tree.integrate();
-                     if(enable_virt) xsection_virt3 = virt.integrate();
-                     if(enable_sc) xsection_SC3 = sc.integrate();
-                     if(enable_hard) xsection_HnonC3 = hc.integrate();
-                     print_to_terminal( "ddbar->suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
-                     xsec_to_json(j, "ddbar->suLsuL*", xsection_tree3, xsection_virt3, xsection_SC3, xsection_HnonC3);
+                     std::array<double, 3> current_tree {};
+                     std::array<double, 3> current_virt {};
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_born) current_tree = tree.integrate();
+                     if(enable_virt) current_virt = virt.integrate();
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal("ddbar->suLsuL*", current_tree, current_virt, current_soft, current_hard);
+                     xsec_to_json(j, "ddbar->suLsuL*", current_tree, current_virt, current_soft, current_hard);
+                     total_xsec_tree += current_tree;
+                     total_xsec_virt += current_virt;
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
                   }
 
                   if( subprocess == "") {
@@ -1056,12 +1140,20 @@ int main(int argc, char* argv[]) {
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_born) xsection_tree4 = tree.integrate();
-                     if(enable_virt) xsection_virt4 = virt.integrate();
-                     if(enable_sc) xsection_SC4 = sc.integrate();
-                     if(enable_hard) xsection_HnonC4 = hc.integrate();
-                     print_to_terminal( "gg > suLsuL*", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
-                     xsec_to_json(j, "gg->suLsuL*", xsection_tree4, xsection_virt4, xsection_SC4, xsection_HnonC4);
+                     std::array<double, 3> current_tree {};
+                     std::array<double, 3> current_virt {};
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_born) current_tree = tree.integrate();
+                     if(enable_virt) current_virt = virt.integrate();
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal("gg > suLsuL*", current_tree, current_virt, current_soft, current_hard);
+                     xsec_to_json(j, "gg->suLsuL*", current_tree, current_virt, current_soft, current_hard);
+                     total_xsec_tree += current_tree;
+                     total_xsec_virt += current_virt;
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
                   }
 
                   if( subprocess == "") {
@@ -1083,10 +1175,14 @@ int main(int argc, char* argv[]) {
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_sc) xsection_SC5 = sc.integrate();
-                     if(enable_hard) xsection_HnonC5 = hc.integrate();
-                     print_to_terminal( "gq > suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5);
-                     xsec_to_json(j, "gq->suLsuL*(+X)", xsection_tree5, xsection_virt5, xsection_SC5, xsection_HnonC5);
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal("gq > suLsuL*(+X)", {}, {}, current_soft, current_hard);
+                     xsec_to_json(j, "gq->suLsuL*(+X)", {}, {}, current_soft, current_hard);
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
                   }
 
                   // g u > suL suLdagger
@@ -1109,18 +1205,17 @@ int main(int argc, char* argv[]) {
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
-                     if(enable_sc) xsection_SC6 = sc.integrate();
-                     if(enable_hard) xsection_HnonC6 = hc.integrate();
-                     print_to_terminal( "gu > suLsuL*(+X)", xsection_tree6, xsection_virt6, xsection_SC6, xsection_HnonC6 );
-                     xsec_to_json(j, "gu->suLsuL*(+X)", xsection_tree6, xsection_virt6, xsection_SC6, xsection_HnonC6);
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal("gu > suLsuL*(+X)", {}, {}, current_soft, current_hard);
+                     xsec_to_json(j, "gu->suLsuL*(+X)", {}, {}, current_soft, current_hard);
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
                   }
 
-                  xsection_tree_total = xsection_tree1 + xsection_tree2 + xsection_tree3 + xsection_tree4;
-                  xsection_virt_total = xsection_virt1 + xsection_virt2 + xsection_virt3;
-                  xsection_SC_total = xsection_SC1 + xsection_SC2 + xsection_SC3 + xsection_SC4 + xsection_SC5;
-                  xsection_HnonC_total = xsection_HnonC1 + xsection_HnonC2 + xsection_HnonC3
-                          + xsection_HnonC4 + xsection_HnonC5;
-                  print_to_terminal( "total", xsection_tree_total, xsection_virt_total, xsection_SC_total, xsection_HnonC_total);
+                  print_to_terminal("sum", total_xsec_tree, total_xsec_virt, total_xsec_soft, total_xsec_hard);
                   break;
                }
                default:
@@ -1243,6 +1338,8 @@ int main(int argc, char* argv[]) {
          {"eta_sign", eta_sign},
          {"delta", delta}
       };
+      break;
+   }
    }
 
    // print out time statistics
