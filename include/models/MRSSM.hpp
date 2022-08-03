@@ -19,9 +19,6 @@ public:
    MRSSM() = delete;
    MRSSM(MRSSMParameters const& params);
 
-   inline double matrix_soft_stub(double, double, double, double, double)  { return 0.; };
-   inline double matrix_xsec_stub(double, double )  { return 0.; };
-
    // pp -> suL suR
    // ------------------------------------------------------------------------------------
 

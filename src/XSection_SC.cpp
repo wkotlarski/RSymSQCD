@@ -2,19 +2,20 @@
 #include "constants.hpp"
 #include "mathematica_wrapper.hpp"
 
+#include "cuba.h"
 #include "LHAPDF/LHAPDF.h"
 
 namespace {
-int forwarder_sc(const int *ndim, const cubareal xx[],
-   const int *ncomp, cubareal ff[], void *userdata) {
+int forwarder_sc(const int *ndim, const double xx[],
+   const int *ncomp, double ff[], void *userdata) {
     return static_cast<XSection_SC*>(userdata)->integrand_sc(ndim, xx, ncomp, ff, nullptr);
 }
-int forwarder_c1(const int *ndim, const cubareal xx[],
-   const int *ncomp, cubareal ff[], void *userdata) {
+int forwarder_c1(const int *ndim, const double xx[],
+   const int *ncomp, double ff[], void *userdata) {
     return static_cast<XSection_SC*>(userdata)->integrand_c1(ndim, xx, ncomp, ff, nullptr);
 }
-int forwarder_c2(const int *ndim, const cubareal xx[],
-   const int *ncomp, cubareal ff[], void *userdata) {
+int forwarder_c2(const int *ndim, const double xx[],
+   const int *ncomp, double ff[], void *userdata) {
     return static_cast<XSection_SC*>(userdata)->integrand_c2(ndim, xx, ncomp, ff, nullptr);
 }
 }
@@ -35,15 +36,19 @@ std::array<double, 3> XSection_SC::integrate() {
 
    int nregions, fail;
 
-   cubareal integral_sc[ncomp], error_sc[ncomp], prob_sc[ncomp];
-   llCuhre(ndim, ncomp, forwarder_sc, this, 1,
-      accuracy_rel_sc, accuracy_abs, integration_verbosity_,
-      neval_min, neval_max, 1, NULL, NULL,
-      &nregions, &neval, &fail, integral_sc, error_sc, prob_sc);
+   double integral_sc[ncomp] {0.};
+   double error_sc[ncomp]    {0.};
+   double prob_sc[ncomp]     {0.};
+   if (f_soft_.has_value()) {
+      llCuhre(ndim, ncomp, forwarder_sc, this, 1,
+         accuracy_rel_sc, accuracy_abs, integration_verbosity_,
+         neval_min, neval_max, 1, NULL, NULL,
+         &nregions, &neval, &fail, integral_sc, error_sc, prob_sc);
+   }
 
-   double integral_c1[ncomp] = {0.};
-   double error_c1[ncomp]    = {0.};
-   double prob_c1[ncomp]     = {0.};
+   double integral_c1[ncomp] {0.};
+   double error_c1[ncomp]    {0.};
+   double prob_c1[ncomp]     {0.};
    if (sp_.at(0).first == SplittingKernel::Pqq || sp_.at(0).first == SplittingKernel::Pgg ||
        sp_.at(1).first == SplittingKernel::Pgg || sp_.at(1).first == SplittingKernel::Pgg) {
       llCuhre(ndim, ncomp, forwarder_c1, this, 1,
@@ -52,7 +57,7 @@ std::array<double, 3> XSection_SC::integrate() {
          &nregions, &neval, &fail, integral_c1, error_c1, prob_c1);
    }
 
-   cubareal integral_c2[ncomp], error_c2[ncomp], prob_c2[ncomp];
+   double integral_c2[ncomp], error_c2[ncomp], prob_c2[ncomp];
    llCuhre(ndim, ncomp, forwarder_c2, this, 1,
       accuracy_rel_c, accuracy_abs, integration_verbosity_,
       neval_min, neval_max, 1, NULL, NULL,
@@ -67,8 +72,8 @@ std::array<double, 3> XSection_SC::integrate() {
   return result_finite;
 }
 
-int XSection_SC::integrand_sc(const int *ndim, const cubareal xx[],
-  const int *ncomp, cubareal ff[], void *userdata) {
+int XSection_SC::integrand_sc(const int *ndim, const double xx[],
+  const int *ncomp, double ff[], void *userdata) {
 
    // integration variables
    const double x1 = 4.*Sqr(m1_/sqrtS_)    + (1-4.*Sqr(m1_/sqrtS_))    * xx[0];
@@ -83,7 +88,7 @@ int XSection_SC::integrand_sc(const int *ndim, const cubareal xx[],
    const double s12 = x1 * x2 * Sqr(sqrtS_);
    const double th = xx[2] * pi;
    const double alphas = pdf_->alphasQ(muR_);
-   ff[0] = pdf_flux * f_soft_(alphas, s12, th, dS_, muR_);
+   ff[0] = pdf_flux * f_soft_.value()(alphas, s12, th, dS_, muR_);
    ff[0] *= to_fb;
 
    // jakobian
@@ -92,11 +97,8 @@ int XSection_SC::integrand_sc(const int *ndim, const cubareal xx[],
    return 0;
 }
 
-// @todo if mu_r != mu_f one needs these term,
-//    otherwise it's 0
-
-int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
-   const int *ncomp, cubareal ff[], void *userdata) {
+int XSection_SC::integrand_c1(const int *ndim, const double xx[],
+   const int *ncomp, double ff[], void *userdata) {
 
    // integration variables
    const double x1 = 4.*Sqr(m1_)/Sqr(sqrtS_)      + (1-4.*Sqr(m1_)/Sqr(sqrtS_))      * xx[0];
@@ -112,12 +114,13 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
    const double alphas = pdf_->alphasQ(muR_);
    double result = 0.;
    for (const auto& [ker, sigma] : sp_) {
+      if (!sigma.has_value()) continue;
       if (ker == SplittingKernel::Pqq) {
-         result += CF*(2.*std::log(dS_) + 1.5)*sigma(alphas, s12);
+         result += CF*(2.*std::log(dS_) + 1.5)*sigma.value()(alphas, s12);
       }
       else if (ker == SplittingKernel::Pgg) {
          static constexpr int Nf = 5;
-         result += (2.*CA*std::log(dS_) + (11.*CA + 2.*Nf)/6)*sigma(alphas, s12);
+         result += (2.*CA*std::log(dS_) + (11.*CA + 2.*Nf)/6)*sigma.value()(alphas, s12);
       }
    };
    result *= alphas/two_pi*std::log(Sqr(muR_/muF_));
@@ -128,8 +131,8 @@ int XSection_SC::integrand_c1(const int *ndim, const cubareal xx[],
    return 0;
 }
 
-int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
-   const int *ncomp, cubareal ff[], void *userdata) {
+int XSection_SC::integrand_c2(const int *ndim, const double xx[],
+   const int *ncomp, double ff[], void *userdata) {
 
    // scale integration variables as Cuba works in a unit hipercube
    const double x1 = 4.*Sqr(m1_)/Sqr(sqrtS_)      + (1-4.*Sqr(m1_)/Sqr(sqrtS_))      * xx[0];
@@ -145,12 +148,16 @@ int XSection_SC::integrand_c2(const int *ndim, const cubareal xx[],
    const double s12 = x1 * x2 * Sqr(sqrtS_);
    const double alphas = pdf_->alphasQ(muR_);
    for (const auto& f : flav_) {
+      if (sp_.at(0).second.has_value()) {
       ff[0] += f.at(2) * pdf_->xfxQ(f.at(0), x1/z, muF_)/(x1/z) * pdf_->xfxQ(f.at(1), x2, muF_)/x2
-            * ( get_sp(sp_.at(0).first, z).at(0) * std::log( dC_/2. * s12/Sqr(muF_) * Sqr(1 - z)/z ) -
-           get_sp(sp_.at(0).first, z).at(1)) * sp_.at(0).second(alphas, s12);
+            * ( get_sp(sp_.at(0).first, z).at(0) * std::log(0.5*dC_ * s12/Sqr(muF_) * Sqr(1 - z)/z ) -
+           get_sp(sp_.at(0).first, z).at(1)) * sp_.at(0).second.value()(alphas, s12);
+      }
+      if (sp_.at(1).second.has_value()) {
       ff[0] += f.at(2) * pdf_->xfxQ(f.at(0), x2, muF_)/x2 * pdf_->xfxQ(f.at(1), x1/z, muF_)/(x1/z)
-           * (get_sp(sp_.at(1).first, z).at(0) * std::log( dC_/2. * s12/Sqr(muF_) * Sqr(1 - z)/z ) -
-           get_sp(sp_.at(1).first, z).at(1)) * sp_.at(1).second(alphas, s12);
+           * (get_sp(sp_.at(1).first, z).at(0) * std::log(0.5*dC_ * s12/Sqr(muF_) * Sqr(1 - z)/z ) -
+           get_sp(sp_.at(1).first, z).at(1)) * sp_.at(1).second.value()(alphas, s12);
+      }
    }
 
    ff[0] *= alphas/two_pi * 1./z * to_fb;

@@ -491,13 +491,13 @@ int main(int argc, char* argv[]) {
                      const std::vector<std::array<int, 3>> flav {{21, 2, 2}};
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
+                        std::nullopt,
                         dS0, dC,
                         flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::matrix_xsec_stub, mrssm, _1, _2)}
-                        },
+                        {{
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pgq, std::nullopt}
+                        }},
                         sc_precision, sc_verbosity
                      );
                      auto f =
@@ -580,12 +580,12 @@ int main(int argc, char* argv[]) {
                      for(int el : {1, 2, 3, 4, 5}) flav.push_back({21, el, 5});
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
+                        std::nullopt,
                         dS0, dC,
                         flav,
                         {
                            std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::matrix_xsec_stub, mrssm, _1, _2)}
+                           std::pair<SplittingKernel, std::optional<std::function<double(double, double)>>>{SplittingKernel::Pgq, std::nullopt}
                         },
                         sc_precision, sc_verbosity
                      );
@@ -671,12 +671,12 @@ int main(int argc, char* argv[]) {
                      for(int el : {1, -1, 2, -2, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2*5});
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
+                        std::nullopt,
                         dS0, dC,
                         flav,
                         {
                            std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::matrix_xsec_stub, mrssm, _1, _2)}
+                           std::pair<SplittingKernel, std::optional<std::function<double(double, double)>>>{SplittingKernel::Pgq, std::nullopt}
                         },
                         sc_precision, sc_verbosity
                      );
@@ -831,7 +831,7 @@ int main(int argc, char* argv[]) {
                      for( int el : { 1, -1, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2});
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
+                        std::nullopt,
                         dS0, dC, flav,
                         {
                            std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
@@ -857,7 +857,7 @@ int main(int argc, char* argv[]) {
                      for( int el : { 2, -2 }) flav.push_back({21, el, 2});
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
+                        std::nullopt,
                         dS0, dC, flav,
                         {
                            std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
@@ -1065,7 +1065,7 @@ int main(int argc, char* argv[]) {
                      for( int el : { 1, -1, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2});
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
+                        std::nullopt,
                         dS0, dC, flav,
                         {
                            std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
@@ -1091,7 +1091,7 @@ int main(int argc, char* argv[]) {
                      for( int el : { 2, -2 }) flav.push_back({21, el, 2});
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrix_soft_stub, mrssm, _1, _2, _3, _4, _5),
+                        std::nullopt,
                         dS0, dC, flav,
                         {
                            std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},

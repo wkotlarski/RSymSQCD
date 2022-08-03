@@ -17,7 +17,6 @@ public:
    {};
 
    std::array<double, 3> integrate();
-   void show_settings();
    int integrand(const int *ndim, const double xx[],
       const int *ncomp, double ff[], void *userdata);
 
