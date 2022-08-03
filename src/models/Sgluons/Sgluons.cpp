@@ -16,6 +16,10 @@ double Sgluons::sigmaSgluonsTree_qqbar_OO(double alphas, double s) {
    return 2 * a2 * pi * Power3(b)/(9. * s);
 }
 
+double Sgluons::sigmaSgluonsTree_gg_OO(double alphas, double s) {
+   return 0.;
+}
+
 #include "sgluons_gg_OOg_soft.cpp"
 #include "sgluons_gg_OOg_hard.cpp"
 #include "sgluons_qqbar_OOg_soft.cpp"

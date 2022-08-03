@@ -203,12 +203,16 @@ int main(int argc, char* argv[]) {
    j["mu_r"] = pt.get<double>("collider setup.mu_r");
    j["mu_f"] = pt.get<double>("collider setup.mu_f");
    j["pdf"] = pt.get<string>("collider setup.pdf");
-   j["masses"] = {
-      {"gluino", pt.get<double>("masses.gluino")},
-      {"pseudoscalar sgluon", pt.get<double>("masses.pseudoscalar_sgluon")},
-      {"top", pt.get<double>("masses.top")},
-      {"squarks", pt.get<double>("masses.squarks")}
-   };
+   switch (model) {
+      case Model::MRSSM:
+         j["masses"] = {
+            {"gluino", pt.get<double>("masses.gluino")},
+            {"pseudoscalar sgluon", pt.get<double>("masses.pseudoscalar_sgluon")},
+            {"top", pt.get<double>("masses.top")},
+            {"squarks", pt.get<double>("masses.squarks")}
+         };
+         break;
+   }
 
    // set PDFs
    std::cout << '\n';
@@ -1129,9 +1133,16 @@ int main(int argc, char* argv[]) {
             switch(channel) {
                case Channel::pp_OO:
                {
-                  const double m1 = pt.get<double>("masses.sgluon");
-                  if (subprocess == "") {
-                     std::vector<std::array<int, 3>> flav {{2, -2, 2}};
+                  const double m1 = pt.get<double>("masses.sgluons");
+                  std::array<double, 3> total_xsec_tree {};
+                  std::array<double, 3> total_xsec_virt {};
+                  std::array<double, 3> total_xsec_soft {};
+                  std::array<double, 3> total_xsec_hard {};
+                  {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {1, 2, 3, 4, 5}) {
+                      flav.push_back({i, -i, 2});
+                     }
                      XSection_Tree tree(
                         parameters, m1, m1,
                         std::bind(&Sgluons::matrixSgluonsTree_qqbar_OO, sgluons, _1, _2, _3), flav,
@@ -1143,32 +1154,86 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixMRSSMVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav
                      );
+                     */
                      XSection_SC sc(
-                        parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        parameters, m1, m1,
+                        std::bind(&Sgluons::sgluons_qqbar_OOg_soft, sgluons, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)}
-                        }
-
+                        {{
+                           {SplittingKernel::Pqq, std::bind(&Sgluons::sigmaSgluonsTree_qqbar_OO, sgluons, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&Sgluons::sigmaSgluonsTree_qqbar_OO, sgluons, _1, _2)}
+                        }},
+                        sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
-                        parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_uubar_suLsuLdaggerg, mrssm, _1, _2),
+                        parameters, m1, m1,
+                        std::bind(&Sgluons::sgluons_qqbar_OOg_hard, sgluons, _1, _2),
                         dS, dC,
+                        flav,
+                        hard_precision, hard_verbosity
+                     );
+                     std::array<double, 3> current_tree {};
+                     std::array<double, 3> current_virt {};
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_born) current_tree = tree.integrate();
+                     // if(enable_virt) current_virt = virt.integrate();
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal("qqbar -> OO", current_tree, current_virt, current_soft, current_hard);
+                     xsec_to_json(j, "qqbar->OO", current_tree, current_virt, current_soft, current_hard);
+                     total_xsec_tree += current_tree;
+                     total_xsec_virt += current_virt;
+                     total_xsec_soft += current_soft;
+                     total_xsec_hard += current_hard;
+                  }
+                  {
+                     std::vector<std::array<int, 3>> flav {{21, 21, 1}};
+                     XSection_Tree tree(
+                        parameters, m1, m1,
+                        std::bind(&Sgluons::matrixSgluonsTree_gg_OO, sgluons, _1, _2, _3), flav,
+                        born_precision, born_verbosity
+                     );
+                     /*
+                     XSection_Virt virt(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixMRSSMVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav
                      );
-                     if(enable_born) xsection_tree1 = tree.integrate();
-                     if(enable_virt) xsection_virt1 = virt.integrate();
-                     if(enable_sc) xsection_SC1 = sc.integrate();
-                     if(enable_hard) xsection_HnonC1 = hc.integrate();
-                     print_to_terminal( "uubar > suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
-                     xsec_to_json(j, "uubar->suLsuL*", xsection_tree1, xsection_virt1, xsection_SC1, xsection_HnonC1);
                      */
+                     XSection_SC sc(
+                        parameters, m1, m1,
+                        std::bind(&Sgluons::sgluons_qqbar_OOg_soft, sgluons, _1, _2, _3, _4, _5),
+                        dS, dC,
+                        flav,
+                        {{
+                           {SplittingKernel::Pqq, std::bind(&Sgluons::sigmaSgluonsTree_gg_OO, sgluons, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&Sgluons::sigmaSgluonsTree_gg_OO, sgluons, _1, _2)}
+                        }},
+                        sc_precision, sc_verbosity
+                     );
+                     XSection_HnonC hc(
+                        parameters, m1, m1,
+                        std::bind(&Sgluons::sgluons_gg_OOg_hard, sgluons, _1, _2),
+                        dS, dC,
+                        flav,
+                        hard_precision, hard_verbosity
+                     );
+                     std::array<double, 3> current_tree {};
+                     std::array<double, 3> current_virt {};
+                     std::array<double, 3> current_soft {};
+                     std::array<double, 3> current_hard {};
+                     if(enable_born) current_tree = tree.integrate();
+                     // if(enable_virt) current_virt = virt.integrate();
+                     if(enable_sc) current_soft = sc.integrate();
+                     if(enable_hard) current_hard = hc.integrate();
+                     print_to_terminal("gg -> OO", current_tree, current_virt, current_soft, current_hard);
+                     xsec_to_json(j, "gg->OO", current_tree, current_virt, current_soft, current_hard);
                }
+               print_to_terminal("sum", total_xsec_tree, total_xsec_virt, total_xsec_soft, total_xsec_hard);
             }
+            break;
          }
       }
       j["technical parameters"] = {
