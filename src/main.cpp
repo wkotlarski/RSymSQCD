@@ -26,21 +26,6 @@ namespace po = boost::program_options;
 using json = nlohmann::json;
 using namespace std::placeholders;
 
-/*
- *    XSection_* return results in the form xsection, its error, erros's pvalue
- *    overload + operator to add xsection and errors in quadrature
- *    pvalues are just added
- */
-inline array<double, 3> operator+(array<double, 3> const& x, array<double, 3> const& y) {
-   return {x.at(0) + y.at(0), std::hypot(x.at(1), y.at(1)), std::max(x.at(2), y.at(2))};
-}
-inline array<double, 3>& operator+=(array<double, 3>& x, array<double, 3> const& y) {
-   x.at(0) += y.at(0);
-   x.at(1) = std::hypot(x.at(1), y.at(1));
-   x.at(2) = std::max(x.at(2), y.at(2));
-   return x;
-}
-
 int main(int argc, char* argv[]) {
 
    boost::program_options::positional_options_description p;
