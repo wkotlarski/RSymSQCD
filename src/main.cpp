@@ -213,7 +213,9 @@ int main(int argc, char* argv[]) {
 
    auto start = chrono::steady_clock::now();
 
-   if (pt.get<string>("process.order") == "LO") {
+   switch (order) {
+      case Order::LO:
+      {
       switch(model) {
          case Model::MRSSM:
             MRSSM mrssm(mrssm_params);
@@ -398,8 +400,9 @@ int main(int argc, char* argv[]) {
             } // end of process block
          break;
       } // end of model block
-   } // end of LO block
-   else if (pt.get<string>("process.order") == "NLO") {
+      break;
+      } // end of LO block
+      case Order::NLO: {
       const double dS = pt.get<double>("technical parameters.dS", 1e-5);
       // for the matrix elements that are regular in the limit dS -> 0 because the phase space parametrization
       // fails if we are exactly on the threshold
