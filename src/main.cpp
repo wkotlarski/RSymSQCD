@@ -446,10 +446,10 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)}
-                        },
+                        {{
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)}
+                        }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
@@ -547,10 +547,10 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)}
-                        },
+                        {{
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)}
+                        }},
                         sc_precision, sc_verbosity
                      );
 
@@ -584,10 +584,10 @@ int main(int argc, char* argv[]) {
                         std::nullopt,
                         dS0, dC,
                         flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::optional<std::function<double(double, double)>>>{SplittingKernel::Pgq, std::nullopt}
-                        },
+                        {{
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pgq, std::nullopt}
+                        }},
                         sc_precision, sc_verbosity
                      );
                      auto f =
@@ -650,10 +650,10 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)}
-                        },
+                        {{
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)}
+                        }},
                         sc_precision, sc_verbosity
                      );
 
@@ -687,10 +687,10 @@ int main(int argc, char* argv[]) {
                         std::nullopt,
                         dS0, dC,
                         flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::optional<std::function<double(double, double)>>>{SplittingKernel::Pgq, std::nullopt}
-                        },
+                        {{
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pgq, std::nullopt}
+                        }},
                         sc_precision, sc_verbosity
                      );
                      auto f =
@@ -743,10 +743,10 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixMRSSMSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)}
-                        },
+                        {{
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)}
+                        }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
@@ -793,10 +793,10 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixMRSSMSoft_ddbar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)}
-                        },
+                        {{
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)}
+                        }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
@@ -839,10 +839,10 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixMRSSMSoft_gg_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgg, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgg, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
-                        },
+                        {{
+                           {SplittingKernel::Pgg, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pgg, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                        }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
@@ -874,10 +874,10 @@ int main(int argc, char* argv[]) {
                         parameters, m1, m2,
                         std::nullopt,
                         dS0, dC, flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
-                        },
+                        {{
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                        }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
@@ -904,10 +904,10 @@ int main(int argc, char* argv[]) {
                         parameters, m1, m2,
                         std::nullopt,
                         dS0, dC, flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
-                        },
+                        {{
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                        }},
                         sc_precision, sc_verbosity
                      );
                      auto f =
@@ -962,10 +962,10 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixMRSSMSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)}
-                        },
+                        {{
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)}
+                        }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
@@ -1014,10 +1014,10 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixMRSSMSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)}
-                        },
+                        {{
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)}
+                        }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
@@ -1065,10 +1065,10 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixMRSSMSoft_ddbar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)}
-                        },
+                        {{
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)}
+                        }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
@@ -1112,10 +1112,10 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixMRSSMSoft_gg_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgg, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgg, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
-                        },
+                        {{
+                           {SplittingKernel::Pgg, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pgg, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                        }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
@@ -1147,10 +1147,10 @@ int main(int argc, char* argv[]) {
                         parameters, m1, m2,
                         std::nullopt,
                         dS0, dC, flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
-                        },
+                        {{
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                        }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
@@ -1177,10 +1177,10 @@ int main(int argc, char* argv[]) {
                         parameters, m1, m2,
                         std::nullopt,
                         dS0, dC, flav,
-                        {
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           std::pair<SplittingKernel, std::function<double(double, double)>>{SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
-                        },
+                        {{
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                        }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
