@@ -24,7 +24,7 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND NOT "${CMAKE_CXX_COMPILER_ID}" 
    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
-option(OPTIMIZE_FOR_NATIVE "Build with -march=native" OFF)
+option(OPTIMIZE_FOR_NATIVE "Optimize for native" OFF)
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
    if (${OPTIMIZE_FOR_NATIVE})
       include(CheckCXXCompilerFlag)
