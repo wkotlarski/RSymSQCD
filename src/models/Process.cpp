@@ -1,4 +1,3 @@
-#include "Process.hpp"
 #include "constants.hpp"
 #include "mathematica_wrapper.hpp"
 
@@ -10,11 +9,8 @@
 
 Process::Process(boost::property_tree::ptree const& pt) {
 
-   MassTop = pt.get<double>("masses.top");
-   MassGlu = pt.get<double>("masses.gluino");
    MasssigmaO = pt.get<double>("masses.pseudoscalar_sgluon");
    MassphiO  = sqrt( pow(MasssigmaO,2) + 4.0 * pow(MassGlu, 2) );
-   MassSq = pt.get<double>("masses.squarks");
    double eta_sign = pt.get<double>("technical parameters.eta_sign");
    double delta = pt.get<double>("technical parameters.delta");
    WidthGlu = pt.get<double>("technical parameters.WidthOverMass") * MassGlu;
@@ -300,36 +296,6 @@ Process::Process(boost::property_tree::ptree const& pt) {
       h = 1.;
    }
 */
-/* -------------------- simpliefied models ---------------------*/
-
-   // else if(processID == "Simplified,uubar_OO") {
-      // matrixelementTree = &Process::matrix_tree_stub;
-      // matrixelementVirt = &Process::matrix_virt_stub;
-      // matrixelementReal_SC = &Process::matrixSimplifiedSoft_uubar_OOg;
-      // sigmaPartTree1 = &Process::sigmaMRSSMTree_uubar_OO;
-      // splitting_kernel1 = &Pgg;
-      // sigmaPartTree2 = &Process::sigmaMRSSMTree_uubar_OO;
-      // splitting_kernel2 = &Pgg;
-      // matrixelementReal_HnonC = &Process::matrixSimplifiedHard_uubar_OOg;
-      // m1 = MasssigmaO;
-      // m2 = MasssigmaO;
-      // for (int i : {1, 2, 3, 4, 5}) {
-         // flav.push_back({i, -i, 2});
-      // }
-   // }
-   // else if(processID == "Simplified,gg_OO") {
-      // sigmaPartTree1 = &Process::matrix_xsec_stub;
-      // matrixelementTree = &Process::matrix_tree_stub;
-      // matrixelementVirt = &Process::matrix_virt_stub;
-      // matrixelementReal_SC = &Process::matrixSimplifiedSoft_gg_OOg;
-      // matrixelementReal_HnonC = &Process::matrixSimplifiedHard_gg_OOg;
-      // m1 = MasssigmaO;
-      // m2 = MasssigmaO;
-      // flav.push_back({21, 21, 1});
-   // }
-   // else {
-      // std::cout << "Error! Subprocess " << processID << " not implemented.\n";
-   // }
 }
 
 #include "matrix_elements_and_xsections/MRSSM/mrssm_born_mes.cpp"
@@ -356,42 +322,10 @@ Process::Process(boost::property_tree::ptree const& pt) {
 // #include "matrix_elements_and_xsections/MSSM/mssm_ud_suLsdR_virt_matrix.cpp"
 
 //mrssm
-#include "matrix_elements_and_xsections/MRSSM/mrssm_uu_suLsuR_virt_matrix.cpp"
 #include "matrix_elements_and_xsections/MRSSM/mrssm_ud_suLsdR_virt_matrix.cpp"
 
-/* --------------------- Squark-antisquark production: G+G > sq+sq^dagger ------------------------*/
-//mrssm
-#include "matrix_elements_and_xsections/MRSSM/mrssm_gg_suLsuLdagger_virt_matrix.cpp"
-
-/* --------------------- Squark-antisquark production: q+qbar > sq+sq^dagger ------------------------*/
-//mrssm
-#include "matrix_elements_and_xsections/MRSSM/mrssm_ddbar_suLsuLdagger_virt_matrix.cpp"
-#include "matrix_elements_and_xsections/MRSSM/mrssm_uubar_suLsuLdagger_virt_matrix.cpp"
-
-/*
-
-   Real emissions
-
- */
-#include "matrix_elements_and_xsections/MRSSM/mrssm_uubar_suLsuLdaggerg_soft.cpp"
-#include "matrix_elements_and_xsections/MRSSM/mrssm_uubar_suLsuLdaggerg_hard.cpp"
-
-#include "matrix_elements_and_xsections/MRSSM/mrssm_ddbar_suLsuLdaggerg_soft.cpp"
-#include "matrix_elements_and_xsections/MRSSM/mrssm_ddbar_suLsuLdaggerg_hard.cpp"
-
-#include "matrix_elements_and_xsections/MRSSM/mrssm_gd_suLsuLdaggerd_hard.cpp"
 // wEta_noSimplify is faster than wEta
-#include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuLdaggeru_hard-DS.cpp"
-#include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuLdaggeru_hard-DR.cpp"
 #include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuLdaggeru_hard-DR_wEta_noSimplify.cpp"
-#include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuLdaggeru_hard.cpp"
 
-#include "matrix_elements_and_xsections/MRSSM/mrssm_gg_suLsuLdaggerg_hard.cpp"
-#include "matrix_elements_and_xsections/MRSSM/mrssm_gg_suLsuLdaggerg_soft.cpp"
 
-#include "matrix_elements_and_xsections/MRSSM/mrssm_uu_suLsuRg_soft.cpp"
-#include "matrix_elements_and_xsections/MRSSM/mrssm_uu_suLsuRg_hard.cpp"
-#include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuRubar_hard.cpp"
-#include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuRubar_hard-DR.cpp"
 #include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuRubar_hard-DR_wEtaDep.cpp"
-#include "matrix_elements_and_xsections/MRSSM/mrssm_gu_suLsuRubar_hard-DS.cpp"
