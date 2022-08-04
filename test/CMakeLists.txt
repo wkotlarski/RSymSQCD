@@ -22,6 +22,8 @@ add_executable(Sgluons_hard_matrix_elements Sgluons_hard_matrix_elements.cpp)
 target_link_libraries(Sgluons_hard_matrix_elements GTest::gtest GTest::gtest_main RSymSQCDlib)
 add_test("Sgluons hard and non-colinear matrix elements" Sgluons_hard_matrix_elements)
 
+set(CUBACORES_PER_TEST 4)
+
 # test LO cross sections
 # ------------------------------------------------------------------------------------------------------
 
@@ -47,7 +49,7 @@ add_test(
       "LO cross-section for ${el_0}"
    COMMAND
       ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb
-         $<TARGET_FILE:RSymSQCD> ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/LO/${el_1} 3
+         $<TARGET_FILE:RSymSQCD> ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/LO/${el_1} ${CUBACORES_PER_TEST}
 )
 endforeach()
 
@@ -78,6 +80,6 @@ add_test(
       "NLO cross-section for ${el_0}"
       COMMAND
          ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb
-            $<TARGET_FILE:RSymSQCD> ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/NLO/${el_1} 3
+            $<TARGET_FILE:RSymSQCD> ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/NLO/${el_1} ${CUBACORES_PER_TEST}
 )
 endforeach()
