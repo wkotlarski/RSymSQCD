@@ -16,11 +16,11 @@ add_test("tree-level matrix elements" tree_matrix_elements)
 
 add_executable(MRSSM_hard_matrix_elements MRSSM_hard_matrix_elements.cpp)
 target_link_libraries(MRSSM_hard_matrix_elements GTest::gtest GTest::gtest_main RSymSQCDlib)
-add_test("hard and non-colinear matrix elements" MRSSM_hard_matrix_elements)
+add_test("MRSSM hard and non-colinear matrix elements" MRSSM_hard_matrix_elements)
 
 add_executable(Sgluons_hard_matrix_elements Sgluons_hard_matrix_elements.cpp)
 target_link_libraries(Sgluons_hard_matrix_elements GTest::gtest GTest::gtest_main RSymSQCDlib)
-add_test("hard and non-colinear matrix elements" Sgluons_hard_matrix_elements)
+add_test("Sgluons hard and non-colinear matrix elements" Sgluons_hard_matrix_elements)
 
 # test LO cross sections
 # ------------------------------------------------------------------------------------------------------
