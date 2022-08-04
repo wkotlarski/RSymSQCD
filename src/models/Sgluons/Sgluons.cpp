@@ -10,7 +10,7 @@
 using boost::math::pow;
 
 Sgluons::Sgluons(SgluonParameters const& params)
-   : mO {params.mO}
+   : mO {params.mO}, mt {params.mt}
    {};
 
 // Eq. 7.2 of arXiv:1611.06622

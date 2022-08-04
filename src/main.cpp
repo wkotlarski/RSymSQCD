@@ -126,6 +126,7 @@ int main(int argc, char* argv[]) {
    }
    else if (pt.get<string>("process.model") == "Sgluons") {
       sgluon_params.mO = pt.get<double>("masses.sgluons");
+      sgluon_params.mt = pt.get<double>("masses.top");
       model = Model::Sgluons;
    }
    else {

@@ -4,8 +4,8 @@
 #include <array>
 
 struct SgluonParameters {
-   double mt;
    double mO;
+   double mt;
 };
 
 class Sgluons {
@@ -22,7 +22,8 @@ public:
       double sgluons_gg_OOg_hard(double, std::array<std::array<double, 4>, 5> const&) const;
 
 private:
-   double mO;
+   const double mO;
+   const double mt;
 };
 
 #endif
