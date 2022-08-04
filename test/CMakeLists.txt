@@ -5,7 +5,7 @@ find_package(GTest REQUIRED)
 # allow whitespaces in test names
 cmake_policy(SET CMP0110 NEW)
 
-find_package(Ruby)
+find_package(Ruby REQUIRED)
 
 # test matrix elements
 # ------------------------------------------------------------------------------------------------------

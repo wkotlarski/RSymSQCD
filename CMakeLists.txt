@@ -54,7 +54,6 @@ FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download
 FetchContent_MakeAvailable(json)
 
 find_package(Boost REQUIRED COMPONENTS program_options)
-find_package (Eigen3)
 
 find_path(LIBCUBA_INCLUDE_DIR NAMES cuba.h)
 find_library(LIBCUBA_LIBRARY NAMES libcuba.a)
