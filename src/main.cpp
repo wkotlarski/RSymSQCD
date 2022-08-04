@@ -1290,8 +1290,8 @@ int main(int argc, char* argv[]) {
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&Sgluons::sigmaSgluonsTree_gg_OO, sgluons, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&Sgluons::sigmaSgluonsTree_gg_OO, sgluons, _1, _2)}
+                           {SplittingKernel::Pgg, std::bind(&Sgluons::sigmaSgluonsTree_gg_OO, sgluons, _1, _2)},
+                           {SplittingKernel::Pgg, std::bind(&Sgluons::sigmaSgluonsTree_gg_OO, sgluons, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
                      );
