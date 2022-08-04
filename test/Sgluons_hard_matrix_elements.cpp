@@ -22,7 +22,7 @@ TEST(SgluonsHardMatrixElementTest, BMP1) {
 
    std::cout << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1) <<
       sgluons.sgluons_gg_OOg_hard(alphas, p) << ' ' << sgluons.sgluons_qqbar_OOg_hard(alphas, p) << '\n';
-   EXPECT_NEAR(sgluons.sgluons_gg_OOg_hard(alphas, p),    4.8347454611084431e-02, 2.3e-15);
+   EXPECT_NEAR(sgluons.sgluons_gg_OOg_hard(alphas, p),    4.8347454611084431e-02, 4.0e-15);
    EXPECT_NEAR(sgluons.sgluons_qqbar_OOg_hard(alphas, p), 9.1980745176389479e-03, 7.0e-18);
 }
 
