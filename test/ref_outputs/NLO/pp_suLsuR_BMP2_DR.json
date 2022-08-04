@@ -55,5 +55,12 @@
    "mu_r": 1500.0,
    "pdf": "MMHT2014nlo68cl",
    "process": "pp_suLsuR",
-   "sqrt(S)": 13000.0
+   "sqrt(S)": 13000.0,
+   "technical parameters": {
+      "WidthOverMass": -1.0,
+      "dC": 1e-06,
+      "dS": 1e-05,
+      "delta": 0.0,
+      "eta_sign": -1.0
+   }
 }
