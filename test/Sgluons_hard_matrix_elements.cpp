@@ -20,10 +20,10 @@ TEST(SgluonsHardMatrixElementTest, BMP1) {
    Sgluons sgluons {params};
    static constexpr double alphas {8.41234775121963707e-02};
 
-   //std::cout << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1) <<
-   //   sgluons.sgluons_gg_OOg_hard(alphas, p) << ' ' << sgluons.sgluons_qqbar_OOg_hard(alphas, p) << '\n';
-   EXPECT_NEAR(sgluons.sgluons_gg_OOg_hard(alphas, p), 4.8347454611081774e-02, 1e-100);
-   EXPECT_NEAR(sgluons.sgluons_qqbar_OOg_hard(alphas, p), 9.1980745176389479e-03, 1e-100);
+   std::cout << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1) <<
+      sgluons.sgluons_gg_OOg_hard(alphas, p) << ' ' << sgluons.sgluons_qqbar_OOg_hard(alphas, p) << '\n';
+   EXPECT_NEAR(sgluons.sgluons_gg_OOg_hard(alphas, p),    4.8347454611081774e-02, 2.6e-15);
+   EXPECT_NEAR(sgluons.sgluons_qqbar_OOg_hard(alphas, p), 9.1980745176389479e-03, 5.3e-18);
 }
 
 }
