@@ -1,6 +1,5 @@
-double Process::matrixMSSMVirt_uu_suLsuR(double alphaS, double S, double T,
-   const double FiniteGs, const double Dminus4, int divergence, double mu) {
-   //ltini(); // for LoopTools
+double MSSM::matrixMSSMVirt_uu_suLsuR(double alphaS, double S, double T,
+   double FiniteGs, double Dminus4, int divergence, double mu) const {
    setmudim(pow(mu,2));
    setlambda(divergence);
    const double U = pow(MassSq, 2) + pow(MassSq, 2) - S - T;
