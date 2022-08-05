@@ -1,5 +1,5 @@
-#ifndef PROCESS_H_
-#define PROCESS_H_
+#ifndef MRSSM_H_
+#define MRSSM_H_
 
 #include <array>
 
@@ -83,4 +83,4 @@ private:
       const double MassSq;
       const double WidthGlu;
 };
-#endif /* PROCESS_H_ */
+#endif // MRSSM_H_
