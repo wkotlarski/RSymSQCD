@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
       model = Model::Sgluons;
    }
    else {
-      std::cout << "\nModel not implemented!\n\n";
+      std::cerr << "\nError: Model " << pt.get<string>("process.model") << " not implemented\n\n";
       return 1;
    }
 
