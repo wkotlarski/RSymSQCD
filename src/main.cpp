@@ -1352,8 +1352,8 @@ int main(int argc, char* argv[]) {
            + to_string(pt.get<double>("masses.gluino")) + "_"
            + to_string(pt.get<double>("masses.pseudoscalar_sgluon")) + "_"
            + to_string(pt.get<double>("collider setup.sqrt_S")) + "_"
-           + to_string(pt.get<double>("collider setup.mu_r")) + "_"
-           + to_string(pt.get<double>("collider setup.mu_f")) + "_"
+           + to_string(muR) + "_"
+           + to_string(muF) + "_"
            + pt.get<string>("collider setup.pdf")
            + ".json";
    std::ofstream o(json_outputfile_name);
