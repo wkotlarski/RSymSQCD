@@ -19,11 +19,7 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set (CMAKE_BUILD_TYPE "${default_build_type}")
 endif()
 
-# this optimization crashes icpc
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-   set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif()
-
+# processor specific optimizations
 option(OPTIMIZE_FOR_NATIVE "Optimize for native" OFF)
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
    if (${OPTIMIZE_FOR_NATIVE})
@@ -43,6 +39,17 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -xHost")
          endif()
       endif()
+   endif()
+endif()
+
+# interprocedural optimizations
+# IPO crashes icpc
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+   include(CheckIPOSupported)
+   check_ipo_supported(RESULT ipoWorks)
+   if(${ipoWorks})
+      message(STATUS "Enabling interprocedural optimization (IPO/LTO)")
+      set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
    endif()
 endif()
 
