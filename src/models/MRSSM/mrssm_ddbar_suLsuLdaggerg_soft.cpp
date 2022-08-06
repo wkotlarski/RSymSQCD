@@ -1,4 +1,4 @@
-double MRSSM::matrixMRSSMSoft_ddbar_suLsuLdaggerg(double Alfas, double s12, double th, double dS, double muR) {
+double MRSSM::matrixMRSSMSoft_ddbar_suLsuLdaggerg(double Alfas, double s12, double th, double dS, double muR) const {
    const double Alfas2 = Sqr(Alfas);
    const double b = sqrt(1. - 4.*Sqr(MassSq)/s12);
    const double m1 = MassSq;

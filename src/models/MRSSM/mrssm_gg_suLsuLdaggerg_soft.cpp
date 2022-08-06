@@ -1,4 +1,4 @@
-double MRSSM::matrixMRSSMSoft_gg_suLsuLdaggerg(double Alfas, double s12, double th, double dS, double muR) {
+double MRSSM::matrixMRSSMSoft_gg_suLsuLdaggerg(double Alfas, double s12, double th, double dS, double muR) const {
    const double Alfas2 = pow(Alfas, 2);
    const double b = sqrt(1. - 4.*Sqr(MassSq)/s12);
    double lndS = std::log(dS);

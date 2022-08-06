@@ -1,5 +1,5 @@
 double MRSSM::matrixMRSSMVirt_ddbar_suLsuLdagger(double alphaS, double S, double T,
-    const double FiniteGs, const double Dminus4, int divergence, double mu) { // agrees with Philip
+    const double FiniteGs, const double Dminus4, int divergence, double mu) const { // agrees with Philip
     double U = 2.*Sqr(MassSq) - S - T;
     //ltini();
    setmudim(pow(mu,2));

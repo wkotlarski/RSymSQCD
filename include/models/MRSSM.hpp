@@ -23,15 +23,15 @@ public:
    // ------------------------------------------------------------------------------------
 
    // Born
-   double sigmaMRSSMTree_uu_suLsuR(double, double );
+   double sigmaMRSSMTree_uu_suLsuR(double, double) const;
    double matrixMRSSMTree_uu_suLsuR(double, double, double) const;
 
    // virtual
-   double matrixMRSSMVirt_uu_suLsuR(double, double, double, double, double, int, double);
-   double matrixMRSSMVirt_ud_suLsdR(double, double, double, double, double, int, double);
+   double matrixMRSSMVirt_uu_suLsuR(double, double, double, double, double, int, double) const;
+   double matrixMRSSMVirt_ud_suLsdR(double, double, double, double, double, int, double) const;
 
    // soft
-   double matrixMRSSMSoft_uu_suLsuRg(double, double, double, double, double);
+   double matrixMRSSMSoft_uu_suLsuRg(double, double, double, double, double) const;
 
    // hard
    double matrixMRSSMHard_uu_suLsuRg(double, std::array<std::array<double, 4>, 5> const&) const noexcept;
@@ -43,20 +43,20 @@ public:
 
    // pp > suL suL*
    // ------------------------------------------------------------------------------------
-   double matrixMRSSMVirt_uubar_suLsuLdagger(double, double, double, double, double, int, double);
-   double matrixMRSSMVirt_ddbar_suLsuLdagger(double, double, double, double, double, int, double);
-   double matrixMRSSMVirt_GG_suLsuLdagger(double, double, double, double, double, int, double);
+   double matrixMRSSMVirt_uubar_suLsuLdagger(double, double, double, double, double, int, double) const;
+   double matrixMRSSMVirt_ddbar_suLsuLdagger(double, double, double, double, double, int, double) const;
+   double matrixMRSSMVirt_GG_suLsuLdagger(double, double, double, double, double, int, double) const;
    double matrixMRSSMTree_ddbar_suLsuLdagger(double, double, double) const;
    double matrixMRSSMTree_uubar_suLsuLdagger(double, double, double) const;
    double matrixMRSSMTree_udbar_suLsdLdagger(double, double, double) const;
    double matrixMRSSMTree_GG_suLsuLdagger(double, double, double) const;
 
-   double sigmaMRSSMTree_uubar_suLsuLdagger(double, double);
-   double sigmaMRSSMTree_ddbar_suLsuLdagger(double, double);
-   double sigmaMRSSMTree_gg_suLsuLdagger(double, double );
-   double matrixMRSSMSoft_gg_suLsuLdaggerg(double, double, double, double, double);
-   double matrixMRSSMSoft_ddbar_suLsuLdaggerg(double, double, double, double, double);
-   double matrixMRSSMSoft_uubar_suLsuLdaggerg(double, double, double, double, double);
+   double sigmaMRSSMTree_uubar_suLsuLdagger(double, double) const;
+   double sigmaMRSSMTree_ddbar_suLsuLdagger(double, double) const;
+   double sigmaMRSSMTree_gg_suLsuLdagger(double, double ) const;
+   double matrixMRSSMSoft_gg_suLsuLdaggerg(double, double, double, double, double) const;
+   double matrixMRSSMSoft_ddbar_suLsuLdaggerg(double, double, double, double, double) const;
+   double matrixMRSSMSoft_uubar_suLsuLdaggerg(double, double, double, double, double) const;
    double matrixMRSSMHard_gg_suLsuLdaggerg(double, std::array<std::array<double, 4>, 5> const&) const;
    double matrixMRSSMHard_uubar_suLsuLdaggerg(double, std::array<std::array<double, 4>, 5> const&) const;
    double matrixMRSSMHard_ddbar_suLsuLdaggerg(double, std::array<std::array<double, 4>, 5> const&) const;
@@ -73,7 +73,7 @@ public:
 
 private:
       // gauge vector for DR ME
-      std::array<double, 4> eta;
+      const std::array<double, 4> eta;
 
       // particle masses
       const double MasssigmaO;
@@ -83,4 +83,5 @@ private:
       const double MassSq;
       const double WidthGlu;
 };
+
 #endif // MRSSM_H_
