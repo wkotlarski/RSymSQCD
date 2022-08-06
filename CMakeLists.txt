@@ -5,7 +5,8 @@ configure_file(include/version.hpp.in include/version.hpp)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED True)
-set (CMAKE_CXX_EXTENSIONS OFF)            # use -std=c++ instead of -std=gnu
+# use -std=c++ instead of -std=gnu
+set (CMAKE_CXX_EXTENSIONS OFF)
 
 # user should build from his own directory, e.g. ./build
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
