@@ -2,6 +2,5 @@
 Language:        Cpp
 IndentWidth:     3
 Cpp11BracedListStyle: true
-InsertBraces: true
 ...
 
