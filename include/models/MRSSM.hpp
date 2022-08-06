@@ -34,9 +34,12 @@ public:
    double matrixMRSSMSoft_uu_suLsuRg(double, double, double, double, double) const;
 
    // hard
-   double matrixMRSSMHard_uu_suLsuRg(double, std::array<std::array<double, 4>, 5> const&) const noexcept;
-   double matrixMRSSMHard_gu_suLsuRubar(double, std::array<std::array<double, 4>, 5> const&) const noexcept;
-   double matrixMRSSMHard_gu_suLsuRubar_DR(double, std::array<std::array<double, 4>, 5> const&) const noexcept;
+   double matrixMRSSMHard_uu_suLsuRg(
+      double, std::array<std::array<double, 4>, 5> const &) const;
+   double matrixMRSSMHard_gu_suLsuRubar(
+      double, std::array<std::array<double, 4>, 5> const &) const;
+   double matrixMRSSMHard_gu_suLsuRubar_DR(
+      double, std::array<std::array<double, 4>, 5> const &) const;
    double matrixMRSSMHard_gu_suLsuRubar_DS(double, std::array<std::array<double, 4>, 5> const&) const;
    double matrixMRSSMHard_gu_suLsuRubar_DS_unsimp(double, std::array<std::array<double, 4>, 5> const&) const;
    // double matrixMRSSMHard_gu_suLsuRubar_DR_wEtaDep(double, std::array<std::array<double, 4>, 5> const&) const;
