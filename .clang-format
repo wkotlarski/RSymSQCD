@@ -1,6 +1,11 @@
 ---
 Language:        Cpp
-IndentWidth:     3
-Cpp11BracedListStyle: true
+Cpp11BracedListStyle:    true
+ColumnLimit: 80
+
+# indentation
+IndentWidth:               3
+ContinuationIndentWidth:   3
+UseTab:                    Never
 ...
 
