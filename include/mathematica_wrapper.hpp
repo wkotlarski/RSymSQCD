@@ -13,11 +13,6 @@ inline double Cos (Arg arg) {
    return std::cos(arg);
 }
 
-template <typename Arg>
-inline double Sin (Arg arg) {
-   return std::sin(arg);
-}
-
 template <typename Base, typename Exponent>
 Base Power(Base base, Exponent exp) noexcept
 {
