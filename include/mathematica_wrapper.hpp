@@ -3,14 +3,6 @@
 
 #include "Li2.hpp"
 
-inline double Sqrt(double a) {
-   return std::sqrt(a);
-}
-
-inline double Abs(double x) {
-   return std::abs(x);
-}
-
 template <typename Arg>
 inline double Log (Arg arg) {
    return std::log(arg);
