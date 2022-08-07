@@ -1,5 +1,5 @@
 double MRSSM::matrixMRSSMVirt_ud_suLsdR(double alphaS, double S, double T,
-   const double FiniteGs, const double Dminus4, int divergence, double mu) const { // agrees with Philip
+   double FiniteGs, double Dminus4, int divergence, double mu) const { // agrees with Philip
    setmudim(pow<2>(mu));
    setlambda(divergence);
    const double U = 2*pow<2>(MassSq) - S - T;
