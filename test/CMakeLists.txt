@@ -22,6 +22,10 @@ add_executable(Sgluons_hard_matrix_elements Sgluons_hard_matrix_elements.cpp)
 target_link_libraries(Sgluons_hard_matrix_elements GTest::gtest GTest::gtest_main RSymSQCDlib)
 add_test("Sgluons hard and non-colinear matrix elements" Sgluons_hard_matrix_elements)
 
+add_executable(MRSSM_tree_xsections MRSSM_tree_xsections.cpp)
+target_link_libraries(MRSSM_tree_xsections GTest::gtest GTest::gtest_main RSymSQCDlib)
+add_test("MRSSM tree xsections" MRSSM_tree_xsections)
+
 set(CUBACORES_PER_TEST 4)
 
 # test LO cross sections
