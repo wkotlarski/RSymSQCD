@@ -139,7 +139,6 @@ target_link_libraries(
       RSymSQCDlib
    PUBLIC
       process
-      Boost::program_options
       ${LIBCUBA_LIBRARY}
       ${LIBLOOPTOOLS_LIBRARY}
       ${FORTRAN_LIBS}
@@ -163,6 +162,7 @@ target_link_libraries(
    PUBLIC
       process
       RSymSQCDlib
+      Boost::program_options
       nlohmann_json::nlohmann_json
 )
 
