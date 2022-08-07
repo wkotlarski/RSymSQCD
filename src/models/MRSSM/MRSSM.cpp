@@ -6,6 +6,7 @@
 
 #include <Eigen/Dense>
 #include "clooptools.h"
+#include "Li2.hpp"
 
 #include <cmath>
 

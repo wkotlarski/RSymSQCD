@@ -2,6 +2,7 @@
 #include "constants.hpp"
 #include "mathematica_wrapper.hpp"
 
+#include "Li2.hpp"
 #include <boost/math/special_functions/pow.hpp>
 #include "clooptools.h"
 
