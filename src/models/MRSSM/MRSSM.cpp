@@ -15,9 +15,9 @@ MRSSM::MRSSM(MRSSMParameters const& params)
    : MassTop {params.MassTop},
      MassGlu {params.MassGlu},
      MasssigmaO {params.MasssigmaO},
-     MassphiO {std::sqrt(Sqr(params.MasssigmaO) + 4*Sqr(params.MassGlu))},
+     MassphiO {std::sqrt(pow<2>(params.MasssigmaO) + 4*pow<2>(params.MassGlu))},
      MassSq {params.MassSq},
-     eta {{std::sqrt(1.+Sqr(params.delta)), 0., params.delta, params.eta_sign}},
+     eta {{std::sqrt(1.+pow<2>(params.delta)), 0., params.delta, params.eta_sign}},
      WidthGlu {params.WidthGlu}
    {};
 
