@@ -1,5 +1,5 @@
 // unsyplified ME and fullsimplified subtraction term
-double MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru_DS(double Alfas, std::array<std::array<double, 4>, 5> const& p) const {
+double MRSSM::matrixHard_gu_suLsuLdaggeru_DS(double Alfas, std::array<std::array<double, 4>, 5> const& p) const {
    const double m1 = MassSq;
    const double m2 = MassSq;
    const double k12 = p[0][0]*p[1][0]-p[0][1]*p[1][1]-p[0][2]*p[1][2]-p[0][3]*p[1][3];

@@ -1,4 +1,4 @@
-double MRSSM::matrixMRSSMSoft_uu_suLsuRg(double Alfas, double s12, double th, double dS, double muR) const {
+double MRSSM::matrixSoft_uu_suLsuRg(double Alfas, double s12, double th, double dS, double muR) const {
    const double Alfas2 = pow<2>(Alfas);
    const double m1 = MassSq;
    const double m2 = MassSq;

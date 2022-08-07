@@ -1,4 +1,4 @@
-double MRSSM::matrixMRSSMVirt_uu_suLsuR(double alphaS, double S, double T,
+double MRSSM::matrixVirt_uu_suLsuR(double alphaS, double S, double T,
    double FiniteGs, double Dminus4, int divergence, double mu) const { // agrees with Philip
    setmudim(pow<2>(mu));
    setlambda(divergence);

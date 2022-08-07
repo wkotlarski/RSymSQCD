@@ -26,16 +26,16 @@ TEST(MRSSMHardMatrixElementTest, BMP1) {
    MRSSM mrssm {params};
    static constexpr double alphas {8.41234775121963707e-02};
 
-   // EXPECT_NEAR(mrssm.matrixMRSSMHard_uu_suLsuRg(alphas, p), 0.020376409677647898, 5e-17);
-   EXPECT_NEAR(mrssm.matrixMRSSMHard_gu_suLsuRubar(alphas, p), 1.3897879902109231e-07, 6.3e-21);
+   // EXPECT_NEAR(mrssm.matrixHard_uu_suLsuRg(alphas, p), 0.020376409677647898, 5e-17);
+   EXPECT_NEAR(mrssm.matrixHard_gu_suLsuRubar(alphas, p), 1.3897879902109231e-07, 6.3e-21);
 
    // new
    params.WidthGlu = 1e-1 * params.MassGlu;
    std::cout << std::setprecision(17);
-   EXPECT_NEAR(mrssm.matrixMRSSMHard_gu_suLsuRubar_DS(alphas, p), 1.17995509181456260e-04, 4e-22);
-   EXPECT_NEAR(mrssm.matrixMRSSMHard_gu_suLsuRubar_DS_unsimp(alphas, p), 1.17995274638592898e-04, 4e-22);
-   EXPECT_EQ(mrssm.matrixMRSSMHard_gu_suLsuRubar_DS(alphas, p), mrssm.matrixMRSSMHard_gu_suLsuRubar_DS_unsimp(alphas, p));
-   std::cout << std::scientific << std::setprecision(17) <<mrssm.matrixMRSSMHard_gu_suLsuRubar_DS(alphas, p) << ' ' << mrssm.matrixMRSSMHard_gu_suLsuRubar_DS_unsimp(alphas, p) << ' ' << 1-mrssm.matrixMRSSMHard_gu_suLsuRubar_DS(alphas, p)/mrssm.matrixMRSSMHard_gu_suLsuRubar_DS_unsimp(alphas, p) << std::endl;
+   EXPECT_NEAR(mrssm.matrixHard_gu_suLsuRubar_DS(alphas, p), 1.17995509181456260e-04, 4e-22);
+   EXPECT_NEAR(mrssm.matrixHard_gu_suLsuRubar_DS_unsimp(alphas, p), 1.17995274638592898e-04, 4e-22);
+   EXPECT_EQ(mrssm.matrixHard_gu_suLsuRubar_DS(alphas, p), mrssm.matrixHard_gu_suLsuRubar_DS_unsimp(alphas, p));
+   std::cout << std::scientific << std::setprecision(17) <<mrssm.matrixHard_gu_suLsuRubar_DS(alphas, p) << ' ' << mrssm.matrixHard_gu_suLsuRubar_DS_unsimp(alphas, p) << ' ' << 1-mrssm.matrixHard_gu_suLsuRubar_DS(alphas, p)/mrssm.matrixHard_gu_suLsuRubar_DS_unsimp(alphas, p) << std::endl;
 }
 
 }

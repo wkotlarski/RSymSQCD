@@ -229,7 +229,7 @@ int main(int argc, char* argv[]) {
                      std::vector<std::array<int, 3>> flav {{2,2,1}};
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3),
+                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3),
                         flav,
                         born_precision, born_verbosity
                      );
@@ -260,7 +260,7 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      auto result = tree.integrate();
@@ -284,7 +284,7 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      auto result = tree.integrate();
@@ -305,7 +305,7 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      auto chan_res = tree.integrate();
@@ -323,7 +323,7 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      auto chan_res = tree.integrate();
@@ -339,7 +339,7 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      auto chan_res = tree.integrate();
@@ -352,7 +352,7 @@ int main(int argc, char* argv[]) {
                      std::vector<std::array<int, 3>> flav {{21, 21, 2*5}};
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      auto chan_res = tree.integrate();
@@ -374,7 +374,7 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m, m,
-                        std::bind(&MRSSM::matrixMRSSMTree_uubar_glglbar, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uubar_glglbar, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      auto chan_res = tree.integrate();
@@ -386,7 +386,7 @@ int main(int argc, char* argv[]) {
                      std::vector<std::array<int, 3>> flav {{21, 21, 1}};
                      XSection_Tree tree(
                         parameters, m, m,
-                        std::bind(&MRSSM::matrixMRSSMTree_gg_glglbar, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_gg_glglbar, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      auto chan_res = tree.integrate();
@@ -435,30 +435,30 @@ int main(int argc, char* argv[]) {
                      XSection_Tree tree(
                         parameters, m1, m2,
                         // same ME as in the MSSM
-                        std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3),
+                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3),
                         flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_uu_suLsuRg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_uu_suLsuRg, mrssm, _1, _2),
                         dS, dC,
                         flav,
                         hard_precision, hard_verbosity
@@ -488,15 +488,15 @@ int main(int argc, char* argv[]) {
                         dS0, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
                            {SplittingKernel::Pgq, std::nullopt}
                         }},
                         sc_precision, sc_verbosity
                      );
                      auto f =
                         mrssm_params.MassGlu < mrssm_params.MassSq
-                           ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar
-                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DR : &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DS);
+                           ? &MRSSM::matrixHard_gu_suLsuRubar
+                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixHard_gu_suLsuRubar_DR : &MRSSM::matrixHard_gu_suLsuRubar_DS);
                      XSection_HnonC hc(
                         parameters, m1, m2,
                         std::bind(f, mrssm, _1, _2),
@@ -537,30 +537,30 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
                      );
 
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_uu_suLsuRg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_uu_suLsuRg, mrssm, _1, _2),
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -589,15 +589,15 @@ int main(int argc, char* argv[]) {
                         dS0, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
                            {SplittingKernel::Pgq, std::nullopt}
                         }},
                         sc_precision, sc_verbosity
                      );
                      auto f =
                         mrssm_params.MassGlu < mrssm_params.MassSq
-                           ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar
-                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DR : &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DS);
+                           ? &MRSSM::matrixHard_gu_suLsuRubar
+                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixHard_gu_suLsuRubar_DR : &MRSSM::matrixHard_gu_suLsuRubar_DS);
                      XSection_HnonC hc(
                         parameters, m1, m2,
                         std::bind(f, mrssm, _1, _2),
@@ -640,30 +640,30 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
                      );
 
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_uu_suLsuRg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_uu_suLsuRg, mrssm, _1, _2),
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -692,15 +692,15 @@ int main(int argc, char* argv[]) {
                         dS0, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
                            {SplittingKernel::Pgq, std::nullopt}
                         }},
                         sc_precision, sc_verbosity
                      );
                      auto f =
                         mrssm_params.MassGlu < mrssm_params.MassSq
-                           ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar
-                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DR : &MRSSM::matrixMRSSMHard_gu_suLsuRubar_DS);
+                           ? &MRSSM::matrixHard_gu_suLsuRubar
+                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixHard_gu_suLsuRubar_DR : &MRSSM::matrixHard_gu_suLsuRubar_DS);
                      XSection_HnonC hc(
                         parameters, m1, m2,
                         std::bind(f, mrssm, _1, _2),
@@ -733,29 +733,29 @@ int main(int argc, char* argv[]) {
                      std::vector<std::array<int, 3>> flav {{2, -2, 2}};
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_uubar_suLsuLdaggerg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_uubar_suLsuLdaggerg, mrssm, _1, _2),
                         dS, dC,
                         flav,
                         hard_precision, hard_verbosity
@@ -783,29 +783,29 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMVirt_ddbar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_ddbar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMSoft_ddbar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_ddbar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_ddbar_suLsuLdaggerg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_ddbar_suLsuLdaggerg, mrssm, _1, _2),
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -829,29 +829,29 @@ int main(int argc, char* argv[]) {
                      std::vector<std::array<int, 3>> flav {{21, 21, 1}};
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMVirt_GG_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_GG_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMSoft_gg_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_gg_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pgg, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pgg, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pgg, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pgg, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_gg_suLsuLdaggerg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_gg_suLsuLdaggerg, mrssm, _1, _2),
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -879,14 +879,14 @@ int main(int argc, char* argv[]) {
                         std::nullopt,
                         dS0, dC, flav,
                         {{
-                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_gd_suLsuLdaggerd, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_gd_suLsuLdaggerd, mrssm, _1, _2),
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -909,15 +909,15 @@ int main(int argc, char* argv[]) {
                         std::nullopt,
                         dS0, dC, flav,
                         {{
-                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      auto f =
                         mrssm_params.MassGlu < mrssm_params.MassSq
-                           ? &MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru
-                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru_DR : &MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru_DS);
+                           ? &MRSSM::matrixHard_gu_suLsuLdaggeru
+                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixHard_gu_suLsuLdaggeru_DR : &MRSSM::matrixHard_gu_suLsuLdaggeru_DS);
                      XSection_HnonC hc(
                         parameters, m1, m2,
                         std::bind(f, mrssm, _1, _2),
@@ -952,29 +952,29 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_uubar_suLsuLdaggerg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_uubar_suLsuLdaggerg, mrssm, _1, _2),
                         dS, dC,
                         flav,
                         hard_precision, hard_verbosity
@@ -1004,29 +1004,29 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_uubar_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_uubar_suLsuLdaggerg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_uubar_suLsuLdaggerg, mrssm, _1, _2),
                         dS, dC,
                         flav,
                         hard_precision, hard_verbosity
@@ -1055,29 +1055,29 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMVirt_ddbar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_ddbar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMSoft_ddbar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_ddbar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_ddbar_suLsuLdaggerg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_ddbar_suLsuLdaggerg, mrssm, _1, _2),
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -1102,29 +1102,29 @@ int main(int argc, char* argv[]) {
                      std::vector<std::array<int, 3>> flav {{21, 21, 2*5}};
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMVirt_GG_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_GG_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMSoft_gg_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_gg_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pgg, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pgg, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pgg, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pgg, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_gg_suLsuLdaggerg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_gg_suLsuLdaggerg, mrssm, _1, _2),
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -1152,14 +1152,14 @@ int main(int argc, char* argv[]) {
                         std::nullopt,
                         dS0, dC, flav,
                         {{
-                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_gd_suLsuLdaggerd, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_gd_suLsuLdaggerd, mrssm, _1, _2),
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -1182,14 +1182,14 @@ int main(int argc, char* argv[]) {
                         std::nullopt,
                         dS0, dC, flav,
                         {{
-                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaMRSSMTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaMRSSMTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMHard_gu_suLsuLdaggeru, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_gu_suLsuLdaggeru, mrssm, _1, _2),
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -1234,7 +1234,7 @@ int main(int argc, char* argv[]) {
                      /*
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav
                      );
                      */
@@ -1281,7 +1281,7 @@ int main(int argc, char* argv[]) {
                      /*
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixMRSSMVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav
                      );
                      */

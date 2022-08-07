@@ -1,4 +1,4 @@
-double MRSSM::matrixMRSSMVirt_uubar_suLsuLdagger(double alphaS, double S, double T,
+double MRSSM::matrixVirt_uubar_suLsuLdagger(double alphaS, double S, double T,
    double FiniteGs, double Dminus4, int divergence, double mu) const { // agrees with Philip
    const double U = 2.*Sqr(MassSq) - S - T;
    setmudim(Sqr(mu));
