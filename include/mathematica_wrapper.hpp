@@ -3,11 +3,6 @@
 
 #include <complex>
 
-template <typename Arg>
-inline double Log (Arg arg) {
-   return std::log(arg);
-}
-
 template <typename Base, typename Exponent>
 Base Power(Base base, Exponent exp) noexcept
 {
