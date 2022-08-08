@@ -221,7 +221,7 @@ int main(int argc, char* argv[]) {
       {
       switch(model) {
          case Model::MRSSM:
-            MRSSM mrssm(mrssm_params);
+            const MRSSM mrssm(mrssm_params);
             switch(channel) {
                case Channel::pp_suLsuR:
                {
@@ -421,7 +421,7 @@ int main(int argc, char* argv[]) {
       switch(model) {
          case Model::MRSSM:
          {
-            MRSSM mrssm(mrssm_params);
+            const MRSSM mrssm(mrssm_params);
             switch(channel) {
                case Channel::pp_suLsuR:
                {
