@@ -431,12 +431,8 @@ int main(int argc, char* argv[]) {
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
-                  if (world.rank() == 0) {
-                     ChannelResult chan;
-                     boost::mpi::gather(world, std::move(chan), allChannels, 0);
-                  }
                   // uu > suL suR (+g) process
-                  if(world.rank() == 1) {
+                  if(world.rank() == 0) {
                      const std::vector<std::array<int, 3>> flav {{2, 2, 1}};
                      XSection_Tree tree(
                         parameters, m1, m2,
@@ -475,11 +471,11 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
-                     boost::mpi::gather(world, std::move(chan), 0);
+                     boost::mpi::gather(world, std::move(chan), allChannels, 0);
                   }
 
                   // gu > suL suR ubar process
-                  if (world.rank() == 2) {
+                  if (world.rank() == 1) {
                      const std::vector<std::array<int, 3>> flav {{21, 2, 2}};
                      XSection_SC sc(
                         parameters, m1, m2,
@@ -507,7 +503,7 @@ int main(int argc, char* argv[]) {
                      chan.channel_name = "gu->suLsuR(+X)";
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
-                     boost::mpi::gather(world, std::move(chan), 0);
+                     boost::mpi::gather(world, std::move(chan), allChannels, 0);
                   }
                   break;
                }
@@ -721,11 +717,7 @@ int main(int argc, char* argv[]) {
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
-                  std::array<double, 3> total_xsec_tree {};
-                  std::array<double, 3> total_xsec_virt {};
-                  std::array<double, 3> total_xsec_soft {};
-                  std::array<double, 3> total_xsec_hard {};
-                  if (subprocess == "" || subprocess == "uubar_suLsuLdagger") {
+                  if(world.rank() == 0) {
                      std::vector<std::array<int, 3>> flav {{2, -2, 2}};
                      XSection_Tree tree(
                         parameters, m1, m2,
@@ -756,23 +748,16 @@ int main(int argc, char* argv[]) {
                         flav,
                         hard_precision, hard_verbosity
                      );
-                     std::array<double, 3> current_tree {};
-                     std::array<double, 3> current_virt {};
-                     std::array<double, 3> current_soft {};
-                     std::array<double, 3> current_hard {};
-                     if(enable_born) current_tree = tree.integrate();
-                     if(enable_virt) current_virt = virt.integrate();
-                     if(enable_sc) current_soft = sc.integrate();
-                     if(enable_hard) current_hard = hc.integrate();
-                     print_to_terminal( "uubar -> suLsuL*(+X)", current_tree, current_virt, current_soft, current_hard);
-                     xsec_to_json(j, "uubar->suLsuL*", current_tree, current_virt, current_soft, current_hard);
-                     total_xsec_tree += current_tree;
-                     total_xsec_virt += current_virt;
-                     total_xsec_soft += current_soft;
-                     total_xsec_hard += current_hard;
+                     ChannelResult chan;
+                     chan.channel_name = "uubar->suLsuL*";
+                     if(enable_born) chan.b = tree.integrate();
+                     if(enable_virt) chan.v = virt.integrate();
+                     if(enable_sc) chan.s = sc.integrate();
+                     if(enable_hard) chan.h = hc.integrate();
+                     boost::mpi::gather(world, std::move(chan), allChannels, 0);
                   }
 
-                  if( subprocess == "") {
+                  if(world.rank() == 1) {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 3, 4, 5}) {
                         flav.push_back({i,-i, 2});
@@ -805,23 +790,16 @@ int main(int argc, char* argv[]) {
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
-                     std::array<double, 3> current_tree {};
-                     std::array<double, 3> current_virt {};
-                     std::array<double, 3> current_soft {};
-                     std::array<double, 3> current_hard {};
-                     if(enable_born) current_tree = tree.integrate();
-                     if(enable_virt) current_virt = virt.integrate();
-                     if(enable_sc) current_soft = sc.integrate();
-                     if(enable_hard) current_hard = hc.integrate();
-                     print_to_terminal("ddbar -> suLsuL*(+X)", current_tree, current_virt, current_soft, current_hard);
-                     xsec_to_json(j, "ddbar->suLsuL*", current_tree, current_virt, current_soft, current_hard);
-                     total_xsec_tree += current_tree;
-                     total_xsec_virt += current_virt;
-                     total_xsec_soft += current_soft;
-                     total_xsec_hard += current_hard;
+                     ChannelResult chan;
+                     chan.channel_name = "ddbar->suLsuL*";
+                     if(enable_born) chan.b = tree.integrate();
+                     if(enable_virt) chan.v = virt.integrate();
+                     if(enable_sc) chan.s = sc.integrate();
+                     if(enable_hard) chan.h = hc.integrate();
+                     boost::mpi::gather(world, std::move(chan), allChannels, 0);
                   }
 
-                  if( subprocess == "") {
+                  if(world.rank() == 2) {
                      std::vector<std::array<int, 3>> flav {{21, 21, 1}};
                      XSection_Tree tree(
                         parameters, m1, m2,
@@ -851,23 +829,16 @@ int main(int argc, char* argv[]) {
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
-                     std::array<double, 3> current_tree {};
-                     std::array<double, 3> current_virt {};
-                     std::array<double, 3> current_soft {};
-                     std::array<double, 3> current_hard {};
-                     if(enable_born) current_tree = tree.integrate();
-                     if(enable_virt) current_virt = virt.integrate();
-                     if(enable_sc) current_soft = sc.integrate();
-                     if(enable_hard) current_hard = hc.integrate();
-                     print_to_terminal( "gg -> suLsuL*(+X)", current_tree, current_virt, current_soft, current_hard);
-                     xsec_to_json(j, "gg->suLsuL*", current_tree, current_virt, current_soft, current_hard);
-                     total_xsec_tree += current_tree;
-                     total_xsec_virt += current_virt;
-                     total_xsec_soft += current_soft;
-                     total_xsec_hard += current_hard;
+                     ChannelResult chan;
+                     chan.channel_name = "gg->suLsuL*";
+                     if(enable_born) chan.b = tree.integrate();
+                     if(enable_virt) chan.v = virt.integrate();
+                     if(enable_sc) chan.s = sc.integrate();
+                     if(enable_hard) chan.h = hc.integrate();
+                     boost::mpi::gather(world, std::move(chan), allChannels, 0);
                   }
 
-                  if( subprocess == "") {
+                  if(world.rank() == 3) {
                      std::vector<std::array<int, 3>> flav {};
                      for( int el : { 1, -1, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2});
                      XSection_SC sc(
@@ -886,18 +857,15 @@ int main(int argc, char* argv[]) {
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
-                     std::array<double, 3> current_soft {};
-                     std::array<double, 3> current_hard {};
-                     if(enable_sc) current_soft = sc.integrate();
-                     if(enable_hard) current_hard = hc.integrate();
-                     print_to_terminal( "gq -> suLsuL*(+X)", {}, {}, current_soft, current_hard);
-                     xsec_to_json(j, "gq->suLsuL*(+X)", {}, {}, current_soft, current_hard);
-                     total_xsec_soft += current_soft;
-                     total_xsec_hard += current_hard;
+                     ChannelResult chan;
+                     chan.channel_name = "gq->suLsuL*(+X)";
+                     if(enable_sc) chan.s = sc.integrate();
+                     if(enable_hard) chan.h = hc.integrate();
+                     boost::mpi::gather(world, std::move(chan), allChannels, 0);
                   }
 
                   // g u > suL suLdagger
-                  if( subprocess == "gu_suLsuLdaggeru" || subprocess == "" ) {
+                  if(world.rank() == 4) {
                      std::vector<std::array<int, 3>> flav {};
                      for( int el : { 2, -2 }) flav.push_back({21, el, 2});
                      XSection_SC sc(
@@ -920,17 +888,12 @@ int main(int argc, char* argv[]) {
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
-                     std::array<double, 3> current_soft {};
-                     std::array<double, 3> current_hard {};
-                     if(enable_sc) current_soft = sc.integrate();
-                     if(enable_hard) current_hard = hc.integrate();
-                     print_to_terminal( "gu -> suLsuL*(+X)", {}, {}, current_soft, current_hard);
-                     xsec_to_json(j, "gu->suLsuL*(+X)", {}, {}, current_soft, current_hard);
-                     total_xsec_soft += current_soft;
-                     total_xsec_hard += current_hard;
+                     ChannelResult chan;
+                     chan.channel_name = "gu->suLsuL*(+X)";
+                     if(enable_sc) chan.s = sc.integrate();
+                     if(enable_hard) chan.h = hc.integrate();
+                     boost::mpi::gather(world, std::move(chan), allChannels, 0);
                   }
-
-                  print_to_terminal("sum", total_xsec_tree, total_xsec_virt, total_xsec_soft, total_xsec_hard);
                   break;
                }
                case Channel::pp_sqsqdagger:
@@ -1332,45 +1295,45 @@ int main(int argc, char* argv[]) {
    world.barrier();
 
    if (world.rank() == 0) {
-   std::array<double, 3> tot_b {};
-   std::array<double, 3> tot_v {};
-   std::array<double, 3> tot_s {};
-   std::array<double, 3> tot_h {};
-   for (ChannelResult const& ch : allChannels) {
-      print_to_terminal(ch);
-      xsec_to_json(j, ch);
-      tot_b += ch.b;
-      tot_v += ch.v;
-      tot_s += ch.s;
-      tot_h += ch.h;
-   }
-   ChannelResult total {"total", tot_b, tot_v, tot_s, tot_h};
-   print_to_terminal(total);
+      std::array<double, 3> tot_b {};
+      std::array<double, 3> tot_v {};
+      std::array<double, 3> tot_s {};
+      std::array<double, 3> tot_h {};
+      for (ChannelResult const& ch : allChannels) {
+         print_to_terminal(ch);
+         xsec_to_json(j, ch);
+         tot_b += ch.b;
+         tot_v += ch.v;
+         tot_s += ch.s;
+         tot_h += ch.h;
+      }
+      ChannelResult total {"total", tot_b, tot_v, tot_s, tot_h};
+      print_to_terminal(total);
 
-   // print out time statistics
-   auto end = chrono::steady_clock::now();
-   cout << "\nINFO: Calculation ended after ";
-   if (end - start > 1h)
-      cout << chrono::duration_cast<chrono::hours>(end-start).count() << " hour(s), ";
-   if (end - start > 1min)
-      cout << chrono::duration_cast<chrono::minutes>(end-start).count() %  60 << " minute(s) and ";
-   cout << chrono::duration_cast<chrono::seconds>(end-start).count() % 60 << " second(s)\n";
+      // print out time statistics
+      auto end = chrono::steady_clock::now();
+      cout << "\nINFO: Calculation ended after ";
+      if (end - start > 1h)
+         cout << chrono::duration_cast<chrono::hours>(end-start).count() << " hour(s), ";
+      if (end - start > 1min)
+         cout << chrono::duration_cast<chrono::minutes>(end-start).count() %  60 << " minute(s) and ";
+      cout << chrono::duration_cast<chrono::seconds>(end-start).count() % 60 << " second(s)\n";
 
-   // write results to JSON file
-   const string json_outputfile_name =
-      vm.count("json-outputfile-name")
-         ? vm["json-outputfile-name"].as<string>()
-         : pt.get<string>("process.process") + "_"
-           + to_string(pt.get<double>("masses.squarks")) + "_"
-           + to_string(pt.get<double>("masses.gluino")) + "_"
-           + to_string(pt.get<double>("masses.pseudoscalar_sgluon")) + "_"
-           + to_string(pt.get<double>("collider setup.sqrt_S")) + "_"
-           + to_string(muR) + "_"
-           + to_string(muF) + "_"
-           + pt.get<string>("collider setup.pdf")
-           + ".json";
-   std::ofstream o(json_outputfile_name);
-   o << std::setw(3) << j << std::endl;
+      // write results to JSON file
+      const string json_outputfile_name =
+         vm.count("json-outputfile-name")
+            ? vm["json-outputfile-name"].as<string>()
+            : pt.get<string>("process.process") + "_"
+              + to_string(pt.get<double>("masses.squarks")) + "_"
+              + to_string(pt.get<double>("masses.gluino")) + "_"
+              + to_string(pt.get<double>("masses.pseudoscalar_sgluon")) + "_"
+              + to_string(pt.get<double>("collider setup.sqrt_S")) + "_"
+              + to_string(muR) + "_"
+              + to_string(muF) + "_"
+              + pt.get<string>("collider setup.pdf")
+              + ".json";
+      std::ofstream o(json_outputfile_name);
+      o << std::setw(3) << j << std::endl;
    }
 
    return 0;

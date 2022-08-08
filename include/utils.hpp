@@ -6,7 +6,7 @@
 #include <string_view>
 
 struct ChannelResult {
-   std::string channel_name;
+   std::string channel_name = "";
    std::array<double, 3> b {0., 0., 0.};
    std::array<double, 3> v {0., 0., 0.};
    std::array<double, 3> s {0., 0., 0.};
