@@ -28,6 +28,9 @@ using namespace std::placeholders;
 
 int main(int argc, char* argv[]) {
 
+   boost::mpi::environment env{argc, argv};
+   boost::mpi::communicator world;
+
    boost::program_options::positional_options_description p;
    p.add("card", -1);
 
@@ -216,8 +219,7 @@ int main(int argc, char* argv[]) {
    auto start = chrono::steady_clock::now();
 
    std::vector<ChannelResult> allChannels;
-     boost::mpi::environment env{argc, argv};
-  boost::mpi::communicator world;
+
    switch (order) {
       case Order::LO:
       {
