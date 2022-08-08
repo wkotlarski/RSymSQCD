@@ -14,6 +14,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/program_options.hpp>
+#include <boost/mpi.hpp>
 #include "LHAPDF/LHAPDF.h"
 #include <nlohmann/json.hpp>
 
@@ -214,6 +215,9 @@ int main(int argc, char* argv[]) {
 
    auto start = chrono::steady_clock::now();
 
+   std::vector<ChannelResult> allChannels;
+     boost::mpi::environment env{argc, argv};
+  boost::mpi::communicator world;
    switch (order) {
       case Order::LO:
       {
@@ -409,10 +413,12 @@ int main(int argc, char* argv[]) {
       // fails if we are exactly on the threshold
       constexpr double dS0 = 1e-10;
       const double dC = pt.get<double>("technical parameters.dC", 1e-6);
+      if (world.rank() == 0) {
       cout << "\nINFO: Using phase space slicing parameters δS=" << std::scientific << std::setprecision(1) << dS
            << " and δC=" << dC << '\n';
       if (dC > dS) {
          cout << "Warning: δC should be always << than δS\n";
+      }
       }
       const double delta = pt.get<double>("technical parameters.delta", 0.);
       const int eta_sign = pt.get<double>("technical parameters.eta_sign", -1);
@@ -425,12 +431,12 @@ int main(int argc, char* argv[]) {
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
-                  array<double, 3> born_xsec_total {};
-                  array<double, 3> soft_xsec_total {};
-                  array<double, 3> virt_xsec_total {};
-                  array<double, 3> hard_xsec_total {};
+                  if (world.rank() == 0) {
+                     ChannelResult chan;
+                     boost::mpi::gather(world, std::move(chan), allChannels, 0);
+                  }
                   // uu > suL suR (+g) process
-                  if( subprocess == "" ) {
+                  if(world.rank() == 1) {
                      const std::vector<std::array<int, 3>> flav {{2, 2, 1}};
                      XSection_Tree tree(
                         parameters, m1, m2,
@@ -463,24 +469,17 @@ int main(int argc, char* argv[]) {
                         flav,
                         hard_precision, hard_verbosity
                      );
-                     array<double, 3> born_xsec_current {};
-                     array<double, 3> soft_xsec_current {};
-                     array<double, 3> virt_xsec_current {};
-                     array<double, 3> hard_xsec_current {};
-                     if(enable_born) born_xsec_current = tree.integrate();
-                     if(enable_virt) virt_xsec_current = virt.integrate();
-                     if(enable_sc) soft_xsec_current = sc.integrate();
-                     if(enable_hard) hard_xsec_current = hc.integrate();
-                     print_to_terminal("uu > suLsuR(+X)", born_xsec_current, virt_xsec_current, soft_xsec_current, hard_xsec_current);
-                     xsec_to_json(j, "uu->suLsuR(+X)", born_xsec_current, virt_xsec_current, soft_xsec_current, hard_xsec_current);
-                     born_xsec_total += born_xsec_current;
-                     virt_xsec_total += virt_xsec_current;
-                     soft_xsec_total += soft_xsec_current;
-                     hard_xsec_total += hard_xsec_current;
+                     ChannelResult chan;
+                     chan.channel_name = "uu->suLsuR(+X)";
+                     if(enable_born) chan.b = tree.integrate();
+                     if(enable_virt) chan.v = virt.integrate();
+                     if(enable_sc) chan.s = sc.integrate();
+                     if(enable_hard) chan.h = hc.integrate();
+                     boost::mpi::gather(world, std::move(chan), 0);
                   }
 
                   // gu > suL suR ubar process
-                  if (subprocess == "gu_suLsuRubar" || subprocess == "" ) {
+                  if (world.rank() == 2) {
                      const std::vector<std::array<int, 3>> flav {{21, 2, 2}};
                      XSection_SC sc(
                         parameters, m1, m2,
@@ -504,17 +503,12 @@ int main(int argc, char* argv[]) {
                         flav,
                         hard_precision, hard_verbosity
                      );
-                     array<double, 3> soft_xsec_current {};
-                     array<double, 3> hard_xsec_current {};
-                     if(enable_sc) soft_xsec_current = sc.integrate();
-                     if(enable_hard) hard_xsec_current = hc.integrate();
-                     print_to_terminal("gu > suLsuR(+X)", {}, {}, soft_xsec_current, hard_xsec_current);
-                     xsec_to_json(j, "gu->suLsuR(+X)", {}, {}, soft_xsec_current, hard_xsec_current);
-                     soft_xsec_total += soft_xsec_current;
-                     hard_xsec_total += hard_xsec_current;
+                     ChannelResult chan;
+                     chan.channel_name = "gu->suLsuR(+X)";
+                     if(enable_sc) chan.s = sc.integrate();
+                     if(enable_hard) chan.h = hc.integrate();
+                     boost::mpi::gather(world, std::move(chan), 0);
                   }
-
-                  print_to_terminal("sum", born_xsec_total, virt_xsec_total, soft_xsec_total, hard_xsec_total);
                   break;
                }
                case Channel::pp_sqLsqR:
@@ -671,12 +665,14 @@ int main(int argc, char* argv[]) {
                      std::array<double, 3> current_virt {};
                      std::array<double, 3> current_soft {};
                      std::array<double, 3> current_hard {};
-                     if(enable_born) current_tree = tree.integrate();
-                     if(enable_virt) current_virt = virt.integrate();
-                     if(enable_sc) current_soft = sc.integrate();
-                     if(enable_hard) current_hard = hc.integrate();
-                     print_to_terminal( "qq > sqLsqR(+X)", current_tree, current_virt, current_soft, current_hard);
-                     xsec_to_json(j, "qq->sqLsqR(+X)", current_tree, current_virt, current_soft, current_hard);
+                     ChannelResult chan;
+                     chan.channel_name = "qq->sqLsqR(+X)";
+                     if(enable_born) chan.b = tree.integrate();
+                     if(enable_virt) chan.v = virt.integrate();
+                     if(enable_sc) chan.s = sc.integrate();
+                     if(enable_hard) chan.h = hc.integrate();
+                     print_to_terminal(chan);
+                     xsec_to_json(j, chan);
                      total_xsec_tree += current_tree;
                      total_xsec_virt += current_virt;
                      total_xsec_soft += current_soft;
@@ -1333,6 +1329,23 @@ int main(int argc, char* argv[]) {
       break;
    }
    }
+   world.barrier();
+
+   if (world.rank() == 0) {
+   std::array<double, 3> tot_b {};
+   std::array<double, 3> tot_v {};
+   std::array<double, 3> tot_s {};
+   std::array<double, 3> tot_h {};
+   for (ChannelResult const& ch : allChannels) {
+      print_to_terminal(ch);
+      xsec_to_json(j, ch);
+      tot_b += ch.b;
+      tot_v += ch.v;
+      tot_s += ch.s;
+      tot_h += ch.h;
+   }
+   ChannelResult total {"total", tot_b, tot_v, tot_s, tot_h};
+   print_to_terminal(total);
 
    // print out time statistics
    auto end = chrono::steady_clock::now();
@@ -1358,6 +1371,7 @@ int main(int argc, char* argv[]) {
            + ".json";
    std::ofstream o(json_outputfile_name);
    o << std::setw(3) << j << std::endl;
+   }
 
    return 0;
 }

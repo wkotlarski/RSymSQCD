@@ -63,7 +63,7 @@ set(JSON_MultipleHeaders ON)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.1/json.tar.xz)
 FetchContent_MakeAvailable(json)
 
-find_package(Boost REQUIRED COMPONENTS program_options)
+find_package(Boost REQUIRED COMPONENTS program_options mpi serialization)
 
 find_path(LIBCUBA_INCLUDE_DIR NAMES cuba.h)
 find_library(LIBCUBA_LIBRARY NAMES libcuba.a)
@@ -139,7 +139,6 @@ target_link_libraries(
       RSymSQCDlib
    PUBLIC
       process
-      Boost::program_options
       ${LIBCUBA_LIBRARY}
       ${LIBLOOPTOOLS_LIBRARY}
       ${FORTRAN_LIBS}
@@ -147,6 +146,7 @@ target_link_libraries(
       ${LIBCOLORFULL_LIBRARY}
 )
 
+find_package(MPI REQUIRED)
 add_executable(RSymSQCD "src/main.cpp" "src/XSection_Tree.cpp" "src/XSection_Virt.cpp" "src/XSection_SC.cpp" "src/XSection_HnonC.cpp" "src/utils.cpp")
 target_include_directories(
       RSymSQCD
@@ -156,6 +156,7 @@ target_include_directories(
       ${LIBCUBA_INCLUDE_DIR}
       ${LIBRK_INCLUDE_DIR}
       ${Boost_INCLUDE_DIRS}
+      ${MPI_CXX_INCLUDE_PATH}
       # ${LIBCOLORFULL_INCLUDE_DIRS}
 )
 target_link_libraries(
@@ -164,6 +165,8 @@ target_link_libraries(
       process
       RSymSQCDlib
       nlohmann_json::nlohmann_json
+      Boost::program_options
+      Boost::mpi
 )
 
 if(ENABLE_TESTS)

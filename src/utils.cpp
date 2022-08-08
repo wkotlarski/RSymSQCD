@@ -70,3 +70,13 @@ void xsec_to_json(
    };
 }
 
+
+void print_to_terminal(ChannelResult const& c) {
+   print_to_terminal(c.channel_name, c.b, c.v, c.s, c.h);
+}
+
+void xsec_to_json(
+      nlohmann::json& j,
+      ChannelResult const& c) {
+   xsec_to_json(j, c.channel_name, c.b, c.v, c.s, c.h);
+}
