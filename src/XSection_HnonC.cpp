@@ -9,17 +9,42 @@
 
 #include <cassert>
 #include <iostream>
+#include <algorithm>
+#include <execution>
 
 // @todo this is absolutely necessary but I don't know why
 // without it the uu -> uLuRg gives for BMP1 57.1.. +/- 0.005
 // with it                                   57.8.. +/- 0.005
 
 namespace {
-int forwarder(const int *ndim, const double xx[],
-   const int *ncomp, double ff[], void *userdata) {
-    return static_cast<XSection_HnonC*>(userdata)->integrand(ndim, xx, ncomp, ff, nullptr);
+
+// x[*nvec][*ndim] and f[*nvec][*ncomp]
+int forwarder(const int *ndim, const double xx[][7],
+   const int *ncomp, double ff[], void *userdata,
+   int const* nvec, int const* cores, double const* weight, int const* iter) {
+   std::vector<std::array<double, 7>> input;
+   input.resize(*nvec);
+   for(int i=0; i<*nvec; ++i) {
+      for(int j = 0; j<7; ++j) {
+         input.at(i).at(j) = xx[i][j];
+      }
+   }
+   std::vector<double> output;
+   output.resize(*nvec);
+   std::transform(
+      std::execution::par_unseq,
+      input.cbegin(), input.cend(), output.begin(),
+      [&userdata](std::array<double, 7> const& x) -> double {
+         return static_cast<XSection_HnonC*>(userdata)->integrand(x);
+      }
+   );
+   for (int i=0; i<*nvec; ++i) {
+      ff[i] = output.at(i);
+   }
+   return 0;
 }
-}
+
+} // anonymous
 
 std::array<double, 3> XSection_HnonC::integrate() {
 
@@ -40,11 +65,12 @@ std::array<double, 3> XSection_HnonC::integrate() {
    static constexpr int nbatch = 1000;
    static constexpr int gridno = 0;
    static constexpr int seed = 0;
+   static constexpr int nvec = 1000;
    const char* state_file = "";
    int nregions, fail;
 
    double integral[ncomp], error[ncomp], prob[ncomp];
-   llVegas( ndim, ncomp, forwarder, this, 1,
+   llVegas(ndim, ncomp, (integrand_t)forwarder, this, nvec,
       accuracy_rel, accuracy_abs, integration_verbosity_, seed,
       neval_min, neval_max, nstart, nincrease, nbatch,
       gridno, state_file, NULL,
@@ -56,12 +82,10 @@ std::array<double, 3> XSection_HnonC::integrate() {
    return result_finite;
 }
 
-int XSection_HnonC::integrand(const int *ndim, const double xx[],
-   const int *ncomp, double ff[], void *userdata) {
+double XSection_HnonC::integrand(std::array<double, 7> const& xx) {
 
    const double m_sqr = Sqr(m1_);
 
-   ff[0] = 0.;
    /*
    *  3-body phase space parametrization based on
    *  http://www.t39.ph.tum.de/T39_files/T39_people_files/duell_files/Dipl-MultiPion.pdf
@@ -108,7 +132,7 @@ int XSection_HnonC::integrand(const int *ndim, const double xx[],
    // if yes, return 0 and continue
    if ( cosx > 1 || cosx < -1)  {
       std::cout << "Warning! 1 - |cos(x)| = " << 1 - std::abs(cosx) << "  - Skipping the phase space point.\n";
-      return 0;
+      return 0.;
    }
 
    // initialize matrix of particles momenta
@@ -186,7 +210,7 @@ int XSection_HnonC::integrand(const int *ndim, const double xx[],
    // check if we are not in the collinear region
    // if yes, return
    if (-t15 < dC_*shat_sqrt*Ej || -t25 < dC_*shat_sqrt*Ej) {
-      return 0;
+      return 0.;
    }
 
    double ME2 = f(pdf_->alphasQ(muR_), p);
@@ -223,8 +247,5 @@ int XSection_HnonC::integrand(const int *ndim, const double xx[],
          4*(-1 + xx[5]*xx[6] + dS_*(-1 + xx[5]*xx[6])*(-1 + xx[0]) - xx[5]*xx[6]*xx[0])*Sqr(m1_))*
        (-4*dS_*Sqr(m1_) + (-1 + dS_)*xx[5]*xx[6]*(-S + 4*Sqr(m1_)))))*0.25;
 
-   ff[0] = ME2 * std::abs(jacobian);
-   assert(ff[0] >= 0);
-
-   return 0;
+   return ME2 * std::abs(jacobian);
 }

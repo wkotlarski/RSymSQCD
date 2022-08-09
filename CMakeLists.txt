@@ -59,6 +59,7 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 endif()
 
 include(FetchContent)
+cmake_policy(SET CMP0135 NEW)
 set(JSON_MultipleHeaders ON)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.1/json.tar.xz)
 FetchContent_MakeAvailable(json)
@@ -122,6 +123,8 @@ target_include_directories(
       ${LIBLHAPDF_INCLUDE_DIR}
 )
 
+find_package(TBB REQUIRED)
+
 file (GLOB SOURCES
    "src/Li2.cpp"  "src/splitting_kernels.cpp"  "XSection*.cpp" "colour_me.cpp"
 )
@@ -144,6 +147,7 @@ target_link_libraries(
       ${FORTRAN_LIBS}
       ${LIBLHAPDF_LIBRARY}
       ${LIBCOLORFULL_LIBRARY}
+      TBB::tbb
 )
 
 add_executable(RSymSQCD "src/main.cpp" "src/XSection_Tree.cpp" "src/XSection_Virt.cpp" "src/XSection_SC.cpp" "src/XSection_HnonC.cpp" "src/utils.cpp")
