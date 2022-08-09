@@ -7,10 +7,11 @@
 #include "rk/rk.hh"
 #include "rk/geom3.hh"
 
-#include <cassert>
-#include <iostream>
 #include <algorithm>
+#include <cassert>
+#include <cstdlib>
 #include <execution>
+#include <iostream>
 
 // @todo this is absolutely necessary but I don't know why
 // without it the uu -> uLuRg gives for BMP1 57.1.. +/- 0.005
@@ -70,11 +71,16 @@ std::array<double, 3> XSection_HnonC::integrate() {
    int nregions, fail;
 
    double integral[ncomp], error[ncomp], prob[ncomp];
+   const int ncores = std::atoi(std::getenv("CUBACORES"));
+   int nn = 0;
+   const int pn = 10'000;
+   cubacores(&nn, &pn);
    llVegas(ndim, ncomp, (integrand_t)forwarder, this, nvec,
       accuracy_rel, accuracy_abs, integration_verbosity_, seed,
       neval_min, neval_max, nstart, nincrease, nbatch,
       gridno, state_file, NULL,
       &neval, &fail, integral, error, prob );
+   cubacores(&ncores, &pn);
 
    std::array <double, 3> result_finite
       {integral[0], error[0], prob[0]};
