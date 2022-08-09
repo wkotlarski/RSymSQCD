@@ -467,6 +467,7 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
+                     print_to_terminal(chan);
                      allChannels.push_back(std::move(chan));
                   }
 
@@ -499,6 +500,7 @@ int main(int argc, char* argv[]) {
                      chan.channel_name = "gu->suLsuR(+X)";
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
+                     print_to_terminal(chan);
                      allChannels.push_back(std::move(chan));
                   }
                   break;
@@ -750,6 +752,7 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
+                     print_to_terminal(chan);
                      allChannels.push_back(std::move(chan));
                   }
 
@@ -792,6 +795,7 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
+                     print_to_terminal(chan);
                      allChannels.push_back(std::move(chan));
                   }
 
@@ -831,6 +835,7 @@ int main(int argc, char* argv[]) {
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
+                     print_to_terminal(chan);
                      allChannels.push_back(std::move(chan));
                   }
 
@@ -857,6 +862,7 @@ int main(int argc, char* argv[]) {
                      chan.channel_name = "gq->suLsuL*(+X)";
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
+                     print_to_terminal(chan);
                      allChannels.push_back(std::move(chan));
                   }
 
@@ -888,6 +894,7 @@ int main(int argc, char* argv[]) {
                      chan.channel_name = "gu->suLsuL*(+X)";
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
+                     print_to_terminal(chan);
                      allChannels.push_back(std::move(chan));
                   }
                   break;
@@ -1294,7 +1301,6 @@ int main(int argc, char* argv[]) {
    std::array<double, 3> tot_s {};
    std::array<double, 3> tot_h {};
    for (ChannelResult const& ch : allChannels) {
-      print_to_terminal(ch);
       xsec_to_json(j, ch);
       tot_b += ch.b;
       tot_v += ch.v;
