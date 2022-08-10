@@ -71,16 +71,26 @@ std::array<double, 3> XSection_HnonC::integrate() {
    int nregions, fail;
 
    double integral[ncomp], error[ncomp], prob[ncomp];
-   const int ncores = std::atoi(std::getenv("CUBACORES"));
+
+   const char* env_cubacores = std::getenv("CUBACORES");
    int nn = 0;
-   const int pn = 10'000;
+   const int pn = 10'000; // this is Cuba's default, see arXiv:1408.6373
    cubacores(&nn, &pn);
+
    llVegas(ndim, ncomp, (integrand_t)forwarder, this, nvec,
       accuracy_rel, accuracy_abs, integration_verbosity_, seed,
       neval_min, neval_max, nstart, nincrease, nbatch,
       gridno, state_file, NULL,
       &neval, &fail, integral, error, prob );
-   cubacores(&ncores, &pn);
+
+   /* @todo:
+    * if CUBACORES was undefined, Cuba automatically set number of cores
+    * based on the current system load. I don't know how to get this value
+    * so I cannot restore it... */
+   if (env_cubacores) {
+      const int ncores = std::atoi(env_cubacores);
+      cubacores(&ncores, &pn);
+   }
 
    std::array <double, 3> result_finite
       {integral[0], error[0], prob[0]};
