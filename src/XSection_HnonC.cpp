@@ -62,11 +62,11 @@ std::array<double, 3> XSection_HnonC::integrate() {
 
    // technical (Vegas specific) stuff
    static constexpr int nstart = 200'000;
-   static constexpr int nincrease = 10000;
-   static constexpr int nbatch = 1000;
+   static constexpr int nincrease = 10'000;
+   static constexpr int nbatch = 1'000;
    static constexpr int gridno = 0;
    static constexpr int seed = 0;
-   static constexpr int nvec = 1000;
+   static constexpr int nvec = 1'000;
    const char* state_file = "";
    int nregions, fail;
 
