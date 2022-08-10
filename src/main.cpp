@@ -125,7 +125,7 @@ int main(int argc, char* argv[]) {
       model = Model::MSSM;
    }
    else if (pt.get<string>("process.model") == "Sgluons") {
-      sgluon_params.mO = pt.get<double>("masses.sgluons");
+      sgluon_params.mO = pt.get<double>("masses.sgluon");
       sgluon_params.mt = pt.get<double>("masses.top");
       model = Model::Sgluons;
    }
@@ -184,6 +184,12 @@ int main(int argc, char* argv[]) {
             {"pseudoscalar sgluon", pt.get<double>("masses.pseudoscalar_sgluon")},
             {"top", pt.get<double>("masses.top")},
             {"squarks", pt.get<double>("masses.squarks")}
+         };
+         break;
+      case Model::Sgluons:
+         j["masses"] = {
+            {"sgluon", pt.get<double>("masses.sgluon")},
+            {"top",    pt.get<double>("masses.top")}
          };
          break;
    }
@@ -1178,7 +1184,7 @@ int main(int argc, char* argv[]) {
             switch(channel) {
                case Channel::pp_OO:
                {
-                  const double m1 = pt.get<double>("masses.sgluons");
+                  const double m1 = pt.get<double>("masses.sgluon");
                   std::array<double, 3> total_xsec_tree {};
                   std::array<double, 3> total_xsec_virt {};
                   std::array<double, 3> total_xsec_soft {};
