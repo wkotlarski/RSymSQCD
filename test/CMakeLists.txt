@@ -26,8 +26,6 @@ add_executable(MRSSM_tree_xsections MRSSM_tree_xsections.cpp)
 target_link_libraries(MRSSM_tree_xsections GTest::gtest GTest::gtest_main RSymSQCDlib)
 add_test("MRSSM tree xsections" MRSSM_tree_xsections)
 
-set(CUBACORES_PER_TEST 4)
-
 # test LO cross sections
 # ------------------------------------------------------------------------------------------------------
 
@@ -53,7 +51,7 @@ add_test(
       "LO cross-section for ${el_0}"
    COMMAND
       ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb
-         $<TARGET_FILE:RSymSQCD> ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/LO/${el_1} ${CUBACORES_PER_TEST}
+         $<TARGET_FILE:RSymSQCD> ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/LO/${el_1}
 )
 endforeach()
 
@@ -84,6 +82,6 @@ add_test(
       "NLO cross-section for ${el_0}"
       COMMAND
          ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb
-            $<TARGET_FILE:RSymSQCD> ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/NLO/${el_1} ${CUBACORES_PER_TEST}
+            $<TARGET_FILE:RSymSQCD> ${CMAKE_SOURCE_DIR}/run_cards/${el_0} ${CMAKE_SOURCE_DIR}/test/ref_outputs/NLO/${el_1}
 )
 endforeach()

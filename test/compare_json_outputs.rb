@@ -4,7 +4,7 @@ require 'json'
 require 'securerandom'
 
 uuid = SecureRandom.uuid
-system({"CUBACORES" => ARGV[3]}, ARGV[0], "--card=#{ARGV[1]}", "--json-outputfile-name=#{uuid}")
+system(ARGV[0], "--card=#{ARGV[1]}", "--json-outputfile-name=#{uuid}")
 exit 1 if $?.exitstatus != 0
 
 file_ref     = File.read(ARGV[2])
