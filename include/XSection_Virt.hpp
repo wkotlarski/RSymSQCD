@@ -15,8 +15,7 @@ public:
    {};
 
    std::array<double, 3> integrate();
-   int integrand(const int *ndim, const double xx[],
-      const int *ncomp, double ff[], void *userdata);
+   double integrand(const double xx[]);
 
 private:
    std::function<double(double, double, double, double, double, int, double)> f;

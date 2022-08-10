@@ -7,14 +7,14 @@
 #include "LHAPDF/LHAPDF.h"
 
 namespace {
-int forwarder(const int *ndim, const double xx[],
-   const int *ncomp, double ff[], void *userdata) {
-    return static_cast<XSection_Virt*>(userdata)->integrand(ndim, xx, ncomp, ff, nullptr);
+int forwarder(const int *, const double xx[],
+   const int *, double ff[], void *userdata) {
+    ff[0] = static_cast<XSection_Virt*>(userdata)->integrand(xx);
+    return 0.;
 }
 }
 
-int XSection_Virt::integrand(const int *ndim, const double xx[],
-   const int *ncomp, double ff[], void *userdata) {
+double XSection_Virt::integrand(const double xx[]) {
 
     const double x1min = 4.*Sqr(m1_/sqrtS_);
     static constexpr double xmax = 1.;
@@ -62,8 +62,7 @@ int XSection_Virt::integrand(const int *ndim, const double xx[],
    }
    pdf_flux /= (x1 * x2);
 
-   ff[0] = dSigmaHad*jacobian*to_fb * pdf_flux;   // in femto barn
-   return 0;
+   return dSigmaHad*jacobian*to_fb * pdf_flux;   // in femto barn
 }
 
 

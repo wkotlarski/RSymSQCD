@@ -19,29 +19,26 @@
 
 namespace {
 
+static constexpr int nvec_ {1'000};
+
 // x[*nvec][*ndim] and f[*nvec][*ncomp]
-int forwarder(const int *ndim, const double xx[][7],
-   const int *ncomp, double ff[], void *userdata,
-   int const* nvec, int const* cores, double const* weight, int const* iter) {
+int forwarder(const int*, const double xx[][7],
+   const int*, double ff[], void *userdata,
+   int const* nvec, int const*, double const*, int const*) {
    std::vector<std::array<double, 7>> input;
-   input.resize(*nvec);
+   input.reserve(*nvec);
    for(int i=0; i<*nvec; ++i) {
-      for(int j = 0; j<7; ++j) {
-         input.at(i).at(j) = xx[i][j];
-      }
+         input.emplace_back(reinterpret_cast<std::array<double, 7> const&>(xx[i]));
    }
-   std::vector<double> output;
-   output.resize(*nvec);
    std::transform(
       std::execution::par_unseq,
-      input.cbegin(), input.cend(), output.begin(),
+      std::begin(input),
+      std::end(input),
+      std::begin(reinterpret_cast<std::vector<double>&>(ff)),
       [&userdata](std::array<double, 7> const& x) -> double {
          return static_cast<XSection_HnonC*>(userdata)->integrand(x);
       }
    );
-   for (int i=0; i<*nvec; ++i) {
-      ff[i] = output.at(i);
-   }
    return 0;
 }
 
@@ -66,7 +63,6 @@ std::array<double, 3> XSection_HnonC::integrate() {
    static constexpr int nbatch = 1'000;
    static constexpr int gridno = 0;
    static constexpr int seed = 0;
-   static constexpr int nvec = 1'000;
    const char* state_file = "";
    int nregions, fail;
 
@@ -77,7 +73,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
    const int pn = 10'000; // this is Cuba's default, see arXiv:1408.6373
    cubacores(&nn, &pn);
 
-   llVegas(ndim, ncomp, (integrand_t)forwarder, this, nvec,
+   llVegas(ndim, ncomp, (integrand_t)forwarder, this, nvec_,
       accuracy_rel, accuracy_abs, integration_verbosity_, seed,
       neval_min, neval_max, nstart, nincrease, nbatch,
       gridno, state_file, NULL,
