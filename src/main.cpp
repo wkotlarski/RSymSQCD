@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) {
       channel = Channel::pp_glglbar;
    }
    else {
-      cout << "\n Process not implemented! \n\n";
+      cerr << "Error: Process not implemented\n";
       return 1.;
    }
 
@@ -1127,7 +1127,7 @@ int main(int argc, char* argv[]) {
                   {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
-                      flav.push_back({i, -i, 2});
+                        flav.push_back({i, -i, 2});
                      }
                      XSection_Tree tree(
                         parameters, m1, m1,
@@ -1169,7 +1169,7 @@ int main(int argc, char* argv[]) {
                      allChannels.push_back(std::move(chan));
                   }
                   {
-                     std::vector<std::array<int, 3>> flav {{21, 21, 1}};
+                     const std::vector<std::array<int, 3>> flav {{21, 21, 1}};
                      XSection_Tree tree(
                         parameters, m1, m1,
                         std::bind(&Sgluons::matrixSgluonsTree_gg_OO, sgluons, _1, _2, _3), flav,

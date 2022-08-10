@@ -28,7 +28,7 @@ int forwarder(const int*, const double xx[][7],
    std::vector<std::array<double, 7>> input;
    input.reserve(*nvec);
    for(int i=0; i<*nvec; ++i) {
-         input.emplace_back(reinterpret_cast<std::array<double, 7> const&>(xx[i]));
+      input.emplace_back(reinterpret_cast<std::array<double, 7> const&>(xx[i]));
    }
    std::transform(
       std::execution::par_unseq,
