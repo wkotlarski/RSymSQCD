@@ -27,3 +27,7 @@ content_ref["cross sections"].each do |key, _|
     exit 1 if sigma > 2.0
   end
 end
+
+# if the test passed (no 'exit 1') above
+# than we can delete the file
+File.delete(uuid) if File.exist?(uuid)
