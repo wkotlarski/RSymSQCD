@@ -1248,7 +1248,7 @@ int main(int argc, char* argv[]) {
    cout << chrono::duration_cast<chrono::seconds>(end-start).count() % 60 << " second(s)\n";
 
    // write results to JSON file
-   const string json_outputfile_name =
+   string json_outputfile_name =
       vm.count("json-outputfile-name")
          ? vm["json-outputfile-name"].as<string>()
          : pt.get<string>("process.process") + "_"
@@ -1258,9 +1258,16 @@ int main(int argc, char* argv[]) {
            + to_string(pt.get<double>("collider setup.sqrt_S")) + "_"
            + to_string(muR) + "_"
            + to_string(muF) + "_"
-           + pt.get<string>("collider setup.pdf")
-           + ".json";
-   std::ofstream o(json_outputfile_name);
+           + pt.get<string>("collider setup.pdf");
+   int file_index = 0;
+   while (std::ifstream(json_outputfile_name + ".json")) {
+      file_index += 1;
+      std::cout
+         << "File " << json_outputfile_name + ".json already exists. "
+         << "Trying " << json_outputfile_name + "_" + std::to_string(file_index)  + ".json instead.\n";
+      json_outputfile_name += "_" + std::to_string(file_index);
+   }
+   std::ofstream o(vm.count("json-outputfile-name") ? vm["json-outputfile-name"].as<string>() : json_outputfile_name + ".json");
    o << std::setw(3) << j << std::endl;
 
    return 0;
