@@ -67,7 +67,7 @@ list(
    # pp -> sqL sqR
    pp_sqLsqR/pp_sqLsqR_BMP1.ini pp_sqLsqR/pp_sqLsqR_BMP2_DR.ini pp_sqLsqR/pp_sqLsqR_BMP3_DR.ini
    # pp -> sqL sqR + sqL* sqR*
-   pp_sqLsqR+cc/pp_sqLsqR+cc_BMP1.json pp_sqLsqR+cc/pp_sqLsqR+cc_BMP2_DR.json pp_sqLsqR+cc/pp_sqLsqR+cc_BMP3_DR.json
+   pp_sqLsqR+cc/pp_sqLsqR+cc_BMP1.ini pp_sqLsqR+cc/pp_sqLsqR+cc_BMP2_DR.ini pp_sqLsqR+cc/pp_sqLsqR+cc_BMP3_DR.ini
 )
 list(
    APPEND NLO_RESULTS
