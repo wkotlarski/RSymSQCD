@@ -59,7 +59,7 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 endif()
 
 include(FetchContent)
-if(${CMAKE_VERSION} VERSION_GREATER 3.23)
+if(${CMAKE_VERSION} VERSION_EQUAL "3.24.0" OR ${CMAKE_VERSION} VERSION_GREATER "3.24.0")
    cmake_policy(SET CMP0135 NEW)
 endif()
 set(JSON_MultipleHeaders ON)
