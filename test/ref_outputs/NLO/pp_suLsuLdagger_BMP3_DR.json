@@ -1,6 +1,6 @@
 {
    "cross sections": {
-      "ddbar->suLsuL*": {
+      "ddbar->suLsuL*(+g)": {
          "HnonC": {
             "err": 0.026923267777100798,
             "p-val": 3.1832593249096097e-17,
@@ -22,7 +22,7 @@
             "res": -1.1677540547701049
          }
       },
-      "gg->suLsuL*": {
+      "gg->suLsuL*(+g)": {
          "HnonC": {
             "err": 0.6966481107036049,
             "p-val": 0.0,
@@ -88,7 +88,7 @@
             "res": 0.0
          }
       },
-      "uubar->suLsuL*": {
+      "uubar->suLsuL*(+g)": {
          "HnonC": {
             "err": 0.0576175861324911,
             "p-val": 1.1102230246251565e-15,

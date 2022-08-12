@@ -468,7 +468,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "uu->suLsuR(+X)";
+                     chan.channel_name = "uu->suLsuR(+g)";
                      if(enable_born) chan.b = tree.integrate();
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
@@ -503,7 +503,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "gu->suLsuR(+X)";
+                     chan.channel_name = "gu->suLsuRubar";
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
                      print_to_terminal(chan);
@@ -555,7 +555,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "qq->sqLsqR(+X)";
+                     chan.channel_name = "qq->sqLsqR(+g)";
                      if(enable_born) chan.b = tree.integrate();
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
@@ -590,7 +590,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "gq->sqLsqR(+X)";
+                     chan.channel_name = "gq->sqLsqRqbar";
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
                      print_to_terminal(chan);
@@ -648,7 +648,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "qq->sqLsqR(+X)+cc";
+                     chan.channel_name = "qq->sqLsqR(+g)+cc";
                      if(enable_born) chan.b = tree.integrate();
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
@@ -683,7 +683,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "gq->sqLsqR(+X)+cc";
+                     chan.channel_name = "gq->sqLsqRqbar+cc";
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
                      print_to_terminal(chan);
@@ -727,7 +727,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "uubar->suLsuL*";
+                     chan.channel_name = "uubar->suLsuL*(+g)";
                      if(enable_born) chan.b = tree.integrate();
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
@@ -770,7 +770,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "ddbar->suLsuL*";
+                     chan.channel_name = "ddbar->suLsuL*(+g)";
                      if(enable_born) chan.b = tree.integrate();
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
@@ -810,7 +810,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "gg->suLsuL*";
+                     chan.channel_name = "gg->suLsuL*(+g)";
                      if(enable_born) chan.b = tree.integrate();
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
@@ -918,7 +918,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "qqbar->sqsq*";
+                     chan.channel_name = "qqbar->sqsq*(+g)";
                      if(enable_born) chan.b = tree.integrate();
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
@@ -965,7 +965,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "qqbar->sqsq*";
+                     chan.channel_name = "qq'bar->sqsq'*(+g)";
                      if(enable_born) chan.b = tree.integrate();
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
@@ -1009,7 +1009,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "ddbar->suLsuL*";
+                     chan.channel_name = "ddbar->suLsuL*(+g)";
                      if(enable_born) chan.b = tree.integrate();
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
@@ -1050,7 +1050,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "gg->suLsuL*";
+                     chan.channel_name = "gg->suLsuL*(+g)";
                      if(enable_born) chan.b = tree.integrate();
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();

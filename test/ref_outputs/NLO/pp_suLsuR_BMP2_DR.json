@@ -1,6 +1,6 @@
 {
    "cross sections": {
-      "gu->suLsuR(+X)": {
+      "gu->suLsuRubar": {
          "HnonC": {
             "err": 1.465708438406558e-07,
             "p-val": 0.0,
@@ -22,7 +22,7 @@
             "res": 0.0
          }
       },
-      "uu->suLsuR(+X)": {
+      "uu->suLsuR(+g)": {
          "HnonC": {
             "err": 0.0002029386478922622,
             "p-val": 0.0,

@@ -1,6 +1,6 @@
 {
    "cross sections": {
-      "gq->sqLsqR(+X)": {
+      "gq->sqLsqRqbar": {
          "HnonC": {
             "err": 0.0010937922287427453,
             "p-val": 0.0,
@@ -22,7 +22,7 @@
             "res": 0.0
          }
       },
-      "qq->sqLsqR(+X)": {
+      "qq->sqLsqR(+g)": {
          "HnonC": {
             "err": 0.18206502289385101,
             "p-val": 1.5227739992158884e-15,
