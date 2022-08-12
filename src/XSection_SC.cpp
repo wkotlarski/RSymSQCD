@@ -6,17 +6,20 @@
 #include "LHAPDF/LHAPDF.h"
 
 namespace {
-int forwarder_sc(const int *ndim, const double xx[],
-   const int *ncomp, double ff[], void *userdata) {
-    return static_cast<XSection_SC*>(userdata)->integrand_sc(ndim, xx, ncomp, ff, nullptr);
+int forwarder_sc(const int *, const double xx[],
+   const int *, double ff[], void *userdata) {
+   ff[0] = static_cast<XSection_SC*>(userdata)->integrand_sc(xx);
+   return 0.;
 }
-int forwarder_c1(const int *ndim, const double xx[],
-   const int *ncomp, double ff[], void *userdata) {
-    return static_cast<XSection_SC*>(userdata)->integrand_c1(ndim, xx, ncomp, ff, nullptr);
+int forwarder_c1(const int *, const double xx[],
+   const int *, double ff[], void *userdata) {
+    ff[0] = static_cast<XSection_SC*>(userdata)->integrand_c1(xx);
+    return 0;
 }
-int forwarder_c2(const int *ndim, const double xx[],
-   const int *ncomp, double ff[], void *userdata) {
-    return static_cast<XSection_SC*>(userdata)->integrand_c2(ndim, xx, ncomp, ff, nullptr);
+int forwarder_c2(const int *, const double xx[],
+   const int *, double ff[], void *userdata) {
+    ff[0] = static_cast<XSection_SC*>(userdata)->integrand_c2(xx);
+    return 0.;
 }
 }
 
@@ -72,8 +75,7 @@ std::array<double, 3> XSection_SC::integrate() {
   return result_finite;
 }
 
-int XSection_SC::integrand_sc(const int *ndim, const double xx[],
-  const int *ncomp, double ff[], void *userdata) {
+double XSection_SC::integrand_sc(const double xx[]) {
 
    // integration variables
    const double x1 = 4.*Sqr(m1_/sqrtS_)    + (1-4.*Sqr(m1_/sqrtS_))    * xx[0];
@@ -88,17 +90,16 @@ int XSection_SC::integrand_sc(const int *ndim, const double xx[],
    const double s12 = x1 * x2 * Sqr(sqrtS_);
    const double th = xx[2] * pi;
    const double alphas = pdf_->alphasQ(muR_);
-   ff[0] = pdf_flux * f_soft_.value()(alphas, s12, th, dS_, muR_);
-   ff[0] *= to_fb;
+   double result = pdf_flux * f_soft_.value()(alphas, s12, th, dS_, muR_);
+   result *= to_fb;
 
    // jakobian
-   ff[0] *= pi*Sqr(-4*Sqr(m1_) + Sqr(sqrtS_))*xx[0] /
+   result *= pi*Sqr(-4*Sqr(m1_) + Sqr(sqrtS_))*xx[0] /
            (Sqr(sqrtS_)*(-4*Sqr(m1_)*(-1 + xx[0]) + Sqr(sqrtS_)*xx[0]));
-   return 0;
+   return result;
 }
 
-int XSection_SC::integrand_c1(const int *ndim, const double xx[],
-   const int *ncomp, double ff[], void *userdata) {
+double XSection_SC::integrand_c1(const double xx[]) {
 
    // integration variables
    const double x1 = 4.*Sqr(m1_)/Sqr(sqrtS_)      + (1-4.*Sqr(m1_)/Sqr(sqrtS_))      * xx[0];
@@ -125,46 +126,42 @@ int XSection_SC::integrand_c1(const int *ndim, const double xx[],
    };
    result *= alphas/two_pi*std::log(Sqr(muR_/muF_));
 
-   ff[0] = result*(pow(-4.*pow(m1_, 2) + Sqr(sqrtS_), 2)*xx[0] /
+   return result*(pow(-4.*pow(m1_, 2) + Sqr(sqrtS_), 2)*xx[0] /
           (Sqr(sqrtS_)*(-4*pow(m1_, 2)*(-1 + xx[0]) + Sqr(sqrtS_)*xx[0])))*pdf_flux*to_fb;
-
-   return 0;
 }
 
-int XSection_SC::integrand_c2(const int *ndim, const double xx[],
-   const int *ncomp, double ff[], void *userdata) {
+double XSection_SC::integrand_c2(const double xx[]) {
 
    // scale integration variables as Cuba works in a unit hipercube
    const double x1 = 4.*Sqr(m1_)/Sqr(sqrtS_)      + (1-4.*Sqr(m1_)/Sqr(sqrtS_))      * xx[0];
    const double x2 = 4.*Sqr(m1_)/(Sqr(sqrtS_)*x1) + (1-4.*Sqr(m1_)/(Sqr(sqrtS_)*x1)) * xx[1];
    const double z = x1 + (1-dS_-x1)*xx[2];
 
-   ff[0] = 0.0;
-
    if (x1/z > 1.) {
-      return 0;
+      return 0.;
    }
 
+   double result = 0.;
    const double s12 = x1 * x2 * Sqr(sqrtS_);
    const double alphas = pdf_->alphasQ(muR_);
    for (const auto& f : flav_) {
       if (sp_.at(0).second.has_value()) {
-      ff[0] += f.at(2) * pdf_->xfxQ(f.at(0), x1/z, muF_)/(x1/z) * pdf_->xfxQ(f.at(1), x2, muF_)/x2
-            * ( get_sp(sp_.at(0).first, z).at(0) * std::log(0.5*dC_ * s12/Sqr(muF_) * Sqr(1 - z)/z ) -
-           get_sp(sp_.at(0).first, z).at(1)) * sp_.at(0).second.value()(alphas, s12);
+         result += f.at(2) * pdf_->xfxQ(f.at(0), x1/z, muF_)/(x1/z) * pdf_->xfxQ(f.at(1), x2, muF_)/x2
+               * ( get_sp(sp_.at(0).first, z).at(0) * std::log(0.5*dC_ * s12/Sqr(muF_) * Sqr(1 - z)/z ) -
+               get_sp(sp_.at(0).first, z).at(1)) * sp_.at(0).second.value()(alphas, s12);
       }
       if (sp_.at(1).second.has_value()) {
-      ff[0] += f.at(2) * pdf_->xfxQ(f.at(0), x2, muF_)/x2 * pdf_->xfxQ(f.at(1), x1/z, muF_)/(x1/z)
-           * (get_sp(sp_.at(1).first, z).at(0) * std::log(0.5*dC_ * s12/Sqr(muF_) * Sqr(1 - z)/z ) -
-           get_sp(sp_.at(1).first, z).at(1)) * sp_.at(1).second.value()(alphas, s12);
+         result += f.at(2) * pdf_->xfxQ(f.at(0), x2, muF_)/x2 * pdf_->xfxQ(f.at(1), x1/z, muF_)/(x1/z)
+               * (get_sp(sp_.at(1).first, z).at(0) * std::log(0.5*dC_ * s12/Sqr(muF_) * Sqr(1 - z)/z ) -
+               get_sp(sp_.at(1).first, z).at(1)) * sp_.at(1).second.value()(alphas, s12);
       }
    }
 
-   ff[0] *= alphas/two_pi * 1./z * to_fb;
+   result *= alphas/two_pi * 1./z * to_fb;
 
    // multiply by jakobian of integration variable transformation
-   ff[0] *= (Sqr(-4*Sqr(m1_) + Sqr(sqrtS_))*xx[0]*(4*Sqr(m1_)*(-1 + xx[0]) - Sqr(sqrtS_)*(-1 + dS_ + xx[0])))/
+   result *= (Sqr(-4*Sqr(m1_) + Sqr(sqrtS_))*xx[0]*(4*Sqr(m1_)*(-1 + xx[0]) - Sqr(sqrtS_)*(-1 + dS_ + xx[0])))/
         (Sqr(Sqr(sqrtS_))*(-4*Sqr(m1_)*(-1 + xx[0]) + Sqr(sqrtS_)*xx[0]));
 
-   return 0;
+   return result;
 }

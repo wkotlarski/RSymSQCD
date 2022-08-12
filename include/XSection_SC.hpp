@@ -21,12 +21,9 @@ public:
    {};
 
    std::array<double, 3> integrate();
-   int integrand_sc(const int*, const double[],
-              const int*, double[], void*);
-   int integrand_c1(const int*, const double[],
-              const int*, double[], void*);
-   int integrand_c2(const int*, const double[],
-              const int*, double[], void*);
+   double integrand_sc(const double[]);
+   double integrand_c1(const double[]);
+   double integrand_c2(const double[]);
 
 private:
    const double dS_;
