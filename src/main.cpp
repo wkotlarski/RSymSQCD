@@ -603,10 +603,6 @@ int main(int argc, char* argv[]) {
                   // qq > sqL sqR (+g) process
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
-                  std::array<double, 3> total_xsec_tree {};
-                  std::array<double, 3> total_xsec_virt {};
-                  std::array<double, 3> total_xsec_soft {};
-                  std::array<double, 3> total_xsec_hard {};
                   if( subprocess == "" ) {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 2, 3, 4, 5}) {
