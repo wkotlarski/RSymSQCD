@@ -1103,7 +1103,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "gu->suLsuL*(+X)";
+                     chan.channel_name = "gq->sqsq*(+X)";
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
                      print_to_terminal(chan);
