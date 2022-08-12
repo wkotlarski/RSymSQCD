@@ -63,7 +63,7 @@ if(${CMAKE_VERSION} VERSION_EQUAL "3.24.0" OR ${CMAKE_VERSION} VERSION_GREATER "
    cmake_policy(SET CMP0135 NEW)
 endif()
 set(JSON_MultipleHeaders ON)
-FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.1/json.tar.xz)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
 FetchContent_MakeAvailable(json)
 
 find_package(Boost REQUIRED COMPONENTS program_options)
