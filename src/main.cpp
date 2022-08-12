@@ -415,7 +415,7 @@ int main(int argc, char* argv[]) {
       const double dS = pt.get<double>("technical parameters.dS", 1e-5);
       // for the matrix elements that are regular in the limit dS -> 0 because the phase space parametrization
       // fails if we are exactly on the threshold
-      constexpr double dS0 = 1e-10;
+      constexpr double dS0 = 1e-9;
       const double dC = pt.get<double>("technical parameters.dC", 1e-6);
       cout << "\nINFO: Using phase space slicing parameters δS=" << std::scientific << std::setprecision(1) << dS
            << " and δC=" << dC << '\n';
@@ -483,7 +483,7 @@ int main(int argc, char* argv[]) {
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::nullopt,
-                        dS0, dC,
+                        0., dC,
                         flav,
                         {{
                            {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
@@ -570,7 +570,7 @@ int main(int argc, char* argv[]) {
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::nullopt,
-                        dS0, dC,
+                        0., dC,
                         flav,
                         {{
                            {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
@@ -659,7 +659,7 @@ int main(int argc, char* argv[]) {
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::nullopt,
-                        dS0, dC,
+                        0., dC,
                         flav,
                         {{
                            {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
@@ -821,7 +821,7 @@ int main(int argc, char* argv[]) {
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::nullopt,
-                        dS0, dC, flav,
+                        0., dC, flav,
                         {{
                            {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
                            {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
@@ -849,7 +849,7 @@ int main(int argc, char* argv[]) {
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::nullopt,
-                        dS0, dC, flav,
+                        0., dC, flav,
                         {{
                            {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)},
                            {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
@@ -1061,7 +1061,7 @@ int main(int argc, char* argv[]) {
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::nullopt,
-                        dS0, dC, flav,
+                        0., dC, flav,
                         {{
                            {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
                            {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
@@ -1089,7 +1089,7 @@ int main(int argc, char* argv[]) {
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::nullopt,
-                        dS0, dC, flav,
+                        0., dC, flav,
                         {{
                            {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
                            {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
