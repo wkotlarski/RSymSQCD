@@ -134,7 +134,7 @@ int main(int argc, char* argv[]) {
       return 1;
    }
 
-   enum class Channel {
+   enum class Process {
        pp_OO,
        pp_suLsuR,
        pp_sqLsqR,
@@ -144,27 +144,27 @@ int main(int argc, char* argv[]) {
        pp_glglbar
    };
 
-   Channel channel;
+   Process channel;
    if (pt.get<string>("process.process") == "pp_suLsuR") {
-      channel = Channel::pp_suLsuR;
+      channel = Process::pp_suLsuR;
    }
    else if (pt.get<string>("process.process") == "pp_sqLsqR") {
-      channel = Channel::pp_sqLsqR;
+      channel = Process::pp_sqLsqR;
    }
    else if (pt.get<string>("process.process") == "pp_sqLsqR+cc") {
-      channel = Channel::pp_sqLsqR_w_cc;
+      channel = Process::pp_sqLsqR_w_cc;
    }
    else if (pt.get<string>("process.process") == "pp_suLsuLdagger") {
-      channel = Channel::pp_suLsuLdagger;
+      channel = Process::pp_suLsuLdagger;
    }
    else if (pt.get<string>("process.process") == "pp_sqsqdagger") {
-      channel = Channel::pp_sqsqdagger;
+      channel = Process::pp_sqsqdagger;
    }
    else if (pt.get<string>("process.process") == "pp_OO") {
-      channel = Channel::pp_OO;
+      channel = Process::pp_OO;
    }
    else if (pt.get<string>("process.process") == "pp_glglbar") {
-      channel = Channel::pp_glglbar;
+      channel = Process::pp_glglbar;
    }
    else {
       cerr << "Error: Process not implemented\n";
@@ -229,7 +229,7 @@ int main(int argc, char* argv[]) {
          case Model::MRSSM:
             const MRSSM mrssm(mrssm_params);
             switch(channel) {
-               case Channel::pp_suLsuR:
+               case Process::pp_suLsuR:
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
@@ -247,11 +247,11 @@ int main(int argc, char* argv[]) {
                   }
                   break;
                }
-               case Channel::pp_suLsuLdagger:
+               case Process::pp_suLsuLdagger:
                {
                   break;
                }
-               case Channel::pp_sqLsqR_w_cc:
+               case Process::pp_sqLsqR_w_cc:
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
@@ -277,7 +277,7 @@ int main(int argc, char* argv[]) {
                   }
                   break;
                }
-               case Channel::pp_sqLsqR:
+               case Process::pp_sqLsqR:
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
@@ -301,7 +301,7 @@ int main(int argc, char* argv[]) {
                   }
                   break;
                }
-               case Channel::pp_sqsqdagger:
+               case Process::pp_sqsqdagger:
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
@@ -371,7 +371,7 @@ int main(int argc, char* argv[]) {
                   print_to_terminal("total", result);
                   break;
                }
-               case Channel::pp_glglbar:
+               case Process::pp_glglbar:
                {
                   const double m = pt.get<double>("masses.gluino");
                   std::array<double, 3> result {};
@@ -429,7 +429,7 @@ int main(int argc, char* argv[]) {
          {
             const MRSSM mrssm(mrssm_params);
             switch(channel) {
-               case Channel::pp_suLsuR:
+               case Process::pp_suLsuR:
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
@@ -511,7 +511,7 @@ int main(int argc, char* argv[]) {
                   }
                   break;
                }
-               case Channel::pp_sqLsqR:
+               case Process::pp_sqLsqR:
                {
                   // qq > sqL sqR (+g) process
                   const double m1 = pt.get<double>("masses.squarks");
@@ -598,7 +598,7 @@ int main(int argc, char* argv[]) {
                   }
                   break;
                }
-               case Channel::pp_sqLsqR_w_cc:
+               case Process::pp_sqLsqR_w_cc:
                {
                   // qq > sqL sqR (+g) process
                   const double m1 = pt.get<double>("masses.squarks");
@@ -687,7 +687,7 @@ int main(int argc, char* argv[]) {
                   }
                   break;
                }
-               case Channel::pp_suLsuLdagger:
+               case Process::pp_suLsuLdagger:
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
@@ -875,7 +875,7 @@ int main(int argc, char* argv[]) {
                   }
                   break;
                }
-               case Channel::pp_sqsqdagger:
+               case Process::pp_sqsqdagger:
                {
                   const double m1 = pt.get<double>("masses.squarks");
                   const double m2 = pt.get<double>("masses.squarks");
@@ -1117,7 +1117,7 @@ int main(int argc, char* argv[]) {
          case Model::Sgluons:
             Sgluons sgluons(sgluon_params);
             switch(channel) {
-               case Channel::pp_OO:
+               case Process::pp_OO:
                {
                   const double m1 = pt.get<double>("masses.sgluon");
                   {
