@@ -1,4 +1,4 @@
-#include "XSection_SC.hpp"
+#include "XSections/XSection_SC.hpp"
 #include "constants.hpp"
 #include "mathematica_wrapper.hpp"
 

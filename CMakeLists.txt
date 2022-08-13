@@ -120,6 +120,7 @@ target_include_directories(
       process
    PUBLIC
       include
+      include/Li2
       ${EIGEN3_INCLUDE_DIR}
       ${LIBLOOPTOOLS_INCLUDE_DIR}
       ${LIBLHAPDF_INCLUDE_DIR}
@@ -128,9 +129,10 @@ target_include_directories(
 find_package(TBB REQUIRED)
 
 file (GLOB SOURCES
-   "src/Li2.cpp"  "src/splitting_kernels.cpp"  "XSection*.cpp" "colour_me.cpp"
+   "src/Li2.cpp"  "src/splitting_kernels.cpp"  "src/XSections/XSection*.cpp" "colour_me.cpp"
 )
 add_library(RSymSQCDlib SHARED ${SOURCES})
+target_compile_options(RSymSQCDlib PRIVATE -fPIC)
 target_include_directories (
       RSymSQCDlib
    PUBLIC
@@ -152,7 +154,7 @@ target_link_libraries(
       TBB::tbb
 )
 
-add_executable(RSymSQCD "src/main.cpp" "src/XSection_Tree.cpp" "src/XSection_Virt.cpp" "src/XSection_SC.cpp" "src/XSection_HnonC.cpp" "src/utils.cpp")
+add_executable(RSymSQCD "src/main.cpp" "src/XSections/XSection_Tree.cpp" "src/XSections/XSection_Virt.cpp" "src/XSections/XSection_SC.cpp" "src/XSections/XSection_HnonC.cpp" "src/utils.cpp")
 target_include_directories(
       RSymSQCD
    PUBLIC

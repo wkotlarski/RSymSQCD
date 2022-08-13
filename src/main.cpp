@@ -1,8 +1,8 @@
 #include "version.hpp"
-#include "XSection_Tree.hpp"
-#include "XSection_Virt.hpp"
-#include "XSection_SC.hpp"
-#include "XSection_HnonC.hpp"
+#include "XSections/XSection_Tree.hpp"
+#include "XSections/XSection_Virt.hpp"
+#include "XSections/XSection_SC.hpp"
+#include "XSections/XSection_HnonC.hpp"
 #include "splitting_kernels.hpp"
 #include "utils.hpp"
 

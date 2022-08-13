@@ -1,4 +1,4 @@
-#include "XSection_HnonC.hpp"
+#include "XSections/XSection_HnonC.hpp"
 #include "constants.hpp"
 #include "mathematica_wrapper.hpp"
 

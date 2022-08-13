@@ -1,4 +1,4 @@
-#include "XSection_Virt.hpp"
+#include "XSections/XSection_Virt.hpp"
 #include "constants.hpp"
 #include "mathematica_wrapper.hpp"
 
