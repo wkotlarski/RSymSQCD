@@ -62,6 +62,8 @@ list(
    APPEND NLO_RUN_CARDS
    # pp -> suL suR
    pp_suLsuR/pp_suLsuR_BMP1 pp_suLsuR/pp_suLsuR_BMP2_DR pp_suLsuR/pp_suLsuR_BMP3_DR
+   # test mu_r != mu_F
+   pp_suLsuR/pp_suLsuR_BMP1-scale_variation
    # pp -> suL suL*
    pp_suLsuLdagger/pp_suLsuLdagger_BMP1 pp_suLsuLdagger/pp_suLsuLdagger_BMP2_DR pp_suLsuLdagger/pp_suLsuLdagger_BMP3_DR
    # pp -> sqL sqR
@@ -74,6 +76,8 @@ list(
    APPEND NLO_RESULTS
    # pp -> suL suR
    pp_suLsuR_BMP1 pp_suLsuR_BMP2_DR pp_suLsuR_BMP3_DR
+   # test mu_r != mu_F
+   pp_suLsuR_BMP1-scale_variation
    # pp -> suL suL*
    pp_suLsuLdagger_BMP1 pp_suLsuLdagger_BMP2_DR pp_suLsuLdagger_BMP3_DR
    # pp -> sqL sqR
