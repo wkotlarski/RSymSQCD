@@ -7,7 +7,7 @@ double MRSSM::matrixHard_gu_suLsuRubar_DS_unsimp(double Alfas, std::array<std::a
    const double S12 = 2*k12;
    const double m1 = MassSq;
    const double m2 = MassSq;
-   const int Theta = (MassGlu > m2 ? 1 : 0) * (S12 > Sqr(MassGlu + m1) ? 1 : 0);
+   const int Theta = (MassGlu > m2 ? 1 : 0) * (S12 > pow<2>(MassGlu + m1) ? 1 : 0);
    const double S35 = m1*m1 + 2*k35;
    const double S45 = m2*m2 + 2*k45;
    const double T = m1*m1 - 2*k13;
