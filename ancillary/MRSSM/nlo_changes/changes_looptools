@@ -1,4 +1,0 @@
-shell variable $LT should contain the path to looptools,
-this will automatically be done here when the gosam variables are set
-makefile has to be changed to that all flag variables contain the flags '-fPIC -ff2c' 
-# not fully tested but needed for fortran and c, than run make and make install 
