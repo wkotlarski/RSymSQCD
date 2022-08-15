@@ -45,7 +45,7 @@ std::array<double, 3> XSection_SC::integrate() {
    if (f_soft_.has_value()) {
       llCuhre(ndim, ncomp, forwarder_sc, this, 1,
          accuracy_rel_sc, accuracy_abs, integration_verbosity_,
-         neval_min, neval_max, 1, NULL, NULL,
+         neval_min, neval_max, 1, nullptr, nullptr,
          &nregions, &neval, &fail, integral_sc, error_sc, prob_sc);
    }
 
@@ -56,14 +56,14 @@ std::array<double, 3> XSection_SC::integrate() {
        sp_.at(1).first == SplittingKernel::Pgg || sp_.at(1).first == SplittingKernel::Pgg) {
       llCuhre(ndim, ncomp, forwarder_c1, this, 1,
          accuracy_rel_c, accuracy_abs, integration_verbosity_,
-         neval_min, neval_max, 1, NULL, NULL,
+         neval_min, neval_max, 1, nullptr, nullptr,
          &nregions, &neval, &fail, integral_c1, error_c1, prob_c1);
    }
 
    double integral_c2[ncomp], error_c2[ncomp], prob_c2[ncomp];
    llCuhre(ndim, ncomp, forwarder_c2, this, 1,
       accuracy_rel_c, accuracy_abs, integration_verbosity_,
-      neval_min, neval_max, 1, NULL, NULL,
+      neval_min, neval_max, 1, nullptr, nullptr,
       &nregions, &neval, &fail, integral_c2, error_c2, prob_c2);
 
    std::array <double, 3> result_finite {

@@ -76,7 +76,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
    llVegas(ndim, ncomp, (integrand_t)forwarder, this, nvec_,
       accuracy_rel, accuracy_abs, integration_verbosity_, seed,
       neval_min, neval_max, nstart, nincrease, nbatch,
-      gridno, state_file, NULL,
+      gridno, state_file, nullptr,
       &neval, &fail, integral, error, prob );
 
    /* @todo:

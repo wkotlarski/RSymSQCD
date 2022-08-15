@@ -69,7 +69,7 @@ int XSection_Tree::integrand(const int *ndim, const double xx[],
 
    Cuhre( ndim, ncomp, forwarder, this, nvec,
       accuracy_rel, accuracy_abs, integration_verbosity_ | last,
-      eval_min, eval_max, key, NULL, NULL,
+      eval_min, eval_max, key, nullptr, nullptr,
       &nregions, &neval, &fail, integral, error, prob );
 
    std::array<double, 3> result {integral[0], error[0], prob[0]};

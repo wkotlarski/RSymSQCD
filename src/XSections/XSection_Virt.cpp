@@ -107,8 +107,8 @@ double XSection_Virt::integrand(const double xx[]) {
         prec_virt, accuracy_abs, integration_verbosity_, seed,
         eval_min, eval_max, key1, key2, key3, maxpass,
         border, maxchisq, mindeviation,
-        ngiven, ldxgiven, NULL, nextra, NULL,
-        NULL, NULL,
+        ngiven, ldxgiven, nullptr, nextra, nullptr,
+        nullptr, nullptr,
         &nregions, &neval, &fail, integral, error, prob);
 
    std::array<double, 3> result {integral[0], error[0], prob[0]};
