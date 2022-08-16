@@ -92,9 +92,9 @@ double MRSSM::sigmaTree_gg_suLsuLdagger(double alphas, double s12 ) const {
 /*
  *    checked with MadGraph
  */
-double MRSSM::sigmaTree_uu_suLsuR(double alphas, double s ) const {
-   double MGl2 = pow(MassGlu, 2);
-   double a = pow<2>(alphas);
+double MRSSM::sigmaTree_uu_suLsuR(double alphas, double s) const {
+   const double MGl2 = pow<2>(MassGlu);
+   const double a = pow<2>(alphas);
    return (-4.*a*pi*(2.*sqrt(s*(-4*pow<2>(MassSq) + s)) + (2.*pow<2>(MassSq) - 2.*MGl2 - s)*
       log((4.*MGl2 + pow<2>(1. + sqrt(1. - (4.*pow<2>(MassSq))/s))*s)/
       (4.*MGl2 + pow<2>(-1. + sqrt(1. - (4.*pow<2>(MassSq))/s))*s))))/(9.*pow<2>(s));

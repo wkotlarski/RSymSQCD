@@ -249,6 +249,50 @@ int main(int argc, char* argv[]) {
                }
                case Process::pp_suLsuLdagger:
                {
+                  const double m1 = pt.get<double>("masses.squarks");
+                  const double m2 = pt.get<double>("masses.squarks");
+                  {
+                     std::vector<std::array<int, 3>> flav {{2, -2, 2}};
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        born_precision, born_verbosity
+                     );
+                     ChannelResult chan;
+                     chan.channel_name = "uubar->suLsuL*";
+                     if(enable_born) chan.b = tree.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
+                  }
+                  {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {1, 3, 4, 5}) {
+                        flav.push_back({i,-i, 2});
+                     }
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        born_precision, born_verbosity
+                     );
+                     ChannelResult chan;
+                     chan.channel_name = "ddbar->suLsuL*";
+                     if(enable_born) chan.b = tree.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
+                  }
+                  {
+                     std::vector<std::array<int, 3>> flav {{21, 21, 1}};
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        born_precision, born_verbosity
+                     );
+                     ChannelResult chan;
+                     chan.channel_name = "gg->suLsuL*";
+                     if(enable_born) chan.b = tree.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
+                  }
                   break;
                }
                case Process::pp_sqLsqR_w_cc:
