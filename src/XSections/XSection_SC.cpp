@@ -115,7 +115,7 @@ double XSection_SC::integrand_c1(const double xx[]) {
    const double alphas = pdf_->alphasQ(muR_);
    double result = 0.;
    for (const auto& [ker, sigma] : sp_) {
-      if (!sigma.has_value()) continue;
+      if (!sigma) continue;
       if (ker == SplittingKernel::Pqq) {
          result += CF*(2.*std::log(dS_) + 1.5)*sigma.value()(alphas, s12);
       }
@@ -145,12 +145,12 @@ double XSection_SC::integrand_c2(const double xx[]) {
    const double s12 = x1 * x2 * Sqr(sqrtS_);
    const double alphas = pdf_->alphasQ(muR_);
    for (const auto& f : flav_) {
-      if (sp_.at(0).second.has_value()) {
+      if (sp_.at(0).second) {
          result += f.at(2) * pdf_->xfxQ(f.at(0), x1/z, muF_)/(x1/z) * pdf_->xfxQ(f.at(1), x2, muF_)/x2
                * ( get_sp(sp_.at(0).first, z).at(0) * std::log(0.5*dC_ * s12/Sqr(muF_) * Sqr(1 - z)/z ) -
                get_sp(sp_.at(0).first, z).at(1)) * sp_.at(0).second.value()(alphas, s12);
       }
-      if (sp_.at(1).second.has_value()) {
+      if (sp_.at(1).second) {
          result += f.at(2) * pdf_->xfxQ(f.at(0), x2, muF_)/x2 * pdf_->xfxQ(f.at(1), x1/z, muF_)/(x1/z)
                * (get_sp(sp_.at(1).first, z).at(0) * std::log(0.5*dC_ * s12/Sqr(muF_) * Sqr(1 - z)/z ) -
                get_sp(sp_.at(1).first, z).at(1)) * sp_.at(1).second.value()(alphas, s12);
