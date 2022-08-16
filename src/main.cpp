@@ -241,9 +241,11 @@ int main(int argc, char* argv[]) {
                         flav,
                         born_precision, born_verbosity
                      );
-                     auto xsection_current = tree.integrate();
-                     xsec_to_json(j, "uu->suLsuR", xsection_current);
-                     print_to_terminal("uu > suLsuR", xsection_current);
+                     ChannelResult chan;
+                     chan.channel_name = "uu->suLsuR";
+                     if(enable_born) chan.b = tree.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
                   }
                   break;
                }
@@ -315,9 +317,11 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
-                     auto result = tree.integrate();
-                     print_to_terminal("qq > sqLsqR + cc", result);
-                     xsec_to_json(j, "qq->sqLsqR+cc", result);
+                     ChannelResult chan;
+                     chan.channel_name = "qq->sqLsqR+cc";
+                     if(enable_born) chan.b = tree.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
                   }
                   break;
                }
@@ -339,9 +343,11 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
-                     auto result = tree.integrate();
-                     print_to_terminal("qq > sqLsqR", result);
-                     xsec_to_json(j, "qq->sqLsqR", result);
+                     ChannelResult chan;
+                     chan.channel_name = "qq->sqLsqR";
+                     if(enable_born) chan.b = tree.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
                   }
                   break;
                }
@@ -360,10 +366,11 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
-                     auto chan_res = tree.integrate();
-                     print_to_terminal("qqbar -> sqsq*", chan_res);
-                     xsec_to_json(j, "qqbar->sqsq*", chan_res);
-                     result += chan_res;
+                     ChannelResult chan;
+                     chan.channel_name = "qqbar->sqsq*";
+                     if(enable_born) chan.b = tree.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
                   }
                   {
                      std::vector<std::array<int, 3>> flav {};
@@ -378,10 +385,11 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
-                     auto chan_res = tree.integrate();
-                     print_to_terminal("qq'bar -> sqsq'*", chan_res);
-                     xsec_to_json(j, "qq'bar->sqsq'*", chan_res);
-                     result += chan_res;
+                     ChannelResult chan;
+                     chan.channel_name = "qq'bar->sqsq'*";
+                     if(enable_born) chan.b = tree.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
                   }
                   {
                      std::vector<std::array<int, 3>> flav {};
@@ -394,10 +402,11 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
-                     auto chan_res = tree.integrate();
-                     print_to_terminal("qqbar -> sq'sq'*", chan_res);
-                     xsec_to_json(j, "ddbar->sq'sq'*", chan_res);
-                     result += chan_res;
+                     ChannelResult chan;
+                     chan.channel_name = "ddbar->sq'sq'*";
+                     if(enable_born) chan.b = tree.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
                   }
                   {
                      // 5 squark flavours * (L + R)
@@ -407,12 +416,12 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
-                     auto chan_res = tree.integrate();
-                     print_to_terminal( "gg -> suLsuL*", chan_res);
-                     xsec_to_json(j, "gg->sqsq*", chan_res);
-                     result += chan_res;
+                     ChannelResult chan;
+                     chan.channel_name = "gg->sqsq*";
+                     if(enable_born) chan.b = tree.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
                   }
-                  print_to_terminal("total", result);
                   break;
                }
                case Process::pp_glglbar:
@@ -429,10 +438,11 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixTree_uubar_glglbar, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
-                     auto chan_res = tree.integrate();
-                     print_to_terminal("qqbar > gluglubar", chan_res);
-                     xsec_to_json(j, "qqbar->gluglubar", chan_res);
-                     result += chan_res;
+                     ChannelResult chan;
+                     chan.channel_name = "qqbar->gluglubar";
+                     if(enable_born) chan.b = tree.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
                   }
                   {
                      std::vector<std::array<int, 3>> flav {{21, 21, 1}};
@@ -441,12 +451,13 @@ int main(int argc, char* argv[]) {
                         std::bind(&MRSSM::matrixTree_gg_glglbar, mrssm, _1, _2, _3), flav,
                         born_precision, born_verbosity
                      );
-                     auto chan_res = tree.integrate();
-                     print_to_terminal("gg > gluglubar", chan_res);
-                     xsec_to_json(j, "gg->gluglubar", chan_res);
-                     result += chan_res;
+                     ChannelResult chan;
+                     chan.channel_name = "gg->gluglubar";
+                     if(enable_born) chan.b = tree.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
                   }
-                  print_to_terminal("total", result);
+                  break;
                }
                default:
                   break;
@@ -1264,19 +1275,36 @@ int main(int argc, char* argv[]) {
    }
    }
 
-   std::array<double, 3> tot_b {};
-   std::array<double, 3> tot_v {};
-   std::array<double, 3> tot_s {};
-   std::array<double, 3> tot_h {};
-   for (ChannelResult const& ch : allChannels) {
-      xsec_to_json(j, ch);
-      tot_b += ch.b;
-      tot_v += ch.v;
-      tot_s += ch.s;
-      tot_h += ch.h;
+   switch (order) {
+      case Order::LO:
+      {
+         std::array<double, 3> tot_b {};
+         for (ChannelResult const& ch : allChannels) {
+            xsec_to_json(j, ch);
+            tot_b += ch.b;
+         }
+         ChannelResult total {"total", tot_b};
+         print_to_terminal(total);
+         break;
+      }
+      case Order::NLO:
+      {
+         std::array<double, 3> tot_b {};
+         std::array<double, 3> tot_v {};
+         std::array<double, 3> tot_s {};
+         std::array<double, 3> tot_h {};
+         for (ChannelResult const& ch : allChannels) {
+            xsec_to_json(j, ch);
+            tot_b += ch.b;
+            tot_v += ch.v.value_or(std::array<double, 3>{0., 0., 0.});
+            tot_s += ch.s.value_or(std::array<double, 3>{0., 0., 0.});
+            tot_h += ch.h.value_or(std::array<double, 3>{0., 0., 0.});
+         }
+         ChannelResult total {"total", tot_b, tot_v, tot_s, tot_h};
+         print_to_terminal(total);
+         break;
+      }
    }
-   ChannelResult total {"total", tot_b, tot_v, tot_s, tot_h};
-   print_to_terminal(total);
 
    // print out time statistics
    auto end = chrono::steady_clock::now();

@@ -2,29 +2,18 @@
 
 #include <array>
 #include <cmath>
+#include <optional>
 #include <string_view>
 
 struct ChannelResult {
    std::string channel_name;
    std::array<double, 3> b {0., 0., 0.};
-   std::array<double, 3> v {0., 0., 0.};
-   std::array<double, 3> s {0., 0., 0.};
-   std::array<double, 3> h {0., 0., 0.};
+   std::optional<std::array<double, 3>> v;
+   std::optional<std::array<double, 3>> s;
+   std::optional<std::array<double, 3>> h;
 };
 
-void print_to_terminal(
-   std::string_view,
-   std::array<double, 3> const&, std::array<double, 3> const&, std::array<double, 3> const&, std::array<double, 3> const&);
 void print_to_terminal(ChannelResult const&);
-
-void print_to_terminal(std::string_view, std::array<double, 3> const&);
-
-void xsec_to_json(nlohmann::json&, std::string_view, std::array<double, 3> const&);
-void xsec_to_json(
-   nlohmann::json&,
-   std::string_view,
-   std::array<double, 3> const&, std::array<double, 3> const&, std::array<double, 3> const&, std::array<double, 3> const&
-);
 void xsec_to_json(nlohmann::json&, ChannelResult const&);
 
 inline std::array<double, 3> operator+(std::array<double, 3> const& x, std::array<double, 3> const& y) {

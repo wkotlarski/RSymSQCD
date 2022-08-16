@@ -72,11 +72,21 @@ void xsec_to_json(
 
 
 void print_to_terminal(ChannelResult const& c) {
-   print_to_terminal(c.channel_name, c.b, c.v, c.s, c.h);
+   if (c.v || c.s || c.h) {
+      print_to_terminal(c.channel_name, c.b, c.v.value_or(std::array<double, 3>{0., 0., 0.}), c.s.value_or(std::array<double, 3>{0., 0., 0.}), c.h.value_or(std::array<double, 3>{0., 0., 0.}));
+   }
+   else {
+      print_to_terminal(c.channel_name, c.b);
+   }
 }
 
 void xsec_to_json(
       nlohmann::json& j,
       ChannelResult const& c) {
-   xsec_to_json(j, c.channel_name, c.b, c.v, c.s, c.h);
+   if (c.v || c.s || c.h) {
+      xsec_to_json(j, c.channel_name, c.b, c.v.value_or(std::array<double, 3>{0., 0., 0.}), c.s.value_or(std::array<double, 3>{0., 0., 0.}), c.h.value_or(std::array<double, 3>{0., 0., 0.}));
+   }
+   else {
+      xsec_to_json(j, c.channel_name, c.b);
+   }
 }
