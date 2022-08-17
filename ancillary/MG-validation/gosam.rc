@@ -26,6 +26,8 @@ diagsum=True
 PSP_check=True
 PSP_verbosity=True
 
+extensions=shared
+
 ###################
 # program options #
 ###################

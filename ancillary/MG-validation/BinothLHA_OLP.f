@@ -83,23 +83,20 @@ c
          call BinothLHAInit()
          firsttime_init=.false.
       endif
-      ierr=0
-      setvar="SMINPUTS&&3"
-      call OLP_SetParameter(setvar,alpha_S,0.0,ierr)
-c      write (*,*) "setting alphas", setvar, alpha_S
-      if (ierr.eq.1) then
+      ierr=1
+      call OLP_SetParameter("alphaS", alpha_S, 0d0, ierr)
+      if (ierr.eq.0) then
          write (*,*) 'ERROR in the BinothLHASetParameter aS process initialization'
          stop
       endif
 c      call OLP_SetParameter("renormalization",0,0.0,ierr)
-      if (ierr.eq.1) then
-         write (*,*) 'ERROR in the BinothLHASetParameter prefactor process initialization'
-         stop
-      endif
+c      if (ierr.eq.1) then
+c         write (*,*) 'ERROR in the BinothLHASetParameter prefactor process initialization'
+c         stop
+c      endif
      
       call OLP_EvalSubProcess2(proc_label,p,mu_r,virt_wgts,acc)
 
-c      call OLP_EvalSubProcess(proc_label,p,mu_r,alpha_S,virt_wgts)
       double  = virt_wgts(1)/dble(ngluons)
       single  = virt_wgts(2)/dble(ngluons)
       virt_wgt= virt_wgts(3)/dble(ngluons)
