@@ -1060,7 +1060,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "ddbar->suLsuL*(+g)";
+                     chan.channel_name = "qqbar->sq'sq'*(+g)";
                      if(enable_born) chan.b = tree.integrate();
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
