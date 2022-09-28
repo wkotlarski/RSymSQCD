@@ -983,7 +983,7 @@ int main(int argc, char* argv[]) {
                      for (int i : {1, 2, 3, 4, 5}) {
                         for (int j : {1, 2, 3, 4, 5}) {
                            if (j==i) continue;
-                           flav.push_back({i,-j,2});
+                           flav.push_back({i, -j, 2});
                         }
                      }
                      XSection_Tree tree(
@@ -993,24 +993,24 @@ int main(int argc, char* argv[]) {
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixHard_uubar_suLsuLdaggerg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_uu_suLsuRg, mrssm, _1, _2),
                         dS, dC,
                         flav,
                         hard_precision, hard_verbosity
@@ -1101,7 +1101,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "gg->suLsuL*(+g)";
+                     chan.channel_name = "gg->sqsq*(+g)";
                      if(enable_born) chan.b = tree.integrate();
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
@@ -1112,11 +1112,11 @@ int main(int argc, char* argv[]) {
 
                   {
                      std::vector<std::array<int, 3>> flav {};
-                     for(int el : { 1, -1, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2});
+                     for(int el : { 1, -1, 2, -2, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2*2*4 /* initial state permutation x L+R squarks x 4-squark flavours */});
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::nullopt,
-                        0., dC, flav,
+                        dS0, dC, flav,
                         {{
                            {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
                            {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
@@ -1130,23 +1130,23 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "gq->suLsuL*(+X)";
+                     chan.channel_name = "gq->sq'sq'*(+X)";
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
                      print_to_terminal(chan);
                      allChannels.push_back(std::move(chan));
                   }
 
-                  // g u > suL suLdagger
+                  // g q > sq sqdagger
                   {
                      std::vector<std::array<int, 3>> flav {};
-                     for( int el : { 2, -2 }) flav.push_back({21, el, 2});
+                     for( int el : { 1, -1, 2, -2, 3, -3, 4, -4, 5, -5 }) flav.push_back({21, el, 2*2});
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::nullopt,
-                        0., dC, flav,
+                        dS0, dC, flav,
                         {{
-                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)},
                            {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
                         }},
                         sc_precision, sc_verbosity
@@ -1159,6 +1159,32 @@ int main(int argc, char* argv[]) {
                      );
                      ChannelResult chan;
                      chan.channel_name = "gq->sqsq*(+X)";
+                     if(enable_sc) chan.s = sc.integrate();
+                     if(enable_hard) chan.h = hc.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
+                  }
+                  {
+                     std::vector<std::array<int, 3>> flav {};
+                     for( int el : { 1, -1, 2, -2, 3, -3, 4, -4, 5, -5 }) flav.push_back({21, el, 2*4});
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::nullopt,
+                        dS0, dC, flav,
+                        {{
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pgq, std::nullopt}
+                        }},
+                        sc_precision, sc_verbosity
+                     );
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixHard_gu_suLsuRubar, mrssm, _1, _2),
+                        dS0, dC, flav,
+                        hard_precision, hard_verbosity
+                     );
+                     ChannelResult chan;
+                     chan.channel_name = "gq->sqsq'*(+X)+h.c.";
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
                      print_to_terminal(chan);
