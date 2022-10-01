@@ -1151,9 +1151,13 @@ int main(int argc, char* argv[]) {
                         }},
                         sc_precision, sc_verbosity
                      );
+                     auto f =
+                        mrssm_params.MassGlu < mrssm_params.MassSq
+                           ? &MRSSM::matrixHard_gu_suLsuLdaggeru
+                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixHard_gu_suLsuLdaggeru_DR : &MRSSM::matrixHard_gu_suLsuLdaggeru_DS);
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixHard_gu_suLsuLdaggeru, mrssm, _1, _2),
+                        std::bind(f, mrssm, _1, _2),
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -1177,9 +1181,13 @@ int main(int argc, char* argv[]) {
                         }},
                         sc_precision, sc_verbosity
                      );
+                     auto f =
+                        mrssm_params.MassGlu < mrssm_params.MassSq
+                           ? &MRSSM::matrixHard_gu_suLsuRubar
+                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixHard_gu_suLsuRubar_DR : &MRSSM::matrixHard_gu_suLsuRubar_DS);
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixHard_gu_suLsuRubar, mrssm, _1, _2),
+                        std::bind(f, mrssm, _1, _2),
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
