@@ -62,7 +62,7 @@ list(
    APPEND NLO_RUN_CARDS
    # pp -> suL suR
    pp_suLsuR/pp_suLsuR_BMP1 pp_suLsuR/pp_suLsuR_BMP2_DR pp_suLsuR/pp_suLsuR_BMP3_DR
-   # test mu_r != mu_F
+   # pp -> suL suR with mu_r != mu_F
    pp_suLsuR/pp_suLsuR_BMP1-scale_variation
    # pp -> suL suL*
    pp_suLsuLdagger/pp_suLsuLdagger_BMP1 pp_suLsuLdagger/pp_suLsuLdagger_BMP2_DR pp_suLsuLdagger/pp_suLsuLdagger_BMP3_DR
@@ -71,12 +71,13 @@ list(
    # pp -> sqL sqR + sqL* sqR*
    pp_sqLsqR+cc/pp_sqLsqR+cc_BMP1 pp_sqLsqR+cc/pp_sqLsqR+cc_BMP2_DR pp_sqLsqR+cc/pp_sqLsqR+cc_BMP3_DR
    # pp -> sqL sq'L* + sqR sq'R*
+   pp_sqsqdagger/pp_sqsqdagger_BMP1 pp_sqsqdagger/pp_sqsqdagger_BMP2_DR pp_sqsqdagger/pp_sqsqdagger_BMP3_DR
 )
 list(
    APPEND NLO_RESULTS
    # pp -> suL suR
    pp_suLsuR_BMP1 pp_suLsuR_BMP2_DR pp_suLsuR_BMP3_DR
-   # test mu_r != mu_F
+   # pp -> suL suR with mu_r != mu_F
    pp_suLsuR_BMP1-scale_variation
    # pp -> suL suL*
    pp_suLsuLdagger_BMP1 pp_suLsuLdagger_BMP2_DR pp_suLsuLdagger_BMP3_DR
@@ -85,6 +86,7 @@ list(
    # pp -> sqL sqR + sqL* sqR*
    pp_sqLsqR+cc_BMP1 pp_sqLsqR+cc_BMP2_DR pp_sqLsqR+cc_BMP3_DR
    # pp -> sqL sq'L* + sqR sq'R*
+   pp_sqsqdagger_BMP1 pp_sqsqdagger_BMP2_DR pp_sqsqdagger_BMP3_DR
 )
 foreach(el IN ZIP_LISTS NLO_RUN_CARDS NLO_RESULTS)
 add_test(
