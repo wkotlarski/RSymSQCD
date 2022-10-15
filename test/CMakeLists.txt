@@ -58,6 +58,9 @@ endforeach()
 # test NLO cross sections
 # ------------------------------------------------------------------------------------------------------
 
+# we test 16 cross-sections
+# 3 BMPs x 5 processes ([suLsuR, suLsuLdagger, sqLsqR, sqLsqR+cc, sqsqdagger])
+#    + suLsuR for BMP1 with alternative scale choice (muR != muF)
 list(
    APPEND NLO_RUN_CARDS
    # pp -> suL suR
