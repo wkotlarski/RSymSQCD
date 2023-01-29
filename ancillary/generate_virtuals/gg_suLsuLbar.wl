@@ -62,6 +62,15 @@ If[uvDiv =!= 0,
   Quit[1];
 ];
 
+total = Simplify[total, TimeConstraint->Infinity];
+
+WriteString[
+  "gg_suLsuLdagger.txt",
+  CForm[
+    N[Simplify[total /. MassSu[_]|MassSd[_] -> MassSq /. MassFu[3] -> MassTop]]
+  ]
+];
+
 Install["/home/kotlarskiw/HEP-software/gcc/LoopTools-2.16/bin/LoopTools"];
 
 numerics = {
