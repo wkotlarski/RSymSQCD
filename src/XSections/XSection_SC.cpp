@@ -121,7 +121,7 @@ double XSection_SC::integrand_c1(const double xx[]) {
       }
       else if (ker == SplittingKernel::Pgg) {
          static constexpr int Nf = 5;
-         result += (2.*CA*std::log(dS_) + (11.*CA + 2.*Nf)/6)*sigma.value()(alphas, s12);
+         result += (2.*CA*std::log(dS_) + (11.*CA - 2.*Nf)/6)*sigma.value()(alphas, s12);
       }
    };
    result *= alphas/two_pi*std::log(Sqr(muR_/muF_));
