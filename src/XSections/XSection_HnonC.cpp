@@ -202,19 +202,7 @@ double XSection_HnonC::integrand(std::array<double, 7> const& xx) {
    const geom3::Vector3 p_temp = rot.rotate(p_parton);
 
    // set parton momenta
-   const std::array<double, 4> p_temp_2 = {Ej, p_temp.x(), p_temp.y(), p_temp.z()};
-
-   // 2nd sgluon momenta
-   p[3][0] = shat_sqrt - E1 - Ej;
-   for (int i = 1; i < 4; ++i) p[3][i] = - p[2][i] - p_temp_2[i];
-
-   assert( std::abs(
-      (pow(p[2][0], 2) - pow(p[2][1], 2) - pow(p[2][2], 2) - pow(p[2][3], 2))/(m1_ * m1_) - 1) < 1e-10
-         && p[2][0] >= m1_
-   );
-
-   // write parton momentum to momentum matrix p
-   for(int i = 0; i < 4; ++i) p[4][i] = p_temp_2[i];
+   p[4] = {Ej, p_temp.x(), p_temp.y(), p_temp.z()};
 
    const double t15 = -2.*(p[0][0]*p[4][0] - p[0][3]*p[4][3]);
    const double t25 = -2.*(p[1][0]*p[4][0] - p[1][3]*p[4][3]);
@@ -224,6 +212,15 @@ double XSection_HnonC::integrand(std::array<double, 7> const& xx) {
    if (-t15 < dC_*shat_sqrt*Ej || -t25 < dC_*shat_sqrt*Ej) {
       return 0.;
    }
+
+   // 2nd sgluon momenta
+   p[3][0] = shat_sqrt - E1 - Ej;
+   for (int i = 1; i < 4; ++i) p[3][i] = - p[2][i] - p[4][i];
+
+   assert( std::abs(
+      (pow(p[2][0], 2) - pow(p[2][1], 2) - pow(p[2][2], 2) - pow(p[2][3], 2))/(m1_ * m1_) - 1) < 1e-10
+         && p[2][0] >= m1_
+   );
 
    double ME2 = f(pdf_->alphasQ(muR_), p);
    assert(!std::isnan(ME2) && ME2 >= 0);
