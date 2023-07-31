@@ -787,7 +787,7 @@ int main(int argc, char* argv[]) {
                      allChannels.push_back(std::move(chan));
                   }
 
-                  if( subprocess == "") {
+                  if (subprocess == "" || subprocess == "ddbar_suLsuLdagger") {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 3, 4, 5}) {
                         flav.push_back({i,-i, 2});
@@ -830,7 +830,7 @@ int main(int argc, char* argv[]) {
                      allChannels.push_back(std::move(chan));
                   }
 
-                  {
+                  if (subprocess == "" || subprocess == "gg_suLsuLdagger") {
                      std::vector<std::array<int, 3>> flav {{21, 21, 1}};
                      XSection_Tree tree(
                         parameters, m1, m2,
@@ -870,7 +870,7 @@ int main(int argc, char* argv[]) {
                      allChannels.push_back(std::move(chan));
                   }
 
-                  {
+                  if (subprocess == "" || subprocess == "gq_suLsuLdaggerq") {
                      std::vector<std::array<int, 3>> flav {};
                      for( int el : { 1, -1, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2});
                      XSection_SC sc(
