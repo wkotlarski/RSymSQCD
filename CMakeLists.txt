@@ -20,8 +20,11 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set (CMAKE_BUILD_TYPE "${default_build_type}")
 endif()
 
+string(REGEX REPLACE "-g" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}" )
+string(APPEND CMAKE_CXX_FLAGS_DEBUG " -O1")
+
 # processor specific optimizations
-option(OPTIMIZE_FOR_NATIVE "Optimize for native" OFF)
+option(OPTIMIZE_FOR_NATIVE "Optimize for native" FALSE)
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
    if (${OPTIMIZE_FOR_NATIVE})
       include(CheckCXXCompilerFlag)
@@ -44,27 +47,35 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
 endif()
 
 # interprocedural optimizations
+if ("${ENABLE_IPO}" STREQUAL "")
+   set(ENABLE_IPO TRUE)
+endif()
 # IPO crashes icpc
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND "${ENABLE_IPO}" AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
    include(CheckIPOSupported)
    check_ipo_supported(RESULT ipoWorks)
    if(${ipoWorks})
       message(STATUS "Enabling interprocedural optimization (IPO/LTO)")
       set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
    endif()
+else()
+   set(CMAKE_INTERPROCEDURAL_OPTIMIZATION FALSE)
 endif()
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
    add_compile_options(-Wall -Wextra -pedantic)
 endif()
 
-include(FetchContent)
-if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.24.0")
-   cmake_policy(SET CMP0135 NEW)
+find_package(nlohmann_json 3.0.0 CONFIG)
+if (NOT nlohmann_json_FOUND)
+   include(FetchContent)
+   if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.24.0")
+      cmake_policy(SET CMP0135 NEW)
+   endif()
+   set(JSON_MultipleHeaders ON)
+   FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+   FetchContent_MakeAvailable(json)
 endif()
-set(JSON_MultipleHeaders ON)
-FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
-FetchContent_MakeAvailable(json)
 
 find_package(Boost REQUIRED COMPONENTS program_options)
 
@@ -113,62 +124,49 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 endif()
 
 find_package(Eigen3 REQUIRED)
-
-add_library(process OBJECT "src/models/MRSSM/MRSSM.cpp" "src/models/Sgluons/Sgluons.cpp" "src/models/MSSM/MSSM.cpp")
-target_compile_options(process PRIVATE -fPIC)
-target_include_directories(
-      process
-   PUBLIC
-      include
-      include/Li2
-      ${EIGEN3_INCLUDE_DIR}
-      ${LIBLOOPTOOLS_INCLUDE_DIR}
-      ${LIBLHAPDF_INCLUDE_DIR}
-)
-
 find_package(TBB REQUIRED)
 
-file (GLOB SOURCES
-   "src/Li2.cpp"  "src/splitting_kernels.cpp"  "src/XSections/XSection*.cpp" "colour_me.cpp"
-)
-add_library(RSymSQCDlib SHARED ${SOURCES})
-target_compile_options(RSymSQCDlib PRIVATE -fPIC)
-target_include_directories (
-      RSymSQCDlib
-   PUBLIC
-      include
-      ${LIBCUBA_INCLUDE_DIR}
-      ${LIBRK_INCLUDE_DIR}
-      ${Boost_INCLUDE_DIRS}
-      ${LIBCOLORFULL_INCLUDE_DIRS}
-)
-target_link_libraries(
-      RSymSQCDlib
-   PUBLIC
-      process
-      ${LIBCUBA_LIBRARY}
-      ${LIBLOOPTOOLS_LIBRARY}
-      ${FORTRAN_LIBS}
-      ${LIBLHAPDF_LIBRARY}
-      ${LIBCOLORFULL_LIBRARY}
-      TBB::tbb
-)
+foreach (MODEL MSSM MRSSM Sgluons)
+   add_library(${MODEL} SHARED "src/models/${MODEL}/${MODEL}.cpp" "src/Li2.cpp")
+   target_include_directories (
+      ${MODEL}
+      PUBLIC
+         include
+         include/Li2
+         ${EIGEN3_INCLUDE_DIR}
+         ${Boost_INCLUDE_DIRS}
+         ${LIBLOOPTOOLS_INCLUDE_DIR}
+   )
+   target_link_libraries(
+      ${MODEL}
+         PUBLIC
+         ${FORTRAN_LIBS}
+         ${LIBLOOPTOOLS_LIBRARY}
+   )
+endforeach()
 
-add_executable(RSymSQCD "src/main.cpp" "src/XSections/XSection_Tree.cpp" "src/XSections/XSection_Virt.cpp" "src/XSections/XSection_SC.cpp" "src/XSections/XSection_HnonC.cpp" "src/utils.cpp")
+add_executable(RSymSQCD "src/main.cpp" "src/XSections/XSection_Tree.cpp" "src/XSections/XSection_Virt.cpp" "src/XSections/XSection_SC.cpp" "src/XSections/XSection_HnonC.cpp" "src/utils.cpp" "src/splitting_kernels.cpp")
 target_include_directories(
       RSymSQCD
    PUBLIC
       include
+      ${LIBCUBA_INCLUDE_DIR}
+      ${LIBRK_INCLUDE_DIR}
+      ${LIBLOOPTOOLS_INCLUDE_DIR}
+      ${LIBLHAPDF_INCLUDE_DIR}
       ${CMAKE_CURRENT_BINARY_DIR}/include # location of version.hpp
       ${Boost_INCLUDE_DIRS}
 )
 target_link_libraries(
       RSymSQCD
    PUBLIC
-      process
-      RSymSQCDlib
+      MSSM MRSSM Sgluons
+      ${LIBCUBA_LIBRARY}
+      ${LIBLHAPDF_LIBRARY}
+      ${LIBLOOPTOOLS_LIBRARY}
       Boost::program_options
       nlohmann_json::nlohmann_json
+      TBB::tbb
 )
 
 if(ENABLE_TESTS)

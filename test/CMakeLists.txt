@@ -5,25 +5,29 @@ find_package(GTest REQUIRED)
 # allow whitespaces in test names
 cmake_policy(SET CMP0110 NEW)
 
-find_package(Ruby REQUIRED)
+find_program(Ruby REQUIRED NAMES ruby)
 
 # test matrix elements
 # ------------------------------------------------------------------------------------------------------
 
 add_executable(tree_matrix_elements tree_matrix_elements.cpp)
-target_link_libraries(tree_matrix_elements GTest::gtest GTest::gtest_main RSymSQCDlib)
+target_include_directories(tree_matrix_elements PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(tree_matrix_elements GTest::gtest GTest::gtest_main MRSSM)
 add_test("tree-level matrix elements" tree_matrix_elements)
 
 add_executable(MRSSM_hard_matrix_elements MRSSM_hard_matrix_elements.cpp)
-target_link_libraries(MRSSM_hard_matrix_elements GTest::gtest GTest::gtest_main RSymSQCDlib)
+target_include_directories(MRSSM_hard_matrix_elements PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(MRSSM_hard_matrix_elements GTest::gtest GTest::gtest_main MRSSM)
 add_test("MRSSM hard and non-colinear matrix elements" MRSSM_hard_matrix_elements)
 
 add_executable(Sgluons_hard_matrix_elements Sgluons_hard_matrix_elements.cpp)
-target_link_libraries(Sgluons_hard_matrix_elements GTest::gtest GTest::gtest_main RSymSQCDlib)
+target_include_directories(Sgluons_hard_matrix_elements PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(Sgluons_hard_matrix_elements GTest::gtest GTest::gtest_main Sgluons)
 add_test("Sgluons hard and non-colinear matrix elements" Sgluons_hard_matrix_elements)
 
 add_executable(MRSSM_tree_xsections MRSSM_tree_xsections.cpp)
-target_link_libraries(MRSSM_tree_xsections GTest::gtest GTest::gtest_main RSymSQCDlib)
+target_include_directories(MRSSM_tree_xsections PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(MRSSM_tree_xsections GTest::gtest GTest::gtest_main MRSSM)
 add_test("MRSSM tree xsections" MRSSM_tree_xsections)
 
 # test LO cross sections
