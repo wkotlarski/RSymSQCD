@@ -20,6 +20,11 @@ target_include_directories(MRSSM_hard_matrix_elements PUBLIC ${PROJECT_SOURCE_DI
 target_link_libraries(MRSSM_hard_matrix_elements GTest::gtest GTest::gtest_main MRSSM)
 add_test("MRSSM hard and non-colinear matrix elements" MRSSM_hard_matrix_elements)
 
+add_executable(MRSSM_virtual_matrix_elements MRSSM_virtual_matrix_elements.cpp)
+target_include_directories(MRSSM_virtual_matrix_elements PUBLIC ${PROJECT_SOURCE_DIR}/include ${LIBLOOPTOOLS_INCLUDE_DIR})
+target_link_libraries(MRSSM_virtual_matrix_elements GTest::gtest GTest::gtest_main MRSSM ${FORTRAN_LIBS} ${LIBLOOPTOOLS_LIBRARY})
+add_test("MRSSM virtual matrix elements" MRSSM_virtual_matrix_elements)
+
 add_executable(Sgluons_hard_matrix_elements Sgluons_hard_matrix_elements.cpp)
 target_include_directories(Sgluons_hard_matrix_elements PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(Sgluons_hard_matrix_elements GTest::gtest GTest::gtest_main Sgluons)
