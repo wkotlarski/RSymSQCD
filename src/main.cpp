@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
       ("precision-born", po::value<int>() -> default_value(6), "")
       ("precision-virt", po::value<int>() -> default_value(4), "")
       // gu_suLsuLdaggeru with SC precision 5 for BMP2 gives p-value 1
-      ("precision-sc",   po::value<int>() -> default_value(7), "")
+      ("precision-sc",   po::value<int>() -> default_value(4), "")
       ("precision-hard", po::value<int>() -> default_value(4), "")
       ("enable-born", po::value<bool>() -> default_value(true), "")
       ("enable-virt", po::value<bool>() -> default_value(true), "")
