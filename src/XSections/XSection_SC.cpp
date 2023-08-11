@@ -60,7 +60,7 @@ std::array<double, 3> XSection_SC::integrate() {
    }
 
    double integral_c2[ncomp], error_c2[ncomp], prob_c2[ncomp];
-   llCuhre(3, ncomp, forwarder_c2, this, 1,
+   llCuhre(4, ncomp, forwarder_c2, this, 1,
       accuracy_rel_c, accuracy_abs, integration_verbosity_,
       neval_min, neval_max, 1, nullptr, nullptr,
       &nregions, &neval, &fail, integral_c2, error_c2, prob_c2);
@@ -108,29 +108,35 @@ double XSection_SC::integrand_c1(const double xx[]) {
    const double x2min = 4.*Sqr(m1_/sqrtS_)/x1;
    const double x2 = x2min + (xmax-x2min)*xx[1];
 
+   const double s12 = x1 * x2 * Sqr(sqrtS_);
+
+   const double Tmin = Sqr(m1_) - 0.5*s12 - std::sqrt(0.25*Sqr(s12) - Sqr(m1_)*s12);
+   const double Tmax = Sqr(m1_) - 0.5*s12 + std::sqrt(0.25*Sqr(s12) - Sqr(m1_)*s12);
+   const double T = Tmin + (Tmax-Tmin)*xx[2];
+
    double pdf_flux = 0.0;
    for (const auto& inner : flav_) {
       pdf_flux += inner.at(2) * pdf_->xfxQ(inner.at(0), x1, muF_) * pdf_->xfxQ(inner.at(1), x2, muF_);
    }
    pdf_flux /= x1 * x2;
 
-   const double s12 = x1 * x2 * Sqr(sqrtS_);
    const double alphas = pdf_->alphasQ(muR_);
    double result = 0.;
    for (const auto& [ker, sigma] : sp_) {
       if (!sigma) continue;
       if (ker == SplittingKernel::Pqq) {
-         result += CF*(2.*std::log(dS_) + 1.5)*sigma.value()(alphas, s12);
+         result += CF*(2.*std::log(dS_) + 1.5)*sigma.value()(alphas, s12, T);
       }
       else if (ker == SplittingKernel::Pgg) {
          static constexpr int Nf = 5;
-         result += (2.*CA*std::log(dS_) + (11.*CA - 2.*Nf)/6)*sigma.value()(alphas, s12);
+         result += (2.*CA*std::log(dS_) + (11.*CA - 2.*Nf)/6)*sigma.value()(alphas, s12, T);
       }
    };
-   result *= alphas/two_pi*std::log(Sqr(muR_/muF_));
+   const double phaseFlux= 1/(16*pi*s12*s12);
+   result *= alphas/two_pi*std::log(Sqr(muR_/muF_))*phaseFlux;
 
    return result*(pow(-4.*pow(m1_, 2) + Sqr(sqrtS_), 2)*xx[0] /
-          (Sqr(sqrtS_)*(-4*pow(m1_, 2)*(-1 + xx[0]) + Sqr(sqrtS_)*xx[0])))*pdf_flux*to_fb;
+          (Sqr(sqrtS_)*(-4*pow(m1_, 2)*(-1 + xx[0]) + Sqr(sqrtS_)*xx[0])))*pdf_flux*to_fb*0;
 }
 
 double XSection_SC::integrand_c2(const double xx[]) {
@@ -141,32 +147,38 @@ double XSection_SC::integrand_c2(const double xx[]) {
    const double x2min = 4.*Sqr(m1_/sqrtS_)/x1;
    const double x2 = x2min + (xmax-x2min)*xx[1];
 
+   const double s12 = x1 * x2 * Sqr(sqrtS_);
+
    const double z = x1 + (1-dS_-x1)*xx[2];
 
+   const double Tmin = Sqr(m1_) - 0.5*s12 - std::sqrt(0.25*Sqr(s12) - Sqr(m1_)*s12);
+   const double Tmax = Sqr(m1_) - 0.5*s12 + std::sqrt(0.25*Sqr(s12) - Sqr(m1_)*s12);
+   const double T = Tmin + (Tmax-Tmin)*xx[3];
+
+   const double phaseFlux= 1/(16*pi*s12*s12);
    if (x1/z > 1.) {
       return 0.;
    }
 
    double result = 0.;
-   const double s12 = x1 * x2 * Sqr(sqrtS_);
    const double alphas = pdf_->alphasQ(muR_);
    for (const auto& f : flav_) {
       if (sp_.at(0).second) {
          result += f.at(2) * pdf_->xfxQ(f.at(0), x1/z, muF_)/(x1/z) * pdf_->xfxQ(f.at(1), x2, muF_)/x2
                * ( get_sp(sp_.at(0).first, z).at(0) * std::log(0.5*dC_ * s12/Sqr(muF_) * Sqr(1 - z)/z ) -
-               get_sp(sp_.at(0).first, z).at(1)) * sp_.at(0).second.value()(alphas, s12);
+               get_sp(sp_.at(0).first, z).at(1)) * sp_.at(0).second.value()(alphas, s12, T)*phaseFlux;
       }
       if (sp_.at(1).second) {
          result += f.at(2) * pdf_->xfxQ(f.at(0), x2, muF_)/x2 * pdf_->xfxQ(f.at(1), x1/z, muF_)/(x1/z)
                * (get_sp(sp_.at(1).first, z).at(0) * std::log(0.5*dC_ * s12/Sqr(muF_) * Sqr(1 - z)/z ) -
-               get_sp(sp_.at(1).first, z).at(1)) * sp_.at(1).second.value()(alphas, s12);
+               get_sp(sp_.at(1).first, z).at(1)) * sp_.at(1).second.value()(alphas, s12, T)*phaseFlux;
       }
    }
 
-   result *= alphas/two_pi * 1./z * to_fb;
+   result *= alphas/two_pi * 1/z * to_fb;
 
    // multiply by jakobian of integration variable transformation
-   const double jacobian = (1.-x1min)*(1.-x2min)*(1-dS_-x1);
+   const double jacobian = (1.-x1min)*(1.-x2min)*(Tmax-Tmin)*(1-dS_-x1);
    result *= jacobian;
 
    return result;

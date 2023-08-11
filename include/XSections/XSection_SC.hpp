@@ -15,7 +15,7 @@ public:
       std::optional<std::function<double(double, double, double, double, double)>> f_soft,
       double dS, double dC,
       std::vector<std::array<int, 3>> flav,
-      std::array<std::pair<SplittingKernel, std::optional<std::function<double(double, double)>>>, 2> sp,
+      std::array<std::pair<SplittingKernel, std::optional<std::function<double(double, double, double)>>>, 2> sp,
       int integration_precision, int integration_verbosity
    ) : XSection{parameters, m1, m2, flav, integration_precision, integration_verbosity}, f_soft_{f_soft}, dS_{dS}, dC_{dC}, sp_{sp}
    {};
@@ -29,7 +29,7 @@ private:
    const double dS_;
    const double dC_;
    std::optional<std::function<double(double, double, double, double, double)>> f_soft_;
-   std::array<std::pair<SplittingKernel, std::optional<std::function<double(double, double)>>>, 2> sp_;
+   std::array<std::pair<SplittingKernel, std::optional<std::function<double(double, double, double)>>>, 2> sp_;
 };
 
 #endif // SRC_XSECTION_SC_H_
