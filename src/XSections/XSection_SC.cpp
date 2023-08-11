@@ -26,7 +26,6 @@ int forwarder_c2(const int *, const double xx[],
 std::array<double, 3> XSection_SC::integrate() {
 
    // integrals dimensions, number of integrands
-   static constexpr int ndim  = 3;
    static constexpr int ncomp = 1;
    // accuraccy
    const double accuracy_rel_sc {std::pow(10., -integration_precision_)};
@@ -43,7 +42,7 @@ std::array<double, 3> XSection_SC::integrate() {
    double error_sc[ncomp]    {0.};
    double prob_sc[ncomp]     {0.};
    if (f_soft_.has_value()) {
-      llCuhre(ndim, ncomp, forwarder_sc, this, 1,
+      llCuhre(3, ncomp, forwarder_sc, this, 1,
          accuracy_rel_sc, accuracy_abs, integration_verbosity_,
          neval_min, neval_max, 1, nullptr, nullptr,
          &nregions, &neval, &fail, integral_sc, error_sc, prob_sc);
@@ -54,14 +53,14 @@ std::array<double, 3> XSection_SC::integrate() {
    double prob_c1[ncomp]     {0.};
    if (sp_.at(0).first == SplittingKernel::Pqq || sp_.at(0).first == SplittingKernel::Pgg ||
        sp_.at(1).first == SplittingKernel::Pgg || sp_.at(1).first == SplittingKernel::Pgg) {
-      llCuhre(ndim, ncomp, forwarder_c1, this, 1,
+      llCuhre(2, ncomp, forwarder_c1, this, 1,
          accuracy_rel_c, accuracy_abs, integration_verbosity_,
          neval_min, neval_max, 1, nullptr, nullptr,
          &nregions, &neval, &fail, integral_c1, error_c1, prob_c1);
    }
 
    double integral_c2[ncomp], error_c2[ncomp], prob_c2[ncomp];
-   llCuhre(ndim, ncomp, forwarder_c2, this, 1,
+   llCuhre(3, ncomp, forwarder_c2, this, 1,
       accuracy_rel_c, accuracy_abs, integration_verbosity_,
       neval_min, neval_max, 1, nullptr, nullptr,
       &nregions, &neval, &fail, integral_c2, error_c2, prob_c2);
@@ -77,9 +76,11 @@ std::array<double, 3> XSection_SC::integrate() {
 
 double XSection_SC::integrand_sc(const double xx[]) {
 
-   // integration variables
-   const double x1 = 4.*Sqr(m1_/sqrtS_)    + (1-4.*Sqr(m1_/sqrtS_))    * xx[0];
-   const double x2 = 4.*Sqr(m1_/sqrtS_)/x1 + (1-4.*Sqr(m1_/sqrtS_)/x1) * xx[1];
+   const double x1min = 4.*Sqr(m1_/sqrtS_);
+   static constexpr double xmax = 1.;
+   const double x1 = x1min + (xmax-x1min)*xx[0];
+   const double x2min = 4.*Sqr(m1_/sqrtS_)/x1;
+   const double x2 = x2min + (xmax-x2min)*xx[1];
 
    double pdf_flux = 0.0;
    for (const auto& f : flav_) {
@@ -93,17 +94,19 @@ double XSection_SC::integrand_sc(const double xx[]) {
    double result = pdf_flux * f_soft_.value()(alphas, s12, th, dS_, muR_);
    result *= to_fb;
 
-   // jakobian
-   result *= pi*Sqr(-4*Sqr(m1_) + Sqr(sqrtS_))*xx[0] /
-           (Sqr(sqrtS_)*(-4*Sqr(m1_)*(-1 + xx[0]) + Sqr(sqrtS_)*xx[0]));
+   // jacobian
+   const double jacobian = pi*(1.-x1min)*(1.-x2min);
+   result *= jacobian;
    return result;
 }
 
 double XSection_SC::integrand_c1(const double xx[]) {
 
-   // integration variables
-   const double x1 = 4.*Sqr(m1_)/Sqr(sqrtS_)      + (1-4.*Sqr(m1_)/Sqr(sqrtS_))      * xx[0];
-   const double x2 = 4.*Sqr(m1_)/(Sqr(sqrtS_)*x1) + (1-4.*Sqr(m1_)/(Sqr(sqrtS_)*x1)) * xx[1];
+   const double x1min = 4.*Sqr(m1_/sqrtS_);
+   static constexpr double xmax = 1.;
+   const double x1 = x1min + (xmax-x1min)*xx[0];
+   const double x2min = 4.*Sqr(m1_/sqrtS_)/x1;
+   const double x2 = x2min + (xmax-x2min)*xx[1];
 
    double pdf_flux = 0.0;
    for (const auto& inner : flav_) {
@@ -132,9 +135,12 @@ double XSection_SC::integrand_c1(const double xx[]) {
 
 double XSection_SC::integrand_c2(const double xx[]) {
 
-   // scale integration variables as Cuba works in a unit hipercube
-   const double x1 = 4.*Sqr(m1_)/Sqr(sqrtS_)      + (1-4.*Sqr(m1_)/Sqr(sqrtS_))      * xx[0];
-   const double x2 = 4.*Sqr(m1_)/(Sqr(sqrtS_)*x1) + (1-4.*Sqr(m1_)/(Sqr(sqrtS_)*x1)) * xx[1];
+   const double x1min = 4.*Sqr(m1_/sqrtS_);
+   static constexpr double xmax = 1.;
+   const double x1 = x1min + (xmax-x1min)*xx[0];
+   const double x2min = 4.*Sqr(m1_/sqrtS_)/x1;
+   const double x2 = x2min + (xmax-x2min)*xx[1];
+
    const double z = x1 + (1-dS_-x1)*xx[2];
 
    if (x1/z > 1.) {
@@ -160,8 +166,8 @@ double XSection_SC::integrand_c2(const double xx[]) {
    result *= alphas/two_pi * 1./z * to_fb;
 
    // multiply by jakobian of integration variable transformation
-   result *= (Sqr(-4*Sqr(m1_) + Sqr(sqrtS_))*xx[0]*(4*Sqr(m1_)*(-1 + xx[0]) - Sqr(sqrtS_)*(-1 + dS_ + xx[0])))/
-        (Sqr(Sqr(sqrtS_))*(-4*Sqr(m1_)*(-1 + xx[0]) + Sqr(sqrtS_)*xx[0]));
+   const double jacobian = (1.-x1min)*(1.-x2min)*(1-dS_-x1);
+   result *= jacobian;
 
    return result;
 }
