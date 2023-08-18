@@ -40,7 +40,7 @@ M$ClassesDescription= {
 S[26] == {SelfConjugate -> True,
 Indices -> {Index[Gluon]},
 Mass -> MasssigmaO,
-PropagatorLabel->ComposedChar["\\sigma",Index[Gluon],"o"],
+PropagatorLabel->ComposedChar["O","P"],
 PropagatorType -> ScalarDash,
 PropagatorArrow -> None},
 
@@ -48,7 +48,7 @@ PropagatorArrow -> None},
 S[25] == {SelfConjugate -> True,
 Indices -> {Index[Gluon]},
 Mass -> MassphiO,
-PropagatorLabel->ComposedChar["\\phi",Index[Gluon],"o"],
+PropagatorLabel->ComposedChar["O","S"],
 PropagatorType -> ScalarDash,
 PropagatorArrow -> None},
 
@@ -56,7 +56,7 @@ PropagatorArrow -> None},
 S[14] == {SelfConjugate -> False,
 Indices -> {Index[I6Gen], Index[Colour]},
 Mass -> MassSd,
-PropagatorLabel->ComposedChar["d",Index[I6Gen],Index[Colour],"\\tilde"],
+PropagatorLabel->ComposedChar["d",Index[I6Gen],Null,"\\tilde"],
 PropagatorType -> ScalarDash,
 PropagatorArrow -> Forward},
 
@@ -64,7 +64,7 @@ PropagatorArrow -> Forward},
 S[13] == {SelfConjugate -> False,
 Indices -> {Index[I6Gen], Index[Colour]},
 Mass -> MassSu,
-PropagatorLabel->ComposedChar["u",Index[I6Gen],Index[Colour],"\\tilde"],
+PropagatorLabel->ComposedChar["u",Index[I6Gen],Null,"\\tilde"],
 PropagatorType -> ScalarDash,
 PropagatorArrow -> Forward},
 
@@ -72,7 +72,7 @@ PropagatorArrow -> Forward},
 F[15] == {SelfConjugate -> False,
 Indices -> {Index[Gluon]},
 Mass -> MassGlu,
-PropagatorLabel->ComposedChar["g",Index[Gluon],"\\tilde"],
+PropagatorLabel->ComposedChar["g", Null, Null ,"\\tilde"],
 PropagatorType -> Straight,
 PropagatorArrow -> Forward},
 
@@ -80,7 +80,7 @@ PropagatorArrow -> Forward},
 F[4] == {SelfConjugate -> False,
 Indices -> {Index[I3Gen], Index[Colour]},
 Mass -> MassFd,
-PropagatorLabel->ComposedChar["d",Index[I3Gen],Index[Colour]],
+PropagatorLabel->ComposedChar["d",Index[I3Gen]],
 PropagatorType -> Straight,
 PropagatorArrow -> Forward},
 
@@ -88,7 +88,7 @@ PropagatorArrow -> Forward},
 F[3] == {SelfConjugate -> False,
 Indices -> {Index[I3Gen], Index[Colour]},
 Mass -> MassFu,
-PropagatorLabel->ComposedChar["u",Index[I3Gen],Index[Colour]],
+PropagatorLabel->ComposedChar["u",Index[I3Gen]],
 PropagatorType -> Straight,
 PropagatorArrow -> Forward},
 
@@ -96,7 +96,7 @@ PropagatorArrow -> Forward},
 V[5] == {SelfConjugate -> True,
 Indices -> {Index[Gluon]},
 Mass -> 0,
-PropagatorLabel->ComposedChar["g",Index[Gluon]],
+PropagatorLabel->ComposedChar["g"],
 PropagatorType -> Sine,
 PropagatorArrow -> None},
 
@@ -369,7 +369,8 @@ g3^2*(SUNT[ct1,ct2,ct4,ct3]-SUNT[ct2,ct1,ct4,ct3])*(-(Conjugate[ZU[gt3, 1]]*ZU[g
  (* C[-V[3], V[1], V[3]] == {{I*g2*STW}}, *)
  (* C[-V[3], V[3], V[2]] == {{(-I)*CTW*g2}}, *)
 
- C[-U[5, {ct1}], U[5, {ct2}], V[5, {ct3}]] == {{g3*fSU3[ct1, ct2, ct3]}, {0}},
+ (* what about ghost wave-function renormalization? *)
+ C[-U[5, {ct1}], U[5, {ct2}], V[5, {ct3}]] == g3*fSU3[ct1, ct2, ct3] * {{1, dZgs1 + dZGG1/2}, {0, 0}},
 
  (* C[-U[3], U[1], V[3]] == {{I*g2*STW}, {0}}, *)
  (* C[-U[4], U[1], -V[3]] == {{(-I)*g2*STW}, {0}}, *)
@@ -566,27 +567,27 @@ RenConst[dZbarfL1[t_, j1_, j2_]] := xZbarfL1[F[t, {j1}], F[t, {j2}], 0]*)
 
 
 (* --------------------------------- SQCD ---------------------------------- *)
-RenConst[dZFu1[gen_]] :=FieldRC[F[3,{gen}]][[1]]
-RenConst[dZFd1[gen_]] :=FieldRC[F[4,{gen}]][[1]]  
+RenConst[dZFu1[gen_]] := FieldRC[F[3,{gen}]][[1]];
+RenConst[dZFd1[gen_]] := FieldRC[F[4,{gen}]][[1]];
 
-RenConst[dZSu1[gen_]] := FieldRC[S[13,{gen}]]	
-RenConst[dMSu1[gen_]] := MassRC[S[13,{gen}]]
-RenConst[dZSd1[gen_]] := FieldRC[S[14,{gen}]]	
-RenConst[dMSd1[gen_]] := MassRC[S[14,{gen}]]
+RenConst[dZSu1[gen_]] := FieldRC[S[13,{gen}]];
+RenConst[dMSu1[gen_]] := MassRC[S[13,{gen}]];
+RenConst[dZSd1[gen_]] := FieldRC[S[14,{gen}]];
+RenConst[dMSd1[gen_]] := MassRC[S[14,{gen}]];
 
-RenConst[dZGlL1] := FieldRC[F[15]][[1]]  (*xZfL1[F[15], 0]*)
-RenConst[dZGlR1] := FieldRC[F[15]][[2]]  (*xZfR1[F[15], 0]*)
-RenConst[dZbarGlL1] := dZGlR1
-RenConst[dZbarGlR1] := dZGlL1
-RenConst[dMGl1] := MassRC[F[15]]
+RenConst[dZGlL1] := xZfL1[F[15], 0]
+RenConst[dZGlR1] := xZfR1[F[15], 0]
+RenConst[dZbarGlL1] := dZGlR1;
+RenConst[dZbarGlR1] := dZGlL1;
+RenConst[dMGl1] := MassRC[F[15]];
 
 RenConst[dZgs1] := 0 - FiniteGs * g3*g3/(16*Pi*Pi)*(2*Log[(MassGlu/mu)^2]
                      +Log[(MassSq/mu)^2]+1/3*Log[(MassFu[3]/mu)^2]
                      +1/4*Log[(MasssigmaO/mu)^2]
                      +1/4*Log[(MassphiO/mu)^2])
-dZgs1restore := FiniteGs * g3*g3/(12*Pi*Pi)
+dZgs1restore := g3^2/(16*Pi^2)*(-2/3*Dminus4*Divergence);
 
-RenConst[dZGG1] := FieldRC[V[5]]
+RenConst[dZGG1] := FieldRC[V[5]];
 (*-------------------------------------------------------------------*)
 
 (*Set mixing matrices to identities*) 
