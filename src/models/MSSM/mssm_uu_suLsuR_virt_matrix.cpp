@@ -1,4 +1,4 @@
-double MSSM::matrixMSSMVirt_uu_suLsuR(double alphaS, double S, double T,
+double MSSM::matrixVirt_uu_suLsuR(double alphaS, double S, double T,
    double FiniteGs, double Dminus4, int divergence, double mu) const {
    setmudim(pow(mu,2));
    setlambda(divergence);

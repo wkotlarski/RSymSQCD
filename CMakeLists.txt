@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.13)
 
-project (RSymSQCD VERSION 0.9.0 LANGUAGES CXX)
+project (RSymSQCD VERSION 1.0.0 LANGUAGES CXX)
 configure_file(include/version.hpp.in include/version.hpp)
 
 set (CMAKE_CXX_STANDARD 17)
@@ -29,7 +29,7 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
    if (${OPTIMIZE_FOR_NATIVE})
       include(CheckCXXCompilerFlag)
       if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
+         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -fno-finite-math-only")
          CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
          if(${COMPILER_SUPPORTS_MARCH_NATIVE})
             message (STATUS "Optimizing for native (adding '-march=native' to CMAKE_CXX_FLAGS)")
@@ -125,6 +125,7 @@ endif()
 
 find_package(Eigen3 REQUIRED)
 find_package(TBB REQUIRED)
+find_package(spdlog REQUIRED)
 
 foreach (MODEL MSSM MRSSM Sgluons)
    add_library(${MODEL} SHARED "src/models/${MODEL}/${MODEL}.cpp" "src/Li2.cpp")
@@ -142,6 +143,7 @@ foreach (MODEL MSSM MRSSM Sgluons)
          PUBLIC
          ${FORTRAN_LIBS}
          ${LIBLOOPTOOLS_LIBRARY}
+         spdlog::spdlog
    )
 endforeach()
 
@@ -167,6 +169,7 @@ target_link_libraries(
       Boost::program_options
       nlohmann_json::nlohmann_json
       TBB::tbb
+      spdlog::spdlog
 )
 
 if(ENABLE_TESTS)

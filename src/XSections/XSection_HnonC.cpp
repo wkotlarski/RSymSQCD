@@ -6,6 +6,7 @@
 #include "LHAPDF/LHAPDF.h"
 #include "rk/rk.hh"
 #include "rk/geom3.hh"
+#include "spdlog/spdlog.h"
 
 #include <algorithm>
 #include <cassert>
@@ -143,7 +144,7 @@ double XSection_HnonC::integrand(std::array<double, 7> const& xx) {
    // check if due to numerics |cos(x)| is not > 1
    // if yes, return 0 and continue
    if ( cosx > 1 || cosx < -1)  {
-      std::cout << "Warning! 1 - |cos(x)| = " << 1 - std::abs(cosx) << "  - Skipping the phase space point.\n";
+      spdlog::get("console")->warn("Skipping the phase space point in 3-body kinematic (1 - |cos(θ)| = {})", 1 - std::abs(cosx));
       return 0.;
    }
 
@@ -222,8 +223,17 @@ double XSection_HnonC::integrand(std::array<double, 7> const& xx) {
          && p[2][0] >= m1_
    );
 
+   /*
+   const double T = pow<2>(m1_) - 2*(p[0][0]*p[2][0]-p[0][3]*p[2][3]);
+   const double S35 = pow<2>(m1_) + 2.*(p[2][0]*p[4][0] - p[2][1]*p[4][1] - p[2][2]*p[4][2] - p[2][3]*p[4][3]);
+   double ME2 = f(pdf_->alphasQ(muR_), S, T, t15, t25, s35);
+   */
    double ME2 = f(pdf_->alphasQ(muR_), p);
-   assert(!std::isnan(ME2) && ME2 >= 0);
+   assert(!std::isnan(ME2));
+   if (ME2 < 0) {
+      spdlog::get("console")->debug("2->3 |M|^2 is negative: {}", ME2);
+      return 0.;
+   }
    /*
    std::cout << setprecision(17);
    for (const auto& row : p) {

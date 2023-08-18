@@ -1,6 +1,9 @@
-double MRSSM::matrixSoft_ddbar_suLsuLdaggerg(double Alfas, double s12, double th, double dS, double muR) const {
-   const double b = sqrt(1. - 4.*pow<2>(MassSq)/s12);
-   const double m1 = MassSq;
+double MRSSM::matrixSoft_ddbar_suLsuLdaggerg(const double alphas, const double S, const double th, const double dS, const double mu) const {
+   const double b = std::sqrt(1. - 4.*pow<2>(MassSq)/S);
    const double lndS = std::log(dS);
-   return (-0.0023148148148148147*pow<3>(Alfas)*(8.*pow<2>(m1) + (-2. + b*b)*s12 + b*b*s12*cos(2.*th))*(16.*s12*log((1. + b)/(1. - b)) + (-2.*pow<2>(m1) + s12 - 9.*b*s12)*pow<2>(log((1. + b)/(1. - b))) + 32.*b*s12*pow<2>(lndS) + 4.*lndS*(2.*pow<2>(m1)*log((1. + b)/(1. - b)) + s12*(log(-1. + 2./(1. + b)) + b*(-8. + 8.*log(s12/(muR*muR)) + 7.*log((-pow<2>(-1. + b*cos(th)))/(-1. + b*b))))) + 2.*((-2.*pow<2>(m1) + s12)*log(-1. + 2./(1. + b))*log(s12/(muR*muR)) + b*(-36. + s12*(log(pow<8>(pow<2>(muR)/s12)) + 4.*pow<2>(log(s12/(muR*muR))) + 7.*pow<2>(log((-1. + b)/(-1. + b*cos(th)))) - 7.*log((muR*muR)/s12)*log((-pow<2>(-1. + b*cos(th)))/(-1. + b*b)) + 2.*pow<2>(log((1. - b)/(1. + b*cos(th)))) + 2.*log((dS*dS*s12)/(muR*muR))*log((-pow<2>(1. + b*cos(th)))/(-1. + b*b))))) + 4.*((-2.*pow<2>(m1) + s12)*polylogarithm::Li2((2.*b)/(1. + b)) + b*s12*(2.*polylogarithm::Li2((b*(1. + cos(th)))/(-1. + b)) + 7.*polylogarithm::Li2((b - b*cos(th))/(-1. + b)) - 7.*polylogarithm::Li2((b*(1. + cos(th)))/(-1. + b*cos(th))) - 2.*polylogarithm::Li2((b*(-1. + cos(th)))/(1. + b*cos(th))))))*sin(th))/pow<3>(s12);
+   const double cth = std::cos(th);
+   const double sth = std::sin(th);
+   const double mu2 = pow<2>(mu);
+   const double res = -0.0011574074074074073*(sth*(-pow<2>(b) + pow<2>(b)*cos(2*th))*(4*(1 + pow<2>(b))*polylogarithm::Li2((2*b)/(1 + b)) + 8*b*(2*polylogarithm::Li2((b*(1 + cth))/(-1 + b)) + 7*polylogarithm::Li2((b - b*cth)/(-1 + b)) - 7*polylogarithm::Li2((b*(1 + cth))/(-1 + b*cth)) - 2*polylogarithm::Li2((b*(-1 + cth))/(1 + b*cth))) + 4*(1 + pow<2>(b))*lndS*log(-1 + 2/(1 + b)) + (1 - 18*b + pow<2>(b))*pow<2>(log(-1 + 2/(1 + b))) + 4*atanh(b)*(16 + (1 + pow<2>(b))*log(mu2/S)) + 4*b*(16*pow<2>(lndS) - 2*lndS*(8 + 9*log(1 - pow<2>(b))) + 7*pow<2>(log((-1 + b)/(-1 + b*cth))) + 2*pow<2>(log((1 - b)/(1 + b*cth))) + log(mu2/S)*(8 + 9*log(1 - pow<2>(b)) + 4*log(mu2/(pow<4>(dS)*S))) + 2*(7*log(1 - b*cth) + 2*log(1 + b*cth))*log((pow<2>(dS)*S)/mu2))))/(pow<3>(pi)*S);
+   return pow<3>(alphas*pi)*res;
 }

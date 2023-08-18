@@ -1,9 +1,9 @@
 WK: those instructions work with MG 2.4.3
 
-add the tree level model file and NLO-like model file, 
+1. add the tree level model file and NLO-like model file,
 latter needed as else MG won't start the NLO mode.
 
-change OLE template in MG/madgraph/iolibs/export_fks.py
+2. change OLE template in MG/madgraph/iolibs/export_fks.py
 in fun write_lh_order
 
 """
@@ -25,10 +25,10 @@ Parameters              %(params)s\n\
 " % replace_dict 
 """
 
-add correct model and options 
-in Templates/loop_materials/OLP-specific/GoSam/gosam.rc
+3. add correct model and options 
+in Template/loop_material/OLP_specifics/GoSam/gosam.rc
 see file in this directory
 
 add LT path to Subprocesses makefile_fks_dir
 add -fPIC flag to .f .o compile rule
-swap Subprocesses/BinothLHA_OLP.f with the one in this sub-dir
+4. swap Subprocesses/BinothLHA_OLP.f with the one in this sub-dir

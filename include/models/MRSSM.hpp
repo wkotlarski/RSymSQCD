@@ -23,12 +23,12 @@ public:
    // ------------------------------------------------------------------------------------
 
    // Born
-   double sigmaTree_uu_suLsuR(double, double) const;
-   double matrixTree_uu_suLsuR(double, double, double) const;
+   double sigmaTree_uu_suLsuR(double, double, double = 0.) const;
+   double matrixTree_uu_suLsuR(double, double, double, int) const;
 
    // virtual
-   double matrixVirt_uu_suLsuR(double, double, double, double, double, int, double) const;
-   double matrixVirt_ud_suLsdR(double, double, double, double, double, int, double) const;
+   double matrixVirt_uu_suLsuR(double, double, double, double, int, int, double) const;
+   double matrixVirt_ud_suLsdR(double, double, double, double, int, int, double) const;
 
    // soft
    double matrixSoft_uu_suLsuRg(double, double, double, double, double) const;
@@ -46,17 +46,17 @@ public:
 
    // pp > suL suL*
    // ------------------------------------------------------------------------------------
-   double matrixVirt_uubar_suLsuLdagger(double, double, double, double, double, int, double) const;
-   double matrixVirt_ddbar_suLsuLdagger(double, double, double, double, double, int, double) const;
-   double matrixVirt_GG_suLsuLdagger(double, double, double, double, double, int, double) const;
-   double matrixTree_ddbar_suLsuLdagger(double, double, double) const;
-   double matrixTree_uubar_suLsuLdagger(double, double, double) const;
-   double matrixTree_udbar_suLsdLdagger(double, double, double) const;
-   double matrixTree_GG_suLsuLdagger(double, double, double) const;
+   double matrixVirt_uubar_suLsuLdagger(double, double, double, double, int, int, double) const;
+   double matrixVirt_ddbar_suLsuLdagger(double, double, double, double, int, int, double) const;
+   double matrixVirt_gg_suLsuLdagger(double, double, double, double, int, int, double) const;
+   double matrixTree_ddbar_suLsuLdagger(double, double, double, int) const;
+   double matrixTree_uubar_suLsuLdagger(double, double, double, int) const;
+   double matrixTree_udbar_suLsdLdagger(double, double, double, int) const;
+   double matrixTree_gg_suLsuLdagger(double, double, double, int) const;
 
-   double sigmaTree_uubar_suLsuLdagger(double, double) const;
-   double sigmaTree_ddbar_suLsuLdagger(double, double) const;
-   double sigmaTree_gg_suLsuLdagger(double, double ) const;
+   double sigmaTree_uubar_suLsuLdagger(double, double, double = 0.) const;
+   double sigmaTree_ddbar_suLsuLdagger(double, double, double = 0.) const;
+   double sigmaTree_gg_suLsuLdagger(double, double, double = 0.) const;
    double matrixSoft_gg_suLsuLdaggerg(double, double, double, double, double) const;
    double matrixSoft_ddbar_suLsuLdaggerg(double, double, double, double, double) const;
    double matrixSoft_uubar_suLsuLdaggerg(double, double, double, double, double) const;
@@ -68,11 +68,14 @@ public:
    // double matrixHard_gu_suLsuLdaggeru_DR_wEta(double, std::array<std::array<double, 4>, 5> const&) const;
    double matrixHard_gu_suLsuLdaggeru_DS(double, std::array<std::array<double, 4>, 5> const&) const;
    double matrixHard_gu_suLsuLdaggeru(double, std::array<std::array<double, 4>, 5> const&) const;
+   double matrixHard_gubar_suLsuLdaggerubar(double, std::array<std::array<double, 4>, 5> const&) const;
+   double matrixHard_gubar_suLsuLdaggerubar_DR(double, std::array<std::array<double, 4>, 5> const&) const;
+   double matrixHard_gdbar_suLsuLdaggerdbar(double, std::array<std::array<double, 4>, 5> const&) const;
 
    // pp -> glglbar
    // ------------------------------------------------------------------------------------
-   double matrixTree_uubar_glglbar(double, double, double) const;
-   double matrixTree_gg_glglbar(double, double, double) const;
+   double matrixTree_uubar_glglbar(double, double, double, int) const;
+   double matrixTree_gg_glglbar(double, double, double, int) const;
 
 private:
       // gauge vector for DR ME

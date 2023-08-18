@@ -10,6 +10,8 @@ using boost::math::double_constants::pi;
 using boost::math::double_constants::pi_sqr;
 using boost::math::double_constants::pi_cubed;
 using boost::math::double_constants::two_pi;
+using boost::math::double_constants::pi_sqr_div_six;
+using boost::math::double_constants::euler;
 
 // physics
 

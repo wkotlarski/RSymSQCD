@@ -42,7 +42,7 @@ int XSection_Tree::integrand(const int *ndim, const double xx[],
       const double Tmax = Sqr(m1_) - 0.5*s + std::sqrt(0.25*Sqr(s) - Sqr(m1_)*s);
       const double T = Tmin + (Tmax-Tmin)*xx[2];
       const double jacobian = (Tmax-Tmin)*(xmax-x1min)*(xmax-x2min);
-      const double squaredM = f(alphas, s, T);
+      const double squaredM = f(alphas, s, T, 0);
       double dSigmaPart = squaredM/(16.*pi*Sqr(s));
 
       ff[0] = dSigmaPart * pdf_flux * jacobian * to_fb;

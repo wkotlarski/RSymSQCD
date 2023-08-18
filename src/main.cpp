@@ -16,9 +16,14 @@
 #include <boost/program_options.hpp>
 #include "LHAPDF/LHAPDF.h"
 #include <nlohmann/json.hpp>
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/stopwatch.h"
 
 #include <chrono>
+#include <filesystem>
 #include <functional>
+#include <sstream>
 
 using namespace std;
 using namespace std::chrono_literals;
@@ -45,8 +50,9 @@ int main(int argc, char* argv[]) {
       ("enable-virt", po::value<bool>() -> default_value(true), "")
       ("enable-sc",   po::value<bool>() -> default_value(true), "")
       ("enable-hard", po::value<bool>() -> default_value(true), "")
-      ("card", po::value<string>(), "path to a run card")
+      ("card", po::value<string>()->required(), "path to a run card")
       ("subprocess", po::value<string>() -> default_value(""), "")
+      ("log-level", po::value<string>() -> default_value("info"), "")
    ;
 
    // verbosity of the integration routines
@@ -70,6 +76,36 @@ int main(int argc, char* argv[]) {
    if (vm.count("version")) {
       std::cout << RSymSQCD_VERSION << std::endl;
       return 0;
+   }
+
+   spdlog::set_pattern("[%H:%M:%S] [%^%l%$] : %v");
+   auto console = spdlog::stdout_color_mt("console");
+   if (vm["log-level"].as<std::string>() == "trace") {
+      console->set_level(spdlog::level::trace);
+   }
+   else if (vm["log-level"].as<std::string>() == "info") {
+      console->set_level(spdlog::level::info);
+   }
+   else if (vm["log-level"].as<std::string>() == "warn") {
+      console->set_level(spdlog::level::warn);
+   }
+   else if (vm["log-level"].as<std::string>() == "error") {
+      console->set_level(spdlog::level::err);
+   }
+   else if (vm["log-level"].as<std::string>() == "critical") {
+      console->set_level(spdlog::level::critical);
+   }
+   else if (vm["log-level"].as<std::string>() == "off") {
+      console->set_level(spdlog::level::off);
+   }
+   else {
+      spdlog::get("console")->error("Unknown log-level {}", vm["log-level"].as<std::string>());
+      return 1;
+   }
+   spdlog::get("console")->info("Log level set to {}", vm["log-level"].as<std::string>());
+
+   if (vm["precision-virt"].as<int>() > 4) {
+      spdlog::get("console")->warn("Virtual integration with such a high precision is known to use very large amounts of RAM. In case of problems consider reducing precision");
    }
 
    bool enable_born = vm["enable-born"].as<bool>();
@@ -108,6 +144,7 @@ int main(int argc, char* argv[]) {
        Sgluons
    };
 
+   MSSMParameters mssm_params;
    MRSSMParameters mrssm_params;
    SgluonParameters sgluon_params;
    Model model;
@@ -123,6 +160,12 @@ int main(int argc, char* argv[]) {
    }
    else if (pt.get<string>("process.model") == "MSSM") {
       model = Model::MSSM;
+      mssm_params.MassTop = pt.get<double>("masses.top");
+      mssm_params.MassGlu = pt.get<double>("masses.gluino");
+      mssm_params.MassSq = pt.get<double>("masses.squarks");
+      mssm_params.eta_sign = pt.get<int>("technical parameters.eta_sign", -1);
+      mssm_params.delta = pt.get<double>("technical parameters.delta", 0.);
+      mssm_params.WidthGlu = pt.get<double>("technical parameters.WidthOverMass", -1.) * mrssm_params.MassGlu;
    }
    else if (pt.get<string>("process.model") == "Sgluons") {
       sgluon_params.mO = pt.get<double>("masses.sgluon");
@@ -195,9 +238,12 @@ int main(int argc, char* argv[]) {
    }
 
    // set PDFs
-   std::cout << '\n';
-   std::unique_ptr<LHAPDF::PDF> pdf(LHAPDF::mkPDF(pt.get<std::string>("collider setup.pdf")));
    LHAPDF::setVerbosity(0);
+   std::unique_ptr<LHAPDF::PDF> pdf(LHAPDF::mkPDF(pt.get<std::string>("collider setup.pdf")));
+   stringstream ss;
+   ss << "Using " << pdf->set().name() << " PDF set, member #" << pdf->memberID()
+      << ", version " << pdf->dataversion() << "; LHAPDF ID = " << pdf->lhapdfID();
+   console->info(ss.str());
 
    // parameters used by both LO and NLO calculations
    const double muR = pt.get<double>("collider setup.mu_r");
@@ -222,6 +268,7 @@ int main(int argc, char* argv[]) {
 
    std::vector<ChannelResult> allChannels;
 
+   spdlog::stopwatch sw;
    switch (order) {
       case Order::LO:
       {
@@ -237,7 +284,7 @@ int main(int argc, char* argv[]) {
                      std::vector<std::array<int, 3>> flav {{2,2,1}};
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3),
+                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
                         flav,
                         born_precision, born_verbosity
                      );
@@ -257,7 +304,7 @@ int main(int argc, char* argv[]) {
                      std::vector<std::array<int, 3>> flav {{2, -2, 2}};
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      ChannelResult chan;
@@ -273,7 +320,7 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      ChannelResult chan;
@@ -286,7 +333,7 @@ int main(int argc, char* argv[]) {
                      std::vector<std::array<int, 3>> flav {{21, 21, 1}};
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      ChannelResult chan;
@@ -314,7 +361,7 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      ChannelResult chan;
@@ -340,7 +387,7 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      ChannelResult chan;
@@ -363,7 +410,7 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      ChannelResult chan;
@@ -382,7 +429,7 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      ChannelResult chan;
@@ -399,7 +446,7 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      ChannelResult chan;
@@ -413,7 +460,7 @@ int main(int argc, char* argv[]) {
                      std::vector<std::array<int, 3>> flav {{21, 21, 2*5}};
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      ChannelResult chan;
@@ -435,7 +482,7 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m, m,
-                        std::bind(&MRSSM::matrixTree_uubar_glglbar, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uubar_glglbar, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      ChannelResult chan;
@@ -448,7 +495,7 @@ int main(int argc, char* argv[]) {
                      std::vector<std::array<int, 3>> flav {{21, 21, 1}};
                      XSection_Tree tree(
                         parameters, m, m,
-                        std::bind(&MRSSM::matrixTree_gg_glglbar, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_gg_glglbar, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      ChannelResult chan;
@@ -472,10 +519,9 @@ int main(int argc, char* argv[]) {
       // fails if we are exactly on the threshold
       constexpr double dS0 = 1e-9;
       const double dC = pt.get<double>("technical parameters.dC", 1e-6);
-      cout << "\nINFO: Using phase space slicing parameters δS=" << std::scientific << std::setprecision(1) << dS
-           << " and δC=" << dC << '\n';
+      spdlog::get("console")->info("Using phase space slicing parameters δS={0} and δC={1}", dS, dC);
       if (dC > dS) {
-         cout << "Warning: δC should be always << than δS\n";
+         spdlog::get("console")->warn("Warning: δC should be always << than δS");
       }
       const double delta = pt.get<double>("technical parameters.delta", 0.);
       const int eta_sign = pt.get<double>("technical parameters.eta_sign", -1);
@@ -494,30 +540,30 @@ int main(int argc, char* argv[]) {
                      XSection_Tree tree(
                         parameters, m1, m2,
                         // same ME as in the MSSM
-                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3),
+                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4),
                         flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixHard_uu_suLsuRg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_uu_suLsuRg, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS, dC,
                         flav,
                         hard_precision, hard_verbosity
@@ -541,7 +587,7 @@ int main(int argc, char* argv[]) {
                         0., dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
                            {SplittingKernel::Pgq, std::nullopt}
                         }},
                         sc_precision, sc_verbosity
@@ -552,7 +598,7 @@ int main(int argc, char* argv[]) {
                               : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixHard_gu_suLsuRubar_DR : &MRSSM::matrixHard_gu_suLsuRubar_DS);
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(f, mrssm, _1, _2),
+                        std::bind(f, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS0, dC,
                         flav,
                         hard_precision, hard_verbosity
@@ -582,30 +628,30 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
                         }},
                         sc_precision, sc_verbosity
                      );
 
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixHard_uu_suLsuRg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_uu_suLsuRg, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -628,7 +674,7 @@ int main(int argc, char* argv[]) {
                         0., dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
                            {SplittingKernel::Pgq, std::nullopt}
                         }},
                         sc_precision, sc_verbosity
@@ -639,7 +685,7 @@ int main(int argc, char* argv[]) {
                               : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixHard_gu_suLsuRubar_DR : &MRSSM::matrixHard_gu_suLsuRubar_DS);
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(f, mrssm, _1, _2),
+                        std::bind(f, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS0, dC,
                         flav,
                         hard_precision, hard_verbosity
@@ -671,30 +717,30 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
                         }},
                         sc_precision, sc_verbosity
                      );
 
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixHard_uu_suLsuRg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_uu_suLsuRg, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -717,7 +763,7 @@ int main(int argc, char* argv[]) {
                         0., dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
                            {SplittingKernel::Pgq, std::nullopt}
                         }},
                         sc_precision, sc_verbosity
@@ -728,7 +774,7 @@ int main(int argc, char* argv[]) {
                               : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixHard_gu_suLsuRubar_DR : &MRSSM::matrixHard_gu_suLsuRubar_DS);
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(f, mrssm, _1, _2),
+                        std::bind(f, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS0, dC,
                         flav,
                         hard_precision, hard_verbosity
@@ -750,29 +796,29 @@ int main(int argc, char* argv[]) {
                      std::vector<std::array<int, 3>> flav {{2, -2, 2}};
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uubar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_uubar_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixHard_uubar_suLsuLdaggerg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_uubar_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS, dC,
                         flav,
                         hard_precision, hard_verbosity
@@ -790,33 +836,33 @@ int main(int argc, char* argv[]) {
                   if (subprocess == "" || subprocess == "ddbar_suLsuLdagger") {
                      std::vector<std::array<int, 3>> flav {};
                      for (int i : {1, 3, 4, 5}) {
-                        flav.push_back({i,-i, 2});
+                        flav.push_back({i, -i, 2});
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixVirt_ddbar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_ddbar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_ddbar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_ddbar_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixHard_ddbar_suLsuLdaggerg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_ddbar_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -834,29 +880,29 @@ int main(int argc, char* argv[]) {
                      std::vector<std::array<int, 3>> flav {{21, 21, 1}};
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixVirt_GG_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_gg_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_gg_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pgg, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pgg, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pgg, std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pgg, std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixHard_gg_suLsuLdaggerg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_gg_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -872,25 +918,52 @@ int main(int argc, char* argv[]) {
 
                   if (subprocess == "" || subprocess == "gq_suLsuLdaggerq") {
                      std::vector<std::array<int, 3>> flav {};
-                     for( int el : { 1, -1, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2});
+                     for( int el : { 1, 3, 4, 5}) flav.push_back({21, el, 2});
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::nullopt,
                         0., dC, flav,
                         {{
-                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pgq, std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixHard_gd_suLsuLdaggerd, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_gd_suLsuLdaggerd, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "gq->suLsuL*(+X)";
+                     chan.channel_name = "gq->suLsuL*q";
+                     if(enable_sc) chan.s = sc.integrate();
+                     if(enable_hard) chan.h = hc.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
+                  }
+
+                  if (subprocess == "" || subprocess == "gq_suLsuLdaggerq") {
+                     std::vector<std::array<int, 3>> flav {};
+                     for( int el : { -1, -3, -4, -5}) flav.push_back({21, el, 2});
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::nullopt,
+                        0., dC, flav,
+                        {{
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pgq, std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
+                        }},
+                        sc_precision, sc_verbosity
+                     );
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixHard_gdbar_suLsuLdaggerdbar, mrssm, std::placeholders::_1, std::placeholders::_2),
+                        dS0, dC, flav,
+                        hard_precision, hard_verbosity
+                     );
+                     ChannelResult chan;
+                     chan.channel_name = "gqbar->suLsuL*qbar";
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
                      print_to_terminal(chan);
@@ -900,14 +973,14 @@ int main(int argc, char* argv[]) {
                   // g u > suL suLdagger
                   if( subprocess == "gu_suLsuLdaggeru" || subprocess == "" ) {
                      std::vector<std::array<int, 3>> flav {};
-                     for( int el : { 2, -2 }) flav.push_back({21, el, 2});
+                     for( int el : { 2 }) flav.push_back({21, el, 2});
                      XSection_SC sc(
                         parameters, m1, m2,
                         std::nullopt,
                         0., dC, flav,
                         {{
-                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pgq, std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
                         }},
                         sc_precision, sc_verbosity
                      );
@@ -917,12 +990,44 @@ int main(int argc, char* argv[]) {
                               : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixHard_gu_suLsuLdaggeru_DR : &MRSSM::matrixHard_gu_suLsuLdaggeru_DS);
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(f, mrssm, _1, _2),
+                        std::bind(f, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "gu->suLsuL*(+X)";
+                     chan.channel_name = "gu->suLsuL*u";
+                     if(enable_sc) chan.s = sc.integrate();
+                     if(enable_hard) chan.h = hc.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
+                  }
+
+                  // g ubar > suL suLdagger
+                  if( subprocess == "gubar_suLsuLdaggerubar" || subprocess == "" ) {
+                     std::vector<std::array<int, 3>> flav {};
+                     for( int el : { -2 }) flav.push_back({21, el, 2});
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::nullopt,
+                        0., dC, flav,
+                        {{
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pgq, std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
+                        }},
+                        sc_precision, sc_verbosity
+                     );
+                     auto f =
+                        mrssm_params.MassGlu < mrssm_params.MassSq
+                           ? &MRSSM::matrixHard_gubar_suLsuLdaggerubar
+                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixHard_gubar_suLsuLdaggerubar_DR : &MRSSM::matrixHard_gu_suLsuLdaggeru_DS);
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(f, mrssm, std::placeholders::_1, std::placeholders::_2),
+                        dS0, dC, flav,
+                        hard_precision, hard_verbosity
+                     );
+                     ChannelResult chan;
+                     chan.channel_name = "gubar->suLsuL*ubar";
                      if(enable_sc) chan.s = sc.integrate();
                      if(enable_hard) chan.h = hc.integrate();
                      print_to_terminal(chan);
@@ -941,29 +1046,29 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uubar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_uubar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_uubar_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixHard_uubar_suLsuLdaggerg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_uubar_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS, dC,
                         flav,
                         hard_precision, hard_verbosity
@@ -988,29 +1093,29 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixVirt_uu_suLsuR, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixHard_uu_suLsuRg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_uu_suLsuRg, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS, dC,
                         flav,
                         hard_precision, hard_verbosity
@@ -1033,29 +1138,29 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixVirt_ddbar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_ddbar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_ddbar_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_ddbar_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pqq, std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixHard_ddbar_suLsuLdaggerg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_ddbar_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -1074,29 +1179,29 @@ int main(int argc, char* argv[]) {
                      std::vector<std::array<int, 3>> flav {{21, 21, 2*5}};
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_GG_suLsuLdagger, mrssm, _1, _2, _3), flav,
+                        std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixVirt_GG_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7),
                         flav,
                         virt_precision, virt_verbosity
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_gg_suLsuLdaggerg, mrssm, _1, _2, _3, _4, _5),
+                        std::bind(&MRSSM::matrixSoft_gg_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pgg, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pgg, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pgg, std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pgg, std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixHard_gg_suLsuLdaggerg, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_gg_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -1118,14 +1223,14 @@ int main(int argc, char* argv[]) {
                         std::nullopt,
                         dS0, dC, flav,
                         {{
-                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_ddbar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pgq, std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixHard_gd_suLsuLdaggerd, mrssm, _1, _2),
+                        std::bind(&MRSSM::matrixHard_gd_suLsuLdaggerd, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -1146,8 +1251,8 @@ int main(int argc, char* argv[]) {
                         std::nullopt,
                         dS0, dC, flav,
                         {{
-                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_uubar_suLsuLdagger, mrssm, _1, _2)},
-                           {SplittingKernel::Pgq, std::bind(&MRSSM::sigmaTree_gg_suLsuLdagger, mrssm, _1, _2)}
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pgq, std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
                         }},
                         sc_precision, sc_verbosity
                      );
@@ -1157,7 +1262,7 @@ int main(int argc, char* argv[]) {
                               : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixHard_gu_suLsuLdaggeru_DR : &MRSSM::matrixHard_gu_suLsuLdaggeru_DS);
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(f, mrssm, _1, _2),
+                        std::bind(f, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -1176,7 +1281,7 @@ int main(int argc, char* argv[]) {
                         std::nullopt,
                         dS0, dC, flav,
                         {{
-                           {SplittingKernel::Pqg, std::bind(&MRSSM::sigmaTree_uu_suLsuR, mrssm, _1, _2)},
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::matrixTree_uu_suLsuR, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
                            {SplittingKernel::Pgq, std::nullopt}
                         }},
                         sc_precision, sc_verbosity
@@ -1187,7 +1292,7 @@ int main(int argc, char* argv[]) {
                               : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixHard_gu_suLsuRubar_DR : &MRSSM::matrixHard_gu_suLsuRubar_DS);
                      XSection_HnonC hc(
                         parameters, m1, m2,
-                        std::bind(f, mrssm, _1, _2),
+                        std::bind(f, mrssm, std::placeholders::_1, std::placeholders::_2),
                         dS0, dC, flav,
                         hard_precision, hard_verbosity
                      );
@@ -1201,8 +1306,205 @@ int main(int argc, char* argv[]) {
                   break;
                }
             } //channels
-         break;
+            break;
          } // MRSSM
+         case Model::MSSM:
+         {
+            MSSM mssm(mssm_params);
+            switch (channel) {
+               case Process::pp_suLsuLdagger:
+               {
+                  /*
+                  const double m1 = pt.get<double>("masses.squarks");
+                  const double m2 = pt.get<double>("masses.squarks");
+                  if (subprocess == "" || subprocess == "uubar_suLsuLdagger") {
+                     std::vector<std::array<int, 3>> flav {{2, -2, 2}};
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MSSM::matrixTree_uubar_suLsuLdagger, mssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
+                        born_precision, born_verbosity
+                     );
+                     XSection_Virt virt(
+                        parameters, m1, m2,
+                        std::bind(&MSSM::matrixVirt_uubar_suLsuLdagger, mssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7),
+                        flav,
+                        virt_precision, virt_verbosity
+                     );
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::bind(&MSSM::matrixSoft_uubar_suLsuLdaggerg, mssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+                        dS, dC,
+                        flav,
+                        {{
+                           {SplittingKernel::Pqq, std::bind(&MSSM::matrixTree_uubar_suLsuLdagger, mssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pqq, std::bind(&MSSM::matrixTree_uubar_suLsuLdagger, mssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
+                        }},
+                        sc_precision, sc_verbosity
+                     );
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(&MSSM::matrixHard_uubar_suLsuLdaggerg, mssm, std::placeholders::_1, std::placeholders::_2),
+                        dS, dC,
+                        flav,
+                        hard_precision, hard_verbosity
+                     );
+                     ChannelResult chan;
+                     chan.channel_name = "uubar->suLsuL*(+g)";
+                     if(enable_born) chan.b = tree.integrate();
+                     if(enable_virt) chan.v = virt.integrate();
+                     if(enable_sc) chan.s = sc.integrate();
+                     if(enable_hard) chan.h = hc.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
+                  }
+
+                  if (subprocess == "ddbar_suLsuLdagger" || subprocess == "") {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {1, 3, 4, 5}) {
+                        flav.push_back({i, -i, 2});
+                     }
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MSSM::matrixTree_ddbar_suLsuLdagger, mssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
+                        born_precision, born_verbosity
+                     );
+                     XSection_Virt virt(
+                        parameters, m1, m2,
+                        std::bind(&MSSM::matrixVirt_ddbar_suLsuLdagger, mssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7),
+                        flav,
+                        virt_precision, virt_verbosity
+                     );
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::bind(&MSSM::matrixSoft_ddbar_suLsuLdaggerg, mssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+                        dS, dC,
+                        flav,
+                        {{
+                           {SplittingKernel::Pqq, std::bind(&MSSM::matrixTree_ddbar_suLsuLdagger, mssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pqq, std::bind(&MSSM::matrixTree_ddbar_suLsuLdagger, mssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
+                        }},
+                        sc_precision, sc_verbosity
+                     );
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(&MSSM::matrixHard_ddbar_suLsuLdaggerg, mssm, std::placeholders::_1, std::placeholders::_2),
+                        dS, dC, flav,
+                        hard_precision, hard_verbosity
+                     );
+                     ChannelResult chan;
+                     chan.channel_name = "ddbar->suLsuL*(+g)";
+                     if(enable_born) chan.b = tree.integrate();
+                     if(enable_virt) chan.v = virt.integrate();
+                     if(enable_sc) chan.s = sc.integrate();
+                     if(enable_hard) chan.h = hc.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
+                  }
+
+                  {
+                     std::vector<std::array<int, 3>> flav {{21, 21, 1}};
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
+                        born_precision, born_verbosity
+                     );
+                     XSection_Virt virt(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixVirt_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7),
+                        flav,
+                        virt_precision, virt_verbosity
+                     );
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixSoft_gg_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+                        dS, dC,
+                        flav,
+                        {{
+                           {SplittingKernel::Pgg, std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pgg, std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
+                        }},
+                        sc_precision, sc_verbosity
+                     );
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixHard_gg_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2),
+                        dS, dC, flav,
+                        hard_precision, hard_verbosity
+                     );
+                     ChannelResult chan;
+                     chan.channel_name = "gg->suLsuL*(+g)";
+                     if(enable_born) chan.b = tree.integrate();
+                     if(enable_virt) chan.v = virt.integrate();
+                     if(enable_sc) chan.s = sc.integrate();
+                     if(enable_hard) chan.h = hc.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
+                  }
+
+                  {
+                     std::vector<std::array<int, 3>> flav {};
+                     for( int el : { 1, -1, 3, -3, 4, -4, 5, -5}) flav.push_back({21, el, 2});
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::nullopt,
+                        0., dC, flav,
+                        {{
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::matrixTree_ddbar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pgq, std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
+                        }},
+                        sc_precision, sc_verbosity
+                     );
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixHard_gd_suLsuLdaggerd, mrssm, std::placeholders::_1, std::placeholders::_2),
+                        dS0, dC, flav,
+                        hard_precision, hard_verbosity
+                     );
+                     ChannelResult chan;
+                     chan.channel_name = "gq->suLsuL*q";
+                     if(enable_sc) chan.s = sc.integrate();
+                     if(enable_hard) chan.h = hc.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
+                  }
+
+                  // g u > suL suLdagger
+                  if( subprocess == "gu_suLsuLdaggeru" || subprocess == "" ) {
+                     std::vector<std::array<int, 3>> flav {};
+                     for( int el : { 2, -2 }) flav.push_back({21, el, 2});
+                     XSection_SC sc(
+                        parameters, m1, m2,
+                        std::nullopt,
+                        0., dC, flav,
+                        {{
+                           {SplittingKernel::Pqg, std::bind(&MRSSM::matrixTree_uubar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pgq, std::bind(&MRSSM::matrixTree_gg_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
+                        }},
+                        sc_precision, sc_verbosity
+                     );
+                     auto f =
+                        mrssm_params.MassGlu < mrssm_params.MassSq
+                           ? &MRSSM::matrixHard_gu_suLsuLdaggeru
+                              : (mrssm_params.WidthGlu < 0 ? &MRSSM::matrixHard_gu_suLsuLdaggeru_DR : &MRSSM::matrixHard_gu_suLsuLdaggeru_DS);
+                     XSection_HnonC hc(
+                        parameters, m1, m2,
+                        std::bind(f, mrssm, std::placeholders::_1, std::placeholders::_2),
+                        dS0, dC, flav,
+                        hard_precision, hard_verbosity
+                     );
+                     ChannelResult chan;
+                     chan.channel_name = "gu->suLsuL*u";
+                     if(enable_sc) chan.s = sc.integrate();
+                     if(enable_hard) chan.h = hc.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
+                  }
+                  */
+                  break;
+               }
+            } //channels
+            break;
+         } // MSSM
          case Model::Sgluons:
             Sgluons sgluons(sgluon_params);
             switch(channel) {
@@ -1216,30 +1518,30 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m1,
-                        std::bind(&Sgluons::matrixSgluonsTree_qqbar_OO, sgluons, _1, _2, _3), flav,
+                        std::bind(&Sgluons::matrixSgluonsTree_qqbar_OO, sgluons, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      /*
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uubar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7),
                         flav
                      );
                      */
                      XSection_SC sc(
                         parameters, m1, m1,
-                        std::bind(&Sgluons::sgluons_qqbar_OOg_soft, sgluons, _1, _2, _3, _4, _5),
+                        std::bind(&Sgluons::sgluons_qqbar_OOg_soft, sgluons, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pqq, std::bind(&Sgluons::sigmaSgluonsTree_qqbar_OO, sgluons, _1, _2)},
-                           {SplittingKernel::Pqq, std::bind(&Sgluons::sigmaSgluonsTree_qqbar_OO, sgluons, _1, _2)}
+                           {SplittingKernel::Pqq, std::bind(&Sgluons::matrixSgluonsTree_qqbar_OO, sgluons, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pqq, std::bind(&Sgluons::matrixSgluonsTree_qqbar_OO, sgluons, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m1,
-                        std::bind(&Sgluons::sgluons_qqbar_OOg_hard, sgluons, _1, _2),
+                        std::bind(&Sgluons::sgluons_qqbar_OOg_hard, sgluons, std::placeholders::_1, std::placeholders::_2),
                         dS, dC,
                         flav,
                         hard_precision, hard_verbosity
@@ -1257,30 +1559,30 @@ int main(int argc, char* argv[]) {
                      const std::vector<std::array<int, 3>> flav {{21, 21, 1}};
                      XSection_Tree tree(
                         parameters, m1, m1,
-                        std::bind(&Sgluons::matrixSgluonsTree_gg_OO, sgluons, _1, _2, _3), flav,
+                        std::bind(&Sgluons::matrixSgluonsTree_gg_OO, sgluons, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      /*
                      XSection_Virt virt(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixVirt_uubar_suLsuLdagger, mrssm, _1, _2, _3, _4, _5, _6, _7),
+                        std::bind(&MRSSM::matrixVirt_uubar_suLsuLdagger, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7),
                         flav
                      );
                      */
                      XSection_SC sc(
                         parameters, m1, m1,
-                        std::bind(&Sgluons::sgluons_gg_OOg_soft, sgluons, _1, _2, _3, _4, _5),
+                        std::bind(&Sgluons::sgluons_gg_OOg_soft, sgluons, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
-                           {SplittingKernel::Pgg, std::bind(&Sgluons::sigmaSgluonsTree_gg_OO, sgluons, _1, _2)},
-                           {SplittingKernel::Pgg, std::bind(&Sgluons::sigmaSgluonsTree_gg_OO, sgluons, _1, _2)}
+                           {SplittingKernel::Pgg, std::bind(&Sgluons::matrixSgluonsTree_gg_OO, sgluons, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)},
+                           {SplittingKernel::Pgg, std::bind(&Sgluons::matrixSgluonsTree_gg_OO, sgluons, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)}
                         }},
                         sc_precision, sc_verbosity
                      );
                      XSection_HnonC hc(
                         parameters, m1, m1,
-                        std::bind(&Sgluons::sgluons_gg_OOg_hard, sgluons, _1, _2),
+                        std::bind(&Sgluons::sgluons_gg_OOg_hard, sgluons, std::placeholders::_1, std::placeholders::_2),
                         dS, dC,
                         flav,
                         hard_precision, hard_verbosity
@@ -1339,38 +1641,38 @@ int main(int argc, char* argv[]) {
          break;
       }
    }
+   console->info("Elapsed {:.3}", sw);
 
    // print out time statistics
    auto end = chrono::steady_clock::now();
-   cout << "\nINFO: Calculation ended after ";
-   if (end - start > 1h)
-      cout << chrono::duration_cast<chrono::hours>(end-start).count() << " hour(s), ";
-   if (end - start > 1min)
-      cout << chrono::duration_cast<chrono::minutes>(end-start).count() %  60 << " minute(s) and ";
-   cout << chrono::duration_cast<chrono::seconds>(end-start).count() % 60 << " second(s)\n";
+   std::stringstream s;
+   if (end - start > 1h) {
+      s << chrono::duration_cast<chrono::hours>(end-start).count() << " hour(s), ";
+   }
+   if (end - start > 1min) {
+      s << chrono::duration_cast<chrono::minutes>(end-start).count() %  60 << " minute(s) and ";
+   }
+   s << chrono::duration_cast<chrono::seconds>(end-start).count() % 60 << " second(s)";
+   spdlog::get("console")->info("Calculation ended after {}", s.str());
 
    // write results to JSON file
+   std::filesystem::path path(card);
+   path.replace_extension();
    string json_outputfile_name =
       vm.count("json-outputfile-name")
          ? vm["json-outputfile-name"].as<string>()
-         : pt.get<string>("process.process") + "_"
-           + to_string(pt.get<double>("masses.squarks")) + "_"
-           + to_string(pt.get<double>("masses.gluino")) + "_"
-           + to_string(pt.get<double>("masses.pseudoscalar_sgluon")) + "_"
-           + to_string(pt.get<double>("collider setup.sqrt_S")) + "_"
-           + to_string(muR) + "_"
-           + to_string(muF) + "_"
-           + pt.get<string>("collider setup.pdf");
+         :  path.filename().string();
    int file_index = 0;
-   while (std::ifstream(json_outputfile_name + ".json")) {
+   std::string file_suffix = "";
+   while (std::ifstream(json_outputfile_name + file_suffix + ".json")) {
       file_index += 1;
-      std::cout
-         << "File " << json_outputfile_name + ".json already exists. "
-         << "Trying " << json_outputfile_name + "_" + std::to_string(file_index)  + ".json instead.\n";
-      json_outputfile_name += "_" + std::to_string(file_index);
+      file_suffix = "_" + std::to_string(file_index);
    }
-   std::ofstream o(vm.count("json-outputfile-name") ? vm["json-outputfile-name"].as<string>() : json_outputfile_name + ".json");
+   const std::string fileName = json_outputfile_name + file_suffix + ".json";
+   std::ofstream o(fileName);
    o << std::setw(3) << j << std::endl;
+   console->info("JSON output written as {}", fileName);
+   o.close();
 
    return 0;
 }

@@ -2,10 +2,15 @@
 #include "constants.hpp"
 #include "mathematica_wrapper.hpp"
 
+#include <boost/math/special_functions/pow.hpp>
+
 #include "cuba.h"
 #include "LHAPDF/LHAPDF.h"
 
+using boost::math::pow;
+
 namespace {
+
 int forwarder_sc(const int *, const double xx[],
    const int *, double ff[], void *userdata) {
    ff[0] = static_cast<XSection_SC*>(userdata)->integrand_sc(xx);
@@ -21,7 +26,8 @@ int forwarder_c2(const int *, const double xx[],
     ff[0] = static_cast<XSection_SC*>(userdata)->integrand_c2(xx);
     return 0.;
 }
-}
+
+} // anonymous
 
 std::array<double, 3> XSection_SC::integrate() {
 
@@ -53,7 +59,7 @@ std::array<double, 3> XSection_SC::integrate() {
    double prob_c1[ncomp]     {0.};
    if (sp_.at(0).first == SplittingKernel::Pqq || sp_.at(0).first == SplittingKernel::Pgg ||
        sp_.at(1).first == SplittingKernel::Pgg || sp_.at(1).first == SplittingKernel::Pgg) {
-      llCuhre(2, ncomp, forwarder_c1, this, 1,
+      llCuhre(3, ncomp, forwarder_c1, this, 1,
          accuracy_rel_c, accuracy_abs, integration_verbosity_,
          neval_min, neval_max, 1, nullptr, nullptr,
          &nregions, &neval, &fail, integral_c1, error_c1, prob_c1);
@@ -125,18 +131,17 @@ double XSection_SC::integrand_c1(const double xx[]) {
    for (const auto& [ker, sigma] : sp_) {
       if (!sigma) continue;
       if (ker == SplittingKernel::Pqq) {
-         result += CF*(2.*std::log(dS_) + 1.5)*sigma.value()(alphas, s12, T);
+         result += CF*(2.*std::log(dS_) + 1.5)*(sigma.value()(alphas, s12, T, 0)*std::log(Sqr(muR_/muF_)) - 2.*sigma.value()(alphas, s12, T, 1));
       }
       else if (ker == SplittingKernel::Pgg) {
          static constexpr int Nf = 5;
-         result += (2.*CA*std::log(dS_) + (11.*CA - 2.*Nf)/6)*sigma.value()(alphas, s12, T);
+         result += (2.*CA*std::log(dS_) + (11.*CA - 2.*Nf)/6)*(sigma.value()(alphas, s12, T, 0)*std::log(Sqr(muR_/muF_)) - 2.*sigma.value()(alphas, s12, T, 1));
       }
    };
-   const double phaseFlux= 1/(16*pi*s12*s12);
-   result *= alphas/two_pi*std::log(Sqr(muR_/muF_))*phaseFlux;
+   const double jacobian = (xmax-x1min)*(xmax-x2min)*(Tmax-Tmin);
+   result *= alphas/two_pi;
 
-   return result*(pow(-4.*pow(m1_, 2) + Sqr(sqrtS_), 2)*xx[0] /
-          (Sqr(sqrtS_)*(-4*pow(m1_, 2)*(-1 + xx[0]) + Sqr(sqrtS_)*xx[0])))*pdf_flux*to_fb*0;
+   return result*jacobian*pdf_flux*to_fb/(16.*pi*Sqr(s12));
 }
 
 double XSection_SC::integrand_c2(const double xx[]) {
@@ -155,7 +160,7 @@ double XSection_SC::integrand_c2(const double xx[]) {
    const double Tmax = Sqr(m1_) - 0.5*s12 + std::sqrt(0.25*Sqr(s12) - Sqr(m1_)*s12);
    const double T = Tmin + (Tmax-Tmin)*xx[3];
 
-   const double phaseFlux= 1/(16*pi*s12*s12);
+   const double phaseFlux= 1/(16.*pi*Sqr(s12));
    if (x1/z > 1.) {
       return 0.;
    }
@@ -166,12 +171,12 @@ double XSection_SC::integrand_c2(const double xx[]) {
       if (sp_.at(0).second) {
          result += f.at(2) * pdf_->xfxQ(f.at(0), x1/z, muF_)/(x1/z) * pdf_->xfxQ(f.at(1), x2, muF_)/x2
                * ( get_sp(sp_.at(0).first, z).at(0) * std::log(0.5*dC_ * s12/Sqr(muF_) * Sqr(1 - z)/z ) -
-               get_sp(sp_.at(0).first, z).at(1)) * sp_.at(0).second.value()(alphas, s12, T)*phaseFlux;
+               get_sp(sp_.at(0).first, z).at(1)) * sp_.at(0).second.value()(alphas, s12, T, 0)*phaseFlux;;
       }
       if (sp_.at(1).second) {
          result += f.at(2) * pdf_->xfxQ(f.at(0), x2, muF_)/x2 * pdf_->xfxQ(f.at(1), x1/z, muF_)/(x1/z)
                * (get_sp(sp_.at(1).first, z).at(0) * std::log(0.5*dC_ * s12/Sqr(muF_) * Sqr(1 - z)/z ) -
-               get_sp(sp_.at(1).first, z).at(1)) * sp_.at(1).second.value()(alphas, s12, T)*phaseFlux;
+               get_sp(sp_.at(1).first, z).at(1)) * sp_.at(1).second.value()(alphas, s12, T, 0)*phaseFlux;;
       }
    }
 

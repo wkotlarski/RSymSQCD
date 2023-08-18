@@ -15,13 +15,13 @@ Sgluons::Sgluons(SgluonParameters const& params)
    {};
 
 // Eq. 7.2 of arXiv:1611.06622
-double Sgluons::sigmaSgluonsTree_qqbar_OO(double alphas, double s) {
+double Sgluons::sigmaSgluonsTree_qqbar_OO(double alphas, double s, double Dminus4) {
    const double b = std::sqrt(1. - 4.*pow<2>(mO)/s);
    return 2*pow<2>(alphas)*pi*pow<3>(b)/(9.*s);
 }
 
 // Eq. 7.3 of arXiv:1611.06622
-double Sgluons::sigmaSgluonsTree_gg_OO(double alphas, double s) {
+double Sgluons::sigmaSgluonsTree_gg_OO(double alphas, double s, double Dminus4) {
    const double b = std::sqrt(1. - 4.*pow<2>(mO)/s);
    return 3*pow<2>(alphas)*pi/(32.*s)*(27*b - 17*pow<3>(b) + 6*(-3 + 2*pow<2>(b) + pow<4>(b))*std::atanh(b));
 }
