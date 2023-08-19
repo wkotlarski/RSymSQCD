@@ -8,7 +8,7 @@ system(ARGV[0], "--card=#{ARGV[1]}", "--json-outputfile-name=#{uuid}")
 exit 1 if $?.exitstatus != 0
 
 file_ref     = File.read(ARGV[2])
-file_to_test = File.read(uuid)
+file_to_test = File.read("#{uuid}.json")
 content_ref = JSON.parse(file_ref)
 content_new = JSON.parse(file_to_test)
 
