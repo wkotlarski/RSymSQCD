@@ -943,7 +943,7 @@ int main(int argc, char* argv[]) {
                      allChannels.push_back(std::move(chan));
                   }
 
-                  if (subprocess == "" || subprocess == "gq_suLsuLdaggerq") {
+                  if (subprocess == "" || subprocess == "gqbar_suLsuLdaggerqbar") {
                      std::vector<std::array<int, 3>> flav {};
                      for( int el : { -1, -3, -4, -5}) flav.push_back({21, el, 2});
                      XSection_SC sc(
