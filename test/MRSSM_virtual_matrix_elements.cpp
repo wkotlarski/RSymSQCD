@@ -35,36 +35,14 @@ TEST(MRSSMVirtualMatrixElementTest, AppendixC) {
 
    ltini();
 
-   double FiniteGs = 0.;
-   double Dminus4Coeff = 0.;
-   int lambda = -2;
-
-   // double poles
-   EXPECT_DOUBLE_EQ(mrssm.matrixVirt_uu_suLsuR(alphas, S, T, FiniteGs, Dminus4Coeff, lambda, mu)/(alpha_o_2pi*born_uu_suLsuR),                   -8/3.);
-   EXPECT_DOUBLE_EQ(mrssm.matrixVirt_uubar_suLsuLdagger(alphas, S, T, FiniteGs, Dminus4Coeff, lambda, mu)/(alpha_o_2pi*born_uubar_suLsuLdagger), -8/3.);
-   EXPECT_DOUBLE_EQ(mrssm.matrixVirt_ddbar_suLsuLdagger(alphas, S, T, FiniteGs, Dminus4Coeff, lambda, mu)/(alpha_o_2pi*born_ddbar_suLsuLdagger), -8/3.);
-   EXPECT_NEAR(mrssm.matrixVirt_gg_suLsuLdagger(alphas, S, T, FiniteGs, Dminus4Coeff, lambda, mu)/(alpha_o_2pi*born_gg_suLsuLdagger),            -6.0, 8e-15);
-
-   // single pole
+   // uu -> suL suR
+   EXPECT_DOUBLE_EQ(mrssm.matrixVirt_uu_suLsuR(alphas, S, T, 0, 0, -2, mu)/(alpha_o_2pi*born_uu_suLsuR),
+      -8/3.
+   );
    EXPECT_DOUBLE_EQ(
-      (mrssm.matrixVirt_uu_suLsuR(alphas, S, T, FiniteGs, 0, -1, mu) - 2.*mrssm.matrixVirt_uu_suLsuR(alphas, S, T, FiniteGs, 1, -2, mu))/(alpha_o_2pi*born_uu_suLsuR),
+      (mrssm.matrixVirt_uu_suLsuR(alphas, S, T, 0, 0, -1, mu) - 2.*mrssm.matrixVirt_uu_suLsuR(alphas, S, T, 0, 1, -2, mu))/(alpha_o_2pi*born_uu_suLsuR),
       6.3424494456737985
    );
-   EXPECT_DOUBLE_EQ(
-      (mrssm.matrixVirt_uubar_suLsuLdagger(alphas, S, T, FiniteGs, 0, -1, mu) - 2.*mrssm.matrixVirt_uubar_suLsuLdagger(alphas, S, T, FiniteGs, 1, -2, mu))/(alpha_o_2pi*born_uubar_suLsuLdagger),
-       4.8560767580444564
-   );
-   EXPECT_DOUBLE_EQ(
-      (mrssm.matrixVirt_ddbar_suLsuLdagger(alphas, S, T, FiniteGs, 0, -1, mu) -2.*mrssm.matrixVirt_ddbar_suLsuLdagger(alphas, S, T, FiniteGs, 1, -2, mu))/(alpha_o_2pi*born_ddbar_suLsuLdagger),
-      4.8369561733416342
-   );
-   EXPECT_NEAR(
-      (mrssm.matrixVirt_gg_suLsuLdagger(alphas, S, T, FiniteGs, 0, -1, mu) -2.*mrssm.matrixVirt_gg_suLsuLdagger(alphas, S, T, FiniteGs, 1, -2, mu))/(alpha_o_2pi*born_gg_suLsuLdagger),
-      8.4161500386713985,
-      2e-14
-   );
-
-   // finite
    EXPECT_NEAR(
       (
          mrssm.matrixVirt_uu_suLsuR(alphas, S, T, 1, 0, 0, mu)
@@ -74,6 +52,15 @@ TEST(MRSSMVirtualMatrixElementTest, AppendixC) {
       36.720472180005572,
       5e-14
    );
+
+   // uubar -> suL suL*
+   EXPECT_DOUBLE_EQ(mrssm.matrixVirt_uubar_suLsuLdagger(alphas, S, T, 0, 0, -2, mu)/(alpha_o_2pi*born_uubar_suLsuLdagger),
+      -8/3.
+   );
+   EXPECT_DOUBLE_EQ(
+      (mrssm.matrixVirt_uubar_suLsuLdagger(alphas, S, T, 0, 0, -1, mu) - 2.*mrssm.matrixVirt_uubar_suLsuLdagger(alphas, S, T, 0, 1, -2, mu))/(alpha_o_2pi*born_uubar_suLsuLdagger),
+       4.8560767580444564
+   );
    EXPECT_DOUBLE_EQ(
       (
          mrssm.matrixVirt_uubar_suLsuLdagger(alphas, S, T, 1, 0, 0, mu)
@@ -82,6 +69,15 @@ TEST(MRSSMVirtualMatrixElementTest, AppendixC) {
       )/(alpha_o_2pi*born_uubar_suLsuLdagger),
       18.078757030780139
    );
+
+   // ddbar -> suL suL*
+   EXPECT_DOUBLE_EQ(mrssm.matrixVirt_ddbar_suLsuLdagger(alphas, S, T, 0, 0, -2, mu)/(alpha_o_2pi*born_ddbar_suLsuLdagger),
+      -8/3.
+   );
+   EXPECT_DOUBLE_EQ(
+      (mrssm.matrixVirt_ddbar_suLsuLdagger(alphas, S, T, 0, 0, -1, mu) -2.*mrssm.matrixVirt_ddbar_suLsuLdagger(alphas, S, T, 0, 1, -2, mu))/(alpha_o_2pi*born_ddbar_suLsuLdagger),
+      4.8369561733416342
+   );
    EXPECT_DOUBLE_EQ(
       (
          mrssm.matrixVirt_ddbar_suLsuLdagger(alphas, S, T, 1, 0, 0, mu)
@@ -89,6 +85,17 @@ TEST(MRSSMVirtualMatrixElementTest, AppendixC) {
          +4.*mrssm.matrixVirt_ddbar_suLsuLdagger(alphas, S, T, 0, 2, -2, mu)
       )/(alpha_o_2pi*born_ddbar_suLsuLdagger),
       -4.713602224435669
+   );
+
+   // gg -> suL suL*
+   EXPECT_NEAR(mrssm.matrixVirt_gg_suLsuLdagger(alphas, S, T, 0, 0, -2, mu)/(alpha_o_2pi*born_gg_suLsuLdagger),
+      -6.0,
+      8e-15
+   );
+   EXPECT_NEAR(
+      (mrssm.matrixVirt_gg_suLsuLdagger(alphas, S, T, 0, 0, -1, mu) -2.*mrssm.matrixVirt_gg_suLsuLdagger(alphas, S, T, 0, 1, -2, mu))/(alpha_o_2pi*born_gg_suLsuLdagger),
+      8.4161500386713985,
+      2e-14
    );
    EXPECT_NEAR(
       (
