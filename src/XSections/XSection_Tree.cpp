@@ -6,6 +6,7 @@
 #include "LHAPDF/LHAPDF.h"
 
 #include <functional>
+#include <thread>
 
 namespace {
 int forwarder(const int *ndim, const double xx[],
@@ -66,6 +67,11 @@ int XSection_Tree::integrand(const int *ndim, const double xx[],
    constexpr int key = 0;
    int nregions, neval, fail;
    double integral[ncomp], error[ncomp], prob[ncomp];
+
+   const char* env_cubacores = std::getenv("CUBACORES");
+   const int ncores = env_cubacores ? std::atoi(env_cubacores) : std::thread::hardware_concurrency();
+   const int pn = 10'000; // this is Cuba's default, see arXiv:1408.6373
+   cubacores(&ncores, &pn);
 
    Cuhre( ndim, ncomp, forwarder, this, nvec,
       accuracy_rel, accuracy_abs, integration_verbosity_ | last,

@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <execution>
 #include <iostream>
+#include <thread>
 
 // @todo this is absolutely necessary but I don't know why
 // without it the uu -> uLuRg gives for BMP1 57.1.. +/- 0.005
@@ -69,8 +70,7 @@ std::array<double, 3> XSection_HnonC::integrate() {
 
    double integral[ncomp], error[ncomp], prob[ncomp];
 
-   const char* env_cubacores = std::getenv("CUBACORES");
-   int nn = 0;
+   const int nn = 0;
    const int pn = 10'000; // this is Cuba's default, see arXiv:1408.6373
    cubacores(&nn, &pn);
 
@@ -79,15 +79,6 @@ std::array<double, 3> XSection_HnonC::integrate() {
       neval_min, neval_max, nstart, nincrease, nbatch,
       gridno, state_file, nullptr,
       &neval, &fail, integral, error, prob );
-
-   /* @todo:
-    * if CUBACORES was undefined, Cuba automatically set number of cores
-    * based on the current system load. I don't know how to get this value
-    * so I cannot restore it... */
-   if (env_cubacores) {
-      const int ncores = std::atoi(env_cubacores);
-      cubacores(&ncores, &pn);
-   }
 
    std::array <double, 3> result_finite
       {integral[0], error[0], prob[0]};

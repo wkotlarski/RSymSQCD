@@ -89,6 +89,13 @@ std::array<double, 3> XSection_Virt::integrate() {
    static constexpr int nextra = 0;
    const double prec_virt = std::pow(10., -integration_precision_);
 
+   // LoopTools uses global state to specify pole part, ren scale etc
+   // Multithreading seems to not break it but better be safe then sorry
+   const char* env_cubacores = std::getenv("CUBACORES");
+   const int nn = 0;
+   const int pn = 10'000; // this is Cuba's default, see arXiv:1408.6373
+   cubacores(&nn, &pn);
+
    static bool looptools_initialized = false;
    if(!looptools_initialized) {
       std::cout << std::endl;

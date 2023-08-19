@@ -8,6 +8,8 @@
 #include "cuba.h"
 #include "LHAPDF/LHAPDF.h"
 
+#include <thread>
+
 using boost::math::pow;
 
 namespace {
@@ -50,6 +52,11 @@ std::array<double, 3> XSection_SC::integrate() {
 
    int nregions, fail;
 
+   const char* env_cubacores = std::getenv("CUBACORES");
+   const int ncores = env_cubacores ? std::atoi(env_cubacores) : std::thread::hardware_concurrency();
+   const int pn = 10'000; // this is Cuba's default, see arXiv:1408.6373
+   cubacores(&ncores, &pn);
+
    double integral_sc[ncomp] {0.};
    double error_sc[ncomp]    {0.};
    double prob_sc[ncomp]     {0.};
@@ -89,7 +96,6 @@ std::array<double, 3> XSection_SC::integrate() {
       std::sqrt(pow<2>(error_sc[0]) + pow<2>(error_c1[0]) + pow<2>(error_c2A[0]) + pow<2>(error_c2B[0])),
       prob_sc[0]  + prob_c1[0] + prob_c2A[0] + prob_c2B[0]
    };
-  std::cout << integral_c2A[0] << ' ' << integral_c2B[0] << std::endl;
 
   return result_finite;
 }
