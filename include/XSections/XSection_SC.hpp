@@ -23,7 +23,8 @@ public:
    std::array<double, 3> integrate();
    double integrand_sc(const double[]);
    double integrand_c1(const double[]);
-   double integrand_c2(const double[]);
+   double integrand_c2A(const double[]);
+   double integrand_c2B(const double[]);
 
 private:
    const double dS_;
