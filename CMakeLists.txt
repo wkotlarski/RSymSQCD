@@ -127,7 +127,20 @@ endif()
 
 find_package(Eigen3 REQUIRED)
 find_package(TBB REQUIRED)
-find_package(spdlog REQUIRED)
+find_package(spdlog NO_CMAKE_PACKAGE_REGISTRY QUIET)
+if (NOT spdlog_FOUND)
+   message(STATUS "spdlog not found. Using internal spdlog")
+   include(FetchContent)
+   FetchContent_Declare(
+      spdlog
+      GIT_REPOSITORY https://github.com/gabime/spdlog
+      GIT_TAG        v1.11.0
+   )
+   FetchContent_MakeAvailable(spdlog)
+   include_directories("${spdlog_SOURCE_DIR}/include")
+else()
+   message(STATUS "spdlog found. Using system spdlog.")
+endif()
 
 foreach (MODEL MSSM MRSSM Sgluons)
    add_library(${MODEL} SHARED "src/models/${MODEL}/${MODEL}.cpp" "src/Li2.cpp")
