@@ -18,7 +18,6 @@ If you use it, please cite:
 * [LoopTools](http://www.feynarts.de/looptools)
 * [LHAPDF](https://lhapdf.hepforge.org)
 * [rk](http://rk.hepforge.org)
-* [spdlog](https://github.com/gabime/spdlog)
 
 ### Bulding RSymSQCD
 

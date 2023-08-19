@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
       ("precision-born", po::value<int>() -> default_value(6), "")
       ("precision-virt", po::value<int>() -> default_value(4), "")
       // gu_suLsuLdaggeru with SC precision 5 for BMP2 gives p-value 1
-      ("precision-sc",   po::value<int>() -> default_value(4), "")
+      ("precision-sc",   po::value<int>() -> default_value(6), "")
       ("precision-hard", po::value<int>() -> default_value(4), "")
       ("enable-born", po::value<bool>() -> default_value(true), "")
       ("enable-virt", po::value<bool>() -> default_value(true), "")
@@ -867,7 +867,7 @@ int main(int argc, char* argv[]) {
                         hard_precision, hard_verbosity
                      );
                      ChannelResult chan;
-                     chan.channel_name = "ddbar->suLsuL*(+g)";
+                     chan.channel_name = "qqbar->suLsuL*(+g), q!=u";
                      if(enable_born) chan.b = tree.integrate();
                      if(enable_virt) chan.v = virt.integrate();
                      if(enable_sc) chan.s = sc.integrate();
@@ -1671,7 +1671,7 @@ int main(int argc, char* argv[]) {
    const std::string fileName = json_outputfile_name + file_suffix + ".json";
    std::ofstream o(fileName);
    o << std::setw(3) << j << std::endl;
-   console->info("JSON output written as {}", fileName);
+   console->info("JSON output written to {}", fileName);
    o.close();
 
    return 0;
