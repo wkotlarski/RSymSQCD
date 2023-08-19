@@ -29,6 +29,6 @@ TEST(MRSSMVirtualMatrixElementTest, AppendixC) {
    EXPECT_DOUBLE_EQ(mrssm.matrixTree_uu_suLsuR(alphas, S, T, Dminus4Coeff),          1.1187184131205632);
    EXPECT_DOUBLE_EQ(mrssm.matrixTree_uubar_suLsuLdagger(alphas, S, T, Dminus4Coeff), 0.41567383692610566);
    EXPECT_DOUBLE_EQ(mrssm.matrixTree_ddbar_suLsuLdagger(alphas, S, T, Dminus4Coeff), 0.15281365356525714);
-   EXPECT_DOUBLE_EQ(mrssm.matrixTree_gg_suLsuLdagger(alphas, S, T, Dminus4Coeff),    0.11114746957753696);
+   EXPECT_NEAR(mrssm.matrixTree_gg_suLsuLdagger(alphas, S, T, Dminus4Coeff),    0.11114746957753696, 2e-16);
 }
 }

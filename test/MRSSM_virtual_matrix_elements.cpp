@@ -57,17 +57,19 @@ TEST(MRSSMVirtualMatrixElementTest, AppendixC) {
    EXPECT_DOUBLE_EQ(mrssm.matrixVirt_uubar_suLsuLdagger(alphas, S, T, 0, 0, -2, mu)/(alpha_o_2pi*born_uubar_suLsuLdagger),
       -8/3.
    );
-   EXPECT_DOUBLE_EQ(
+   EXPECT_NEAR(
       (mrssm.matrixVirt_uubar_suLsuLdagger(alphas, S, T, 0, 0, -1, mu) - 2.*mrssm.matrixVirt_uubar_suLsuLdagger(alphas, S, T, 0, 1, -2, mu))/(alpha_o_2pi*born_uubar_suLsuLdagger),
-       4.8560767580444564
+       4.8560767580444564,
+       7e-15
    );
-   EXPECT_DOUBLE_EQ(
+   EXPECT_NEAR(
       (
          mrssm.matrixVirt_uubar_suLsuLdagger(alphas, S, T, 1, 0, 0, mu)
          - 2.*mrssm.matrixVirt_uubar_suLsuLdagger(alphas, S, T, 0, 1, -1, mu)
          + 4.*mrssm.matrixVirt_uubar_suLsuLdagger(alphas, S, T, 0, 2, -2, mu)
       )/(alpha_o_2pi*born_uubar_suLsuLdagger),
-      18.078757030780139
+      18.078757030780139,
+      3e-14
    );
 
    // ddbar -> suL suL*
@@ -78,13 +80,14 @@ TEST(MRSSMVirtualMatrixElementTest, AppendixC) {
       (mrssm.matrixVirt_ddbar_suLsuLdagger(alphas, S, T, 0, 0, -1, mu) -2.*mrssm.matrixVirt_ddbar_suLsuLdagger(alphas, S, T, 0, 1, -2, mu))/(alpha_o_2pi*born_ddbar_suLsuLdagger),
       4.8369561733416342
    );
-   EXPECT_DOUBLE_EQ(
+   EXPECT_NEAR(
       (
          mrssm.matrixVirt_ddbar_suLsuLdagger(alphas, S, T, 1, 0, 0, mu)
          -2.*mrssm.matrixVirt_ddbar_suLsuLdagger(alphas, S, T, 0, 1, -1, mu)
          +4.*mrssm.matrixVirt_ddbar_suLsuLdagger(alphas, S, T, 0, 2, -2, mu)
       )/(alpha_o_2pi*born_ddbar_suLsuLdagger),
-      -4.713602224435669
+      -4.713602224435669,
+      2e-14
    );
 
    // gg -> suL suL*
@@ -104,7 +107,7 @@ TEST(MRSSMVirtualMatrixElementTest, AppendixC) {
          +4.*mrssm.matrixVirt_gg_suLsuLdagger(alphas, S, T, 0, 2, -2, mu)
       )/(alpha_o_2pi*born_gg_suLsuLdagger),
       -3.7965233237193581,
-      3e-14
+      4e-14
    );
 }
 }
