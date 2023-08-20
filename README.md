@@ -20,6 +20,13 @@ If you use it, please cite:
 * [LoopTools](http://www.feynarts.de/looptools)
 * [LHAPDF](https://lhapdf.hepforge.org)
 * [rk](http://rk.hepforge.org)
+* Threading Building Blocks
+
+Some of those dependencies are usually avaliable in the repository of your linux distribution.
+On Ubuntu, they can be installed as
+```
+sudo apt install -y nlohmann-json3-dev libspdlog-dev libboost-program-options-dev libtbb-dev libeigen3-dev
+```
 
 ### Bulding RSymSQCD
 
