@@ -6,6 +6,7 @@ on:
       - master
       - development
     paths-ignore:
+      - '.gitattributes'
       - 'README.md'
       - 'AUTHORS'
       - 'COPYING'

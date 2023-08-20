@@ -1,0 +1,2 @@
+# reclassify language of some files
+*.mod linguist-language=Mathematica
