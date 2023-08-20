@@ -11,7 +11,7 @@ on:
       - 'COPYING'
 
 jobs:
-  default:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,7 +30,7 @@ jobs:
           wget https://feynarts.de/looptools/LoopTools-2.16.tar.gz
           tar -xf LoopTools-2.16.tar.gz
           cd LoopTools-2.16
-          FFLAGS="-O3 -fPIC" CFLAGS="-O3 -fPIC" CXX="-O3 -fPIC" ./configure --prefix=/home/runner/work/LoopTools
+          FFLAGS="-O3 -fPIC" ./configure --prefix=/home/runner/work/LoopTools
           make install
           cd ..
           rm -r LoopTools-2.16
@@ -72,3 +72,4 @@ jobs:
         run: |
           cmake -Bbuild -DLT_PREFIX=/home/runner/work/LoopTools -DCMAKE_PREFIX_PATH=/home/runner/work/Cuba\;/home/runner/work/rk\;/home/runner/work/LHAPDF -DENABLE_TESTS=On -DCMAKE_CXX_COMPILER=clang++
           cmake --build build
+          GTEST_COLOR=1 ctest --output-on-failure --test-dir build -R '^LO|matrix'
