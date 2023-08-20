@@ -10,6 +10,8 @@ set (CMAKE_CXX_STANDARD_REQUIRED True)
 # use -std=c++ instead of -std=gnu
 set (CMAKE_CXX_EXTENSIONS OFF)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
+
 # user should build from his own directory, e.g. ./build
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
    message(SEND_ERROR "In-source builds are not allowed.")
@@ -87,12 +89,7 @@ find_library(LIBCUBA_LIBRARY NAMES libcuba.a)
 find_path(LIBLOOPTOOLS_INCLUDE_DIR NAMES clooptools.h PATHS ${LT_PREFIX}/include)
 find_library(LIBLOOPTOOLS_LIBRARY NAMES ooptools PATHS ${LT_PREFIX}/lib ${LT_PREFIX}/lib64)
 
-find_path(LIBLHAPDF_INCLUDE_DIR NAMES LHAPDF/LHAPDF.h)
-if (APPLE)
-   find_library(LIBLHAPDF_LIBRARY NAMES libLHAPDF.dylib)
-elseif (UNIX)
-   find_library(LIBLHAPDF_LIBRARY NAMES libLHAPDF.so)
-endif()
+find_package(LHAPDF6 REQUIRED)
 
 find_path(LIBRK_INCLUDE_DIR NAMES rk/rk.hh)
 if(APPLE)
@@ -171,7 +168,7 @@ target_include_directories(
       ${LIBCUBA_INCLUDE_DIR}
       ${LIBRK_INCLUDE_DIR}
       ${LIBLOOPTOOLS_INCLUDE_DIR}
-      ${LIBLHAPDF_INCLUDE_DIR}
+      ${LHAPDF6_INCLUDE_DIR}
       ${CMAKE_CURRENT_BINARY_DIR}/include # location of version.hpp
       ${Boost_INCLUDE_DIRS}
 )
@@ -180,7 +177,7 @@ target_link_libraries(
    PUBLIC
       MSSM MRSSM Sgluons
       ${LIBCUBA_LIBRARY}
-      ${LIBLHAPDF_LIBRARY}
+      ${LHAPDF6_LIBRARY}
       ${LIBLOOPTOOLS_LIBRARY}
       Boost::program_options
       nlohmann_json::nlohmann_json
