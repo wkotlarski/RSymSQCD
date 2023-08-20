@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - development
+    paths-ignore:
+      - 'README.md'
+      - 'AUTHORS'
+      - 'COPYING'
+
+jobs:
+  default:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: sudo apt install -y nlohmann-json3-dev libspdlog-dev libboost-program-options-dev libtbb-dev libgtest-dev libeigen3-dev
+
+      - name: Install LoopTools
+        run: |
+          gcc -v
+          g++ -v
+          echo $GITHUB_WORKSPACE
+          cd /tmp
+          wget https://feynarts.de/looptools/LoopTools-2.16.tar.gz
+          tar -xf LoopTools-2.16.tar.gz
+          cd LoopTools-2.16
+          ./configure --prefix=/home/runner/work/LoopTools
+          make
+          make install
+          cd ..
+          rm -r LoopTools-2.16
+
+      - name: Install LHAPDF
+        run: |
+          cd /tmp
+          wget https://lhapdf.hepforge.org/downloads/LHAPDF-6.5.4.tar.gz
+          tar -xf LHAPDF-6.5.4.tar.gz
+          cd LHAPDF-6.5.4
+          ./configure --prefix=/home/runner/work/LHAPDF
+          make install
+          cd ..
+          rm -r LHAPDF-6.5.4
+
+      - name: Install Cuba
+        run: |
+          cd /tmp
+          wget https://feynarts.de/cuba/Cuba-4.2.2.tar.gz
+          tar -xf Cuba-4.2.2.tar.gz
+          cd Cuba-4.2.2
+          ./configure --prefix=/home/runner/work/Cuba
+          make install
+          cd ..
+          rm -r Cuba-4.2.2
+
+      - name: Install rk
+        run: |
+          cd /tmp
+          wget https://rk.hepforge.org/downloads/rk-1.8.tar.gz
+          tar -xf rk-1.8.tar.gz
+          cd rk-1.8
+          ./configure --prefix=/home/runner/work/rk
+          make install
+          cd ..
+          rm -r rk-1.8
+
+      - name: Build
+        run: |
+          cmake -Bbuild -DLT_PREFIX=/home/runner/work/LoopTools -DCMAKE_PREFIX_PATH=/home/runner/work/Cuba\;/home/runner/work/rk\;/home/runner/work/LHAPDF -DENABLE_TESTS=On -DCMAKE_CXX_COMPILER=clang++

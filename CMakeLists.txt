@@ -84,8 +84,8 @@ find_package(Boost REQUIRED COMPONENTS program_options)
 find_path(LIBCUBA_INCLUDE_DIR NAMES cuba.h)
 find_library(LIBCUBA_LIBRARY NAMES libcuba.a)
 
-find_path(LIBLOOPTOOLS_INCLUDE_DIR NAMES clooptools.h)
-find_library(LIBLOOPTOOLS_LIBRARY NAMES libooptools.a)
+find_path(LIBLOOPTOOLS_INCLUDE_DIR NAMES clooptools.h PATHS ${LT_PREFIX}/include)
+find_library(LIBLOOPTOOLS_LIBRARY NAMES ooptools PATHS ${LT_PREFIX}/lib ${LT_PREFIX}/lib64)
 
 find_path(LIBLHAPDF_INCLUDE_DIR NAMES LHAPDF/LHAPDF.h)
 if (APPLE)
