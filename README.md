@@ -1,3 +1,5 @@
+![tests](https://github.com/wkotlarski/RSymSQCD/actions/workflows/test.yml/badge.svg)
+
 # RSymSQCD
 
 A C++ code for calculation of NLO (S)QCD corrections in (not only) the Minimal R-symmetric Supersymmetric Standard Model (**MRSSM**).
