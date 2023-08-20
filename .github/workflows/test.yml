@@ -55,7 +55,7 @@ jobs:
           tar -xf Cuba-4.2.2.tar.gz
           cd Cuba-4.2.2
           ./configure --prefix=/home/runner/work/Cuba
-          make -j2 install
+          make install
           cd ..
           rm -r Cuba-4.2.2
 
