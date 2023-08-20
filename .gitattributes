@@ -1,2 +1,5 @@
+ancillary                       export-ignore
+test                            export-ignore
+
 # reclassify language of some files
 *.mod linguist-language=Mathematica
