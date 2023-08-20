@@ -3,7 +3,7 @@
 #include <array>
 #include <cmath>
 #include <optional>
-#include <string_view>
+#include <string>
 
 struct ChannelResult {
    std::string channel_name;

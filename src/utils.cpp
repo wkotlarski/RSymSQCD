@@ -53,7 +53,7 @@ void print_to_terminal(std::string_view str, std::array<double, 3> const& tree) 
          << " fb ( p-value = " << std::setw(8) << tree.at(2) << " )\n";
 }
 
-void xsec_to_json(nlohmann::json& j, std::string_view str, std::array<double, 3> const& tree) {
+void xsec_to_json(nlohmann::json& j, std::string const& str, std::array<double, 3> const& tree) {
    j["cross sections"][str] = {
       {"tree", {{"res", tree.at(0)}, {"err", tree.at(1)}, {"p-val", tree.at(2)}}}
    };
@@ -61,7 +61,7 @@ void xsec_to_json(nlohmann::json& j, std::string_view str, std::array<double, 3>
 
 void xsec_to_json(
       nlohmann::json& j,
-      std::string_view str,
+      std::string const& str,
       std::array<double, 3> const& tree, std::array<double, 3> const& virt, std::array<double, 3> const& soft, std::array<double, 3> const& hard) {
 
    xsec_to_json(j, str, tree);
