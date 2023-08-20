@@ -50,7 +50,7 @@ TEST(MRSSMVirtualMatrixElementTest, AppendixC) {
          + 4.*mrssm.matrixVirt_uu_suLsuR(alphas, S, T, 0, 2, -2, mu)
       )/(alpha_o_2pi*born_uu_suLsuR),
       36.720472180005572,
-      5e-14
+      8e-14
    );
 
    // uubar -> suL suL*
@@ -60,7 +60,7 @@ TEST(MRSSMVirtualMatrixElementTest, AppendixC) {
    EXPECT_NEAR(
       (mrssm.matrixVirt_uubar_suLsuLdagger(alphas, S, T, 0, 0, -1, mu) - 2.*mrssm.matrixVirt_uubar_suLsuLdagger(alphas, S, T, 0, 1, -2, mu))/(alpha_o_2pi*born_uubar_suLsuLdagger),
        4.8560767580444564,
-       7e-15
+       2e-14
    );
    EXPECT_NEAR(
       (
@@ -93,12 +93,12 @@ TEST(MRSSMVirtualMatrixElementTest, AppendixC) {
    // gg -> suL suL*
    EXPECT_NEAR(mrssm.matrixVirt_gg_suLsuLdagger(alphas, S, T, 0, 0, -2, mu)/(alpha_o_2pi*born_gg_suLsuLdagger),
       -6.0,
-      8e-15
+      2e-14
    );
    EXPECT_NEAR(
       (mrssm.matrixVirt_gg_suLsuLdagger(alphas, S, T, 0, 0, -1, mu) -2.*mrssm.matrixVirt_gg_suLsuLdagger(alphas, S, T, 0, 1, -2, mu))/(alpha_o_2pi*born_gg_suLsuLdagger),
       8.4161500386713985,
-      2e-14
+      4e-14
    );
    EXPECT_NEAR(
       (

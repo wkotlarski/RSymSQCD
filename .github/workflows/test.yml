@@ -24,15 +24,12 @@ jobs:
 
       - name: Install LoopTools
         run: |
-          gcc -v
-          g++ -v
-          echo $GITHUB_WORKSPACE
           cd /tmp
           wget https://feynarts.de/looptools/LoopTools-2.16.tar.gz
           tar -xf LoopTools-2.16.tar.gz
           cd LoopTools-2.16
           FFLAGS="-O3 -fPIC" ./configure --prefix=/home/runner/work/LoopTools
-          make install
+          make -j2 install
           cd ..
           rm -r LoopTools-2.16
 
@@ -43,9 +40,13 @@ jobs:
           tar -xf LHAPDF-6.5.4.tar.gz
           cd LHAPDF-6.5.4
           ./configure --prefix=/home/runner/work/LHAPDF
-          make install
+          make -j2 install
           cd ..
           rm -r LHAPDF-6.5.4
+          export PATH=$PATH:/home/runner/work/LHAPDF/bin
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/runner/work/LHAPDF/lib
+          export PYTHONPATH=$PYTHONPATH:/home/runner/work/LHAPDF/local/lib/python3.10/dist-packages
+          lhapdf install MMHT2014lo68cl
 
       - name: Install Cuba
         run: |
@@ -54,7 +55,7 @@ jobs:
           tar -xf Cuba-4.2.2.tar.gz
           cd Cuba-4.2.2
           ./configure --prefix=/home/runner/work/Cuba
-          make install
+          make -j2 install
           cd ..
           rm -r Cuba-4.2.2
 
@@ -65,12 +66,12 @@ jobs:
           tar -xf rk-1.8.tar.gz
           cd rk-1.8
           ./configure --prefix=/home/runner/work/rk
-          make install
+          make -j2 install
           cd ..
           rm -r rk-1.8
 
       - name: Build
         run: |
           cmake -Bbuild -DLT_PREFIX=/home/runner/work/LoopTools -DCMAKE_PREFIX_PATH=/home/runner/work/Cuba\;/home/runner/work/rk\;/home/runner/work/LHAPDF -DENABLE_TESTS=On -DCMAKE_CXX_COMPILER=clang++
-          cmake --build build
+          cmake --build build -j2
           GTEST_COLOR=1 ctest --output-on-failure --test-dir build -R '^LO|matrix'
