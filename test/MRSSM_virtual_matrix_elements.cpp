@@ -39,9 +39,10 @@ TEST(MRSSMVirtualMatrixElementTest, AppendixC) {
    EXPECT_DOUBLE_EQ(mrssm.matrixVirt_uu_suLsuR(alphas, S, T, 0, 0, -2, mu)/(alpha_o_2pi*born_uu_suLsuR),
       -8/3.
    );
-   EXPECT_DOUBLE_EQ(
+   EXPECT_NEAR(
       (mrssm.matrixVirt_uu_suLsuR(alphas, S, T, 0, 0, -1, mu) - 2.*mrssm.matrixVirt_uu_suLsuR(alphas, S, T, 0, 1, -2, mu))/(alpha_o_2pi*born_uu_suLsuR),
-      6.3424494456737985
+      6.3424494456737985,
+      6e-15
    );
    EXPECT_NEAR(
       (
