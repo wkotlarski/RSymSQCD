@@ -11,10 +11,6 @@
 
 using boost::math::pow;
 
-double inline Power(double x, int i) {
-   return pow(x, i);
-}
-
 MRSSM::MRSSM(MRSSMParameters const& params)
    : MassTop {params.MassTop},
      MassGlu {params.MassGlu},
@@ -68,10 +64,10 @@ double MRSSM::sigmaTree_gg_suLsuLdagger(double alphas, double s, double Dminus4)
    const double MassSq2 = pow<2>(MassSq);
    const double coeff1 =
       (alphas*alphas*pi*(62*(MassSq*MassSq)*sqrt(s*(-4*(MassSq*MassSq) + s)) +
-                         5*sqrt(Power(s,3)*(-4*(MassSq*MassSq) + s)) -
+                         5*sqrt(pow<3>(s)*(-4*(MassSq*MassSq) + s)) -
                          16*(MassSq*MassSq)*(MassSq*MassSq +
                             4*s)*atanh(sqrt(1 -
-                                  (4*(MassSq*MassSq))/s))))/(48.*Power(s,3));
+                                  (4*(MassSq*MassSq))/s))))/(48.*pow<3>(s));
    const double coeffDm4 =
       -1/96.*(alphas*alphas*pi*(130*MassSq2*sqrt(s*(-4*MassSq2 + s)) + 5*sqrt(pow<3>(s)*(-4*MassSq2 + s)) - 32*MassSq2*(MassSq2 + 4*s)*atanh(sqrt(1 - (4*MassSq2)/s))))/pow<3>(s);
    return (1+0.5*Dminus4)*coeff1 + Dminus4*coeffDm4;
