@@ -226,7 +226,7 @@ Print["Writing to " <> filePath];
 (* write final expression to a file *)
 WriteString[
    filePath,
-"double " <> model <> "::matrixHard_" <> procName <> "(const double alphas, std::array<std::array<double, 4>, 5> const &p) const {
+"double " <> model <> "::matrixHard_" <> procName <> If[diagRemoval, "_DR", ""] <> "(const double alphas, std::array<std::array<double, 4>, 5> const &p) const {
    const double k12 = p[0][0]*p[1][0]-p[0][3]*p[1][3];
    const double k13 = p[0][0]*p[2][0]-p[0][3]*p[2][3];
    const double k35 = p[2][0]*p[4][0]-p[2][1]*p[4][1]-p[2][2]*p[4][2]-p[2][3]*p[4][3];
@@ -239,5 +239,5 @@ WriteString[
    If[!FreeQ[result, MassSq^2],  "   const double MassSq2 = pow<2>(MassSq);\n", ""] <>
 "   const double res = " <>
       ToString@CForm[result] <> ";\n" <>
-"   return pow<3>(alphas*pi)*res;\n}"
+"   return pow<3>(alphas*pi)*res;\n}\n"
 ];
