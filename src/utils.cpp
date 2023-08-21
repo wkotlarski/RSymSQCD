@@ -2,10 +2,15 @@
 #include "mathematica_wrapper.hpp"
 
 #include "nlohmann/json.hpp"
+#include "spdlog/fmt/fmt.h"
+
+#include <boost/math/special_functions/pow.hpp>
 
 #include <cmath>
 #include <iostream>
 #include <iomanip>
+
+using boost::math::pow;
 
 void print_to_terminal(
    std::string_view str,
@@ -16,30 +21,18 @@ void print_to_terminal(
    static constexpr std::string_view line = "-------------------------------------------------------------------\n";
 
    std::cout << "\nResults for subprocess " << str << '\n';
-   std::cout << std::scientific;
    std::cout << line;
-   std::cout << std::setprecision(precision);
-   std::cout << std::setw(width) << "born (B):" << std::setw(13) << tree.at(0)
-         << " +/- " << std::setprecision(1) << tree.at(1)
-         << " fb (p-value = " << std::setw(7) << tree.at(2) << ")\n";
-   std::cout << std::setprecision(precision);
-   std::cout << std::setw(width) << "virtual (V):" << std::setw(13) << virt.at(0) << " +/- "
-           << std::setprecision(1) << virt.at(1) << " fb (p-value = "
-           << std::setw(7) << virt.at(2) << ")\n";
-
-      std::cout << std::setprecision(precision);
-      std::cout << std::setw(width) << "real (S+HC):" << std::setw(13) << soft.at(0) << " +/- " << std::setprecision(1) << soft.at(1)
-           << " fb (p-value = " << std::setw(7) << soft.at(2) << ")\n";
-      std::cout << std::setprecision(precision);
-      std::cout << std::setw(width) << "real (HnC):" << std::setw(13) << hard.at(0) << " +/- " << std::setprecision(1) << hard.at(1)
-           << " fb (p-value = " << std::setw(7) << hard.at(2) << ")\n";
-      std::cout << line;
-      std::cout << std::setprecision(precision);
-      std::cout << std::setw(width) << "sum (B+V+S+HC+HnC):" << std::setw(13)
-           << tree.at(0) + virt.at(0) + hard.at(0) + soft.at(0)
-           << " +/- " << std::setprecision(1) << std::sqrt(pow(tree.at(1),2) +
-           Sqr(virt.at(1)) + Sqr(hard.at(1)) +
-           Sqr(soft.at(1))) << " fb\n";
+   fmt::print("          Born (B): {: .5e} +/- {:.1e} fb (p-value = {:.1e})\n", tree.at(0), tree.at(1), tree.at(2));
+   fmt::print("       Virtual (V): {: .5e} +/- {:.1e} fb (p-value = {:.1e})\n", virt.at(0), virt.at(1), virt.at(2));
+   fmt::print("       Real (S+HC): {: .5e} +/- {:.1e} fb (p-value = {:.1e})\n", soft.at(0), soft.at(1), soft.at(2));
+   fmt::print("        Real (HnC): {: .5e} +/- {:.1e} fb (p-value = {:.1e})\n", hard.at(0), hard.at(1), hard.at(2));
+   std::cout << line;
+   fmt::print(
+      "sum (B+V+S+HC+HnC): {: .5e} +/- {:.1e} fb (p-value = {:.1e})\n",
+      tree.at(0) + virt.at(0) + hard.at(0) + soft.at(0),
+      std::sqrt(pow<2>(tree.at(1)) + pow<2>(virt.at(1)) + pow<2>(hard.at(1)) + pow<2>(soft.at(1))),
+      std::max({tree.at(2), virt.at(2), soft.at(2), hard.at(2)})
+   );
 }
 
 void print_to_terminal(std::string_view str, std::array<double, 3> const& tree) {

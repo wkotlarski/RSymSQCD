@@ -1641,6 +1641,9 @@ int main(int argc, char* argv[]) {
          break;
       }
    }
+
+   std::cout << std::endl;
+
    console->info("Elapsed {:.3}", sw);
 
    // print out time statistics
