@@ -24,26 +24,29 @@ If you use it, please cite:
 
 Some of those dependencies are usually avaliable in the repository of your linux distribution.
 On Ubuntu, they can be installed as
-```
+```console
 sudo apt install -y nlohmann-json3-dev libspdlog-dev libboost-program-options-dev libtbb-dev libeigen3-dev
+```
+LoopTools has to be compiled in position independent mode
+```console
+FFLAGS="-O3 -fPIC" ./configure
 ```
 
 ### Bulding RSymSQCD
 
 To compile RSymSQCD you need a C++17 compiler (icpc, g++ >= 7.1 or clang >= 5.0).
 
-Location of dependencies can be passed to cmake cmake via `CMAKE_PREFIX_PATH`
-   variable. It accepts a `;` separated list of directories. Don't forget to
-   escape the semicolon in the shell `\;`!
+Location of `LoopTools`, `Cuba`, `rk` can be passed to cmake via `LT_PREFIX`, `CUBA_PREFIX`, `RK_PREFIX` variables 
 
 Example:
 ```console
-foo@bar:~$ cmake -Bbuild -DCMAKE_PREFIX_PATH=YOUR_CUBA_LOCATION/Cuba-4.2.2\;YOUR_LT_LOCATION/LoopTools-2.16
-foo@bar:~$ cmake --build build
+cmake -Bbuild -DCUBA_PREFIX=YOUR_CUBA_LOCATION/Cuba-4.2.2 -DLT_PREFIX=YOUR_LT_LOCATION/LoopTools-2.16 -DRK_PREFIX=YOUR_LT_LOCATION/rk-1.8
+cmake --build build
 ```
 
 There is one project specific CMake variable: `OPTIMIZE_FOR_NATIVE` which enables (default is `OFF`) CPU specific optimizations (`-march=native` on GCC or Clang and `-xHost` on Intel).
 Use it if you plan to run the code on the same (or reasonably similar) machine as the one you are compiling it on.
+
 
 ## Models
 
