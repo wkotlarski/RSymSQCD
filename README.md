@@ -16,7 +16,6 @@ If you use it, please cite:
 * [boost](http://www.boost.org)
 * [cmake](https://cmake.org)
 * [Cuba](http://www.feynarts.de/cuba)
-* [eigen](https://eigen.tuxfamily.org)
 * [LoopTools](http://www.feynarts.de/looptools)
 * [LHAPDF](https://lhapdf.hepforge.org)
 * [rk](http://rk.hepforge.org)
@@ -25,7 +24,7 @@ If you use it, please cite:
 Some of those dependencies are usually avaliable in the repository of your linux distribution.
 On Ubuntu, they can be installed as
 ```console
-sudo apt install -y nlohmann-json3-dev libspdlog-dev libboost-program-options-dev libtbb-dev libeigen3-dev
+sudo apt install -y nlohmann-json3-dev libspdlog-dev libboost-program-options-dev libtbb-dev
 ```
 LoopTools has to be compiled in position independent mode
 ```console

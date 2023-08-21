@@ -4,7 +4,6 @@
 #include <boost/math/special_functions/pow.hpp>
 #include "spdlog/spdlog.h"
 
-#include <Eigen/Dense>
 #include "clooptools.h"
 #include "Li2.hpp"
 

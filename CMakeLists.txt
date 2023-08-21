@@ -122,7 +122,6 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
    set(FORTRAN_LIBS "ifcore;ifport")
 endif()
 
-find_package(Eigen3 REQUIRED)
 find_package(TBB REQUIRED)
 find_package(spdlog NO_CMAKE_PACKAGE_REGISTRY QUIET)
 if (NOT spdlog_FOUND)
