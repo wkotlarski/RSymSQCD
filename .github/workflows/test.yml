@@ -75,5 +75,8 @@ jobs:
           cmake -Bbuild -DLT_PREFIX=/home/runner/work/LoopTools -DCMAKE_PREFIX_PATH=/home/runner/work/Cuba\;/home/runner/work/rk\;/home/runner/work/LHAPDF -DENABLE_TESTS=On -DCMAKE_CXX_COMPILER=clang++
           cmake --build build -j2
 
-      - name: Test
-        run: GTEST_COLOR=1 ctest --output-on-failure --test-dir build -R '^LO|matrix'
+      - name: Test MEs
+        run: GTEST_COLOR=1 ctest --output-on-failure --test-dir build -R 'matrix'
+
+      - name: Test LO cross-sections
+        run: GTEST_COLOR=1 ctest --output-on-failure --test-dir build -R '^LO'
