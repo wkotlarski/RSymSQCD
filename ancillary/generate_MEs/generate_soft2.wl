@@ -91,17 +91,25 @@ mOfLeg[i_Integer] := TheMass[Flatten[List@@process][[i]]];
 Square[mOfLeg[3]];
 Square[mOfLeg[4]];
 
+SetOptions[CalcFeynAmp, FermionChains->Chiral, Dimension->0, FermionOrder->None];
+SetOptions[PolarizationSum, GaugeTerms->Off];
+SetOptions[HelicityME, Dimension->0];
+
 (* For gg->suLsuL*g with Transverse->False FormCalc crashes because the
    expression is larger than a hardcoded maximal size. One needs to edit file
    ReadForm.tm in FormCalc directory and change TERMBUF to lets say 6000000 *)
-SetOptions[CalcFeynAmp, FermionChains->Chiral, Dimension->0, FermionOrder->None];
-SetOptions[PolarizationSum, GaugeTerms->Off, Dimension->4];
-SetOptions[HelicityME, Dimension->0];
-
 amp = CalcFeynAmp[CreateFeynAmp[ins], Invariants->False, Normalized->False, Transverse->False];
 amp2 = SquaredME[amp];
 _Hel = 0;
-result = PolarizationSum[amp2[[1]] /. amp2[[2]] /. HelicityME[amp]] /. ColourME[amp] //. SubExpr[] //. Abbr[];
+result = amp2[[1]] /. amp2[[2]] /. HelicityME[amp];
+(* incoming gluons (if present) should be 4-dimensional *)
+If[processNr == 7,
+   result = PolarizationSum[result, Dimension->4, SumLegs->{1,2}]
+];
+(* real emission gluons should be D-dimensional because they correspond to
+   gluons in loops in virtual matrix elements *)
+result = PolarizationSum[result, Dimension->0];
+result = result /. ColourME[amp] //. SubExpr[] //. Abbr[];
 
 If[Count[Flatten[List@@process], V[5]] >= 2,
    If[processNr == 7,
