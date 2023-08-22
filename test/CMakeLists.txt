@@ -60,7 +60,7 @@ add_test(
       "LO cross-section for ${el_0}"
    COMMAND
       ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/compare_json_outputs.rb
-         $<TARGET_FILE:RSymSQCD> ${CMAKE_SOURCE_DIR}/run_cards/${el_0}.ini ${CMAKE_SOURCE_DIR}/test/ref_outputs/LO/${el_1}.json
+         $<TARGET_FILE:RSymSQCD> ${CMAKE_SOURCE_DIR}/run_cards/MRSSM/${el_0}.ini ${CMAKE_SOURCE_DIR}/test/ref_outputs/LO/${el_1}.json
 )
 endforeach()
 
