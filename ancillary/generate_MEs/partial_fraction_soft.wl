@@ -17,11 +17,11 @@ minPow = Min[findPower /@ List@@Expand[expr]];
 Print["INFO: minimal power ", minPow];
 If[minPow < -2, Quit[1]];
 
-If[!Simplify[origExpr == expr],
+If[!FullSimplify[origExpr == expr],
    Print["Expressions differ"];
    Quit[1];
 ];
 
 fileName = Last@StringSplit[$ScriptCommandLine[[2]], "/"];
 fileName = StringSplit[fileName, "."];
-Put[Expand[expr], FileNameJoin[{DirectoryName @ $InputFileName, "soft_mes", fileName[[1]] <> "-fractioned.m"}]];
+Put[Expand[expr], FileNameJoin[{DirectoryName[$ScriptCommandLine[[2]]], fileName[[1]] <> "-fractioned.m"}]];
