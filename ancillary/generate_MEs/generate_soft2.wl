@@ -231,4 +231,4 @@ result = result*colAverage*helSum*polAverage;
 
 Needs["MultivariateApart`", FileNameJoin[{ParentDirectory @ DirectoryName @ $InputFileName, "MultivariateApart.wl"}]];
 result = MultivariateApart[result /. MassSu[_]|MassSd[_]->MassSq];
-Put[result, FileNameJoin[{DirectoryName @ $InputFileName, "soft_mes", procName <> "_for_soft.m"}]];
+Put[result, FileNameJoin[{DirectoryName @ $InputFileName, "soft_mes", ToLowerCase[model], procName <> "_for_soft.m"}]];
