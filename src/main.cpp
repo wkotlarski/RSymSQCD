@@ -552,7 +552,7 @@ int main(int argc, char* argv[]) {
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg_finite, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
@@ -639,7 +639,7 @@ int main(int argc, char* argv[]) {
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg_finite, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
@@ -728,7 +728,7 @@ int main(int argc, char* argv[]) {
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg_finite, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
@@ -807,7 +807,7 @@ int main(int argc, char* argv[]) {
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_uubar_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+                        std::bind(&MRSSM::matrixSoft_uubar_suLsuLdaggerg_finite, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
@@ -851,7 +851,7 @@ int main(int argc, char* argv[]) {
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_ddbar_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+                        std::bind(&MRSSM::matrixSoft_ddbar_suLsuLdaggerg_finite, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
@@ -891,7 +891,7 @@ int main(int argc, char* argv[]) {
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_gg_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+                        std::bind(&MRSSM::matrixSoft_gg_suLsuLdaggerg_finite, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
@@ -1057,7 +1057,7 @@ int main(int argc, char* argv[]) {
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_uubar_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+                        std::bind(&MRSSM::matrixSoft_uubar_suLsuLdaggerg_finite, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
@@ -1104,7 +1104,7 @@ int main(int argc, char* argv[]) {
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+                        std::bind(&MRSSM::matrixSoft_uu_suLsuRg_finite, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
@@ -1149,7 +1149,7 @@ int main(int argc, char* argv[]) {
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_ddbar_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+                        std::bind(&MRSSM::matrixSoft_ddbar_suLsuLdaggerg_finite, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
@@ -1190,7 +1190,7 @@ int main(int argc, char* argv[]) {
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_gg_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+                        std::bind(&MRSSM::matrixSoft_gg_suLsuLdaggerg_finite, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
@@ -1332,7 +1332,7 @@ int main(int argc, char* argv[]) {
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MSSM::matrixSoft_uubar_suLsuLdaggerg, mssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+                        std::bind(&MSSM::matrixSoft_uubar_suLsuLdaggerg_finite, mssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
@@ -1376,7 +1376,7 @@ int main(int argc, char* argv[]) {
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MSSM::matrixSoft_ddbar_suLsuLdaggerg, mssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+                        std::bind(&MSSM::matrixSoft_ddbar_suLsuLdaggerg_finite, mssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{
@@ -1416,7 +1416,7 @@ int main(int argc, char* argv[]) {
                      );
                      XSection_SC sc(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixSoft_gg_suLsuLdaggerg, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+                        std::bind(&MRSSM::matrixSoft_gg_suLsuLdaggerg_finite, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
                         dS, dC,
                         flav,
                         {{

@@ -33,7 +33,7 @@ threeBody = ((4*Pi*mu2)/S)^eps*Gamma[1 - eps]/Gamma[1 - 2 eps];
 
 prefactor = (
     (flux * bornPS * threeBody /. eps->0)*0+
-     flux*(beta/(16*Pi)*Sin[th])*(mu2/S)^eps *
+     (* flux*(beta/(16*Pi)*Sin[th])* *) (mu2/S)^eps *
         1/(2*(2*Pi)^2) *
         (* final state symmetry factor *)
         Switch[processNr, 1, 1/2, 2, 1/2, 3, 1, 4, 1, 5, 1, 6, 1, 7, 1]
@@ -87,13 +87,13 @@ expr = expr /.
    MassSq->Sqrt[S - b^2*S]/2;
 
 (* O(eps^0) term *)
-res0ord = SeriesCoefficient[Series[prefactor*expr /. Dminus4 -> -2*eps, {eps, 0, 0}], 0];
+resAllOrd = Series[prefactor*expr /. Dminus4 -> -2*eps, {eps, 0, 0}];
 
 replace = {Pi->pi, Sqrt[x_]->sqrt[x], ArcTanh[x_]:>atanh[x], Log[x_]:>log[x]};
 
 Needs["Developer`"];
-res0ord = PolyLogSimplify[res0ord];
-res0ord = FullSimplify[res0ord];
+resAllOrd = PolyLogSimplify[resAllOrd];
+resAllOrd = FullSimplify[resAllOrd];
 
 Unprotect[Power];
 Format[Power[x_, i_Integer], CForm] := Format["pow<" <> ToString[i] <> ">(" <> ToString@CForm[x] <> ")", OutputForm];
@@ -109,23 +109,26 @@ tempName=StringSplit[tempName, "_"];
 fileName=tempName[[1]] <> "_" <> tempName[[2]];
 
 (* write final expression to a file *)
+For[i=-2, i<=0, i++,
+   suffix=Switch[i, -2, "dp", -1, "sp", 0, "finite"];
+   resOrd = SeriesCoefficient[resAllOrd, i];
 WriteString[
-   FileNameJoin[{"src", "models", model, ToLowerCase[model] <> "_" <> fileName <> "_soft.cpp"}],
-"double " <> model <> "::matrixSoft_" <> fileName <> "(const double alphas, const double S, const double th, const double dS, const double mu) const {
-   const double b = std::sqrt(1. - 4.*pow<2>(MassSq)/S);
-   const double lndS = std::log(dS);
-   const double cth = std::cos(th);
-   const double sth = std::sin(th);\n" <>
-   If[!FreeQ[res0ord, MassGlu^2], "   const double MassGlu2 = pow<2>(MassGlu);\n", ""] <>
-   If[!FreeQ[res0ord, MassTop^2],  "   const double MassTop2 = pow<2>(MassTop);\n", ""] <>
-   If[!FreeQ[res0ord, MasssigmaO^2],  "   const double MasssigmaO2 = pow<2>(MasssigmaO);\n", ""] <>
-   If[!FreeQ[res0ord, mu2],  "   const double mu2 = pow<2>(mu);\n", ""] <>
-   If[!FreeQ[res0ord, alphas3],  "   const double alphas3 = pow<3>(alphas);\n", ""] <>
-   If[!FreeQ[res0ord, MassSq^2],  "   const double MassSq2 = pow<2>(MassSq);\n", ""] <>
+   FileNameJoin[{"src", "models", model, ToLowerCase[model] <> "_" <> fileName <> "_soft_" <> suffix <> ".cpp"}],
+"double " <> model <> "::matrixSoft_" <> fileName <> "_" <> suffix <> "(const double alphas, const double S, const double th" <> If[i==-2, "", ", const double dS, const double mu"] <> ") const {\n" <>
+   If[!FreeQ[resOrd, beta], "   const double b = std::sqrt(1. - 4.*pow<2>(MassSq)/S);\n", ""] <>
+   If[!FreeQ[resOrd, Log[dS]], "   const double lndS = std::log(dS);\n", ""] <>
+   If[!FreeQ[resOrd, Cos[th]], "   const double cth = std::cos(th);\n" , ""] <>
+   If[!FreeQ[resOrd, Sin[th]], "   const double sth = std::sin(th);\n" , ""] <>
+   If[!FreeQ[resOrd, MassGlu^2], "   const double MassGlu2 = pow<2>(MassGlu);\n", ""] <>
+   If[!FreeQ[resOrd, MassTop^2],  "   const double MassTop2 = pow<2>(MassTop);\n", ""] <>
+   If[!FreeQ[resOrd, MasssigmaO^2],  "   const double MasssigmaO2 = pow<2>(MasssigmaO);\n", ""] <>
+   If[!FreeQ[resOrd, mu2],  "   const double mu2 = pow<2>(mu);\n", ""] <>
+   If[!FreeQ[resOrd, alphas3],  "   const double alphas3 = pow<3>(alphas);\n", ""] <>
+   If[!FreeQ[resOrd, MassSq^2],  "   const double MassSq2 = pow<2>(MassSq);\n", ""] <>
 "   const double res = " <>
    StringReplace[
       ToString@CForm[
-            res0ord /.
+            SeriesCoefficient[resAllOrd, i] /.
                Log[dS] -> lndS /.
                PolyLog[2, x_] :> Li2[x] /.
                Cos[th] -> cth /. Sin[th] -> sth /. Sin -> sin /.
@@ -134,4 +137,5 @@ WriteString[
       {"Li2" -> "polylogarithm::Li2", "EulerGamma" -> "euler"}
    ] <> ";\n" <>
 "   return pow<3>(alphas*pi)*res;\n}"
+]
 ];

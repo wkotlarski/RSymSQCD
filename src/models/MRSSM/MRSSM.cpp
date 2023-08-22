@@ -89,7 +89,9 @@ double MRSSM::sigmaTree_uu_suLsuR(double alphas, double s, double Dminus4) const
  */
 
 #include "mrssm_uu_suLsuR_virt_matrix.cpp"
-#include "mrssm_uu_suLsuRg_soft.cpp"
+#include "mrssm_uu_suLsuRg_soft_dp.cpp"
+#include "mrssm_uu_suLsuRg_soft_sp.cpp"
+#include "mrssm_uu_suLsuRg_soft_finite.cpp"
 #include "mrssm_uu_suLsuRg_hard.cpp"
 #include "mrssm_gu_suLsuRubar_hard.cpp"
 #include "mrssm_gu_suLsuRubar_hard-DR.cpp"
@@ -99,15 +101,21 @@ double MRSSM::sigmaTree_uu_suLsuR(double alphas, double s, double Dminus4) const
  *  pp -> suL suL*
  */
 #include "mrssm_uubar_suLsuLdagger_virt_matrix.cpp"
-#include "mrssm_uubar_suLsuLdaggerg_soft.cpp"
+#include "mrssm_uubar_suLsuLdaggerg_soft_dp.cpp"
+#include "mrssm_uubar_suLsuLdaggerg_soft_sp.cpp"
+#include "mrssm_uubar_suLsuLdaggerg_soft_finite.cpp"
 #include "mrssm_uubar_suLsuLdaggerg_hard.cpp"
 
 #include "mrssm_ddbar_suLsuLdagger_virt_matrix.cpp"
-#include "mrssm_ddbar_suLsuLdaggerg_soft.cpp"
+#include "mrssm_ddbar_suLsuLdaggerg_soft_dp.cpp"
+#include "mrssm_ddbar_suLsuLdaggerg_soft_sp.cpp"
+#include "mrssm_ddbar_suLsuLdaggerg_soft_finite.cpp"
 #include "mrssm_ddbar_suLsuLdaggerg_hard.cpp"
 
 #include "mrssm_gg_suLsuLdagger_virt_matrix.cpp"
-#include "mrssm_gg_suLsuLdaggerg_soft.cpp"
+#include "mrssm_gg_suLsuLdaggerg_soft_dp.cpp"
+#include "mrssm_gg_suLsuLdaggerg_soft_sp.cpp"
+#include "mrssm_gg_suLsuLdaggerg_soft_finite.cpp"
 #include "mrssm_gg_suLsuLdaggerg_hard.cpp"
 
 #include "mrssm_gu_suLsuLdaggeru_hard.cpp"

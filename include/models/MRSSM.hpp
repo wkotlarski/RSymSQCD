@@ -31,7 +31,9 @@ public:
    double matrixVirt_ud_suLsdR(double, double, double, double, int, int, double) const;
 
    // soft
-   double matrixSoft_uu_suLsuRg(double, double, double, double, double) const;
+   double matrixSoft_uu_suLsuRg_dp(double, double, double) const;
+   double matrixSoft_uu_suLsuRg_sp(double, double, double, double, double) const;
+   double matrixSoft_uu_suLsuRg_finite(double, double, double, double, double) const;
 
    // hard
    double matrixHard_uu_suLsuRg(
@@ -57,9 +59,15 @@ public:
    double sigmaTree_uubar_suLsuLdagger(double, double, double = 0.) const;
    double sigmaTree_ddbar_suLsuLdagger(double, double, double = 0.) const;
    double sigmaTree_gg_suLsuLdagger(double, double, double = 0.) const;
-   double matrixSoft_gg_suLsuLdaggerg(double, double, double, double, double) const;
-   double matrixSoft_ddbar_suLsuLdaggerg(double, double, double, double, double) const;
-   double matrixSoft_uubar_suLsuLdaggerg(double, double, double, double, double) const;
+   double matrixSoft_gg_suLsuLdaggerg_dp(double, double, double) const;
+   double matrixSoft_gg_suLsuLdaggerg_sp(double, double, double, double, double) const;
+   double matrixSoft_gg_suLsuLdaggerg_finite(double, double, double, double, double) const;
+   double matrixSoft_ddbar_suLsuLdaggerg_dp(double, double, double) const;
+   double matrixSoft_ddbar_suLsuLdaggerg_sp(double, double, double, double, double) const;
+   double matrixSoft_ddbar_suLsuLdaggerg_finite(double, double, double, double, double) const;
+   double matrixSoft_uubar_suLsuLdaggerg_dp(double, double, double) const;
+   double matrixSoft_uubar_suLsuLdaggerg_sp(double, double, double, double, double) const;
+   double matrixSoft_uubar_suLsuLdaggerg_finite(double, double, double, double, double) const;
    double matrixHard_gg_suLsuLdaggerg(double, std::array<std::array<double, 4>, 5> const&) const;
    double matrixHard_uubar_suLsuLdaggerg(double, std::array<std::array<double, 4>, 5> const&) const;
    double matrixHard_ddbar_suLsuLdaggerg(double, std::array<std::array<double, 4>, 5> const&) const;

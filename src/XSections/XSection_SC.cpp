@@ -119,6 +119,7 @@ double XSection_SC::integrand_sc(const double xx[]) {
    const double alphas = pdf_->alphasQ(muR_);
    double result = pdf_flux * f_soft_.value()(alphas, s12, th, dS_, muR_);
    result *= to_fb;
+   result *= 0.5/s12 * 1/(16.*pi) * std::sin(th) * std::sqrt(1 - 4.*pow<2>(m1_)/s12);
 
    // jacobian
    const double jacobian = pi*(1.-x1min)*(1.-x2min);
