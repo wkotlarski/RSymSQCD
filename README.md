@@ -7,7 +7,7 @@ A C++ code for calculation of NLO (S)QCD corrections in (not only) the Minimal R
 This code was developed as part of the ongoing research into an R-symmetric SUSY.
 If you use it, please cite:
 
-* **P. Die&szlig;ner, W. Kotlarski, S. Liebschner and D. St&ouml;ckinger** Squark production in R-symmetric SUSY with Dirac gluinos: NLO corrections, *J. High Energ. Phys. (2017) 2017: 142* ([inspirehep](https://inspirehep.net/literature/1610032))
+* **P. Die&szlig;ner, W. Kotlarski, S. Liebschner and D. St&ouml;ckinger**, Squark production in R-symmetric SUSY with Dirac gluinos: NLO corrections, *J. High Energ. Phys. (2017) 2017: 142* ([inspirehep](https://inspirehep.net/literature/1610032))
 
 ## Getting started
 
