@@ -32,7 +32,7 @@ TEST(MRSSMVirtualMatrixElementTest, AppendixC) {
    EXPECT_NEAR(
       mrssm.matrixSoft_uu_suLsuRg(alphas, S, theta, dS, mu),
       7.4718949947862054e-10,
-      3e-25.
+      3e-25
    );
    EXPECT_NEAR(
       mrssm.matrixSoft_uubar_suLsuLdaggerg(alphas, S, theta, dS, mu),
@@ -42,7 +42,7 @@ TEST(MRSSMVirtualMatrixElementTest, AppendixC) {
    EXPECT_NEAR(
       mrssm.matrixSoft_ddbar_suLsuLdaggerg(alphas, S, theta, dS, mu),
       1.1526982445319974e-10,
-      2e-26.
+      2e-26
    );
    EXPECT_NEAR(
       mrssm.matrixSoft_gg_suLsuLdaggerg(alphas, S, theta, dS, mu),
