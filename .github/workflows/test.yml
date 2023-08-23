@@ -19,8 +19,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: sudo apt install -y nlohmann-json3-dev libspdlog-dev libboost-program-options-dev libtbb-dev libgtest-dev
+      - name: Install ubuntu dependencies
+        run: |
+           sudo apt update
+           sudo apt upgrade -y
+           sudo apt install -y nlohmann-json3-dev libspdlog-dev libboost-program-options-dev libtbb-dev libgtest-dev
 
       - name: Install LoopTools
         run: |
