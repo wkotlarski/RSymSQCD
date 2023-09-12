@@ -135,7 +135,7 @@ double XSection_HnonC::integrand(std::array<double, 7> const& xx) {
    // check if due to numerics |cos(x)| is not > 1
    // if yes, return 0 and continue
    if ( cosx > 1 || cosx < -1)  {
-      spdlog::get("console")->warn("Skipping the phase space point in 3-body kinematic (1 - |cos(θ)| = {})", 1 - std::abs(cosx));
+      spdlog::get("console")->warn("Skipping a phase space point in the 3-body kinematics (1-|cos(θ)|={:.1e})", 1 - std::abs(cosx));
       return 0.;
    }
 
