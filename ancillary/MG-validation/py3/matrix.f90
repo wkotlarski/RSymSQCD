@@ -2292,7 +2292,7 @@ contains
   
   function testreno(epsorder) result(dz)
     implicit none
-    integer, intent(in) :: epsorder
+    real(ki), intent(in) :: epsorder
     real(ki) :: dz
     dz=1.d0
     call setlambda(epsorder)
