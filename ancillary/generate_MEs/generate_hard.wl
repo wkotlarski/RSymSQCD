@@ -88,12 +88,19 @@ Square[mOfLeg[3]];
 Square[mOfLeg[4]];
 
 SetOptions[CalcFeynAmp, FermionChains->Chiral];
-SetOptions[PolarizationSum, GaugeTerms->Off];
+If[diagRemoval,
+   SetOptions[PolarizationSum, GaugeTerms->True],
+   SetOptions[PolarizationSum, GaugeTerms->Off]
+];
 
 (* For gg->suLsuL*g with Transverse->False FormCalc crashes because the
    expression is larger than a hardcoded maximal size. One needs to edit file
    ReadForm.tm in FormCalc directory and change TERMBUF to lets say 6000000 *)
-amp = CalcFeynAmp[CreateFeynAmp[ins], Invariants->False, Normalized->False, Transverse->False];
+amp =
+   If[diagRemoval,
+      CalcFeynAmp[CreateFeynAmp[ins], Invariants->False, Normalized->True, Transverse->True],
+      CalcFeynAmp[CreateFeynAmp[ins], Invariants->False, Normalized->False, Transverse->False]
+   ];
 result = PolarizationSum[amp] //. Abbr[] //. Subexpr[];
 
 If[Count[Flatten[List@@process], V[5]] >= 2,
@@ -124,9 +131,13 @@ momReplaceRules = {
    Pair[k[i_Integer], k[4]] /; i<4 :> Pair[k[i], k[1]] + Pair[k[i], k[2]] - Pair[k[i], k[3]] - Pair[k[i], k[5]],
    Pair[k[4], k[5]] -> Pair[k[1], k[5]] + Pair[k[2], k[5]] - Pair[k[3], k[5]] - Pair[k[5], k[5]],
    Eps[k[i1_], k[i2_], k[i3_], k[4]] :> Eps[k[i1], k[i2], k[i3], k[1]] + Eps[k[i1], k[i2], k[i3], k[2]] - Eps[k[i1], k[i2], k[i3], k[3]] - Eps[k[i1], k[i2], k[i3], k[5]],
+   Eps[k[i1_], k[i2_], k[4], k[5]] :> Eps[k[i1], k[i2], k[3], k[5]] + Eps[k[i1], k[i2], k[4], k[5]] - Eps[k[i1], k[i2], k[1], k[5]] - Eps[k[i1], k[i2], k[2], k[5]],
    Eps[k[i1_], k[i2_], k[i3_], k[i4_]] :> Signature[{i1, i2, i3, i4}] * Eps@@(k /@ Sort[{i1, i2, i3, i4}]),
    Pair[k[i_Integer], k[i_Integer]] :> mOfLeg[i]^2
 };
+If[diagRemoval,
+   result = result /. eta[1] -> k[2]
+];
 result = result //. momReplaceRules;
 
 (* We have eliminated one momenta (k[4] in this case).
