@@ -131,8 +131,8 @@ momReplaceRules = {
    Pair[k[i_Integer], k[4]] /; i<4 :> Pair[k[i], k[1]] + Pair[k[i], k[2]] - Pair[k[i], k[3]] - Pair[k[i], k[5]],
    Pair[k[4], k[5]] -> Pair[k[1], k[5]] + Pair[k[2], k[5]] - Pair[k[3], k[5]] - Pair[k[5], k[5]],
    Eps[k[i1_], k[i2_], k[i3_], k[4]] :> Eps[k[i1], k[i2], k[i3], k[1]] + Eps[k[i1], k[i2], k[i3], k[2]] - Eps[k[i1], k[i2], k[i3], k[3]] - Eps[k[i1], k[i2], k[i3], k[5]],
-   Eps[k[i1_], k[i2_], k[4], k[5]] :> Eps[k[i1], k[i2], k[3], k[5]] + Eps[k[i1], k[i2], k[4], k[5]] - Eps[k[i1], k[i2], k[1], k[5]] - Eps[k[i1], k[i2], k[2], k[5]],
-   Eps[k[i1_], k[i2_], k[i3_], k[i4_]] :> Signature[{i1, i2, i3, i4}] * Eps@@(k /@ Sort[{i1, i2, i3, i4}]),
+   Eps[k[i1_], k[i2_], k[4], k[5]] :> Eps[k[i1], k[i2], k[1], k[5]] + Eps[k[i1], k[i2], k[2], k[5]] - Eps[k[i1], k[i2], k[3], k[5]],
+   Eps[k[i1_], k[i2_], k[i3_], k[i4_]] /; !OrderedQ[{i1,i2,i3,i4}] || !DuplicateFreeQ[{i1,i2,i3,i4}] :> Signature[{i1, i2, i3, i4}] * Eps@@(k /@ Sort[{i1, i2, i3, i4}]),
    Pair[k[i_Integer], k[i_Integer]] :> mOfLeg[i]^2
 };
 If[diagRemoval,
