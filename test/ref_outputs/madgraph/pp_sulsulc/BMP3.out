@@ -1,13 +1,13 @@
    --------------------------------------------------------------
       Final results and run summary:
-      Process p p > sul sul~ [QCD] $$ xglu xglu~
+      Process p p > sul sul~ [QCD]
       Run at p-p collider (6500.0 + 6500.0 GeV)
-      Total cross section: 5.202e-01 +- 3.7e-04 pb
+      Total cross section: 5.20200800e-01 +- 4.3974e-06 pb
    --------------------------------------------------------------
       Scale variation (computed from histogram information):
-          Dynamical_scale_choice 0 (envelope of 9 values): 
-              5.203e-01 pb  +11.3% -12.8%
+          Dynamical_scale_choice 0 (envelope of 9 values):
+              5.202e-01 pb  +11.3% -12.8%
       PDF variation (computed from histogram information):
-          MMHT2014nlo68cl (51 members; using hessian method): 
-              5.203e-01 pb  +3.8% -3.7%
+          MMHT2014nlo68cl (51 members; using hessian method):
+              5.202e-01 pb  +3.8% -3.7%
    --------------------------------------------------------------
