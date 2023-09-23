@@ -149,6 +149,7 @@ double XSection_SC::integrand_c1(const double xx[]) {
 
    const double alphas = pdf_->alphasQ(muR_);
    const double a = s12/pow<2>(muF_)*0.5*dC_;
+   static constexpr int Nf = 5;
    double result = 0.;
    if (sp_.at(0).second) {
       const double xsec_ord0 = sp_.at(0).second.value()(alphas, s12, T, 0);
@@ -161,8 +162,7 @@ double XSection_SC::integrand_c1(const double xx[]) {
 			    )*xsec_ord0;
       }
       else if (sp_.at(0).first == SplittingKernel::Pgg) {
-         static constexpr int Nf = 5;
-         result += (2.*CA*std::log(dS_) + (11.*CA - 2.*Nf)/6)*(std::log(pow<2>(muR_/muF_))*xsec_ord0 - 2.*xsec_ordEps) +
+         result += (2.*CA*std::log(dS_) + (11*CA - 2*Nf)/6.)*(std::log(pow<2>(muR_/muF_))*xsec_ord0 - 2.*xsec_ordEps) +
             2.*CA*(
                -0.5*pow<2>(std::log(1 - dS_)) + 2*std::log(1 - dS_)*std::log(dS_) - pow<2>(std::log(dS_)) + pow<2>(std::log(1 - x1)) + (std::log(x1)*(-2*std::log(pow<2>(-1 + x1)) + std::log(x1)))/2. +
                 std::log(a)*(std::log((-1 + dS_)*(-1 + x1)) - std::log(dS_*x1)) + polylogarithm::Li2(dS_) - polylogarithm::Li2(1 - x1)
@@ -180,8 +180,7 @@ double XSection_SC::integrand_c1(const double xx[]) {
 			    )*xsec_ord0;
       }
       else if (sp_.at(1).first == SplittingKernel::Pgg) {
-         static constexpr int Nf = 5;
-         result += (2.*CA*std::log(dS_) + (11.*CA - 2.*Nf)/6)*(std::log(pow<2>(muR_/muF_))*xsec_ord0 - 2.*xsec_ordEps) +
+         result += (2.*CA*std::log(dS_) + (11*CA - 2*Nf)/6.)*(std::log(pow<2>(muR_/muF_))*xsec_ord0 - 2.*xsec_ordEps) +
             2*CA*(
             -0.5*pow<2>(std::log(1 - dS_)) + 2*std::log(1 - dS_)*std::log(dS_) - pow<2>(std::log(dS_)) + pow<2>(std::log(1 - x2)) + (std::log(x2)*(-2*std::log(pow<2>(-1 + x2)) + std::log(x2)))/2. +
              std::log(a)*(std::log((-1 + dS_)*(-1 + x2)) - std::log(dS_*x2)) + polylogarithm::Li2(dS_) - polylogarithm::Li2(1 - x2)

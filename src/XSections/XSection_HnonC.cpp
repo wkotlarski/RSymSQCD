@@ -222,7 +222,7 @@ double XSection_HnonC::integrand(std::array<double, 7> const& xx) {
    double ME2 = f(pdf_->alphasQ(muR_), p);
    assert(!std::isnan(ME2));
    if (ME2 < 0) {
-      spdlog::get("console")->debug("2->3 |M|^2 is negative: {}", ME2);
+      spdlog::get("console")->debug("2->3 |M|^2 is negative: {:.1e}", ME2);
       return 0.;
    }
    /*
