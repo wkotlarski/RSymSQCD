@@ -35,11 +35,11 @@ FFLAGS="-O3 -fPIC" ./configure
 
 To compile RSymSQCD you need a C++17 compiler (icpc, g++ >= 7.1 or clang >= 5.0).
 
-Location of `LoopTools`, `Cuba`, `rk` can be passed to cmake via `LT_PREFIX`, `CUBA_PREFIX`, `RK_PREFIX` variables 
+Location of `LoopTools`, `Cuba`, `rk` and `LHAPDF` can be passed to cmake via `LT_PREFIX`, `CUBA_PREFIX`, `RK_PREFIX` and `LHAPDF6_ROOT_DIR` variables
 
 Example:
 ```console
-cmake -Bbuild -DCUBA_PREFIX=YOUR_CUBA_LOCATION/Cuba-4.2.2 -DLT_PREFIX=YOUR_LT_LOCATION/LoopTools-2.16 -DRK_PREFIX=YOUR_LT_LOCATION/rk-1.8
+cmake -Bbuild -DCUBA_PREFIX=YOUR_CUBA_LOCATION/Cuba-4.2.2 -DLT_PREFIX=YOUR_LT_LOCATION/LoopTools-2.16 -DRK_PREFIX=YOUR_LT_LOCATION/rk-1.8 -DLHAPDF6_ROOT_DIR=YOUR_LHAPDF_LOCATION/LHAPDF
 cmake --build build
 ```
 

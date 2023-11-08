@@ -83,19 +83,19 @@ endif()
 
 find_package(Boost REQUIRED COMPONENTS program_options)
 
-find_path(LIBCUBA_INCLUDE_DIR NAMES cuba.h)
-find_library(LIBCUBA_LIBRARY NAMES libcuba.a)
+find_path(LIBCUBA_INCLUDE_DIR NAMES cuba.h PATHS ${CUBA_PREFIX}/include)
+find_library(LIBCUBA_LIBRARY NAMES libcuba.a PATHS ${CUBA_PREFIX}/lib)
 
 find_path(LIBLOOPTOOLS_INCLUDE_DIR NAMES clooptools.h PATHS ${LT_PREFIX}/include)
 find_library(LIBLOOPTOOLS_LIBRARY NAMES ooptools PATHS ${LT_PREFIX}/lib ${LT_PREFIX}/lib64)
 
 find_package(LHAPDF6 REQUIRED)
 
-find_path(LIBRK_INCLUDE_DIR NAMES rk/rk.hh)
+find_path(LIBRK_INCLUDE_DIR NAMES rk/rk.hh PATHS ${RK_PREFIX}/include)
 if(APPLE)
-   find_library(LIBRK_LIBRARY NAMES librk.dylib)
+   find_library(LIBRK_LIBRARY NAMES librk.dylib PATHS ${RK_PREFIX}/lib)
 elseif(UNIX)
-   find_library(LIBRK_LIBRARY NAMES librk.so)
+   find_library(LIBRK_LIBRARY NAMES librk.so PATHS ${RK_PREFIX}/lib)
 endif()
 
 # find_path(LIBCOLORFULL_INCLUDE_DIRS NAMES ColorFull/Core/Tree_level_gluon_basis.h)
