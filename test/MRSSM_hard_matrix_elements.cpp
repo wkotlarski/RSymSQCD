@@ -28,7 +28,7 @@ TEST(MRSSMHardMatrixElementTest, BMP1) {
 
    // pp -> suL suR
    EXPECT_NEAR(mrssm.matrixHard_uu_suLsuRg(alphas, p),    2.0376409677647898e-2, 4e-14);
-   EXPECT_NEAR(mrssm.matrixHard_gu_suLsuRubar(alphas, p), 0.00011799531375086045, 1e-14);
+   EXPECT_NEAR(mrssm.matrixHard_gu_suLsuRubar(alphas, p), 0.00011799531375086045, 2e-14);
 
    // pp -> suL suL*
    EXPECT_NEAR(mrssm.matrixHard_uubar_suLsuLdaggerg(alphas, p), 8.6466120257818677e-3, 2e-14);

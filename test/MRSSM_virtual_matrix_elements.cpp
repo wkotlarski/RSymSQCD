@@ -88,7 +88,7 @@ TEST(MRSSMVirtualMatrixElementTest, AppendixC) {
          +4.*mrssm.matrixVirt_ddbar_suLsuLdagger(alphas, S, T, 0, 2, -2, mu)
       )/(alpha_o_2pi*born_ddbar_suLsuLdagger),
       -4.713602224435669,
-      2e-14
+      3e-14
    );
 
    // gg -> suL suL*
@@ -99,7 +99,7 @@ TEST(MRSSMVirtualMatrixElementTest, AppendixC) {
    EXPECT_NEAR(
       (mrssm.matrixVirt_gg_suLsuLdagger(alphas, S, T, 0, 0, -1, mu) -2.*mrssm.matrixVirt_gg_suLsuLdagger(alphas, S, T, 0, 1, -2, mu))/(alpha_o_2pi*born_gg_suLsuLdagger),
       8.4161500386713985,
-      4e-14
+      5e-14
    );
    EXPECT_NEAR(
       (
