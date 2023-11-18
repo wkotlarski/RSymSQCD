@@ -30,22 +30,8 @@ double MRSSM::matrixTree_udbar_suLsdLdagger(double alphas, double S, double T, i
 #include "mrssm_uubar_suLsuLdagger_born_matrix.cpp"
 #include "mrssm_ddbar_suLsuLdagger_born_matrix.cpp"
 #include "mrssm_gg_suLsuLdagger_born_matrix.cpp"
-
-double MRSSM::matrixTree_uubar_glglbar(double alphaS, double S, double T, int Dminus4Power) const
-{
-   const double U = 2*pow<2>(MassGlu) - S - T;
-   const double MsquaredReal = 0.5*16.*52.63789013914324*(alphaS*alphaS)*(36*pow<2>(MassGlu)/S + 18*pow<2>(pow<2>(MassGlu) - T)/pow<2>(S) + (4*pow<2>(pow<2>(MassGlu) - T))/pow<2>(pow<2>(MassSq) - T) + (9.*(pow<2>(MassGlu)))/(-(pow<2>(MassSq)) + T) + (9.*pow<2>(pow<2>(MassGlu) - T))/(S*(-(pow<2>(MassSq)) + T)) + (18.*pow<2>(pow<2>(MassGlu) - U))/(pow<2>(S)) + (4.*pow<2>(pow<2>(MassGlu) - U))/pow<2>(pow<2>(MassSq) - U) + (9.*(pow<2>(MassGlu)))/(-(pow<2>(MassSq)) + U) + (9.*pow<2>(pow<2>(MassGlu) - U))/(S*(-(pow<2>(MassSq)) + U)))
-;
-   return MsquaredReal/18.;
-}
-
-double MRSSM::matrixTree_gg_glglbar(double alphaS, double S, double T, int Dminus4Power) const
-{
-   const double U = 2*pow<2>(MassGlu) - S - T;
-   const double MsquaredReal = 8.*pow<2>(4.*pi*alphaS)*3.*24.*(1.-(U - pow<2>(MassGlu))*(T - pow<2>(MassGlu))/(pow<2>(S)))*(pow<2>(S)/((T - pow<2>(MassGlu))*(U - pow<2>(MassGlu))) - 2. + 4.*pow<2>(MassGlu)*S/((T - pow<2>(MassGlu))*(U - pow<2>(MassGlu)))*(1. - pow<2>(MassGlu)*S/((T - pow<2>(MassGlu))*(U - pow<2>(MassGlu)))));
-
-return MsquaredReal/256.;
-}
+#include "mrssm_uubar_glglbar_born_matrix.cpp"
+#include "mrssm_gg_glglbar_born_matrix.cpp"
 
 double MRSSM::sigmaTree_uubar_suLsuLdagger(double alphas, double s12, double Dminus4) const {
    const double Alfas2 = pow<2>(alphas);
