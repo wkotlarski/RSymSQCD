@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
       ("enable-virt", po::value<bool>() -> default_value(true), "")
       ("enable-sc",   po::value<bool>() -> default_value(true), "")
       ("enable-hard", po::value<bool>() -> default_value(true), "")
-      ("card", po::value<string>()->required(), "path to a run card")
+      ("card,f", po::value<string>()->required(), "path to a run card")
       ("subprocess", po::value<string>() -> default_value(""), "")
       ("log-level", po::value<string>() -> default_value("info"), "")
    ;
@@ -118,7 +118,12 @@ int main(int argc, char* argv[]) {
 
    boost::property_tree::ptree pt;
    try {
-      boost::property_tree::ini_parser::read_ini(card, pt);
+      if (card == "-") {
+         boost::property_tree::ini_parser::read_ini(std::cin, pt);
+      }
+      else {
+         boost::property_tree::ini_parser::read_ini(card, pt);
+      }
    }
    catch (const std::exception& e) {
       std::cerr << "Error while trying to parse " << card << " (" << e.what() << ")\n";
