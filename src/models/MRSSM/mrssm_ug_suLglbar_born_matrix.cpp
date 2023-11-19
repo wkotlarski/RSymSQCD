@@ -4,7 +4,8 @@ double MRSSM::matrixTree_ug_suLglbar(const double alphas, const double S, const 
    const double U = MassSq2 + MassGlu2 - T - S;
    double res = 0.;
    if (Dminus4SeriesCoeff == 0) {
-      res = 2.*(-4*(alphas*alphas)*(pi*pi)*(4*(S*S) + S*(MassGlu2 - U) + 4*pow<2>(-MassGlu2 + U))*(5*pow<3>(MassGlu2) - pow<2>(MassGlu2)*(7*S + 6*T + 9*U) - U*(2*T*(S + T) + (S + 2*T)*U + U*U) + MassGlu2*(2*pow<2>(S + T) + 6*S*U + 8*T*U + 5*(U*U))))/(9.*S*pow<2>(MassGlu2 - T)*pow<2>(-MassGlu2 + U));
+      //res = 2.*(-4*(alphas*alphas)*(pi*pi)*(4*(S*S) + S*(MassGlu2 - U) + 4*pow<2>(-MassGlu2 + U))*(5*pow<3>(MassGlu2) - pow<2>(MassGlu2)*(7*S + 6*T + 9*U) - U*(2*T*(S + T) + (S + 2*T)*U + U*U) + MassGlu2*(2*pow<2>(S + T) + 6*S*U + 8*T*U + 5*(U*U))))/(9.*S*pow<2>(MassGlu2 - T)*pow<2>(-MassGlu2 + U));
+      res = 1./(2*4.*3*8)*315.82734083485946*(alphas*alphas)*((MassGlu*MassGlu - 1.*T)/S + (2.*(MassGlu*MassGlu - 1.*(MassSq*MassSq))*(-1.*(MassGlu*MassGlu) + T)*(1. + (MassGlu*MassGlu)/(-1.*(MassGlu*MassGlu) + T) + (MassSq*MassSq)/(-1.*(MassSq*MassSq) + U)))/(S*(-1.*(MassSq*MassSq) + U)))*(-2.6666666666666665 + 24.*(1. - (2.*S*(-1.*(MassSq*MassSq) + U))/pow(-1.*(MassGlu*MassGlu) + T,2))); // from Beenakker
    }
    else if (Dminus4SeriesCoeff == 1) {
       res = 0;

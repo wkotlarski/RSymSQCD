@@ -523,7 +523,7 @@ int main(int argc, char* argv[]) {
                   std::array<double, 3> result {};
                   {
                      std::vector<std::array<int, 3>> flav {};
-                     for (int i : {2}) {
+                     for (int i : {1,2,3,4,5}) {
                         flav.push_back({i, 21, 2});
                      }
                      XSection_Tree tree(
@@ -544,7 +544,7 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_ug_suRgl, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
+                        std::bind(&MRSSM::matrixTree_ug_suLglbar, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      ChannelResult chan;
@@ -560,7 +560,7 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_ubarg_suLdaggergl, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
+                        std::bind(&MRSSM::matrixTree_ug_suLglbar, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      ChannelResult chan;
@@ -576,7 +576,7 @@ int main(int argc, char* argv[]) {
                      }
                      XSection_Tree tree(
                         parameters, m1, m2,
-                        std::bind(&MRSSM::matrixTree_ubarg_suRdaggerglbar, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
+                        std::bind(&MRSSM::matrixTree_ug_suLglbar, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
                         born_precision, born_verbosity
                      );
                      ChannelResult chan;

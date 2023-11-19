@@ -24,10 +24,10 @@ int forwarder(const int *ndim, const double xx[],
 int XSection_Tree::integrand(const int *ndim, const double xx[],
     const int *ncomp, double ff[], void *userdata) {
 
-   const double x1min = 4.*Sqr(m1_)/Sqr(sqrtS_);
+   const double x1min = Sqr(m1_ + m2_)/Sqr(sqrtS_);
    static constexpr double xmax = 1.;
    const double x1 = x1min + (xmax - x1min ) * xx[0];
-   const double x2min = 4.*Sqr(m1_/sqrtS_)/(x1);
+   const double x2min = Sqr((m1_+m2_)/sqrtS_)/(x1);
    const double x2 = x2min + (xmax - x2min) * xx[1];
    const double s = Sqr(sqrtS_) * x1 * x2;     //partonic
 
@@ -39,8 +39,8 @@ int XSection_Tree::integrand(const int *ndim, const double xx[],
 
    const double alphas = pdf_->alphasQ(muR_);
    /* integration of |M^B|^2 */
-      const double Tmin = Sqr(m1_) - 0.5*s - std::sqrt(0.25*Sqr(s) - Sqr(m1_)*s);
-      const double Tmax = Sqr(m1_) - 0.5*s + std::sqrt(0.25*Sqr(s) - Sqr(m1_)*s);
+      const double Tmin = 0.5*(Sqr(m1_) + Sqr(m2_) - s) - std::sqrt(0.25*Sqr(Sqr(m1_) + Sqr(m2_) - s) - Sqr(m1_*m2_));
+      const double Tmax = 0.5*(Sqr(m1_) + Sqr(m2_) - s) + std::sqrt(0.25*Sqr(Sqr(m1_) + Sqr(m2_) - s) - Sqr(m1_*m2_));
       const double T = Tmin + (Tmax-Tmin)*xx[2];
       const double jacobian = (Tmax-Tmin)*(xmax-x1min)*(xmax-x2min);
       const double squaredM = f(alphas, s, T, 0);
