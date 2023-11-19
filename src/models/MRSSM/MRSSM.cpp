@@ -32,6 +32,10 @@ double MRSSM::matrixTree_udbar_suLsdLdagger(double alphas, double S, double T, i
 #include "mrssm_gg_suLsuLdagger_born_matrix.cpp"
 #include "mrssm_uubar_glglbar_born_matrix.cpp"
 #include "mrssm_gg_glglbar_born_matrix.cpp"
+#include "mrssm_ubarg_suLdaggergl_born_matrix.cpp"
+#include "mrssm_ug_suLglbar_born_matrix.cpp"
+#include "mrssm_ubarg_suRdaggerglbar_born_matrix.cpp"
+#include "mrssm_ug_suRgl_born_matrix.cpp"
 
 double MRSSM::sigmaTree_uubar_suLsuLdagger(double alphas, double s12, double Dminus4) const {
    const double Alfas2 = pow<2>(alphas);

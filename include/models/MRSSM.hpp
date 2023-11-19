@@ -85,6 +85,11 @@ public:
    double matrixTree_uubar_glglbar(double, double, double, int) const;
    double matrixTree_gg_glglbar(double, double, double, int) const;
 
+   double matrixTree_ubarg_suLdaggergl(double, double, double, int) const;
+   double matrixTree_ug_suLglbar(double, double, double, int) const;
+   double matrixTree_ubarg_suRdaggerglbar(double, double, double, int) const;
+   double matrixTree_ug_suRgl(double, double, double, int) const;
+
 private:
       // gauge vector for DR ME
       const std::array<double, 4> eta;

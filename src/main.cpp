@@ -189,7 +189,8 @@ int main(int argc, char* argv[]) {
        pp_sqLsqR_w_cc,
        pp_suLsuLdagger,
        pp_sqsqdagger,
-       pp_glglbar
+       pp_glglbar,
+       pp_sqgl_w_cc
    };
 
    Process channel;
@@ -213,6 +214,9 @@ int main(int argc, char* argv[]) {
    }
    else if (pt.get<string>("process.process") == "pp_glglbar") {
       channel = Process::pp_glglbar;
+   }
+   else if (pt.get<string>("process.process") == "pp_sqgl+cc") {
+      channel = Process::pp_sqgl_w_cc;
    }
    else {
       cerr << "Error: Process not implemented\n";
@@ -279,6 +283,7 @@ int main(int argc, char* argv[]) {
       {
       switch(model) {
          case Model::MRSSM:
+         {
             const MRSSM mrssm(mrssm_params);
             switch(channel) {
                case Process::pp_suLsuR:
@@ -511,10 +516,88 @@ int main(int argc, char* argv[]) {
                   }
                   break;
                }
+               case Process::pp_sqgl_w_cc:
+               {
+                  const double m1 = pt.get<double>("masses.squarks");
+                  const double m2 = pt.get<double>("masses.gluino");
+                  std::array<double, 3> result {};
+                  {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {2}) {
+                        flav.push_back({i, 21, 2});
+                     }
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixTree_ug_suLglbar, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
+                        born_precision, born_verbosity
+                     );
+                     ChannelResult chan;
+                     chan.channel_name = "qg->sqLglbar";
+                     if(enable_born) chan.b = tree.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
+                  }
+                  {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {1,2,3,4,5}) {
+                        flav.push_back({i, 21, 2});
+                     }
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixTree_ug_suRgl, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
+                        born_precision, born_verbosity
+                     );
+                     ChannelResult chan;
+                     chan.channel_name = "qg->sqRgl";
+                     if(enable_born) chan.b = tree.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
+                  }
+                  {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {-1,-2,-3,-4,-5}) {
+                        flav.push_back({i, 21, 2});
+                     }
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixTree_ubarg_suLdaggergl, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
+                        born_precision, born_verbosity
+                     );
+                     ChannelResult chan;
+                     chan.channel_name = "qbarg->sqLdaggergl";
+                     if(enable_born) chan.b = tree.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
+                  }
+                  {
+                     std::vector<std::array<int, 3>> flav {};
+                     for (int i : {-1, -2, -3, -4, -5}) {
+                        flav.push_back({i, 21, 2});
+                     }
+                     XSection_Tree tree(
+                        parameters, m1, m2,
+                        std::bind(&MRSSM::matrixTree_ubarg_suRdaggerglbar, mrssm, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4), flav,
+                        born_precision, born_verbosity
+                     );
+                     ChannelResult chan;
+                     chan.channel_name = "qbarg->sqRdaggerglbar";
+                     if(enable_born) chan.b = tree.integrate();
+                     print_to_terminal(chan);
+                     allChannels.push_back(std::move(chan));
+                  }
+               }
                default:
                   break;
             } // end of process block
-         break;
+         }
+         case Model::MSSM:
+            const MSSM mssm(mssm_params);
+            switch(channel) {
+               case Process::pp_suLsuR:
+                  {
+                  }
+               break;
+            }
       } // end of model block
       break;
       } // end of LO block
