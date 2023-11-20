@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
       return 0;
    }
    if (vm.count("version")) {
-      std::cout << RSymSQCD_VERSION << std::endl;
+      std::cout << "RSymSQCD" << ' ' << RSymSQCD_VERSION << std::endl;
       return 0;
    }
 
