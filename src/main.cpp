@@ -67,7 +67,6 @@ int main(int argc, char* argv[]) {
 
    boost::program_options::variables_map vm;
    boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
-   boost::program_options::notify(vm);
 
    if (vm.count("help")) {
       cout << desc << '\n';
@@ -77,6 +76,8 @@ int main(int argc, char* argv[]) {
       std::cout << RSymSQCD_VERSION << std::endl;
       return 0;
    }
+
+   boost::program_options::notify(vm);
 
    spdlog::set_pattern("[%H:%M:%S] [%^%l%$] : %v");
    auto console = spdlog::stdout_color_mt("console");
