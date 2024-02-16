@@ -1,0 +1,10 @@
+   --------------------------------------------------------------
+      Final results and run summary:
+      Process p p > sql sqr [all=QCD] $$ xglu xglu~ ; p p > sqlc sqrc [all=QCD] $$ xglu xglu~
+      Run at p-p collider (6500.0 + 6500.0 GeV)
+      Total cross section: 1.774e-01 +- 3.9e-05 pb
+   --------------------------------------------------------------
+      Scale variation (computed from histogram information):
+          Dynamical_scale_choice 0 (envelope of 9 values):
+              1.774e-01 pb  +3.4% -7.4%
+   --------------------------------------------------------------

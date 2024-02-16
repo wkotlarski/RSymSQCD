@@ -1,0 +1,17 @@
+Added the following to 
+"
+local/share/gosam-contrib/gosam.conf
+to allow for linking with looptools
+#---#[ LT:
++gosam-contrib_fc.fcflags=-cpp -fPIC #-ff2c
++gosam-contrib_libql.ldflags=-L${LT}/lib64 -looptools
++gosam-contrib_libql.fcflags=-I${LT}/include
+#---#] LT: 
+"
+added renormalisation and looptools include to
+local/share/golem/templates/matrix/matrix.f90
+see matrix.f90 here
+
+change gs in
+local/share/golem/olp/templates/olp_module.f90
+to mdlG to account for BLHA2

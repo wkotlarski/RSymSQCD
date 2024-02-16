@@ -1,0 +1,87 @@
+name: tests
+
+on:
+  push:
+    branches:
+      - master
+      - development
+    paths-ignore:
+      - '.gitattributes'
+      - 'README.md'
+      - 'AUTHORS'
+      - 'COPYING'
+      - 'ancillary/MG-validation'
+      - 'ancillary/generate_MEs'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install ubuntu dependencies
+        run: |
+           sudo apt update
+           sudo apt upgrade -y
+           sudo apt install -y nlohmann-json3-dev libspdlog-dev libboost-program-options-dev libtbb-dev libgtest-dev
+
+      - name: Install LoopTools
+        run: |
+          cd /tmp
+          wget https://feynarts.de/looptools/LoopTools-2.16.tar.gz
+          tar -xf LoopTools-2.16.tar.gz
+          cd LoopTools-2.16
+          FFLAGS="-O3 -fPIC" ./configure --prefix=/home/runner/work/LoopTools
+          make -j2 install
+          cd ..
+          rm -r LoopTools-2.16
+
+      - name: Install LHAPDF
+        run: |
+          cd /tmp
+          wget https://lhapdf.hepforge.org/downloads/LHAPDF-6.5.4.tar.gz
+          tar -xf LHAPDF-6.5.4.tar.gz
+          cd LHAPDF-6.5.4
+          ./configure --prefix=/home/runner/work/LHAPDF
+          make -j2 install
+          cd ..
+          rm -r LHAPDF-6.5.4
+          export PATH=$PATH:/home/runner/work/LHAPDF/bin
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/runner/work/LHAPDF/lib
+          export PYTHONPATH=$PYTHONPATH:/home/runner/work/LHAPDF/local/lib/python3.10/dist-packages
+          lhapdf install MMHT2014lo68cl
+
+      - name: Install Cuba
+        run: |
+          cd /tmp
+          wget https://feynarts.de/cuba/Cuba-4.2.2.tar.gz
+          tar -xf Cuba-4.2.2.tar.gz
+          cd Cuba-4.2.2
+          ./configure --prefix=/home/runner/work/Cuba
+          make install
+          cd ..
+          rm -r Cuba-4.2.2
+
+      - name: Install rk
+        run: |
+          cd /tmp
+          wget https://rk.hepforge.org/downloads/rk-1.8.tar.gz
+          tar -xf rk-1.8.tar.gz
+          cd rk-1.8
+          ./configure --prefix=/home/runner/work/rk
+          make -j2 install
+          cd ..
+          rm -r rk-1.8
+
+      - name: Build
+        run: |
+          cmake -Bbuild -DLT_PREFIX=/home/runner/work/LoopTools -DCUBA_PREFIX=/home/runner/work/Cuba -DRK_PREFIX=/home/runner/work/rk -DLHAPDF6_ROOT_DIR=/home/runner/work/LHAPDF -DENABLE_TESTS=On -DCMAKE_CXX_COMPILER=clang++
+          cmake --build build -j2
+
+      - name: Test MEs
+        run: GTEST_COLOR=1 ctest --output-on-failure --test-dir build -R 'matrix'
+
+      - name: Test LO cross-sections
+        run: GTEST_COLOR=1 ctest --output-on-failure --test-dir build -R '^LO'

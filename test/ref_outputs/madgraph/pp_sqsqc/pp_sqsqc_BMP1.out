@@ -1,0 +1,10 @@
+      --------------------------------------------------------------
+      Final results and run summary:
+      Process p p > sq sqc [all=QCD] ; p p > sq sqc [all=QCD]
+      Run at p-p collider (6500.0 + 6500.0 GeV)
+      Total cross section: 4.44577063e-03 +- 5.1019e-07  (1.1476e-02%)
+   --------------------------------------------------------------
+      Scale variation (computed from histogram information):
+          Dynamical_scale_choice 0 (envelope of 9 values):
+              4.446e-03 pb  +14.1% -14.5%
+   --------------------------------------------------------------
